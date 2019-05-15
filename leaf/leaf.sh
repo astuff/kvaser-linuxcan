@@ -75,6 +75,7 @@ fi
 # Add or remove leaf module
 case "$1" in
    start)
+      /bin/sleep 3 # Sleep a second or two to be sure that module init is executed
       /sbin/rmmod leaf
       /sbin/$kv_module_install leaf || exit 1
       $LOG -t $0 "Module leaf added"

@@ -12,7 +12,7 @@ if [ -d /etc/hotplug ] ; then
 fi
 install -m 644 ../10-kvaser.rules /etc/udev/rules.d 
 
-if [ `$UDEVADM version` -lt 128 ] ; then
+if [ `udevd --version` -lt 128 ] ; then
   $UDEVCTRL reload_rules ;
 else
   $UDEVADM control --reload-rules ;

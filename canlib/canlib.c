@@ -158,6 +158,7 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser Leaf Professional LSS",                      {0x30002616, 0x00073301}},
           {"Kvaser Leaf SemiPro SWC",                           {0x30002630, 0x00073301}},
           {"Kvaser Leaf Professional SWC",                      {0x30002647, 0x00073301}},
+          {"Kvaser Leaf Professional LIN",                      {0x30002692, 0x00073301}},
           {"Kvaser PCIcanx 4xHS",                               {0x30003309, 0x00073301}},
           {"Kvaser PCIcanx HS/HS",                              {0x30003316, 0x00073301}},
           {"Kvaser PCIcanx HS",                                 {0x30003323, 0x00073301}},
@@ -187,7 +188,9 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser USBcan Pro SHS/HS",                          {0x30005716, 0x00073301}},
           {"Kvaser USBcan Pro SHS/SHS",                         {0x30005723, 0x00073301}},
           {"Kvaser USBcan R",                                   {0x30005792, 0x00073301}},
-          {"Kvaser BlackBird SemiPro",                          {0x30006294, 0x00073301}}
+          {"Kvaser BlackBird SemiPro",                          {0x30006294, 0x00073301}},
+          {"Kvaser USBcan Professional CB",                     {0x30006843, 0x00073301}},
+          {"Kvaser Leaf Light v2",                              {0x30006850, 0x00073301}}
 };
 
 //******************************************************

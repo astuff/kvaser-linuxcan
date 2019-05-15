@@ -1,0 +1,330 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML><HEAD></HEAD><BODY>
+<OBJECT type="text/site properties">
+<param name="FrameName" value="right">
+</OBJECT>
+<UL>
+<LI><OBJECT type="text/sitemap"><param name="Name" value="Welcome to Kvaser Linux CANLIB!"><param name="ImageNumber" value="1"></OBJECT>
+  <UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Help File Overview"><param name="Local" value="page_help_file_overview.html"><param name="ImageNumber" value="11"></OBJECT>
+    <UL>
+    </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="License and Copyright"><param name="Local" value="page_license_and_copyright.html"><param name="ImageNumber" value="11"></OBJECT>
+    <UL>
+    </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="CANLIB API Calls Grouped by Function"><param name="Local" value="page_canlib_api_calls_grouped_by_function.html"><param name="ImageNumber" value="11"></OBJECT>
+    <UL>
+    </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="CANLIB Core API Calls"><param name="Local" value="page_core_api_calls.html"><param name="ImageNumber" value="11"></OBJECT>
+    <UL>
+    </UL>
+  </UL>
+<LI><OBJECT type="text/sitemap"><param name="Name" value="Related Pages"><param name="ImageNumber" value="1"></OBJECT>
+  <UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="User's Guide"><param name="ImageNumber" value="1"></OBJECT>
+    <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Introduction"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="What is CANLIB?"><param name="Local" value="page_user_guide_intro_what.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Hello, CAN!"><param name="Local" value="page_user_guide_intro_hello.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Programmer's Overview"><param name="Local" value="page_user_guide_intro_programmers.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Initialization"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Library Initialization"><param name="Local" value="page_user_guide_init_lib_init.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Library Deinitialization and Cleanup"><param name="Local" value="page_user_guide_init_lib_deinit.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Chips and Channels"><param name="Local" value="page_user_guide_init_sel_channel.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Bit Rate and Other Bus Parameters"><param name="Local" value="page_user_guide_init_bit_rate.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="CAN Driver Modes"><param name="Local" value="page_user_guide_init_driver_modes.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Sending and Receiving"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Bus On / Bus Off"><param name="Local" value="page_user_guide_send_recv_bus_on_off.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Reading Messages"><param name="Local" value="page_user_guide_send_recv_reading.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Sending Messages"><param name="Local" value="page_user_guide_send_recv_sending.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Message Filters"><param name="Local" value="page_user_guide_send_recv_filters.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Overruns"><param name="Local" value="page_user_guide_send_recv_overruns.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Message Queue and Buffer Sizes"><param name="Local" value="page_user_guide_send_recv_queue_and_buf_sizes.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Object Buffers"><param name="Local" value="page_user_guide_send_recv_obj_buf.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Different CAN Frame Types"><param name="Local" value="page_user_guide_send_recv_sending_different_types.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Handling Bus Errors"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Handling Bus Errors"><param name="Local" value="page_user_guide_bus_errors_error_frames.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="SJA1000 Error Codes"><param name="Local" value="page_user_guide_bus_errors_sja1000_error_codes.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Using Threads"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Threaded Applications"><param name="Local" value="page_user_guide_threads_applications.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Getting and Setting Device Information"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Obtaining special information"><param name="Local" value="page_user_guide_dev_info_special.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Obtaining Status Information"><param name="Local" value="page_user_guide_dev_info_status.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Virtual Channels"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Virtual Channels"><param name="Local" value="page_user_guide_virtual_info.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Time Measurement"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Time Measurement"><param name="Local" value="page_user_guide_time_general.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Time Stamping Accuracy and Resolution"><param name="Local" value="page_user_guide_time_accuracy_and_resolution.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Using the LIN Bus"><param name="Local" value="page_user_guide_lin_intro.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Frequently Asked Questions"><param name="Local" value="page_user_guide_faq.html"><param name="ImageNumber" value="11"></OBJECT>
+      <UL>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Support"><param name="Local" value="page_user_guide_support.html"><param name="ImageNumber" value="11"></OBJECT>
+      <UL>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Miscellaneous Topics"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Message Flags"><param name="Local" value="page_user_guide_misc_message_flags.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Bit Rate Constants"><param name="Local" value="page_user_guide_misc_bitrate.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Code and Mask Format"><param name="Local" value="page_user_guide_misc_code_and_mask.html"><param name="ImageNumber" value="11"></OBJECT>
+        <UL>
+        </UL>
+      </UL>
+    </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Message Mailboxes"><param name="Local" value="page_user_guide_send_recv_mailboxes.html"><param name="ImageNumber" value="11"></OBJECT>
+    <UL>
+    </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Accessing the Databases"><param name="Local" value="page_user_guide_lin_candb.html"><param name="ImageNumber" value="11"></OBJECT>
+    <UL>
+    </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Code snippets"><param name="ImageNumber" value="1"></OBJECT>
+    <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Code Examples"><param name="Local" value="page_code_snippets_examples.html"><param name="ImageNumber" value="11"></OBJECT>
+      <UL>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Bit Rate Examples"><param name="Local" value="page_code_snippets_bit_rate.html"><param name="ImageNumber" value="11"></OBJECT>
+      <UL>
+      </UL>
+    </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Hardware Specific Notes"><param name="ImageNumber" value="1"></OBJECT>
+    <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="CAN Controller Specific Notes"><param name="Local" value="page_hardware_specific_can_controllers.html"><param name="ImageNumber" value="11"></OBJECT>
+      <UL>
+      </UL>
+    </UL>
+  </UL>
+<LI><OBJECT type="text/sitemap"><param name="Name" value="Modules"><param name="ImageNumber" value="1"></OBJECT>
+  <UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="General"><param name="ImageNumber" value="1"></OBJECT>
+    <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Functions"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canGetChannelData"><param name="Local" value="group___general.html#gab9552d1a588b0dbc144b097acba017b2"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canGetErrorText"><param name="Local" value="group___general.html#ga01a7a415c95c579750bcdd95a1d245c4"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canGetNumberOfChannels"><param name="Local" value="group___general.html#ga65169ca633cd30aa92b8a80e28a5378b"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canGetVersion"><param name="Local" value="group___general.html#gafb5688859c56ecb6f8d85705d3ec2f14"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canInitializeLibrary"><param name="Local" value="group___general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canIoCtl"><param name="Local" value="group___general.html#gaeaa24db97af22478ca51d48636c7bb12"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="kvSetNotifyCallback"><param name="Local" value="group___general.html#ga99976c5b8e2c534b27bf9ec2e715d8d3"><param name="ImageNumber" value="11"></OBJECT>
+      </UL>
+    </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="CAN"><param name="ImageNumber" value="1"></OBJECT>
+    <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Typedefs"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canNotifyData"><param name="Local" value="group___c_a_n.html#ga58db5be8859c14cd8a0c0f6963c64f26"><param name="ImageNumber" value="11"></OBJECT>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Functions"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canAccept"><param name="Local" value="group___c_a_n.html#gaa4ffd2fad1932ad5763c2c923a1a12d8"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canBusOff"><param name="Local" value="group___c_a_n.html#gaf1786cfbfd542b18b9c599d278837bd9"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canBusOn"><param name="Local" value="group___c_a_n.html#ga99c7c99cc71580f8099a1407f4f9ea1a"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canClose"><param name="Local" value="group___c_a_n.html#ga49525373a4d08d93c651ec10f79dd36b"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canFlushReceiveQueue"><param name="Local" value="group___c_a_n.html#ga7abcf8f512da6ab568850b9faa0bc28b"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canFlushTransmitQueue"><param name="Local" value="group___c_a_n.html#ga52a17bb8012bf025d127b4d29e5f3aa8"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canGetBusOutputControl"><param name="Local" value="group___c_a_n.html#ga1683419d56af8afdbfc9184678c82fdd"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canGetBusParams"><param name="Local" value="group___c_a_n.html#gaf2a734c0486030610389331685a3827a"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canGetRawHandle"><param name="Local" value="group___c_a_n.html#gaa1229ae7635c051a8f7fe545d9d8007a"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canOpenChannel"><param name="Local" value="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canRead"><param name="Local" value="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canReadErrorCounters"><param name="Local" value="group___c_a_n.html#gadb3a712bd123317043cb73e1008075c8"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canReadStatus"><param name="Local" value="group___c_a_n.html#gaca3da209fe673b3838a50a3abe831855"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canReadSync"><param name="Local" value="group___c_a_n.html#ga16356f4d646240ff2e640773d21f4d76"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canReadTimer"><param name="Local" value="group___c_a_n.html#ga04c2f80a23b992bf17591749192e8d48"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canReadWait"><param name="Local" value="group___c_a_n.html#gac01f98e282609b5f6aaf2b1eabfb83ec"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canResetBus"><param name="Local" value="group___c_a_n.html#gaecc8b56e75cf68548af53b2d432079af"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canSetBusOutputControl"><param name="Local" value="group___c_a_n.html#gafca31590718ac7101d065b0c18b2410e"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canSetBusParams"><param name="Local" value="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canSetBusParamsC200"><param name="Local" value="group___c_a_n.html#ga1a3ba0ef73eee6b97e886730ac696935"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canSetNotify"><param name="Local" value="group___c_a_n.html#gaa5dd0f277c7059169055321fbda87486"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canTranslateBaud"><param name="Local" value="group___c_a_n.html#gaf38b95fce4930347d9986887ec046e13"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canWrite"><param name="Local" value="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canWriteSync"><param name="Local" value="group___c_a_n.html#ga304cb3a7bc2874c1f8ad361a911bcd5f"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canWriteWait"><param name="Local" value="group___c_a_n.html#ga47d03bfcc31e290284e65211b61f15f3"><param name="ImageNumber" value="11"></OBJECT>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Data Structures"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canNotifyData"><param name="Local" value="structcan_notify_data.html"><param name="ImageNumber" value="11"></OBJECT>
+      </UL>
+    </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="Object buffers"><param name="ImageNumber" value="1"></OBJECT>
+    <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Functions"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canObjBufAllocate"><param name="Local" value="group___object_buffers.html#gaa189a35c78004d037eed4bd0c2bfa3ee"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canObjBufDisable"><param name="Local" value="group___object_buffers.html#gab1238b563ecf4523092ebe561ece87ea"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canObjBufEnable"><param name="Local" value="group___object_buffers.html#ga1ff3e82f6d0e9795a831e22183c6e7ec"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canObjBufFree"><param name="Local" value="group___object_buffers.html#ga7353b3671b897e1f33b88f9084857382"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canObjBufFreeAll"><param name="Local" value="group___object_buffers.html#gab299ecf20aa368b8ee253ba9610dff3b"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canObjBufSendBurst"><param name="Local" value="group___object_buffers.html#gae3e27cd339700f26897648895e1b37a0"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canObjBufSetFilter"><param name="Local" value="group___object_buffers.html#gaccca9d669c981e910c1805614ee40e72"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canObjBufSetFlags"><param name="Local" value="group___object_buffers.html#ga9369c2f47886d9f815fe5513d6f5b60b"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canObjBufSetMsgCount"><param name="Local" value="group___object_buffers.html#ga769ce97c3b7f3a8e246f872d7dbafe54"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canObjBufSetPeriod"><param name="Local" value="group___object_buffers.html#gaa23baa37921bf089d9123eb97f32541b"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="canObjBufWrite"><param name="Local" value="group___object_buffers.html#gad72611f11b4947c96c8d0b50f59b2173"><param name="ImageNumber" value="11"></OBJECT>
+      </UL>
+    </UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN"><param name="ImageNumber" value="1"></OBJECT>
+    <UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Defines"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="CompilerAssert"><param name="Local" value="group___l_i_n.html#ga147705d4bcf2fbb603385ec0dea71592"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_BIT_ERROR"><param name="Local" value="group___l_i_n.html#ga719cb4b7b29a67803d34ec60ea5e8a4d"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_CSUM_ERROR"><param name="Local" value="group___l_i_n.html#gaf7386e03bb99718fd308013450641cce"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_ENHANCED_CHECKSUM"><param name="Local" value="group___l_i_n.html#ga937225a25c3c24efabf7c8438ccecd09"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_MASTER"><param name="Local" value="group___l_i_n.html#gaddf7881b12723497542ff0f66222c46e"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_MSG_DISTURB_CSUM"><param name="Local" value="group___l_i_n.html#ga479885d0466fcaff2cb80dedd09a7805"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_MSG_DISTURB_PARITY"><param name="Local" value="group___l_i_n.html#gad4e1ec16e25ca05d694d1faff1ebf147"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_MSG_USE_ENHANCED_PARITY"><param name="Local" value="group___l_i_n.html#ga8c2ab5dd117f814cef07f6b072aaafc9"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_MSG_USE_STANDARD_PARITY"><param name="Local" value="group___l_i_n.html#ga88ace2b1c8f8f6ed08714fc8725a03f8"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_NODATA"><param name="Local" value="group___l_i_n.html#gaa7796bf62c2772d49bd5572e7302f55e"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_PARITY_ERROR"><param name="Local" value="group___l_i_n.html#ga79d31160f0025e7c6c7fe6d5cb843847"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_RX"><param name="Local" value="group___l_i_n.html#ga8a77e3db8950ff23e2a154d3c347f307"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_SLAVE"><param name="Local" value="group___l_i_n.html#ga9b19af88006130b3220a4ecb57cd4e0b"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_SYNCH_ERROR"><param name="Local" value="group___l_i_n.html#gad8f162919711144a9cc1ae398f569e53"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_TX"><param name="Local" value="group___l_i_n.html#gaa71a0b1071a3246b40ed830f32ed43ce"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_VARIABLE_DLC"><param name="Local" value="group___l_i_n.html#ga2edd31e15abb5f7cb8dd213fd707dfff"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LIN_WAKEUP_FRAME"><param name="Local" value="group___l_i_n.html#ga1837b69bf93680cfe775253ebb01e5ef"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LINERROR"><param name="Local" value="group___l_i_n.html#gab873580aa6b650d641cc2439b96a118a"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linINVALID_HANDLE"><param name="Local" value="group___l_i_n.html#gaf080de594ae6f3a531e9b530577e9ebe"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LINLIBAPI"><param name="Local" value="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb"><param name="ImageNumber" value="11"></OBJECT>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Typedefs"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LinHandle"><param name="Local" value="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a"><param name="ImageNumber" value="11"></OBJECT>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Enumerations"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LinStatus"><param name="Local" value="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14"><param name="ImageNumber" value="11"></OBJECT>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Functions"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linBusOff"><param name="Local" value="group___l_i_n.html#ga051ffc0c24d6322825cbc8ff21e50744"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linBusOn"><param name="Local" value="group___l_i_n.html#ga79ab73655c1749ad9fe2b784885e2dd9"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linClearMessage"><param name="Local" value="group___l_i_n.html#ga905647480dd89a7225e4b8ae0d82cb92"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linClose"><param name="Local" value="group___l_i_n.html#ga5d8cb59baccdefc9e772ad34c01c596f"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linGetCanHandle"><param name="Local" value="group___l_i_n.html#gadf904a2ba0101ac6dc622b6035cf0f5f"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linGetFirmwareVersion"><param name="Local" value="group___l_i_n.html#gafa260028be850e70a99c1b0706679583"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linGetTransceiverData"><param name="Local" value="group___l_i_n.html#ga95408cd6c8639514b4be8e188bd7b38a"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linInitializeLibrary"><param name="Local" value="group___l_i_n.html#gaf47a1f1078f6b3919e2b2d9dfd559d8b"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linOpenChannel"><param name="Local" value="group___l_i_n.html#ga040336f8176a10cb9578b47c42baef6b"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linReadMessage"><param name="Local" value="group___l_i_n.html#gaca2d874c870f16c11a4e8e158817d8bf"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linReadMessageWait"><param name="Local" value="group___l_i_n.html#gaa2f729a931bf644ce62b373ab7414250"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linReadTimer"><param name="Local" value="group___l_i_n.html#ga8af35ecbb1aca56baed27990f3d43d4b"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linRequestMessage"><param name="Local" value="group___l_i_n.html#ga068419b8b624d8918720a8907c4f9274"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linSetBitrate"><param name="Local" value="group___l_i_n.html#ga77e1463234ee6c67a71a2ab57f578b7f"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linSetupIllegalMessage"><param name="Local" value="group___l_i_n.html#ga1c89e03300af644cee54861f92ae567e"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linSetupLIN"><param name="Local" value="group___l_i_n.html#ga911287175a2ca5574a50d17b698b6d9d"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linUpdateMessage"><param name="Local" value="group___l_i_n.html#ga5bf84820248e95fde2718fa46304a5a5"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linWriteMessage"><param name="Local" value="group___l_i_n.html#gac012f34a621bc885bd582398c3d5d175"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linWriteSync"><param name="Local" value="group___l_i_n.html#ga1bd437b46f5923f05905c43cd4a1617a"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="linWriteWakeup"><param name="Local" value="group___l_i_n.html#ga4ba0a5256a785f3cc67a5e661837223e"><param name="ImageNumber" value="11"></OBJECT>
+      </UL>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Data Structures"><param name="ImageNumber" value="1"></OBJECT>
+      <UL>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="LinMessageInfo"><param name="Local" value="struct_lin_message_info.html"><param name="ImageNumber" value="11"></OBJECT>
+      </UL>
+    </UL>
+  </UL>
+<LI><OBJECT type="text/sitemap"><param name="Name" value="Data Structures"><param name="ImageNumber" value="1"></OBJECT>
+  <UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="canNotifyData"><param name="Local" value="structcan_notify_data.html"><param name="ImageNumber" value="11"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="canUserIoPortData"><param name="Local" value="structcan_user_io_port_data.html"><param name="ImageNumber" value="11"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="LinMessageInfo"><param name="Local" value="struct_lin_message_info.html"><param name="ImageNumber" value="11"></OBJECT>
+  </UL>
+<LI><OBJECT type="text/sitemap"><param name="Name" value="Data Structure Index"><param name="ImageNumber" value="1"></OBJECT>
+<LI><OBJECT type="text/sitemap"><param name="Name" value="Data Fields"><param name="Local" value="functions.html"><param name="ImageNumber" value="11"></OBJECT>
+<LI><OBJECT type="text/sitemap"><param name="Name" value="File List"><param name="ImageNumber" value="1"></OBJECT>
+  <UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="canlib.h"><param name="Local" value="canlib_8h.html"><param name="ImageNumber" value="11"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="canstat.h"><param name="Local" value="canstat_8h.html"><param name="ImageNumber" value="11"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="linlib.h"><param name="Local" value="linlib_8h.html"><param name="ImageNumber" value="11"></OBJECT>
+  </UL>
+<LI><OBJECT type="text/sitemap"><param name="Name" value="Examples"><param name="ImageNumber" value="1"></OBJECT>
+  <UL>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="busparms.c"><param name="Local" value="busparms_8c-example.html"><param name="ImageNumber" value="11"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="cancount.c"><param name="Local" value="cancount_8c-example.html"><param name="ImageNumber" value="11"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="canmonitor.c"><param name="Local" value="canmonitor_8c-example.html"><param name="ImageNumber" value="11"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="listChannels.c"><param name="Local" value="list_channels_8c-example.html"><param name="ImageNumber" value="11"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="opentest.c"><param name="Local" value="opentest_8c-example.html"><param name="ImageNumber" value="11"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="readTimerTest.c"><param name="Local" value="read_timer_test_8c-example.html"><param name="ImageNumber" value="11"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="simplewrite.c"><param name="Local" value="simplewrite_8c-example.html"><param name="ImageNumber" value="11"></OBJECT>
+  <LI><OBJECT type="text/sitemap"><param name="Name" value="writeloop.c"><param name="Local" value="writeloop_8c-example.html"><param name="ImageNumber" value="11"></OBJECT>
+  </UL>
+<LI><OBJECT type="text/sitemap"><param name="Name" value="Globals"><param name="Local" value="globals.html"><param name="ImageNumber" value="11"></OBJECT>
+</UL>
+</BODY>
+</HTML>

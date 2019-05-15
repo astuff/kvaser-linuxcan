@@ -76,7 +76,9 @@
 #include <linux/ioport.h>
 #include <linux/proc_fs.h>
 #include <asm/io.h>
-#include <asm/system.h>
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)
+#   include <asm/system.h>
+#endif
 #include <asm/bitops.h>
 #include <asm/uaccess.h>
 

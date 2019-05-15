@@ -70,7 +70,9 @@
 #include <linux/spinlock.h>
 #include <linux/delay.h>
 #include <linux/proc_fs.h>
-#include <asm/system.h>
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)
+#   include <asm/system.h>
+#endif
 #include <asm/bitops.h>
 #include <asm/uaccess.h>
 #include <linux/pci.h>

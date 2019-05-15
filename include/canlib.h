@@ -86,6 +86,9 @@ typedef int canHandle;
 /* Note the difference from the windows version */
 // #define canINVALID_HANDLE      0
 
+/**
+ * \ingroup CAN
+ */
 typedef struct canNotifyData {
   void *tag;
   int eventType;
@@ -171,6 +174,9 @@ typedef struct canNotifyData {
 #define canBITRATE_83K       (-8)
 #define canBITRATE_10K       (-9)
 
+#define CANID_METAMSG  (-1L)        // Like msgs containing bus status changes
+#define CANID_WILDCARD (-2L)        // We don't care or don't know
+
 // The BAUD_xxx names are retained for compability.
 #define BAUD_1M        (-1)
 #define BAUD_500K      (-2)
@@ -184,19 +190,10 @@ typedef struct canNotifyData {
 
 
 
-/*
-** IOCTL types
-*/
-#define canIOCTL_PREFER_EXT             1
-#define canIOCTL_PREFER_STD             2
-// 3,4 reserved.
-#define canIOCTL_CLEAR_ERROR_COUNTERS   5
-#define canIOCTL_SET_TIMER_SCALE        6
-#define canIOCTL_SET_TXACK              7
 
 
-#define CANID_METAMSG  (-1L)        // Like msgs containing bus status changes
-#define CANID_WILDCARD (-2L)        // We don't care or don't know
+
+
 
 //
 // Define CANLIBAPI unless it's done already.
@@ -261,9 +258,12 @@ canStatus CANLIBAPI canReadErrorCounters(const CanHandle hnd,
                                          unsigned int *rxErr,
                                          unsigned int *ovErr);
 
-canStatus CANLIBAPI canWrite(const CanHandle hnd, long id, void *msg,
-                             unsigned int dlc, unsigned int flag);
-  /*  */
+canStatus CANLIBAPI canWrite (const CanHandle hnd,
+                              long id,
+                              void *msg,
+                              unsigned int dlc,
+                              unsigned int flag);
+
 canStatus CANLIBAPI canWriteSync(const CanHandle hnd, unsigned long timeout);
 
 canStatus CANLIBAPI canRead(const CanHandle hnd,
@@ -288,7 +288,9 @@ canStatus CANLIBAPI canReadSpecific(const CanHandle hnd, long id, void * msg,
                                     unsigned int * dlc, unsigned int * flag,
                                     unsigned long * time);
 
-canStatus CANLIBAPI canReadSyncSpecific(const CanHandle hnd, long id, unsigned long timeout);
+canStatus CANLIBAPI canReadSyncSpecific(const CanHandle hnd,
+                                        long id,
+                                        unsigned long timeout);
 
 canStatus CANLIBAPI canReadSpecificSkip(const CanHandle hnd,
                                         long id,
@@ -305,7 +307,8 @@ canStatus CANLIBAPI canSetNotify(const CanHandle hnd,
 #else
 canStatus CANLIBAPI canSetNotify(const CanHandle hnd,
                                  void (*callback)(canNotifyData *),
-                                 unsigned int notifyFlags, void *tag);
+                                 unsigned int notifyFlags,
+                                 void *tag);
 #endif
 
 #if defined(_WIN32_WCE) || !defined(_WIN32)
@@ -319,12 +322,16 @@ canStatus CANLIBAPI canTranslateBaud(long *const freq,
                                      unsigned int *const nosamp,
                                      unsigned int *const syncMode);
 
-canStatus CANLIBAPI canGetErrorText(canStatus err, char *buf, unsigned int bufsiz);
-
 unsigned short CANLIBAPI canGetVersion(void);
 
-canStatus CANLIBAPI canIoCtl(const CanHandle hnd, unsigned int func,
-                             void *buf, unsigned int buflen);
+canStatus CANLIBAPI canGetErrorText(canStatus err, char *buf, unsigned int bufsiz);
+
+
+
+canStatus CANLIBAPI canIoCtl(const CanHandle hnd,
+                             unsigned int func,
+                             void *buf,
+                             unsigned int buflen);
 
 /* Note the difference from the windows version */
 #if defined(_WIN32) && !defined(_WIN32_WCE)
@@ -337,13 +344,16 @@ CanHandle CANLIBAPI canOpenChannel(int channel, int flags);
 
 canStatus CANLIBAPI canGetNumberOfChannels(int *channelCount);
 
-canStatus CANLIBAPI canGetChannelData(int channel, int item, void *buffer, size_t bufsize);
+canStatus CANLIBAPI canGetChannelData(int channel,
+                                      int item,
+                                      void *buffer,
+                                      size_t bufsize);
 
 #define canCHANNELDATA_CHANNEL_CAP                1
 #define canCHANNELDATA_TRANS_CAP                  2
-#define canCHANNELDATA_CHANNEL_FLAGS              3   // available, etc
-#define canCHANNELDATA_CARD_TYPE                  4   // canHWTYPE_xxx
-#define canCHANNELDATA_CARD_NUMBER                5   // Number in machine, 0,1,...
+#define canCHANNELDATA_CHANNEL_FLAGS              3
+#define canCHANNELDATA_CARD_TYPE                  4
+#define canCHANNELDATA_CARD_NUMBER                5
 #define canCHANNELDATA_CHAN_NO_ON_CARD            6
 #define canCHANNELDATA_CARD_SERIAL_NO             7
 #define canCHANNELDATA_TRANS_SERIAL_NO            8
@@ -404,7 +414,7 @@ canStatus CANLIBAPI canGetChannelData(int channel, int item, void *buffer, size_
 #define canHWTYPE_EAGLE           62       // Kvaser Eagle family
 #define canHWTYPE_BAGEL           64
 #define canHWTYPE_MINIPCIE        66
-
+#define canHWTYPE_USBCAN_KLINE    68
 
 // Channel capabilities.
 #define canCHANNEL_CAP_EXTENDED_CAN         0x00000001L
@@ -422,6 +432,15 @@ canStatus CANLIBAPI canGetChannelData(int channel, int item, void *buffer, size_
 // Driver (transceiver) capabilities
 #define canDRIVER_CAP_HIGHSPEED             0x00000001L
 
+/*
+** IOCTL types
+*/
+#define canIOCTL_PREFER_EXT                       1
+#define canIOCTL_PREFER_STD                       2
+// 3,4 reserved.
+#define canIOCTL_CLEAR_ERROR_COUNTERS             5
+#define canIOCTL_SET_TIMER_SCALE                  6
+#define canIOCTL_SET_TXACK                        7
 #define canIOCTL_GET_RX_BUFFER_LEVEL              8
 #define canIOCTL_GET_TX_BUFFER_LEVEL              9
 #define canIOCTL_FLUSH_RX_BUFFER                  10
@@ -430,7 +449,7 @@ canStatus CANLIBAPI canGetChannelData(int channel, int item, void *buffer, size_
 #define canIOCTL_SET_TXRQ                         13
 #define canIOCTL_GET_EVENTHANDLE                  14
 #define canIOCTL_SET_BYPASS_MODE                  15
-#define canIOCTL_SET_WAKEUP                      16
+#define canIOCTL_SET_WAKEUP                       16
 #if defined(CANLIB_DECLARE_ALL)
 # define canIOCTL_GET_DRIVERHANDLE                17
 # define canIOCTL_MAP_RXQUEUE                     18
@@ -521,6 +540,7 @@ canStatus CANLIBAPI canObjBufFreeAll(const CanHandle hnd);
 
 // Allocates an object buffer of the specified type.
 canStatus CANLIBAPI canObjBufAllocate(const CanHandle hnd, int type);
+
 #define canOBJBUF_TYPE_AUTO_RESPONSE            0x01
 #define canOBJBUF_TYPE_PERIODIC_TX              0x02
 
@@ -528,25 +548,37 @@ canStatus CANLIBAPI canObjBufAllocate(const CanHandle hnd, int type);
 canStatus CANLIBAPI canObjBufFree(const CanHandle hnd, int idx);
 
 // Writes CAN data to the object buffer with the specified index.
-canStatus CANLIBAPI canObjBufWrite(const CanHandle hnd, int idx, int id, void* msg,
-                                   unsigned int dlc, unsigned int flags);
+canStatus CANLIBAPI canObjBufWrite(const CanHandle hnd,
+                                   int idx,
+                                   int id,
+                                   void* msg,
+                                   unsigned int dlc,
+                                   unsigned int flags);
 
 // For an AUTO_RESPONSE buffer, set the code and mask that together define
 // the identifier(s) that trigger(s) the automatic response.
-canStatus CANLIBAPI canObjBufSetFilter(const CanHandle hnd, int idx,
-                                       unsigned int code, unsigned int mask);
+canStatus CANLIBAPI canObjBufSetFilter(const CanHandle hnd,
+                                       int idx,
+                                       unsigned int code,
+                                       unsigned int mask);
 
 // Sets buffer-speficic flags.
-canStatus CANLIBAPI canObjBufSetFlags(const CanHandle hnd, int idx, unsigned int flags);
+canStatus CANLIBAPI canObjBufSetFlags(const CanHandle hnd,
+                                      int idx,
+                                      unsigned int flags);
 // The buffer responds to RTRs only, not regular messages.
 // AUTO_RESPONSE buffers only
 #define canOBJBUF_AUTO_RESPONSE_RTR_ONLY        0x01
 
 // Sets transmission period for auto tx buffers.
-canStatus CANLIBAPI canObjBufSetPeriod(const CanHandle hnd, int idx, unsigned int period);
+canStatus CANLIBAPI canObjBufSetPeriod(const CanHandle hnd,
+                                       int idx,
+                                       unsigned int period);
 
 // Sets message count for auto tx buffers.
-canStatus CANLIBAPI canObjBufSetMsgCount(const CanHandle hnd, int idx, unsigned int count);
+canStatus CANLIBAPI canObjBufSetMsgCount(const CanHandle hnd,
+                                         int idx,
+                                         unsigned int count);
 
 // Enable object buffer with index idx.
 canStatus CANLIBAPI canObjBufEnable(const CanHandle hnd, int idx);
@@ -555,7 +587,9 @@ canStatus CANLIBAPI canObjBufEnable(const CanHandle hnd, int idx);
 canStatus CANLIBAPI canObjBufDisable(const CanHandle hnd, int idx);
 
 // For certain diagnostics.
-canStatus CANLIBAPI canObjBufSendBurst(const CanHandle hnd, int idx, unsigned int burstlen);
+canStatus CANLIBAPI canObjBufSendBurst(const CanHandle hnd,
+                                       int idx,
+                                       unsigned int burstlen);
 
 
 #if defined(CANLIB_DECLARE_ALL)
@@ -563,7 +597,11 @@ canStatus CANLIBAPI canObjBufSendBurst(const CanHandle hnd, int idx, unsigned in
 // Check for specific version(s) of CANLIB.
 #define canVERSION_DONT_ACCEPT_LATER      0x01
 #define canVERSION_DONT_ACCEPT_BETAS      0x02
-BOOL CANLIBAPI canProbeVersion(const CanHandle hnd, int major, int minor, int oem_id, unsigned int flags);
+BOOL CANLIBAPI canProbeVersion(const CanHandle hnd,
+                               int major,
+                               int minor,
+                               int oem_id,
+                               unsigned int flags);
 
 #endif
 
@@ -572,8 +610,11 @@ BOOL CANLIBAPI canProbeVersion(const CanHandle hnd, int major, int minor, int oe
 canStatus CANLIBAPI canResetBus(const CanHandle hnd);
 
 // Convenience function that combines canWrite and canWriteSync.
-canStatus CANLIBAPI canWriteWait(const CanHandle hnd, long id, void *msg,
-                                 unsigned int dlc, unsigned int flag,
+canStatus CANLIBAPI canWriteWait(const CanHandle hnd,
+                                 long id,
+                                 void *msg,
+                                 unsigned int dlc,
+                                 unsigned int flag,
                                  unsigned long timeout);
 
 
@@ -582,8 +623,10 @@ canStatus CANLIBAPI canWriteWait(const CanHandle hnd, long id, void *msg,
 // Tell canlib32.dll to unload its DLLs.
 canStatus CANLIBAPI canUnloadLibrary(void);
 
-canStatus CANLIBAPI canSetAcceptanceFilter(const CanHandle hnd, unsigned int code,
-                                           unsigned int mask, int is_extended);
+canStatus CANLIBAPI canSetAcceptanceFilter(const CanHandle hnd,
+                                           unsigned int code,
+                                           unsigned int mask,
+                                           int is_extended);
 #endif
 
 canStatus CANLIBAPI canFlushReceiveQueue(const CanHandle hnd);
@@ -596,10 +639,11 @@ canStatus CANLIBAPI kvGetApplicationMapping(int busType,
                                   int appChannel,
                                   int *resultingChannel);
 
-canStatus CANLIBAPI kvBeep(const CanHandle hnd, int freq, unsigned int duration);
+canStatus CANLIBAPI kvBeep(const CanHandle hnd,
+                           int freq,
+                           unsigned int duration);
 
 canStatus CANLIBAPI kvSelfTest(const CanHandle hnd, unsigned long *presults);
-
 
 #define kvLED_ACTION_ALL_LEDS_ON    0
 #define kvLED_ACTION_ALL_LEDS_OFF   1  
@@ -628,13 +672,20 @@ typedef struct canBusStatistics_s {
   unsigned long  overruns;
 } canBusStatistics;
 
-canStatus CANLIBAPI canGetBusStatistics(const CanHandle hnd, canBusStatistics *stat, size_t bufsiz);
+canStatus CANLIBAPI canGetBusStatistics(const CanHandle hnd,
+                                        canBusStatistics *stat,
+                                        size_t bufsiz);
 
 canStatus CANLIBAPI canSetBitrate(const CanHandle hnd, int bitrate);
 
-canStatus CANLIBAPI kvAnnounceIdentity(const CanHandle hnd, void *buf, size_t bufsiz);
+canStatus CANLIBAPI kvAnnounceIdentity(const CanHandle hnd,
+                                       void *buf,
+                                       size_t bufsiz);
 
-canStatus CANLIBAPI canGetHandleData(const CanHandle hnd, int item, void *buffer, size_t bufsize);
+canStatus CANLIBAPI canGetHandleData(const CanHandle hnd,
+                                     int item,
+                                     void *buffer,
+                                     size_t bufsize);
 
 
 typedef void *kvTimeDomain;
@@ -653,15 +704,23 @@ kvStatus CANLIBAPI kvTimeDomainCreate(kvTimeDomain *domain);
 kvStatus CANLIBAPI kvTimeDomainDelete(kvTimeDomain domain);
 
 kvStatus CANLIBAPI kvTimeDomainResetTime(kvTimeDomain domain);
-kvStatus CANLIBAPI kvTimeDomainGetData(kvTimeDomain domain, kvTimeDomainData *data, size_t bufsiz);
+kvStatus CANLIBAPI kvTimeDomainGetData(kvTimeDomain domain,
+                                       kvTimeDomainData *data,
+                                       size_t bufsiz);
 
-kvStatus CANLIBAPI kvTimeDomainAddHandle(kvTimeDomain domain, const CanHandle hnd);
-kvStatus CANLIBAPI kvTimeDomainRemoveHandle(kvTimeDomain domain, const CanHandle hnd);
+kvStatus CANLIBAPI kvTimeDomainAddHandle(kvTimeDomain domain,
+                                         const CanHandle hnd);
+kvStatus CANLIBAPI kvTimeDomainRemoveHandle(kvTimeDomain domain,
+                                            const CanHandle hnd);
 #endif
 
 
 typedef void (CANLIBAPI *kvCallback_t)(CanHandle hnd, void* context, unsigned int notifyEvent);
-kvStatus CANLIBAPI kvSetNotifyCallback(const CanHandle hnd, kvCallback_t callback, void* context, unsigned int notifyFlags);
+
+kvStatus CANLIBAPI kvSetNotifyCallback(const CanHandle hnd,
+                                       kvCallback_t callback,
+                                       void* context,
+                                       unsigned int notifyFlags);
 
 
 #if defined(CANLIB_DECLARE_ALL)
@@ -675,17 +734,24 @@ kvStatus CANLIBAPI kvSetNotifyCallback(const CanHandle hnd, kvCallback_t callbac
 #define kvBUSTYPE_VIRTUAL       7
 #define kvBUSTYPE_PC104_PLUS    8
 
-kvStatus CANLIBAPI kvGetSupportedInterfaceInfo(int index, char *hwName, size_t nameLen, int *hwType, int *hwBusType);
-
+kvStatus CANLIBAPI kvGetSupportedInterfaceInfo(int index,
+                                               char *hwName,
+                                               size_t nameLen,
+                                               int *hwType,
+                                               int *hwBusType);
 
 kvStatus CANLIBAPI kvReadTimer(const CanHandle hnd, unsigned int *time);
+
 #if defined(KVINT64)
 kvStatus CANLIBAPI kvReadTimer64(const CanHandle hnd, KVINT64 *time);
 #endif
 
-kvStatus CANLIBAPI kvReadDeviceCustomerData(const CanHandle hnd, int userNumber, int itemNumber, void *data, size_t bufsiz);
+kvStatus CANLIBAPI kvReadDeviceCustomerData(const CanHandle hnd,
+                                            int userNumber,
+                                            int itemNumber,
+                                            void *data,
+                                            size_t bufsiz);
 
-//����������������������������������������������������������������������������������������������������
 //
 // APIs for t-script
 // 
@@ -715,29 +781,39 @@ kvStatus     CANLIBAPI kvScriptEnvvarSetInt(kvEnvHandle eHnd, int val);
 
 kvStatus     CANLIBAPI kvScriptEnvvarGetInt(kvEnvHandle eHnd, int *val);
 
-kvStatus     CANLIBAPI kvScriptEnvvarSetData(kvEnvHandle eHnd, unsigned char *buf, int start_index, int data_len);
+kvStatus     CANLIBAPI kvScriptEnvvarSetData(kvEnvHandle eHnd,
+                                             unsigned char *buf,
+                                             int start_index,
+                                             int data_len);
 
 kvStatus     CANLIBAPI kvScriptEnvvarGetData(kvEnvHandle eHnd, unsigned char *buf, int start_index, int data_len);
 
-kvStatus     CANLIBAPI kvScriptGetMaxEnvvarSize(const CanHandle hnd, int *envvarSize);
+kvStatus CANLIBAPI kvScriptGetMaxEnvvarSize(const CanHandle hnd,
+                                            int *envvarSize);
 
-kvStatus CANLIBAPI kvScriptLoadFileOnDevice(const CanHandle hnd, int scriptNo, char *localFile);
+kvStatus CANLIBAPI kvScriptLoadFileOnDevice(const CanHandle hnd,
+                                            int scriptNo, char *localFile);
 
-kvStatus CANLIBAPI kvScriptLoadFile(const CanHandle hnd, int scriptNo, char *filePathOnPC);
+kvStatus CANLIBAPI kvScriptLoadFile(const CanHandle hnd,
+                                    int scriptNo,
+                                    char *filePathOnPC);
 
-kvStatus CANLIBAPI kvFileCopyToDevice(const CanHandle hnd, char *hostFileName, char *deviceFileName);
+kvStatus CANLIBAPI kvFileCopyToDevice(const CanHandle hnd,
+                                      char *hostFileName,
+                                      char *deviceFileName);
 
-kvStatus CANLIBAPI kvFileCopyFromDevice(const CanHandle hnd, char *deviceFileName, char *hostFileName);
+kvStatus CANLIBAPI kvFileCopyFromDevice(const CanHandle hnd,
+                                        char *deviceFileName,
+                                        char *hostFileName);
 
 kvStatus CANLIBAPI kvFileDelete(const CanHandle hnd, char *deviceFileName);
 
-kvStatus CANLIBAPI kvFileGetFileData(const CanHandle hnd, int fileNo, ... );                 // return list with names, sizes, optional checksums
+kvStatus CANLIBAPI kvFileGetFileData(const CanHandle hnd,
+                                     int fileNo, ... );                 // return list with names, sizes, optional checksums
 
 kvStatus CANLIBAPI kvGetFileCount(const CanHandle hnd, int *count);                          // return number of files
 
 kvStatus CANLIBAPI kvFileGetSystemData(const CanHandle hnd, int itemCode, int *result);
-
-//����������������������������������������������������������������������������������������������������
 
 
 //
@@ -747,8 +823,13 @@ kvStatus CANLIBAPI kvFileGetSystemData(const CanHandle hnd, int itemCode, int *r
 canStatus CANLIBAPI canReadEvent(const CanHandle hnd, CanEvent *event);
 #endif
 void CANLIBAPI canSetDebug(int d);
-canStatus CANLIBAPI canSetNotifyEx(const CanHandle hnd, HANDLE event, unsigned int flags);
-canStatus CANLIBAPI canSetTimer(const CanHandle hnd, DWORD interval, DWORD flags);
+canStatus CANLIBAPI canSetNotifyEx(const CanHandle hnd,
+                                   HANDLE event,
+                                   unsigned int flags);
+
+canStatus CANLIBAPI canSetTimer(const CanHandle hnd,
+                                DWORD interval,
+                                DWORD flags);
 #define canTIMER_CYCLIC             0x01
 #define canTIMER_EXPENSIVE          0x02
 int CANLIBAPI canSplitHandle(CanHandle hnd, int channel);

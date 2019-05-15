@@ -74,7 +74,9 @@
 #  include <linux/ioport.h>
 #  include <linux/proc_fs.h>
 #  include <asm/io.h>
-#  include <asm/system.h>
+#  if LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)
+#     include <asm/system.h>
+#  endif
 #  include <asm/bitops.h>
 #  include <asm/uaccess.h>
 #  include <asm/atomic.h>
@@ -253,11 +255,12 @@ int vCanDispatchEvent (VCanChanData *chd, VCAN_EVENT *e)
   os_if_spin_lock_irqsave(&chd->openLock, &irqFlags);
   for (fileNodePtr = chd->openFileList; fileNodePtr != NULL;
        fileNodePtr = fileNodePtr->next) {
+    unsigned char msg_flags = e->tagData.msg.flags;
     // Event filter
     if (!(e->tag & fileNodePtr->filter.eventMask)) {
       continue;
     }
-    if (e->tag == V_RECEIVE_MSG && e->tagData.msg.flags & VCAN_MSG_FLAG_TXACK) {
+    if (e->tag == V_RECEIVE_MSG && msg_flags & VCAN_MSG_FLAG_TXACK) {
       // Skip if we sent it ourselves and we don't want the ack
       if (e->transId == fileNodePtr->transId && !fileNodePtr->modeTx) {
         DEBUGPRINT(2, (TXT("TXACK Skipped since we sent it ourselves and we don't want the ack!\n")));
@@ -269,10 +272,10 @@ int vCanDispatchEvent (VCanChanData *chd, VCAN_EVENT *e)
           continue;
         }
         // Other receivers (virtual bus extension) should not see the TXACK.
-        e->tagData.msg.flags &= ~VCAN_MSG_FLAG_TXACK;
+        msg_flags &= ~VCAN_MSG_FLAG_TXACK;
       }
     }
-    if (e->tag == V_RECEIVE_MSG && e->tagData.msg.flags & VCAN_MSG_FLAG_TXRQ) {
+    if (e->tag == V_RECEIVE_MSG && msg_flags & VCAN_MSG_FLAG_TXRQ) {
       // Receive only if we sent it and we want the tx request
       if (e->transId != fileNodePtr->transId || !fileNodePtr->modeTxRq) {
         continue;
@@ -296,20 +299,29 @@ int vCanDispatchEvent (VCanChanData *chd, VCAN_EVENT *e)
         }
       }
 
-      if (e->tagData.msg.flags & VCAN_MSG_FLAG_OVERRUN) {
+      if (msg_flags & VCAN_MSG_FLAG_OVERRUN) {
         fileNodePtr->overruns++;
       }
 
       //
       // Check against the object buffers, if any.
       //
-      if (!(e->tagData.msg.flags & (VCAN_MSG_FLAG_TXRQ | VCAN_MSG_FLAG_TXACK)) &&
+      if (!(msg_flags & (VCAN_MSG_FLAG_TXRQ | VCAN_MSG_FLAG_TXACK)) &&
           ((objbuf_mask = objbuf_filter_match(fileNodePtr->objbuf,
                                               e->tagData.msg.id,
-                                              e->tagData.msg.flags)) != 0)) {
+                                              msg_flags)) != 0)) {
         // This is something that matched the code/mask for at least one buffer,
         // and it's *not* a TXRQ or a TXACK.
+#ifdef __arm__
+        unsigned int rd;
+        unsigned int new_rd;
+        do {
+          rd = atomic_read(&fileNodePtr->objbufActive);
+          new_rd = rd | objbuf_mask;
+        } while (atomic_cmpxchg(&fileNodePtr->objbufActive, rd, new_rd) != rd);
+#else
         atomic_set_mask(objbuf_mask, &fileNodePtr->objbufActive);
+#endif
         os_if_queue_task_not_default_queue(fileNodePtr->objbufTaskQ,
                                            &fileNodePtr->objbufWork);
       }

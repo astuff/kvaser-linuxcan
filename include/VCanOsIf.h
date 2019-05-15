@@ -278,7 +278,7 @@ typedef struct VCanOpenFileNode {
     OS_IF_TASK_QUEUE_HANDLE objbufWork;
     OS_IF_WQUEUE            *objbufTaskQ;
     OBJECT_BUFFER           *objbuf;
-    uint32_t                objbufActive;
+    atomic_t                objbufActive;
     uint32_t                overruns;
     struct VCanOpenFileNode *next;
 } VCanOpenFileNode;

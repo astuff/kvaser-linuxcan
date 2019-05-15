@@ -54,7 +54,8 @@
 #----------------------------------------
 # included in build
 #----------------------------------------
-USERLIBS  += canlib  
+USERLIBS  += canlib
+USERLIBS  += linlib
 
 DRIVERS   += leaf
 DRIVERS   += pcican
@@ -72,12 +73,15 @@ SUBDIRS   = $(USERLIBS) $(DRIVERS)
 
 #---------------------------------------------------------------------------
 # RULES
-.PHONY: debug canlib leaf minipciecan pcican pcican2 usbcanII virtualcan install clean
+.PHONY: debug canlib linlib leaf minipciecan pcican pcican2 usbcanII virtualcan install clean
 
 all:  $(SUBDIRS)
 
 canlib:
 	$(MAKE) -C canlib examples
+
+linlib:
+	$(MAKE) -C linlib
 
 pcican:
 	@cd ./pcican; $(MAKE) kv_module
@@ -100,6 +104,7 @@ virtualcan:
 install: $(DRIVERS)
 	@for dir in $(DRIVERS) ; do cd $$dir; echo Installing $$dir;./installscript.sh; cd ..; done
 	$(MAKE) -C canlib install
+	$(MAKE) -C linlib install
 
 clean:
 	@for dir in $(SUBDIRS) ; do cd $$dir; $(MAKE) clean; cd ..; done

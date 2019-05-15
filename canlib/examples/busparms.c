@@ -80,7 +80,7 @@ int main (int argc, char *argv[])
   canHandle h [2];
   
   for(j = 0 ; j < 2 ; j++) {
-    h[j] = canOpenChannel(j, canWANT_EXCLUSIVE | canWANT_EXTENDED);
+    h[j] = canOpenChannel(j, canOPEN_EXCLUSIVE | canOPEN_REQUIRE_EXTENDED);
     if (h[j] < 0) {
       printf("canOpenChannel (%d) failed\n", j);
       return -1;

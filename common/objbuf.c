@@ -132,7 +132,7 @@ static void objbuf_write_all (OS_IF_TASK_QUEUE_HANDLE *work)
     return;
   }
 
-  active_mask = fileNodePtr->objbufActive;
+  active_mask = atomic_read (&fileNodePtr->objbufActive);
   if (!active_mask) {
     os_if_up_sema(&fileNodePtr->ioctl_mutex);
     return;

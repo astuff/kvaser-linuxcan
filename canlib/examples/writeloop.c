@@ -104,7 +104,7 @@ int main (int argc, char *argv[])
   
   /* Open channel, set parameters and go on bus */
 
-  h = canOpenChannel(channel, canWANT_EXCLUSIVE | 0*canWANT_EXTENDED);
+  h = canOpenChannel(channel, canOPEN_EXCLUSIVE | 0*canOPEN_REQUIRE_EXTENDED);
   if (h < 0) {
     printf("canOpenChannel %d failed\n", channel);
     return -1;

@@ -75,6 +75,7 @@ fi
 #
 case "$1" in
    start)
+      /bin/sleep 3 # Sleep a second or two to be sure that module init is executed
       /sbin/rmmod usbcanII
       /sbin/$kv_module_install usbcanII || exit 1
       $LOG -t $0 "Module usbcanII added"

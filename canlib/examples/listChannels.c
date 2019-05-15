@@ -57,6 +57,7 @@
 
 #include "canlib.h"
 #include <stdio.h>
+#include <string.h>
 
  /*
  Lists available CAN channels
@@ -87,11 +88,20 @@ int main (int argc, char* argv[])
   }
 
   for (i = 0; i < chanCount; i++) {
-    stat = canGetChannelData(i, canCHANNELDATA_CHANNEL_NAME,
+    stat = canGetChannelData(i, canCHANNELDATA_DEVDESCR_ASCII,
                              &name, sizeof(name));
     if (stat < 0) {
-      printf("Error in canGetChannelData - CHANNEL_NAME\n");
+      printf("Error in canGetChannelData - DEVDESCR_ASCII\n");
       exit(1);
+    }
+
+    if (strcmp(name, "Kvaser Unknown") == 0) {
+      stat = canGetChannelData(i, canCHANNELDATA_CHANNEL_NAME,
+                               &name, sizeof(name));
+      if (stat < 0) {
+        printf("Error in canGetChannelData - CHANNEL_NAME\n");
+        exit(1);
+      }
     }
 
     stat = canGetChannelData(i, canCHANNELDATA_CARD_UPC_NO,

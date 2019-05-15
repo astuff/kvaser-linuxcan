@@ -1,5 +1,5 @@
 /*
-** Copyright 2002-2012 KVASER AB, Sweden.  All rights reserved.
+** Copyright 2002-2013 KVASER AB, Sweden.  All rights reserved.
 */
 
 ================================================================
@@ -21,6 +21,7 @@ Linux device drivers for
   *  KVASER USBcan R
   *  KVASER Memorator***
   *  KVASER Memorator Professional ****
+  *  KVASER Leaf Professional LIN
   *  KVASER Leaf Professional
   *  KVASER Leaf SemiPro
   *  KVASER Leaf Light
@@ -48,13 +49,14 @@ Version info
    * Significant testing under x86_64 SMP Ubuntu 10.10 (2.6.35).
    * Some testing under x86 SMP Ubuntu 11.04 (2.6.38).
    * Some testing under x86 and x86_64 SMP Ubuntu 12.04 (3.2.0).
-   * Compiled with gcc version 4.2.4, 4.4.5, 4.5.2 and 4.6.3.
-   * Used glibc version 2.7, 2.12.1, 2.13 and 2.15.
+   * Some testing under x86_64 SMP Ubuntu 7.04 (2.6.20)
+   * Compiled with gcc version 4.1.2, 4.2.4, 4.4.5, 4.5.2 and 4.6.3.
+   * Used glibc version 2.5, 2.7, 2.12.1, 2.13 and 2.15.
 
 ================================================================
-Information about version 4.82
+Information about version 5.0
 ================================================================
-Build improvements for recent Linux distributions.
+Build improvements for old and recent Linux distributions.
 Some bug fixes and improvements.
 
 KVASER LAPcan and LAPcanII are excluded from this release and on.
@@ -66,8 +68,16 @@ NOTE! While SMP (and fully preemptible kernel) has seen significant
       Feedback on use under SMP enabled (or fully preemptible)
       and 64 bit kernels is welcome.
       See the FAQ for information on how to disable SMP.
-NOTE! Read 'Known problems in version 4.82' below carefully.
+NOTE! Read 'Known problems in version 4.X' below carefully.
 
+================================================================
+Updates in version 5.0
+================================================================
+   * Fixed bug related to local tx echo
+   * Added support for Leaf Professional LIN
+   * Added LINlib
+   * Fixed build issue on ARM targets. (atomic_set_mask)
+   * Updated linuxcan documentation.
 
 ================================================================
 Updates in version 4.82
@@ -79,6 +89,7 @@ Updates in version 4.81
 ================================================================
    * Added missing licence headers
    * Cleaning files using unifdef
+
 ================================================================
 Updates in version 4.80
 ================================================================
@@ -447,7 +458,7 @@ Known problems in version 4.78 ALPHA
      (This is the same as under Windows.)
 
 ================================================================  
-Known problems in version 4.80 - 4.82
+Known problems in version 4.80 - 5.0
 ================================================================
    * Firmware bug in Leaf will cause it to start up in silent mode.
      (Set it to normal mode manually using canSetBusOutputControl().)
