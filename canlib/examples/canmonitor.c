@@ -63,23 +63,16 @@
 
 int i = 0;
 unsigned char willExit = 0;
+int last;
+time_t last_time = 0;
 
 
 void sighand (int sig)
 {
-  static int last;
-
   switch (sig) {
   case SIGINT:
     willExit = 1;
     alarm(0);
-    break;
-  case SIGALRM:
-    if (i != last) {
-      printf("rx : %d total: %d\n", i - last, i);
-    }
-    last = i;
-    alarm(1);
     break;
   }
 }
@@ -94,7 +87,7 @@ int main (int argc, char *argv[])
   unsigned char msg[8];
   unsigned int dlc;
   unsigned int flag;
-  unsigned long time;  
+  unsigned long t;
   int channel = 0;
   int bitrate = BAUD_1M;
   int j;
@@ -130,7 +123,7 @@ int main (int argc, char *argv[])
   while (!willExit) {
      
     do { 
-      ret = canReadWait(h, &id, &msg, &dlc, &flag, &time, -1);
+      ret = canReadWait(h, &id, &msg, &dlc, &flag, &t, -1);
       switch (ret) {
       case 0:
         printf("(%d) id:%ld dlc:%d data: ", i, id, dlc);
@@ -140,8 +133,17 @@ int main (int argc, char *argv[])
         for (j = 0; j < dlc; j++){
           printf("%2.2x ", msg[j]);
         }
-        printf(" flags:0x%x time:%ld\n", flag, time);
+        printf(" flags:0x%x time:%ld\n", flag, t);
         i++;
+	if (last_time == 0) {
+	  last_time = time(0);
+	} else if (time(0) > last_time) {
+	  last_time = time(0);
+	  if (i != last) {
+	    printf("rx : %d total: %d\n", i - last, i);
+	  }
+	  last = i;
+	}
         break;
       case canERR_NOMSG:
         break;

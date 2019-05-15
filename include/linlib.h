@@ -68,7 +68,9 @@ typedef int LinHandle;
  */
 #define linINVALID_HANDLE      ((LinHandle)(-1))
 
+#if !WIN32
 #  define CompilerAssert(exp) extern char _CompilerAssert[(exp) ? 1 : -1]
+#endif
 
 
 /**
@@ -106,6 +108,9 @@ typedef enum {
 
 
 // sizeof(LinMessageInfo) should be 68 for correct alignment
+#if WIN32
+#include <pshpack1.h>
+#endif
 
 /**
  * In certain LIN bus API calls, the following structure is used to provide more 
@@ -154,13 +159,13 @@ typedef struct {
 
   /**
    * The checksum as read from the LIN bus. Might not
-   * match the data in case of ::LIN_CSUM_ERROR.
+   * match the data in case of \ref LIN_CSUM_ERROR.
    */
   unsigned char checkSum;
 
   /**
    * The id with parity of the message as read from the
-   * LIN bus. Might be invalid in case of ::LIN_PARITY_ERROR.
+   * LIN bus. Might be invalid in case of \ref LIN_PARITY_ERROR.
    */
   unsigned char idPar;
 
@@ -179,13 +184,16 @@ typedef struct {
    unsigned long byteTime[8];
 } LinMessageInfo;
 
+#if WIN32
+#include <poppack.h>
+#endif
 
 
 /**
  * \name LIN message flags
  * \anchor LIN_xxx
- * The following flags can be returned from linReadMessage() and 
- * linReadMessageWait().
+ * The following flags can be returned from \ref linReadMessage() and 
+ * \ref linReadMessageWait().
  *
  * @{
  */
@@ -208,7 +216,17 @@ typedef struct {
 // Define LINLIBAPI unless it's done already.
 // (linlib.c provides its own definition of LINLIBAPI before including this file.)
 //
+#if WIN32
+#ifndef LINLIBAPI
+#   if defined(__BORLANDC__)
+#      define LINLIBAPI __stdcall
+#   elif defined(_MSC_VER) || defined(__MWERKS__) || defined(__GNUC__)
+#      define LINLIBAPI __stdcall
+#   endif
+#endif
+#else
 #define LINLIBAPI
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -217,9 +235,9 @@ extern "C" {
 /** 
  * This function initializes the LIN library and must be called before any other 
  * LIN function is called. If this function isn't called, subsequent calls to 
- * the other LIN functions will return ::linERR_NOTINITIALIZED.
+ * the other LIN functions will return \ref linERR_NOTINITIALIZED.
  *
- * \sa linOpenChannel()
+ * \sa \ref linOpenChannel()
  */
 void LINLIBAPI linInitializeLibrary(void);
 
@@ -235,7 +253,7 @@ void LINLIBAPI linInitializeLibrary(void);
  * interface is connected, or if the channel is connected to a CAN system. 
  *
  * \note Attempts to use the channel for LIN communication will be meaningful 
- * only if linGetTransceiverData() stores ::canTRANSCEIVER_TYPE_LIN in \a ttype. 
+ * only if \ref linGetTransceiverData() stores \ref canTRANSCEIVER_TYPE_LIN in \a ttype. 
  *
  * \note A LIN interface need not be powered for this call to succeed. 
  *
@@ -252,10 +270,10 @@ void LINLIBAPI linInitializeLibrary(void);
  * \param[out] ttype   A pointer to an integer where the transceiver type will 
  *                     be stored.
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  *
- * \sa linGetFirmwareVersion()
+ * \sa \ref linGetFirmwareVersion()
  */ 
 LinStatus LINLIBAPI linGetTransceiverData(int channel, unsigned char eanNo[8],
                                           unsigned char serNo[8], int *ttype);
@@ -269,9 +287,9 @@ LinStatus LINLIBAPI linGetTransceiverData(int channel, unsigned char eanNo[8],
  *
  * \param[in] channel  The number of the channel. Channel numbering is hardware
  *                     dependent. 
- *                     This is the same channel number as used by canOpenChannel().
- * \param[in] flags    Either one of the following values: ::LIN_MASTER or 
- *                     ::LIN_SLAVE. 
+ *                     This is the same channel number as used by \ref canOpenChannel().
+ * \param[in] flags    Either one of the following values: \ref LIN_MASTER or 
+ *                     \ref LIN_SLAVE. 
  *
  * \return If the call succeeds, a handle to the opened channel is returned. 
  * The handle is an integer greater than or equal to zero.
@@ -279,7 +297,7 @@ LinStatus LINLIBAPI linGetTransceiverData(int channel, unsigned char eanNo[8],
  * \return If the call fails, the return value is a negative integer indicating 
  * an error code. See \ref linERR_xxx for a list of possible error codes.
  *
- * \sa linClose()
+ * \sa \ref linClose()
  */
 LinHandle LINLIBAPI linOpenChannel(int channel, int flags);
 
@@ -299,10 +317,10 @@ LinHandle LINLIBAPI linOpenChannel(int channel, int flags);
  *
  * \param[in] h        A handle to an open LIN channel.
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  *
- * \sa linOpenChannel()
+ * \sa \ref linOpenChannel()
  */
 LinStatus LINLIBAPI linClose(LinHandle h);
 
@@ -310,7 +328,7 @@ LinStatus LINLIBAPI linClose(LinHandle h);
  * This function retrieves the firmware version from the LIN interface.
  *
  * 
- * \note The version numbers aren't valid until linBusOn() has been called.
+ * \note The version numbers aren't valid until \ref linBusOn() has been called.
  *
  * \note The firmware in the LIN interface is divided into two parts, the boot 
  * code and the application. The boot code is used only when reprogramming 
@@ -334,7 +352,7 @@ LinStatus LINLIBAPI linClose(LinHandle h);
  *                           of the application code is stored. 
  * \param[out] appVerBuild   A pointer to a byte where the build number of the application is stored. 
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  */
 LinStatus LINLIBAPI linGetFirmwareVersion(LinHandle h,
@@ -356,7 +374,7 @@ LinStatus LINLIBAPI linGetFirmwareVersion(LinHandle h,
  * \param[in] h   A handle to an open LIN channel.
  * \param[in] bps Bit rate in bits per second.
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  */
 LinStatus LINLIBAPI linSetBitrate(LinHandle h, unsigned int bps);
@@ -368,10 +386,10 @@ LinStatus LINLIBAPI linSetBitrate(LinHandle h, unsigned int bps);
  *
  * \param[in] h A handle to an open LIN channel.
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  *
- * \sa linBusOff()
+ * \sa \ref linBusOff()
  */
 LinStatus LINLIBAPI linBusOn(LinHandle h);
 
@@ -381,10 +399,10 @@ LinStatus LINLIBAPI linBusOn(LinHandle h);
  *
  * \param[in] h A handle to an open LIN channel.
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  *
- * \sa linBusOn()
+ * \sa \ref linBusOn()
  */
 LinStatus LINLIBAPI linBusOff(LinHandle h);
 
@@ -394,7 +412,7 @@ LinStatus LINLIBAPI linBusOff(LinHandle h);
  * \note For convenience, this call returns the timer value instead of passing 
  * it in a parameter. This means that if the call fails, it will still return 
  * a value (which then is the error code, type casted to a long unsigned 
- * integer - e.g. 0xFFFFFFF2 for ::linERR_INVHANDLE. Watch out. 
+ * integer - e.g. 0xFFFFFFF2 for \ref linERR_INVHANDLE. Watch out. 
  *
  * \param[in] h        A handle to an open LIN channel.
  * \return If the call succeeds, the present timer value is returned.
@@ -403,7 +421,7 @@ unsigned long LINLIBAPI linReadTimer(LinHandle h);
 
 /** 
  * Write a LIN message.
- * It is advisable to wait until the message is echoed by linReadMessage() 
+ * It is advisable to wait until the message is echoed by \ref linReadMessage() 
  * before transmitting a new message, or in case of a schedule table being used, 
  * transmit the next message when the previous one is known to be complete.
  * 
@@ -415,10 +433,10 @@ unsigned long LINLIBAPI linReadTimer(LinHandle h);
  *                     message.
  * \param[in] dlc      The length of the LIN message. 
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  *
- * \sa inWriteSync()
+ * \sa \ref linWriteSync()
  */
 LinStatus LINLIBAPI linWriteMessage(LinHandle h, unsigned int id, const void *msg,
                                     unsigned int dlc);
@@ -432,18 +450,18 @@ LinStatus LINLIBAPI linWriteMessage(LinHandle h, unsigned int id, const void *ms
  * \param[in] h        A handle to an open LIN channel.
  * \param[in] id       The identifier of the LIN message. 
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  */
 LinStatus LINLIBAPI linRequestMessage(LinHandle h, unsigned int id);
 
 /** 
  * Read a message from the LIN interface. If a message is available for 
- * reception, ::linOK is returned. This is a non-blocking call. If no message 
+ * reception, \ref linOK is returned. This is a non-blocking call. If no message 
  * is available in the LIN interface, an error code is returned.
  *
  * \note This call will also return echoes of what the LIN interface is 
- * transmitting with linWriteMessage. In other words, the LIN interface can hear 
+ * transmitting with \ref linWriteMessage. In other words, the LIN interface can hear 
  * itself. 
  *
  * \param[in] h        A handle to an open LIN channel.
@@ -454,13 +472,13 @@ LinStatus LINLIBAPI linRequestMessage(LinHandle h, unsigned int id);
  * \param[out] dlc     A pointer to an integer where the length of the received 
  *                     LIN message will be stored. 
  * \param[out] flags   A combination of zero or more of the \ref LIN_xxx flags. 
- * \param[out] msgInfo A pointer to a ::LinMessageInfo struct where data about the 
+ * \param[out] msgInfo A pointer to a \ref LinMessageInfo struct where data about the 
  *                     received LIN message will be stored. 
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  *
- * \sa linReadMessageWait()
+ * \sa \ref linReadMessageWait()
  */
 LinStatus LINLIBAPI linReadMessage(LinHandle h, unsigned int *id, void *msg,
                                    unsigned int *dlc, unsigned int *flags,
@@ -468,12 +486,12 @@ LinStatus LINLIBAPI linReadMessage(LinHandle h, unsigned int *id, void *msg,
 
 /** 
  * Read a message from the LIN interface. If a message is available for 
- * reception, ::linOK is returned. This is a blocking call. It waits until a 
+ * reception, \ref linOK is returned. This is a blocking call. It waits until a 
  * message is received in the LIN interface, or the specified timeout period 
  * elapses.
  *
  * \note This call will also return echoes of what the LIN interface is 
- * transmitting with linWriteMessage(). In other words, the LIN interface can
+ * transmitting with \ref linWriteMessage(). In other words, the LIN interface can
  * hear itself. 
  *
  * \param[in] h        A handle to an open LIN channel.
@@ -486,13 +504,13 @@ LinStatus LINLIBAPI linReadMessage(LinHandle h, unsigned int *id, void *msg,
  * \param[out] dlc     A pointer to an integer where the length of the received 
  *                     LIN message will be stored. 
  * \param[out] flags   A combination of zero or more of the \ref LIN_xxx flags. 
- * \param[out] msgInfo A pointer to a ::LinMessageInfo struct where data about the 
+ * \param[out] msgInfo A pointer to a \ref LinMessageInfo struct where data about the 
  *                     received LIN message will be stored. 
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  *
- * \sa linReadMessage()
+ * \sa \ref linReadMessage()
  */
 LinStatus LINLIBAPI linReadMessageWait(LinHandle h, unsigned int *id, void *msg,
                                        unsigned int *dlc, unsigned int *flags,
@@ -510,10 +528,10 @@ LinStatus LINLIBAPI linReadMessageWait(LinHandle h, unsigned int *id, void *msg,
  * \param[in] msg      A pointer to a buffer containing the data of the LIN message.
  * \param[in] dlc      The length of the LIN message. 
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  *
- * \sa linClearMessage()
+ * \sa \ref linClearMessage()
  */
 LinStatus LINLIBAPI linUpdateMessage(LinHandle h, unsigned int id, const void *msg,
                                      unsigned int dlc);
@@ -536,10 +554,10 @@ LinStatus LINLIBAPI linUpdateMessage(LinHandle h, unsigned int id, const void *m
  * \param[in] delay    The delay parameter will result in a delay of this many 
  *                     bittimes after the header and before the first data byte. 
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  *
- * \sa inSetupLIN()
+ * \sa \ref linSetupLIN()
  */
 LinStatus LINLIBAPI linSetupIllegalMessage(LinHandle h, unsigned int id,
                                            unsigned int cFlags, unsigned int delay);
@@ -592,20 +610,20 @@ LinStatus LINLIBAPI linSetupIllegalMessage(LinHandle h, unsigned int id,
  *
  * \note The LIN Interface must be on bus for this command to work.
  * \note It is supported in firmware version 2.5.1 and later.
- * \note For LIN 2.0 compliance, you must specify both ::LIN_ENHANCED_CHECKSUM 
- * and ::LIN_VARIABLE_DLC. 
+ * \note For LIN 2.0 compliance, you must specify both \ref LIN_ENHANCED_CHECKSUM 
+ * and \ref LIN_VARIABLE_DLC. 
  *
  * \param[in] h        A handle to an open LIN channel.
  * \param[in] lFlags   One or more of the following flags: 
- *                     ::LIN_ENHANCED_CHECKSUM, ::LIN_VARIABLE_DLC 
+ *                     \ref LIN_ENHANCED_CHECKSUM, \ref LIN_VARIABLE_DLC 
  * \param bps          Specifies the bit rate in bits per second. This parameter 
  *                     can be used only in master mode. The bit rate is set 
  *                     without going off bus. 
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  *
- * \sa linSetupIllegalMessage()
+ * \sa \ref linSetupIllegalMessage()
  */
 LinStatus LINLIBAPI linSetupLIN(LinHandle h, unsigned int lFlags, unsigned int bps);
 
@@ -617,7 +635,7 @@ LinStatus LINLIBAPI linSetupLIN(LinHandle h, unsigned int lFlags, unsigned int b
 /**
  * When specified, the LIN interface will use the "enhanced" checksum according 
  * to LIN 2.0. Note that (as per the LIN 2.0 spec) the enhanced checksum is not 
- * used on the diagnostic frames even if the ::LIN_ENHANCED_CHECKSUM setting 
+ * used on the diagnostic frames even if the \ref LIN_ENHANCED_CHECKSUM setting 
  * is in effect. 
  *
  * The default value is OFF.
@@ -645,7 +663,7 @@ LinStatus LINLIBAPI linSetupLIN(LinHandle h, unsigned int lFlags, unsigned int b
  * \param[in] count    The number of wakeup frames to send. 
  * \param[in] interval The time, in bit times, between the wakeup frames.
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  */
 LinStatus LINLIBAPI linWriteWakeup(LinHandle h, unsigned int count,
@@ -660,7 +678,7 @@ LinStatus LINLIBAPI linWriteWakeup(LinHandle h, unsigned int count,
  * \param[in] id       The LIN message id for which the corresponding buffer 
  *                     will be cleared. 
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  */
 LinStatus LINLIBAPI linClearMessage(LinHandle h, unsigned int id);
@@ -672,27 +690,27 @@ LinStatus LINLIBAPI linClearMessage(LinHandle h, unsigned int id);
  * When messages are transmitted to the LIN Interface, they are queued by
  * Windows before appearing on the CAN bus.
  *
- * The function returns ::linOK if all writes are done, ::linERR_TIMEOUT in
+ * The function returns \ref linOK if all writes are done, \ref linERR_TIMEOUT in
  * case of timeout or possibly some other error code.
  *
  * If the LIN Interface is in master mode and a LIN message has been 
- * transmitted with linWriteMessage(), this function will return when
+ * transmitted with \ref linWriteMessage(), this function will return when
  * the LIN Interface has received the message. If another LIN messa ge is being
  * received or transmitted, the message will not be transmitted on the
  * LIN bus at once. And even if the LIN Interface is idle, the header of the new
- * message will just have been started when linWriteSync() retur ns.
+ * message will just have been started when \ref linWriteSync() retur ns.
  * 
- * After calling linUpdateMessage() and linClearMessage() for a slave,
+ * After calling \ref linUpdateMessage() and \ref linClearMessage() for a slave,
  * this function is enough to know that the LIN Interface is updated. 
  * 
- * After linWriteMessage(), it is advisable to wait until the message is
- * echoed by linReadMessage() before transmitting a new message, or in
+ * After \ref linWriteMessage(), it is advisable to wait until the message is
+ * echoed by \ref linReadMessage() before transmitting a new message, or in
  * case of a schedule table being used, transmit the next message when
  * the previous one is known to be complete.
  *
  * When, in master mode, a message should be transmitted after a poll
- * (reception) is done, it might be necessary to call linWriteMessage()
- * before the result is received via linReadMessage() as the LIN Interface waits
+ * (reception) is done, it might be necessary to call \ref linWriteMessage()
+ * before the result is received via \ref linReadMessage() as the LIN Interface waits
  * up to the maximum frame length before knowing a received message is
  * complete. A new message to transmit will force completion if the
  * currently received one.
@@ -701,10 +719,10 @@ LinStatus LINLIBAPI linClearMessage(LinHandle h, unsigned int id);
  * \param[in] timeout  The maximum number of milliseconds to wait for the queued 
  *                     messages to be transmitted by the LIN interface. 
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  *
- * \sa linWriteMessage()
+ * \sa \ref linWriteMessage()
  */
 LinStatus LINLIBAPI linWriteSync(LinHandle h, unsigned long timeout);
 
@@ -715,7 +733,7 @@ LinStatus LINLIBAPI linWriteSync(LinHandle h, unsigned long timeout);
  * \param[out] canHandle  A pointer to an integer where the CAN handle will be 
  *                        stored. 
  *
- * \return ::linOK (zero) if success
+ * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
  */
 LinStatus LINLIBAPI linGetCanHandle(LinHandle h, unsigned int *canHandle);

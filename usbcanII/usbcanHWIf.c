@@ -410,6 +410,9 @@ static int usbcan_rx_thread (void *context)
           count += cmd->head.cmdLen;
         }
 
+#if WIN32
+        BREAK(0x2000, "rx_thread2");
+#endif
         usbcan_handle_command(cmd, vCard);
         usbErrorCounter = 0;
       }
@@ -998,6 +1001,9 @@ static void usbcan_send (OS_IF_TASK_QUEUE_HANDLE *work)
   // Wait for a previous write to finish up; we don't use a timeout
   // and so a nonresponsive device can delay us indefinitely. qqq
   os_if_down_sema(&dev->write_finished);
+#if WIN32
+  complete_write(dev);
+#endif
 
   if (!dev->present) {
     // The device was unplugged before the file was released
@@ -1319,6 +1325,9 @@ static int usbcan_transmit (VCanCardData *vCard /*, void *cmd*/)
   if (retval) {
     DEBUGPRINT(1, (TXT("%s - failed submitting write urb, error %d"),
                    __FUNCTION__, retval));
+#if WIN32
+    dev->write_urb->status = (USB_ERROR)dev->write_urb->transfer_handle;
+#endif
     retval = -1; // qqq, VCAN_STAT_FAIL ???
   }
   else {
@@ -1839,6 +1848,21 @@ static int DEVINIT usbcan_allocate (VCanCardData **in_vCard)
   }
   memset(chs, 0, sizeof(ChanHelperStruct));
 
+#if WIN32
+  {
+    UsbcanCardData *dev = vCard->hwCardData;
+
+    dev->read_urb = os_if_kernel_malloc(sizeof(*dev->read_urb) +
+                                        sizeof(*dev->write_urb));
+    if (!dev->read_urb) {
+      DEBUGPRINT(1, (TXT("Could not allocate read/write_urb")));
+      os_if_kernel_free(chs);
+      goto chan_alloc_err;
+    }
+    memset(dev->read_urb, 0, sizeof(*dev->read_urb) + sizeof(*dev->write_urb));
+    dev->write_urb = dev->read_urb + 1;
+  }
+#endif
 
   // Init array and hwChanData
   for (chNr = 0; chNr < MAX_CHANNELS; chNr++) {
@@ -2006,6 +2030,9 @@ static void DEVEXIT usbcan_remove (struct usb_interface *interface)
   USB_KILL_URB(dev->write_urb);
   DEBUGPRINT(6, (TXT("Unlinking urb\n")));
   os_if_down_sema(&dev->write_finished);
+#if WIN32
+  complete_write(dev);
+#endif
 
   // Remove spin locks
   for (i = 0; i < MAX_CHANNELS; i++) {
@@ -2148,6 +2175,11 @@ static int usbcan_set_silent (VCanChanData *vChan, int silent)
 //
 static int usbcan_set_trans_type (VCanChanData *vChan, int linemode, int resnet)
 {
+#if WIN32
+  UNREFERENCED_PARAMETER(vChan);
+  UNREFERENCED_PARAMETER(linemode);
+  UNREFERENCED_PARAMETER(resnet);
+#endif
   // qqq Not implemented
   DEBUGPRINT(3, (TXT("usbcan: _set_trans_type is NOT implemented!\n")));
 

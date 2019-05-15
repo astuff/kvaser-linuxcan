@@ -58,6 +58,10 @@
 #define _USBCAN_HW_IF_H_
 
 
+#if WIN32
+#include "vcanevt.h"
+#include "VCanOSif.h"
+#endif
 
 #include "osif_kernel.h"
 #include "helios_cmds.h"

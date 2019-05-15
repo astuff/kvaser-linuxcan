@@ -50,13 +50,26 @@
 ** ---------------------------------------------------------------------------
 **/
 
+#if WIN32
+#  include <windows.h>
+#  include <winioctl.h>
+#  include <mmsystem.h>
+#else
 #  include <sys/time.h>
 #  include <unistd.h>
+#endif
 #include <canlib.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
 
+#if WIN32
+#  include "vcanio.h"
+#  include "kcanio.h"
+#  include "debug.h"
+
+#  define LINLIBAPI __stdcall
+#else
 #  include <pthread.h>
 
 #  define canOPEN_REQUIRE_INIT_ACCESS 0    // qqq Not available in Linux
@@ -65,6 +78,7 @@
 #  define OutputDebugString(buf)
 #  define CRITICAL_SECTION            pthread_mutex_t
 #  define PRINTF(x)                   dbg_printf x
+#endif
 
 #include <linlib.h>
 
@@ -99,6 +113,9 @@ static void dbg_printf(const char *fmt, ...)
 }
 
 
+#if WIN32
+#include "pshpack1.h"
+#endif
 
 CRITICAL_SECTION    crit;
 
@@ -132,6 +149,9 @@ typedef struct {
 typedef struct {
   uint16 t[8];
 } TimingBytes;
+#if WIN32
+#include "poppack.h"
+#endif
 
 CompilerAssert(sizeof(Timing0) == 8);
 CompilerAssert(sizeof(Timing1) == 8);
@@ -213,6 +233,7 @@ static LinStatus lin_read_version(LinHandleInt lh, BOOL reboot);
 
 
 
+#if !WIN32
 void EnterCriticalSection (void *crit)
 {
   pthread_mutex_lock(crit);
@@ -245,6 +266,7 @@ static void Sleep (int len)
 {
   usleep(len * 1000);
 }
+#endif
 
 
 //===========================================================================
@@ -626,12 +648,17 @@ unsigned long LINLIBAPI linReadTimer(LinHandle h)
     LeaveCriticalSection(&crit);
     return (unsigned long)linERR_INVHANDLE;
   }
+#if WIN32
+  LeaveCriticalSection(&crit);
+  return canReadTimer(lh->ch); 
+#else
   {
     unsigned long time = 0;
     (void)canReadTimer(lh->ch, &time);  // Can't do anything about error!
     LeaveCriticalSection(&crit);
     return time;
   }
+#endif
 }
 
 
@@ -1256,6 +1283,9 @@ LinStatus LINLIBAPI linGetTransceiverData(int channel,
   canStatus stat;
   int hnd;
   DWORD hwtype;
+#if WIN32
+  HANDLE driver_handle;
+#endif
 
   stat = canGetChannelData(channel, canCHANNELDATA_CARD_TYPE, &hwtype, sizeof(hwtype));
   if (stat != canOK) {
@@ -1289,6 +1319,43 @@ LinStatus LINLIBAPI linGetTransceiverData(int channel,
   }
 
   // qqq There is no equivalent to this in the current Linux driver!
+#if WIN32
+  hnd = canOpenChannel(channel, 0);
+  if (hnd < 0) {
+    return linERR_NOTFOUND;
+  }
+
+  driver_handle = INVALID_HANDLE_VALUE;
+  stat = canIoCtl(hnd,
+                  canIOCTL_GET_DRIVERHANDLE,
+                  &driver_handle,
+                  sizeof(driver_handle));
+  
+  if (stat == canOK) {
+    unsigned long size = 0;
+    BOOL ok;
+
+    VCAN_IOCTL_CHANNEL_INFO ioctl_channel_info;
+    ok = DeviceIoControl(driver_handle,
+                         VCAN_IOCTL_GET_CHANNEL_INFO,
+                         &ioctl_channel_info, sizeof(ioctl_channel_info),
+                         &ioctl_channel_info, sizeof(ioctl_channel_info),
+                         &size,
+                         NULL);
+    if (ok)
+      *ttype = ioctl_channel_info.can_transceiver_type;
+    else
+      stat = canERR_DRIVERFAILED;
+  }
+  (void)canClose(hnd);
+  
+  if (stat == canOK)
+    return linOK;
+  else if (stat == canERR_DRIVERFAILED)
+    return linERR_DRIVERFAILED;
+  else
+    return linERR_CANERROR;
+#else
   // Is this a Leaf Professional LIN?
   if ((*(DWORD *)&eanNo[4] == 0x00073301) &&
       (*(DWORD *)&eanNo[0] == 0x30002692)) {
@@ -1297,6 +1364,7 @@ LinStatus LINLIBAPI linGetTransceiverData(int channel,
     *ttype = 0;   // We're not interested in anything besides LIN, so...
   }
   return linOK;
+#endif
 }
 
 
@@ -1532,3 +1600,30 @@ static LinStatus lin_command(LinHandleInt lh,
 }
 
 
+#if WIN32
+//===========================================================================
+int WINAPI
+#ifdef __BORLANDC__
+   DllEntryPoint
+#else
+   DllMain
+#endif
+   (HINSTANCE hinst, unsigned long reason, void* lpReserved)
+{
+  (void)hinst; (void)reason; (void)lpReserved;
+
+  switch (reason) {
+    case DLL_PROCESS_ATTACH:
+      InitializeCriticalSection(&crit);
+      PRINTF(("LINLIB Process Attach\n"));
+      break;
+    case DLL_THREAD_ATTACH:
+      break;
+    case DLL_THREAD_DETACH:
+      break;
+    case DLL_PROCESS_DETACH:
+      break;
+  }
+  return 1;
+}
+#endif
