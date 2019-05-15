@@ -3,14 +3,12 @@ jobs:
   xenial-gcc-5.3:
     docker:
       - image: ubuntu:xenial
-    environment:
-      KDIR: /lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*$' -o | sed -r 's/(.*)\./\1-/')-generic/build
     steps:
       - checkout
       - run:
           name: Set Up Container
           command: |
-            apt update -qq && apt install -y gcc make linux-headers-generic
+            apt update -qq && apt install -y gcc make linux-headers-generic cppcheck
       - run:
           name: Build
           command: |
@@ -35,7 +33,7 @@ jobs:
       - run:
           name: Set Up Container
           command: |
-            apt update -qq && apt install -y gcc make linux-headers-generic
+            apt update -qq && apt install -y gcc make linux-headers-generic cppcheck
       - run:
           name: Build
           command: |
