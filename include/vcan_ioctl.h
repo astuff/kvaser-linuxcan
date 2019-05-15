@@ -121,6 +121,8 @@
 #define VCAN_IOC_SSP_AUTO           _IO(VCAN_IOC_MAGIC,154)
 #define VCAN_IOC_SSP_GET            _IO(VCAN_IOC_MAGIC,155)
 #define VCAN_IOC_SSP_SET            _IO(VCAN_IOC_MAGIC,156)
+#define VCAN_IOC_GET_CHAN_CAP_MASK  _IO(VCAN_IOC_MAGIC,160)
+#define VCAN_IOC_GET_MAX_BITRATE    _IO(VCAN_IOC_MAGIC,161)
 
 #define MAX_IOCTL_CARD_NAME       31
 #define MAX_IOCTL_DRIVER_NAME     31
@@ -146,6 +148,7 @@
 #define VCAN_CHANNEL_CAP_REMOTE                 0x00400000  // Device (channel) is remote, e.g. Iris
 #define VCAN_CHANNEL_CAP_CANFD                  0x00800000  // Device (channel) supports CAN-FD
 #define VCAN_CHANNEL_CAP_CANFD_NONISO           0x01000000  // Device (channel) supports non-ISO CAN-FD
+#define VCAN_CHANNEL_CAP_SILENTMODE             0x02000000  // Device is capable of silentmode
 
 #define VCAN_CHANNEL_STATUS_TIME_SYNC_ENABLED   0x00000001
 #define VCAN_CHANNEL_STATUS_TIME_SYNC_RUNNING   0x00000002

@@ -95,6 +95,7 @@
 #include "debug.h"
 #include "util.h"
 #include "vcan_ioctl.h"
+#include "capabilities.h"
 
 #include "sja1000.h"
 #include "amcc5920.h"
@@ -139,7 +140,6 @@ static int pciCanTxAvailable (VCanChanData *vChd);
 static int EXIT pciCanCloseAllDevices(void);
 static int pciCanProcRead (struct seq_file* m, void* v);
 static int pciCanRequestChipState (VCanChanData *vChd);
-static unsigned long pciCanRxQLen(VCanChanData *vChd);
 static unsigned long pciCanTxQLen(VCanChanData *vChd); 
 static void pciCanRequestSend (VCanCardData *vCard, VCanChanData *vChan);
 
@@ -161,7 +161,6 @@ static VCanHWInterface hwIf = {
     .flushSendBuffer    = vCanFlushSendBuffer,
     .getTxErr           = pciCanGetTxErr,
     .getRxErr           = pciCanGetRxErr,
-    .rxQLen             = pciCanRxQLen,
     .txQLen             = pciCanTxQLen,
     .requestChipState   = pciCanRequestChipState,
     .requestSend        = pciCanRequestSend
@@ -393,12 +392,15 @@ static int DEVINIT pciCanProbe (VCanCardData *vCd)
             }
         }
 
-        // qqq This should be per channel!
-        vCd->capabilities = VCAN_CHANNEL_CAP_RECEIVE_ERROR_FRAMES |
-                            VCAN_CHANNEL_CAP_ERROR_COUNTERS       |
-                            VCAN_CHANNEL_CAP_EXTENDED_CAN         |
-                            VCAN_CHANNEL_CAP_TXREQUEST            |
-                            VCAN_CHANNEL_CAP_TXACKNOWLEDGE;
+        set_capability_value (vCd,
+                              VCAN_CHANNEL_CAP_RECEIVE_ERROR_FRAMES |
+                              VCAN_CHANNEL_CAP_ERROR_COUNTERS       |
+                              VCAN_CHANNEL_CAP_EXTENDED_CAN         |
+                              VCAN_CHANNEL_CAP_TXREQUEST            |
+                              VCAN_CHANNEL_CAP_TXACKNOWLEDGE,
+                              0xFFFFFFFF,
+                              0xFFFFFFFF,
+                              MAX_CARD_CHANNELS);
 
         vCd->hw_type      = HWTYPE_PCICAN;
 
@@ -1530,14 +1532,6 @@ static int pciCanGetRxErr (VCanChanData *vChd)
 }
 
 
-//======================================================================
-//  Read receive queue length in hardware/firmware
-//======================================================================
-static unsigned long pciCanRxQLen (VCanChanData *vChd)
-{
-  // qqq Why _tx_ channel buffer?
-    return queue_length(&vChd->txChanQueue);
-}
 
 
 //======================================================================

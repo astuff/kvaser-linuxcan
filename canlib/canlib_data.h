@@ -97,7 +97,7 @@ typedef struct HandleData
   long               readTimeout;
   long               writeTimeout;
   unsigned long      currentTime;
-  DWORD              timerResolution;
+  uint32_t           timerResolution;
   double             timerScale;
   void               (*callback)(canNotifyData *);
   void               (*callback2)(CanHandle hnd, void* ctx, unsigned int event);
@@ -132,11 +132,11 @@ typedef struct CANOps
   canStatus (*busOn)(HandleData *);
   canStatus (*busOff)(HandleData *);
   canStatus (*setBusParams)(HandleData *hData, long freq, unsigned int tseg1, 
-			    unsigned int tseg2, unsigned int sjw, unsigned int noSamp,
+                            unsigned int tseg2, unsigned int sjw, unsigned int noSamp,
                             long freq_brs, unsigned int tseg1_brs, unsigned int tseg2_brs, 
-			    unsigned int sjw_brs, unsigned int syncmode);
+                            unsigned int sjw_brs, unsigned int syncmode);
   canStatus (*getBusParams)(HandleData *hData, long *freq, unsigned int *tseg1, 
-			    unsigned int *tseg2, unsigned int *sjw, unsigned int *noSamp,
+                            unsigned int *tseg2, unsigned int *sjw, unsigned int *noSamp,
                             long *freq_brs, unsigned int *tseg1_brs, unsigned int *tseg2_brs,
                             unsigned int *sjw_brs, unsigned int *syncmode);
   canStatus (*read)(HandleData *, long *, void *, unsigned int *,

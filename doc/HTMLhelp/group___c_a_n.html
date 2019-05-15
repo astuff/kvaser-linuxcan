@@ -149,11 +149,12 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#gaf38b95fce4930347d9986887ec046e13">canTranslateBaud</a> (long *const freq, unsigned int *const tseg1, unsigned int *const tseg2, unsigned int *const sjw, unsigned int *const nosamp, unsigned int *const syncMode)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga04c2f80a23b992bf17591749192e8d48">canReadTimer</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned long *time)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel</a> (int channel, int flags)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga1a3ba0ef73eee6b97e886730ac696935">canSetBusParamsC200</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, <a class="el" href="canlib_8h.html#a4ae1dab0fb4b072a66584546209e7d58">BYTE</a> btr0, <a class="el" href="canlib_8h.html#a4ae1dab0fb4b072a66584546209e7d58">BYTE</a> btr1)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#gac34c1577cae55385250e7412513c8cbd">canSetBusParamsC200</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned char btr0, unsigned char btr1)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#gaecc8b56e75cf68548af53b2d432079af">canResetBus</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga47d03bfcc31e290284e65211b61f15f3">canWriteWait</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, long id, void *msg, unsigned int dlc, unsigned int flag, unsigned long timeout)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga7abcf8f512da6ab568850b9faa0bc28b">canFlushReceiveQueue</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga52a17bb8012bf025d127b4d29e5f3aa8">canFlushTransmitQueue</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga909e5c14b09fe76bad280475138d503e">canGetHandleData</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, int item, void *buffer, size_t bufsize)</td></tr>
 </table>
 <hr/><h2>Typedef Documentation</h2>
 <a class="anchor" id="ga58db5be8859c14cd8a0c0f6963c64f26"></a><!-- doxytag: member="canlib.h::canNotifyData" ref="ga58db5be8859c14cd8a0c0f6963c64f26" args="" -->
@@ -492,7 +493,7 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="page_code_snippets_bit_rate.html">Bit Rate Examples</a>, <a class="el" href="page_user_guide_init_bit_rate.html">Bit Rate and Other Bus Parameters</a> </dd>
 <dd>
-<a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a>, <a class="el" href="group___c_a_n.html#ga1a3ba0ef73eee6b97e886730ac696935">canSetBusParamsC200()</a> </dd></dl>
+<a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a>, <a class="el" href="group___c_a_n.html#gac34c1577cae55385250e7412513c8cbd">canSetBusParamsC200()</a> </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a6">busparms.c</a>.</dd>
 </dl>
 </div>
@@ -553,6 +554,59 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga909e5c14b09fe76bad280475138d503e"></a><!-- doxytag: member="canlib.h::canGetHandleData" ref="ga909e5c14b09fe76bad280475138d503e" args="(const CanHandle hnd, int item, void *buffer, size_t bufsize)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> canGetHandleData </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a>&#160;</td>
+          <td class="paramname"><em>hnd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>item</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>bufsize</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<dl class="note"><dt><b>Note:</b></dt><dd>This function can be used to retrieve certain pieces of information about an open handle to a CANlib channel.</dd></dl>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">item</td><td>This parameter specifies what data to obtain for the specified handle. The value is one of the constants <a class="el" href="canlib_8h.html#canCHANNELDATA_xxx">canCHANNELDATA_xxx</a> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">buffer</td><td>The address of a buffer which is to receive the data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">bufsize</td><td>The size of the buffer to which the buffer parameter points.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a> </dd></dl>
 
 </div>
 </div>
@@ -1111,7 +1165,7 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
 <p>The library provides default values for <em>tseg1</em>, <em>tseg2</em>, <em>sjw</em> and <em>noSamp</em> when <em>freq</em> is specified to one of the pre-defined constants, <a class="el" href="canlib_8h.html#canBITRATE_xxx">canBITRATE_xxx</a> for classic CAN and <a class="el" href="canlib_8h.html#canFD_BITRATE_xxx">canFD_BITRATE_xxx</a> for CAN FD.</p>
 <p>If <em>freq</em> is any other value, no default values are supplied by the library.</p>
 <p>If you are using multiple handles to the same physical channel, for example if you are writing a threaded application, you must call <a class="el" href="group___c_a_n.html#gaf1786cfbfd542b18b9c599d278837bd9">canBusOff()</a> once for each handle. The same applies to <a class="el" href="group___c_a_n.html#ga99c7c99cc71580f8099a1407f4f9ea1a">canBusOn()</a> - the physical channel will not go off bus until the last handle to the channel goes off bus.</p>
-<dl class="note"><dt><b>Note:</b></dt><dd>Use <a class="el" href="group___c_a_n.html#ga1a3ba0ef73eee6b97e886730ac696935">canSetBusParamsC200()</a> to set the bus timing parameters in the ubiquitous 82c200 bit-timing register format.</dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>Use <a class="el" href="group___c_a_n.html#gac34c1577cae55385250e7412513c8cbd">canSetBusParamsC200()</a> to set the bus timing parameters in the ubiquitous 82c200 bit-timing register format.</dd></dl>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN controller. </td></tr>
@@ -1129,12 +1183,12 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="page_code_snippets_bit_rate.html">Bit Rate Examples</a>, <a class="el" href="page_user_guide_misc_bitrate.html">Bit Rate Constants</a>, <a class="el" href="page_user_guide_init_bit_rate.html">Bit Rate and Other Bus Parameters</a>, <a class="el" href="page_code_snippets_examples.html">Code Examples</a> </dd>
 <dd>
-<a class="el" href="group___c_a_n.html#ga1a3ba0ef73eee6b97e886730ac696935">canSetBusParamsC200()</a>, <a class="el" href="group___c_a_n.html#gaf2a734c0486030610389331685a3827a">canGetBusParams()</a> </dd></dl>
+<a class="el" href="group___c_a_n.html#gac34c1577cae55385250e7412513c8cbd">canSetBusParamsC200()</a>, <a class="el" href="group___c_a_n.html#gaf2a734c0486030610389331685a3827a">canGetBusParams()</a> </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a5">busparms.c</a>, <a class="el" href="cancount_8c-example.html#a6">cancount.c</a>, <a class="el" href="canmonitor_8c-example.html#a4">canmonitor.c</a>, <a class="el" href="opentest_8c-example.html#a5">opentest.c</a>, <a class="el" href="simplewrite_8c-example.html#a7">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a4">writeloop.c</a>.</dd>
 </dl>
 </div>
 </div>
-<a class="anchor" id="ga1a3ba0ef73eee6b97e886730ac696935"></a><!-- doxytag: member="canlib.h::canSetBusParamsC200" ref="ga1a3ba0ef73eee6b97e886730ac696935" args="(const CanHandle hnd, BYTE btr0, BYTE btr1)" -->
+<a class="anchor" id="gac34c1577cae55385250e7412513c8cbd"></a><!-- doxytag: member="canlib.h::canSetBusParamsC200" ref="gac34c1577cae55385250e7412513c8cbd" args="(const CanHandle hnd, unsigned char btr0, unsigned char btr1)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1147,13 +1201,13 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="canlib_8h.html#a4ae1dab0fb4b072a66584546209e7d58">BYTE</a>&#160;</td>
+          <td class="paramtype">unsigned char&#160;</td>
           <td class="paramname"><em>btr0</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="canlib_8h.html#a4ae1dab0fb4b072a66584546209e7d58">BYTE</a>&#160;</td>
+          <td class="paramtype">unsigned char&#160;</td>
           <td class="paramname"><em>btr1</em>&#160;</td>
         </tr>
         <tr>
@@ -1574,7 +1628,7 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.15) - Generated on Mon Mar 7 2016</small>
+<small>Kvaser Linux CANLIB (canlib 5.16) - Generated on Sun May 22 2016</small>
 </address>
 </body>
 </html>

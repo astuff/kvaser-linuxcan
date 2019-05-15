@@ -67,6 +67,9 @@ int main (int argc, char *argv[])
   char errorString[50];
   canHandle h;
   struct timeval tv;
+
+  (void)argc; // Unused.
+  (void)argv; // Unused.
   
   h = canOpenChannel(1, 0);
   if (h < 0) {

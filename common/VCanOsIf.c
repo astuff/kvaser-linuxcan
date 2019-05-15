@@ -319,8 +319,10 @@ int vCanDispatchEvent (VCanChanData *chd, VCAN_EVENT *e)
           rd = atomic_read(&fileNodePtr->objbufActive);
           new_rd = rd | objbuf_mask;
         } while (atomic_cmpxchg(&fileNodePtr->objbufActive, rd, new_rd) != rd);
-#else
+#elif LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0)
         atomic_set_mask(objbuf_mask, &fileNodePtr->objbufActive);
+#else
+        atomic_or(objbuf_mask, &fileNodePtr->objbufActive);
 #endif
         os_if_queue_task_not_default_queue(fileNodePtr->objbufTaskQ,
                                            &fileNodePtr->objbufWork);
@@ -602,6 +604,11 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         DEBUGPRINT(2, (TXT("VCAN_IOC_SENDMSG - returning -EAGAIN\n")));
         return -EAGAIN;
       }
+      
+      if (chd->vCard->card_flags & DEVHND_CARD_REFUSE_TO_USE_CAN) {
+        DEBUGPRINT(2, (TXT("VCAN_IOC_SENDMSG Refuse to run. returning -EACCES\n")));
+        return -EACCES;        
+      }
 
       os_if_init_waitqueue_entry(&wait);
       queue_add_wait_for_space(&chd->txChanQueue, &wait);
@@ -729,6 +736,12 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
     //------------------------------------------------------------------
     case VCAN_IOC_BUS_ON:
       DEBUGPRINT(3, (TXT("VCAN_IOC_BUS_ON\n")));
+      
+      if (chd->vCard->card_flags & DEVHND_CARD_REFUSE_TO_USE_CAN) {
+        DEBUGPRINT(2, (TXT("VCAN_IOC_BUS_ON Refuse to run. returning -EACCES\n")));
+        return -EACCES;        
+      }
+      
       vCanFlushReceiveBuffer(fileNodePtr);
       vStat = hwIf->flushSendBuffer(chd);
       if (vStat == VCAN_STAT_OK) {
@@ -747,6 +760,12 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         VCanBusParams busParams;
         ArgPtrOut(sizeof(VCanBusParams));   // Check first, to make sure
         ArgPtrIn(sizeof(VCanBusParams));
+        
+        if (chd->vCard->card_flags & DEVHND_CARD_REFUSE_TO_USE_CAN) {
+          DEBUGPRINT(2, (TXT("VCAN_IOC_SET_BITRATE Refuse to run. returning -EACCES\n")));
+          return -EACCES;        
+        }
+        
         copy_from_user_ret(&busParams, (VCanBusParams *)arg,
                            sizeof(VCanBusParams), -EFAULT);
         vStat = hwIf->setBusParams(chd, &busParams);
@@ -956,7 +975,15 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
     //------------------------------------------------------------------
     case VCAN_IOC_GET_CHAN_CAP:
       ArgPtrOut(sizeof(int));
-      put_user_ret(VCARD->capabilities, (int *)arg, -EFAULT);
+      put_user_ret(chd->capabilities, (int *)arg, -EFAULT);
+      break;
+    case VCAN_IOC_GET_CHAN_CAP_MASK:
+      ArgPtrOut(sizeof(int));
+      put_user_ret(chd->capabilities_mask, (int *)arg, -EFAULT);
+      break;
+   case VCAN_IOC_GET_MAX_BITRATE:
+      ArgPtrOut(sizeof(uint32_t));
+      put_user_ret(VCARD->current_max_bitrate, (uint32_t *)arg, -EFAULT);
       break;
 #undef VCARD
     //------------------------------------------------------------------
@@ -1018,7 +1045,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
       ArgPtrOut(sizeof(int));
       {
         int ql = getQLen(fileNodePtr->rcv.bufHead, fileNodePtr->rcv.bufTail,
-                         fileNodePtr->rcv.size) + hwIf->rxQLen(chd);
+                         fileNodePtr->rcv.size);
         put_user_ret(ql, (int *)arg, -EFAULT);
       }
       break;
@@ -1046,6 +1073,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         put_user_ret(fileNodePtr->modeTx, (int *)arg, -EFAULT);
         break;
       }
+    //------------------------------------------------------------------
     case VCAN_IOC_SET_TXACK:
       ArgPtrIn(sizeof(int));
       {
@@ -1061,6 +1089,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         }
       }
       break;
+    //------------------------------------------------------------------
     case VCAN_IOC_SET_TXRQ:
       ArgPtrIn(sizeof(int));
       {
@@ -1076,6 +1105,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         }
       }
       break;
+    //------------------------------------------------------------------  
     case VCAN_IOC_SET_TXECHO:
       ArgPtrIn(sizeof(char));
       {
@@ -1092,7 +1122,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         }
       }
       break;
-
+    //------------------------------------------------------------------
     case KCAN_IOCTL_OBJBUF_FREE_ALL:
       if (fileNodePtr->objbuf) {
         // Driver-implemented auto response buffers.
@@ -1112,7 +1142,23 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         }
       }
       break;
-
+    //------------------------------------------------------------------
+    case KCAN_IOCTL_TX_INTERVAL:
+      {
+        uint32_t tmp = *(uint32_t*)arg;
+        vStat = hwIf->tx_interval(chd, &tmp);
+        copy_to_user_ret((uint32_t*)arg, &tmp, sizeof(uint32_t), -EFAULT);
+      }
+      break;
+    case KCAN_IOCTL_SET_BRLIMIT:
+      {
+        if (*(uint32_t*)arg == 0) {
+          chd->vCard->current_max_bitrate = chd->vCard->default_max_bitrate;
+        } else {
+          copy_from_user_ret (&chd->vCard->current_max_bitrate, (uint32_t*)arg, sizeof(uint32_t), -EFAULT);
+        }
+      }
+      break;
     case KCAN_IOCTL_OBJBUF_ALLOCATE:
       {
         KCanObjbufAdminData io;
@@ -1177,7 +1223,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
                          sizeof(KCanObjbufAdminData), -EFAULT);
       }
       break;
-
+    //------------------------------------------------------------------
     case KCAN_IOCTL_OBJBUF_FREE:
       {
         KCanObjbufAdminData io;
@@ -1213,7 +1259,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         }
       }
       break;
-
+    //------------------------------------------------------------------
     case KCAN_IOCTL_OBJBUF_WRITE:
       {
         KCanObjbufBufferData io;
@@ -1261,7 +1307,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
       }
       break;
 
-      
+    //------------------------------------------------------------------ 
     case KCAN_IOCTL_OBJBUF_SET_FILTER:
       {
         KCanObjbufAdminData io;
@@ -1296,7 +1342,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         }
       }
       break;
-      
+    //------------------------------------------------------------------
     case KCAN_IOCTL_OBJBUF_SET_FLAGS:
       {
         KCanObjbufAdminData io;
@@ -1335,7 +1381,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         }
       }
       break;
-      
+    //------------------------------------------------------------------
     case KCAN_IOCTL_OBJBUF_ENABLE:
       {
         KCanObjbufAdminData io;
@@ -1372,7 +1418,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         }
       }
       break;
-
+    //------------------------------------------------------------------
     case KCAN_IOCTL_OBJBUF_DISABLE:
       {
         KCanObjbufAdminData io;
@@ -1409,7 +1455,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         }
       }
       break;
-
+    //------------------------------------------------------------------
     case KCAN_IOCTL_OBJBUF_SET_PERIOD:
       {
         KCanObjbufAdminData io;
@@ -1445,7 +1491,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         }
       }
       break;
-
+    //------------------------------------------------------------------
     case KCAN_IOCTL_OBJBUF_SET_MSG_COUNT:
       {
         KCanObjbufAdminData io;
@@ -1481,7 +1527,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         }
       }
       break;
-
+    //------------------------------------------------------------------
     case KCAN_IOCTL_OBJBUF_SEND_BURST:
       {
         KCanObjbufAdminData io;
@@ -1517,7 +1563,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
       }
       break;
 
-
+  //------------------------------------------------------------------
   case KCAN_IOCTL_CANFD:
     {
       KCAN_IOCTL_CANFD_T fd_data;
@@ -1538,8 +1584,10 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
       }
       os_if_spin_unlock_irqrestore(&chd->openLock, irqFlags);
 
-      if (fd_data.action == CAN_CANFD_SET) canfd_mode = fd_data.fd;
-      else canfd_mode = chd->canFdMode;
+      if (fd_data.action == CAN_CANFD_SET) 
+        canfd_mode = fd_data.fd;
+      else 
+        canfd_mode = chd->canFdMode;
       fd_data.status = CAN_CANFD_NOT_IMPLEMENTED;      
       switch (canfd_mode) {
         case OPEN_AS_CANFD_NONISO:
@@ -1551,7 +1599,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         case OPEN_AS_CAN: {
           if (fd_data.action == CAN_CANFD_SET) {
             fd_data.status = CAN_CANFD_FAILURE;
-            if ((chd->vCard->capabilities & req_caps) == req_caps) {
+            if ((chd->capabilities & req_caps) == req_caps) {
               // 1 since we have to be open to be here.
               if (1 == openHandles) {
                 chd->canFdMode = fd_data.fd;
@@ -1580,7 +1628,8 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
     break;
 
 
-
+    
+    //------------------------------------------------------------------
     default:
       DEBUGPRINT(1, (TXT("vCanIOCtrl UNKNOWN VCAN_IOC!!!: %d\n"), ioctl_cmd));
       return -EINVAL;

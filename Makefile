@@ -76,7 +76,7 @@ SUBDIRS   = $(USERLIBS) $(DRIVERS)
 
 #---------------------------------------------------------------------------
 # RULES
-.PHONY: debug canlib linlib common leaf mhydra pcican pcican2 usbcanII virtualcan pciefd install clean
+.PHONY: debug canlib linlib common leaf mhydra pcican pcican2 usbcanII virtualcan pciefd install clean check
 
 all:  $(SUBDIRS)
 
@@ -115,7 +115,12 @@ install: $(DRIVERS)
 	$(MAKE) -C canlib install
 	$(MAKE) -C linlib install
 
+check:
+	$(MAKE) -C canlib check
+	@for dir in $(DRIVERS) ; do cd $$dir; $(MAKE) check; cd ..; done
+
 clean:
 	@for dir in $(SUBDIRS) ; do cd $$dir; $(MAKE) clean; cd ..; done
 	rm -f modules.order Module.symvers
 	rm -rf .tmp_versions
+	find . -name "checklog.txt"|xargs rm -f

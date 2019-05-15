@@ -89,6 +89,10 @@ typedef unsigned char VeventTag;
 #define MAX_MSG_LEN                 128
 #define EXT_MSG                     0x80000000 // signs an extended identifier
 #define VCAN_EXT_MSG_ID             EXT_MSG
+#define VCAN_MSG_ID_UNDEF           0U
+
+#define MAX_DLC_CAN                 8U
+#define MAX_DLC_CAN_FD              64U
 
 #define VCAN_MSG_FLAG_ERROR_FRAME   0x01
 #define VCAN_MSG_FLAG_OVERRUN       0x02  /* Overrun in Driver or CAN Controller */

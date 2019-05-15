@@ -202,17 +202,24 @@ typedef struct VCanChanData
     void                   *hwChanData;
     OS_IF_ATOMIC_BIT        waitEmpty;
 
+    unsigned int            capabilities;
+    unsigned int            capabilities_mask;
+
     struct VCanCardData    *vCard;
 } VCanChanData;
 
 
 // For VCanCardData->card_flags
-#define DEVHND_CARD_FIRMWARE_BETA       0x01  // Firmware is beta
-#define DEVHND_CARD_FIRMWARE_RC         0x02  // Firmware is release candidate
-#define DEVHND_CARD_AUTO_RESP_OBJBUFS   0x04  // Firmware supports auto-response object buffers
-#define DEVHND_CARD_REFUSE_TO_RUN       0x08  // Major problem detected
-#define DEVHND_CARD_REFUSE_TO_USE_CAN   0x10  // Major problem detected
-#define DEVHND_CARD_AUTO_TX_OBJBUFS     0x20  // Firmware supports periodic transmit object buffers
+#define DEVHND_CARD_FIRMWARE_BETA         0x01  // Firmware is beta
+#define DEVHND_CARD_FIRMWARE_RC           0x02  // Firmware is release candidate
+#define DEVHND_CARD_AUTO_RESP_OBJBUFS     0x04  // Firmware supports auto-response object buffers
+#define DEVHND_CARD_REFUSE_TO_RUN         0x08  // Major problem detected
+#define DEVHND_CARD_REFUSE_TO_USE_CAN     0x10  // Major problem detected
+#define DEVHND_CARD_AUTO_TX_OBJBUFS       0x20  // Firmware supports periodic transmit object buffers
+#define DEVHND_CARD_DELAY_MSGS            0x40  // Firmware supports delay messages
+#define DEVHND_CARD_HYDRA_EXT             0x80  // Firmware supports extended Hydra commands
+#define DEVHND_CARD_CANFD_CAP             0x100 // Firmware supports CAN-FD.
+#define DEVHND_CARD_EXTENDED_CAPABILITIES 0x200 // Firmware supports reading capabilities.
 
 struct VCanHWInterface;
 struct VCanCardData;
@@ -233,7 +240,6 @@ typedef struct VCanCardData
 {
     uint32_t                hw_type;
     uint32_t                card_flags;
-    uint32_t                capabilities;   // qqq This should be per channel!
     unsigned int            nrChannels;
     uint32_t                serialNumber;
     unsigned char           ean[8];
@@ -256,6 +262,9 @@ typedef struct VCanCardData
     OS_IF_SEMAPHORE         open;
 
     unsigned long           timestamp_offset;
+    uint32_t                default_max_bitrate;
+    uint32_t                current_max_bitrate;
+    unsigned char           sysdbg_he;
 
     struct VCanCardData    *next;
 } VCanCardData;
@@ -316,7 +325,6 @@ typedef struct VCanHWInterface {
     int (*flushSendBuffer)      (VCanChanData*);
     int (*getRxErr)             (VCanChanData*);
     int (*getTxErr)             (VCanChanData*);
-    unsigned long (*rxQLen)     (VCanChanData*);
     unsigned long (*txQLen)     (VCanChanData*);
     int (*requestChipState)     (VCanChanData*);
     void (*requestSend)         (VCanCardData*, VCanChanData*);
@@ -338,10 +346,10 @@ typedef struct VCanHWInterface {
                                  int count);
     int (*objbufSendBurst)      (VCanChanData *chd, int bufType, int bufNo,
                                  int burstLen);
+    int (*tx_interval)          (VCanChanData *chd, unsigned int *interval);
 } VCanHWInterface;
 
 
-#define WAITNODE_DATA_SIZE 32 // 32 == MAX(MAX_CMD_LEN in filo_cmds.h and helios_cmds.h)
 typedef struct WaitNode {
   struct list_head list;
   OS_IF_SEMAPHORE  waitSemaphore;
@@ -349,6 +357,7 @@ typedef struct WaitNode {
   unsigned char    cmdNr;
   unsigned char    transId;
   unsigned char    timedOut;
+  unsigned char    check_trans_id; //when not 0, check that transid matches
 } WaitNode;
 
 

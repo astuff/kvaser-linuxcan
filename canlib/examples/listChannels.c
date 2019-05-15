@@ -70,6 +70,9 @@ int main (int argc, char* argv[])
   int stat, i;
   char name[256];
   unsigned int ean[2], fw[2], serial[2];
+
+  (void)argc; // Unused.
+  (void)argv; // Unused.
     
   stat = canGetNumberOfChannels(&chanCount);
   if (stat < 0) {

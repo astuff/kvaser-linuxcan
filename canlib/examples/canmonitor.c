@@ -91,7 +91,7 @@ int main (int argc, char *argv[])
   unsigned long t;
   int channel = 0;
   int bitrate = BAUD_1M;
-  int j;
+  unsigned j;
 
   errno = 0;
   if (argc != 2 || (channel = atoi(argv[1]), errno) != 0) {

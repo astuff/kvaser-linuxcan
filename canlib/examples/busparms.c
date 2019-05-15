@@ -79,6 +79,9 @@ int main (int argc, char *argv[])
   int j;
   canHandle h [2];
   
+  (void)argc; // Unused.
+  (void)argv; // Unused.
+  
   for(j = 0 ; j < 2 ; j++) {
     h[j] = canOpenChannel(j, canOPEN_EXCLUSIVE | canOPEN_REQUIRE_EXTENDED);
     if (h[j] < 0) {

@@ -50,87 +50,13 @@
 ** ---------------------------------------------------------------------------
 **/
 
-#include "osif_functions_user.h"
+#ifndef CAPABILITIES_H
+#define CAPABILITIES_H
 
-#   include <sys/ioctl.h>
-#   include <unistd.h>
-#   include <sys/io.h>
-#   include <fcntl.h>
+#include "VCanOsIf.h"
 
+void set_capability_value (VCanCardData *vCard, uint32_t cap, uint32_t to, uint32_t channel_mask, uint32_t n_channels_max);
+void set_capability_mask  (VCanCardData *vCard, uint32_t cap, uint32_t to, uint32_t channel_mask, uint32_t n_channels_max);
+uint8_t convert_vcan_to_hydra_cmd (uint32_t vcan_cmd);
 
-// Common
-#include <stdio.h>
-
-
-//////////////////////////////////////////////////////////////////////
-// os_if_ioctl_read
-// Let subsystem fill out the buffer
-//////////////////////////////////////////////////////////////////////
-int os_if_ioctl_read (OS_IF_FILE_HANDLE fd,
-                      unsigned int      ioctl_code,
-                      void              *out_buffer,
-                      size_t            out_bufsize)
-{
-  (void)out_bufsize; // Unused
-  return ioctl(fd, ioctl_code, out_buffer);
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// os_if_ioctl_write
-// Send something to the subsystem
-//////////////////////////////////////////////////////////////////////
-int os_if_ioctl_write (OS_IF_FILE_HANDLE fd,
-                       unsigned int      ioctl_code,
-                       void              *in_buffer,
-                       size_t            in_bufsize)
-{
-  (void)in_bufsize; // Unused
-  return ioctl(fd, ioctl_code, in_buffer);
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// os_if_mutex_lock
-//
-//////////////////////////////////////////////////////////////////////
-void os_if_mutex_lock (OS_IF_MUTEX *mutex)
-{
-  pthread_mutex_lock(mutex);
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// os_if_mutex_unlock
-//
-//////////////////////////////////////////////////////////////////////
-void os_if_mutex_unlock (OS_IF_MUTEX *mutex)
-{
-  pthread_mutex_unlock(mutex);
-}
-
-
-
-
-//////////////////////////////////////////////////////////////////////
-// os_if_open
-//
-//////////////////////////////////////////////////////////////////////
-OS_IF_FILE_HANDLE os_if_open (char *fileName)
-{
-  return open(fileName, O_RDONLY);
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// os_if_access
-//
-//////////////////////////////////////////////////////////////////////
-int os_if_access (char *fileName, int code)
-{
-  if (code != F_OK) {
-    return -1;
-  }
-
-  return access(fileName, code);
-}
+#endif

@@ -65,12 +65,9 @@
 #define _CANLIB_H_
 
 #include <stdlib.h>
+#include <stdint.h>
 
-#   define CANLIB_DECLARE_ALL
-typedef unsigned char BYTE;
-typedef unsigned int DWORD;
-typedef unsigned int HANDLE;
-typedef unsigned int BOOL;
+#define CANLIB_DECLARE_ALL
 #include "canstat.h"
 
 /** Handle to an opened circuit. */
@@ -1338,12 +1335,17 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canCHANNELDATA_CHANNEL_CAP                1
 
   /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
    * \a buffer points to a 32-bit unsigned integer that receives the
    * capabilities of the CAN transceiver; this is a combination of the
    * \ref canDRIVER_CAP_xxx flags.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    */
 #define canCHANNELDATA_TRANS_CAP                  2
 
@@ -1366,6 +1368,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canCHANNELDATA_CARD_TYPE                  4
 
   /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
@@ -1373,6 +1376,10 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * number in the computer. Each card type is numbered separately. For
    * example, the first LAPcan card in a machine will have number 0, the second
    * LAPcan number 1, etc.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    */
 #define canCHANNELDATA_CARD_NUMBER                5
 
@@ -1397,12 +1404,17 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canCHANNELDATA_CARD_SERIAL_NO             7
 
   /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
    * \a buffer points to a 64-bit (8 bytes) area which receives the serial
    * number of the transceiver. The serial number is an 8-byte unsigned
    * integer. If the transceiver doesn't have a serial number, 0 is returned.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    */
 #define canCHANNELDATA_TRANS_SERIAL_NO            8
 
@@ -1442,6 +1454,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canCHANNELDATA_CARD_UPC_NO                11
 
   /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
@@ -1449,6 +1462,10 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * the transceiver. If there is no UPC number, the buffer is filled with
    * zeros. The UPC (EAN) number is coded as a BCD string with the LSB first,
    * so e.g. 733-0130-00122-0 is coded as 0x30001220 0x00073301.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    */
 #define canCHANNELDATA_TRANS_UPC_NO               12
 
@@ -1473,6 +1490,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #if defined(CANLIB_DECLARE_ALL)
 
   /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
@@ -1486,10 +1504,15 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * \li 1: The build number
    * \li 2: The minor revision number
    * \li 3: The major revision number
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    */
 # define canCHANNELDATA_DLL_FILE_VERSION          14
 
   /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
@@ -1503,10 +1526,15 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * \li 1: 1
    * \li 2: The minor revision number
    * \li 3: The major revision number
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    */
 # define canCHANNELDATA_DLL_PRODUCT_VERSION       15
 
   /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
@@ -1519,20 +1547,30 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * \li 1: kvalapw.dll - used with CANLIB up to 2.29.
    *
    * \li 2: kvalapw2.dll - used with CANLIB from 3.0 and on.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    */
 # define canCHANNELDATA_DLL_FILETYPE              16
 
   /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
    * \a buffer points to a 32-bit unsigned integer which receives the CAN
    * transceiver type of the specified channel.  This value is one of the
    * \ref canTRANSCEIVER_TYPE_xxx
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    */
 # define canCHANNELDATA_TRANS_TYPE                17
 
   /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
@@ -1553,10 +1591,15 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    *          low word.
    *
    * \li USB: The port number.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    */
 # define canCHANNELDATA_DEVICE_PHYSICAL_POSITION  18
 
   /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
@@ -1566,10 +1609,15 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * a number printed next to the slot on the board, or some other number that
    * makes locating the physical device easier for the user. For buses with no
    * such convention, or when the UI number is unknown, 0xFFFFFFFF is returned.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    */
 # define canCHANNELDATA_UI_NUMBER                 19
 
   /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
@@ -1589,11 +1637,16 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * II. It is not related to Kvaser MagiSync&tm; which is implemented in the
    * high-end members of the Kvaser Leaf family. Kvaser MagiSync&tm; is always
    * enabled and allows for much more accurate time synchronization.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    *
    */
 # define canCHANNELDATA_TIMESYNC_ENABLED          20
 
   /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
@@ -1606,10 +1659,15 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * \li 1: 0
    * \li 2: The minor revision number
    * \li 3: The major revision number
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    */
 # define canCHANNELDATA_DRIVER_FILE_VERSION       21
 
   /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
@@ -1622,15 +1680,24 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * \li 1: 0
    * \li 2: The minor revision number
    * \li 3: The major revision number
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    */
 # define canCHANNELDATA_DRIVER_PRODUCT_VERSION    22
 
   /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
    * \a buffer points to a buffer which receives the device manufacturer's name
    * as a zero-terminated Unicode string.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    */
 # define canCHANNELDATA_MFGNAME_UNICODE           23
 
@@ -1644,11 +1711,16 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 # define canCHANNELDATA_MFGNAME_ASCII             24
 
   /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
    * \a buffer points to a buffer which receives the product name of the device
    * as a zero-terminated Unicode string.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    */
 # define canCHANNELDATA_DEVDESCR_UNICODE          25
 
@@ -1662,6 +1734,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 # define canCHANNELDATA_DEVDESCR_ASCII            26
 
  /**
+   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
@@ -1670,8 +1743,172 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    *
    * \note The device driver names have no special meanings and may change
    * from a release to another.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
    */
 # define canCHANNELDATA_DRIVER_NAME               27
+
+  /**
+   * \win_start
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to a 32-bit unsigned integer that receives the quality of
+   * the channel, where the quality is measured in percent of optimal quality.
+   *
+   * For WLAN, -90 dBm and -35 dBm are considered 0% and 100%, respectively.
+   *
+   * The quality is 100% for any directly connected channel (USB, PCI etc.).
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
+   */
+#  define canCHANNELDATA_CHANNEL_QUALITY           28
+
+  /**
+   * \win_start
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer point to a 32-bit unsigned integer that receives the roundtrip
+   * time which is measured in milliseconds.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
+   */
+#  define canCHANNELDATA_ROUNDTRIP_TIME            29
+
+  /**
+   * \win_start
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to a 32-bit unsigned integer that receives the
+   * \ref kvBUSTYPE_GROUP_xxx bus type.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
+   */
+#  define canCHANNELDATA_BUS_TYPE                  30
+
+  /**
+   * \win_start
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to a CHAR array of at least 32 characters which receives
+   * the current device name as a \c NULL terminated ASCII string.
+   *
+   * If device name is not set or the device does not support this
+   * functionality, an error will be returned.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
+   */
+#  define canCHANNELDATA_DEVNAME_ASCII             31
+
+  /**
+   * \win_start
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to a 32-bit unsigned integer that contains the time in
+   * milliseconds since the last communication occured.
+   *
+   * For WLAN devices, this is the time since the last keep-alive message.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
+   */
+#  define canCHANNELDATA_TIME_SINCE_LAST_SEEN      32
+
+  /**
+   * \win_start
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to a 32-bit unsigned integer that receives the
+   * current WLAN operational mode of the remote capable device;
+   * \ref canCHANNEL_OPMODE_xxx.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
+   */
+#  define canCHANNELDATA_REMOTE_OPERATIONAL_MODE   33
+
+  /**
+   * \win_start
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to a buffer which receives the remote profile name
+   * of the device as a zero-terminated ASCII string.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
+   */
+#  define canCHANNELDATA_REMOTE_PROFILE_NAME   34
+
+  /**
+   * \win_start
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to a buffer which receives the remote host name
+   * of the device as a zero-terminated ASCII string.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
+   */
+#  define canCHANNELDATA_REMOTE_HOST_NAME   35
+
+  /**
+   * \win_start
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to a buffer which receives the mac address
+   * of the device as a zero-terminated ASCII string.
+   * \win_end
+   * \linux_start
+   * Not implemented.
+   * \linux_end
+   */
+#  define canCHANNELDATA_REMOTE_MAC   36
+
+  /**
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to a 32-bit unsigned integer which receives
+   * maximum bitrate of the device. Zero value means no limit on
+   * bitrate.
+   */
+#  define canCHANNELDATA_MAX_BITRATE   37
+
+  /**
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to a 32-bit unsigned integer that receives the
+   * capabilities mask of the CAN channel. This mask specifies 
+   * which capabilities corresponding device is guaranteed
+   * to support/not support at the moment, see \ref canCHANNEL_CAP_xxx
+   * for info about flags.
+   */
+#define canCHANNELDATA_CHANNEL_CAP_MASK  38
+
+
 
 #endif
 
@@ -2012,7 +2249,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
    * functions argument.
    *
-   * \a buf points to a BYTE which contains
+   * \a buf points to a unsigned char which contains
    *
    * \li \c 0 to turn access error reporting off, and
    * \li \c 1 to turn access error reporting on.
@@ -2025,7 +2262,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
    * functions argument.
    *
-   * \a buf points to a BYTE which receives the current setting of the access
+   * \a buf points to a unsigned char which receives the current setting of the access
    * error reporting (0 or 1.)
    */
 # define canIOCTL_GET_REPORT_ACCESS_ERRORS        21
@@ -2162,6 +2399,41 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    */
 #  define canIOCTL_GET_TREF_LIST                   39
 
+  /**
+   * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
+   * functions argument.
+   *
+   * \a buf points to a \c DWORD that contains the number of microseconds
+   * the minimum CAN message transmit interval should be set to, or 0xffffffff
+   * to fetch the current setting.
+   * The minimum interval can not be set to more than one second.
+   *
+   * When a CAN channel goes bus on, the minimum interval is set to zero.
+   * I.e. CAN transmissions happen at the maximum speed the device is capable of.
+   *
+   * If the device does not support this functionality, or if an invalid
+   * minimum interval is requested, an error will be returned.
+   *
+   * \note The minimum CAN messages transmit interval applies to the physical CAN
+   * channel. It will thus affect all messages transmitted, even those sent
+   * using other CANlib handles to the same physical channel. The interval
+   * is defined as the time from the successful completion of one transmit
+   * to the beginning of the next one.
+   */
+#  define canIOCTL_TX_INTERVAL                     40
+
+   /**
+   * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
+   * functions argument.
+   *
+   * Some hardware have bitrate limits, which must be met when using any of \a canSetBusParams(),
+   * \a canSetBusParamsC200(), \a canGetBusParams() functions
+   * which can be overriden with this IOCTL.
+   * \a buf points to a \c long value that contains a user defined bitrate.
+   * A value of 0 means that the device should use its own default bitrate limit.
+   */
+#  define canIOCTL_SET_BRLIMIT                            43
+
 #endif
  /** @} */
 
@@ -2217,7 +2489,7 @@ typedef struct {
  * \sa \ref page_code_snippets_bit_rate, \ref page_user_guide_misc_bitrate
  * \sa \ref canSetBusParams()
  */
-canStatus CANLIBAPI canSetBusParamsC200 (const CanHandle hnd, BYTE btr0, BYTE btr1);
+canStatus CANLIBAPI canSetBusParamsC200 (const CanHandle hnd, unsigned char btr0, unsigned char btr1);
 
 #if defined(CANLIB_DECLARE_ALL)
 #endif
@@ -2650,6 +2922,31 @@ canStatus CANLIBAPI canFlushReceiveQueue (const CanHandle hnd);
  */
 canStatus CANLIBAPI canFlushTransmitQueue (const CanHandle hnd);
 
+
+/**
+ * \ingroup CAN
+ *
+ * \source_cs       <b>static Canlib.canStatus canGetHandleData(int hnd, int item, out object buffer);</b>
+ *
+ * \source_delphi   <b>function canGetHandleData(handle: canHandle; item: Integer; var Buffer; bufsize: Cardinal): canStatus;     </b>
+ * \source_end
+ *
+ * \note This function can be used to retrieve certain pieces of information about an open handle to a CANlib channel.
+ *
+ * \param[in]  hnd      An open handle to a CAN channel.
+ * \param[in]  item     This parameter specifies what data to obtain for the specified handle. The value is one of the constants \ref canCHANNELDATA_xxx
+ * \param[out] buffer   The address of a buffer which is to receive the data.
+ * \param[in]  bufsize  The size of the buffer to which the buffer parameter points.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref canGetChannelData()
+ */
+canStatus CANLIBAPI canGetHandleData (const CanHandle hnd,
+                                      int item,
+                                      void *buffer,
+                                      size_t bufsize);
 
 /** Used for time domain handling. */
 typedef void *kvTimeDomain;

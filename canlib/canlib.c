@@ -84,6 +84,8 @@
 #      define DEBUGPRINT(args)
 #   endif
 
+#define MFGNAME_ASCII "KVASER AB"
+
 
 
 static const char *errorStrings[] = {
@@ -113,7 +115,7 @@ static const char *errorStrings[] = {
   "Can not load or open the device driver", // canERR_DRIVERLOAD
   "The I/O request failed, probably due to resource shortage", //canERR_DRIVERFAILED
   "Unknown error (-25)",             // canERR_NOCONFIGMGR
-  "Card not found"                   // canERR_NOCARD
+  "Card not found",                  // canERR_NOCARD
   "Unknown error (-27)",             // canERR_RESERVED_7
   "Config not found",                // canERR_REGISTRY
   "The license is not valid",        // canERR_LICENSE
@@ -230,6 +232,8 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser Leaf Light HS v2 M12",                       {0x30008816, 0x00073301}}
 };
 
+static canStatus check_bitrate (const CanHandle hnd, unsigned int bitrate);
+
 //******************************************************
 // Find out channel specific data
 //******************************************************
@@ -246,7 +250,7 @@ canStatus getDevParams (int channel, char devName[], int *devChannel,
   int         devCounter  = 0;
   struct stat stbuf;
 
-  int n = 0;
+  unsigned n = 0;
 
   int CardNo          = -1;
   int ChannelNoOnCard = 0;
@@ -286,7 +290,6 @@ canStatus getDevParams (int channel, char devName[], int *devChannel,
         ChannelsOnCard--;
 
         if (chanCounter++ == channel) {
-          *devChannel = channel;
           *canOps = &vCanOps;
           sprintf(officialName, "KVASER %s channel %d", off_name[n], devCounter);
           *devChannel = ChannelNoOnCard;
@@ -480,7 +483,6 @@ canStatus CANLIBAPI canResetBus (const CanHandle hnd)
 }
 
 
-
 //******************************************************
 // Set bus parameters
 //******************************************************
@@ -498,6 +500,7 @@ canSetBusParams (const CanHandle hnd, long freq, unsigned int tseg1,
   if (hData == NULL) {
     return canERR_INVHANDLE;
   }
+
   if (freq < 0) {
     ret = canTranslateBaud(&freq, &tseg1, &tseg2, &sjw, &noSamp, &syncmode);
     if (ret != canOK) {
@@ -505,6 +508,12 @@ canSetBusParams (const CanHandle hnd, long freq, unsigned int tseg1,
     }
   }
 
+  ret = check_bitrate (hnd, (unsigned int)freq);
+
+  if (ret != canOK) {
+    return ret;
+  }
+  
   ret = hData->canOps->getBusParams(hData, NULL, NULL, NULL, NULL, NULL,
                                     &freq_brs, &tseg1_brs, &tseg2_brs,
                                     &sjw_brs, NULL);
@@ -534,9 +543,10 @@ canSetBusParamsFd (const CanHandle hnd, long freq_brs, unsigned int tseg1_brs,
     return canERR_INVHANDLE;
   }
 
-  if ((OPEN_AS_CANFD_ISO != hData->fdMode) && (OPEN_AS_CANFD_NONISO != hData->fdMode))
+  if ((OPEN_AS_CANFD_ISO != hData->fdMode) && (OPEN_AS_CANFD_NONISO != hData->fdMode)) {
     return canERR_INVHANDLE;
-
+  }
+  
   ret = hData->canOps->getBusParams(hData, &freq, &tseg1, &tseg2, &sjw, &noSamp,
                                     NULL, NULL, NULL, NULL, &syncmode);
   if (ret != canOK) {
@@ -550,15 +560,23 @@ canSetBusParamsFd (const CanHandle hnd, long freq_brs, unsigned int tseg1_brs,
     }
   }
 
-  return hData->canOps->setBusParams(hData, freq, tseg1, tseg2, sjw, noSamp,
-                                     freq_brs, tseg1_brs, tseg2_brs, sjw_brs,
-                                     syncmode);
+  ret = check_bitrate (hnd, (unsigned int)freq_brs);
+
+  if (ret != canOK) {
+    return ret;
+  }
+  
+  ret = hData->canOps->setBusParams(hData, freq, tseg1, tseg2, sjw, noSamp,
+                                    freq_brs, tseg1_brs, tseg2_brs, sjw_brs,
+                                    syncmode);
+  return ret;
 }
 
 canStatus CANLIBAPI
 canSetBusParamsC200 (const CanHandle hnd, unsigned char btr0, unsigned char btr1)
 {
-  long bitrate;
+  canStatus    ret;
+  long         bitrate;
   unsigned int tseg1;
   unsigned int tseg2;
   unsigned int sjw;
@@ -571,6 +589,12 @@ canSetBusParamsC200 (const CanHandle hnd, unsigned char btr0, unsigned char btr1
   noSamp  = ((btr1 & 0x80) >> 7) ? 3 : 1;
   bitrate = 8000000L * 64 / (((btr0 & 0x3f) + 1) << 6) /
             (tseg1 + tseg2 + 1);
+
+  ret = check_bitrate (hnd, (unsigned int)bitrate);
+  
+  if (ret != canOK) {
+    return ret;
+  }
 
   return canSetBusParams(hnd, bitrate, tseg1, tseg2, sjw, noSamp, syncmode);
 }
@@ -832,27 +856,27 @@ canReadSync(const CanHandle hnd, unsigned long timeout)
 
   hData = findHandle(hnd);
   if (hData == NULL) {
-	return canERR_INVHANDLE;
+    return canERR_INVHANDLE;
   }
 
   if (hData->syncPressent == 0)
   {
-		stat = canReadWait (hnd, &hData->syncId, &hData->syncMsg, &hData->syncDlc,
-				  &hData->syncFlag, &hData->syncTime, timeout);
-		if (stat != canOK)
-		{
-		  hData->syncPressent = 0;
-		  return canERR_TIMEOUT;
-		}
-		else
-		{
-		  hData->syncPressent = 1;
-		  return canOK;
-		}
+    stat = canReadWait (hnd, &hData->syncId, &hData->syncMsg, &hData->syncDlc,
+              &hData->syncFlag, &hData->syncTime, timeout);
+    if (stat != canOK)
+    {
+      hData->syncPressent = 0;
+      return canERR_TIMEOUT;
+    }
+    else
+    {
+      hData->syncPressent = 1;
+      return canOK;
+    }
   }
   else
   {
-	  return canOK;
+    return canOK;
   }
 }
 //****************************************************************
@@ -1055,7 +1079,7 @@ canGetErrorText (canStatus err, char *buf, unsigned int bufsiz)
   if (!buf || bufsiz == 0) {
     return canOK;
   }
-  if ((code <= 0) && (-code < sizeof(errorStrings) / sizeof(char *))) {
+  if ((code <= 0) && ((unsigned)(-code) < sizeof(errorStrings) / sizeof(char *))) {
     if (errorStrings [-code] == NULL) {
       snprintf(buf, bufsiz, "Unknown error (%d)", (int)code);
     } else {
@@ -1091,7 +1115,7 @@ canStatus CANLIBAPI canGetNumberOfChannels (int *channelCount)
   int tmpCount = 0;
   int cardNr;
   char filename[DEVICE_NAME_LEN];
-  int n = 0;
+  unsigned n = 0;
 
   for(n = 0; n < sizeof(dev_name) / sizeof(*dev_name); n++) {
     // There are 256 minor inode numbers
@@ -1115,25 +1139,25 @@ canStatus CANLIBAPI canGetNumberOfChannels (int *channelCount)
 
 
 //******************************************************
-// Find device description data fom EAN
+// Find device description data from EAN
 //******************************************************
 
 canStatus CANLIBAPI
-canGetDescrData (void *buffer, unsigned int ean[], int cap)
+canGetDescrData (void *buffer, const size_t bufsize, unsigned int ean[], int cap)
 {
   unsigned int len, i;
 
   len = sizeof(dev_descr_list)/sizeof(struct dev_descr);
 
   /* set Unknown device description */
-  strcpy(buffer, dev_descr_list[0].descr_string);
+  strncpy(buffer, dev_descr_list[0].descr_string, bufsize - 1);
 
   /* check in device is virtual device */
   if ((ean[0] == dev_descr_list[1].ean[0]) &&
       (ean[1] == dev_descr_list[1].ean[1]) &&
       (cap & canCHANNEL_CAP_VIRTUAL))
   {
-    strcpy(buffer, dev_descr_list[1].descr_string);
+    strncpy(buffer, dev_descr_list[1].descr_string, bufsize - 1);
   }
   /* search for description by matching ean number */
   else
@@ -1142,7 +1166,7 @@ canGetDescrData (void *buffer, unsigned int ean[], int cap)
     {
       if ((ean[0] == dev_descr_list[i].ean[0]) && (ean[1] == dev_descr_list[i].ean[1]))
       {
-        strcpy(buffer, dev_descr_list[i].descr_string);
+        strncpy(buffer, dev_descr_list[i].descr_string, bufsize - 1);
         break;
       }
     }
@@ -1151,37 +1175,27 @@ canGetDescrData (void *buffer, unsigned int ean[], int cap)
 
 }
 
-//******************************************************
-// Find out channel specific data
-//******************************************************
-canStatus CANLIBAPI
-canGetChannelData (int channel, int item, void *buffer, size_t bufsize)
+static canStatus
+getHandleData (HandleData *hData, int item, void *buffer, const size_t bufsize)
 {
   canStatus status;
-  HandleData hData;
   unsigned int ean[2];
   int cap = 0;
 
-  status = getDevParams(channel, hData.deviceName, &hData.channelNr,
-                        &hData.canOps, hData.deviceOfficialName);
-
-  if (status < 0) {
-    return status;
-  }
-
   switch(item) {
   case canCHANNELDATA_CHANNEL_NAME:
-    strcpy(buffer, hData.deviceOfficialName);
-    bufsize = strlen(hData.deviceOfficialName);
+    strncpy(buffer, hData->deviceOfficialName, bufsize - 1);
     return canOK;
 
   case canCHANNELDATA_CHAN_NO_ON_CARD:
-    bufsize = sizeof(hData.channelNr);
-    memcpy(buffer, &hData.channelNr, bufsize);
+    if (bufsize < sizeof(hData->channelNr)) {
+      return canERR_PARAM;
+    }
+    memcpy(buffer, &hData->channelNr, sizeof(hData->channelNr));
     return canOK;
 
   case canCHANNELDATA_DEVDESCR_ASCII:
-    status = hData.canOps->getChannelData(hData.deviceName,
+    status = hData->canOps->getChannelData(hData->deviceName,
                                           canCHANNELDATA_CARD_UPC_NO,
                                           &ean,
                                           sizeof(ean));
@@ -1190,7 +1204,7 @@ canGetChannelData (int channel, int item, void *buffer, size_t bufsize)
       return status;
     }
 
-    status = hData.canOps->getChannelData(hData.deviceName,
+    status = hData->canOps->getChannelData(hData->deviceName,
                                           canCHANNELDATA_CHANNEL_CAP,
                                           &cap,
                                           sizeof(cap));
@@ -1199,20 +1213,86 @@ canGetChannelData (int channel, int item, void *buffer, size_t bufsize)
       return status;
     }
 
-    return canGetDescrData(buffer, ean, cap);
+    return canGetDescrData(buffer, bufsize, ean, cap);
 
   case canCHANNELDATA_MFGNAME_ASCII:
-    strcpy(buffer, "KVASER AB");
+    strncpy(buffer, MFGNAME_ASCII, bufsize - 1);
     return canOK;
 
+  case canCHANNELDATA_TRANS_CAP:
+  case canCHANNELDATA_CHANNEL_FLAGS:
+  case canCHANNELDATA_CARD_NUMBER:
+  case canCHANNELDATA_TRANS_SERIAL_NO:
+  case canCHANNELDATA_TRANS_UPC_NO:
+  case canCHANNELDATA_DRIVER_NAME:
+  case canCHANNELDATA_DLL_FILE_VERSION:
+  case canCHANNELDATA_DLL_PRODUCT_VERSION:
+  case canCHANNELDATA_DLL_FILETYPE:
+  case canCHANNELDATA_TRANS_TYPE:
+  case canCHANNELDATA_DEVICE_PHYSICAL_POSITION:
+  case canCHANNELDATA_UI_NUMBER:
+  case canCHANNELDATA_TIMESYNC_ENABLED:
+  case canCHANNELDATA_DRIVER_FILE_VERSION:
+  case canCHANNELDATA_DRIVER_PRODUCT_VERSION:
+  case canCHANNELDATA_MFGNAME_UNICODE:
+  case canCHANNELDATA_DEVDESCR_UNICODE:
+  case canCHANNELDATA_CHANNEL_QUALITY:
+  case canCHANNELDATA_ROUNDTRIP_TIME:
+  case canCHANNELDATA_BUS_TYPE:
+  case canCHANNELDATA_TIME_SINCE_LAST_SEEN:
+  case canCHANNELDATA_DEVNAME_ASCII:
+  case canCHANNELDATA_REMOTE_OPERATIONAL_MODE:
+  case canCHANNELDATA_REMOTE_PROFILE_NAME:
+  case canCHANNELDATA_REMOTE_HOST_NAME:
+  case canCHANNELDATA_REMOTE_MAC:
+    return canERR_NOT_IMPLEMENTED;
+
   default:
-    return hData.canOps->getChannelData(hData.deviceName,
+    return hData->canOps->getChannelData(hData->deviceName,
                                         item,
                                         buffer,
                                         bufsize);
   }
 }
 
+//******************************************************
+// Find out channel specific data
+//******************************************************
+canStatus CANLIBAPI
+canGetChannelData (int channel, int item, void *buffer, const size_t bufsize)
+{
+  canStatus status;
+  HandleData hData;
+
+  status = getDevParams(channel, hData.deviceName, &hData.channelNr,
+                        &hData.canOps, hData.deviceOfficialName);
+
+  if (status < 0) {
+    return status;
+  }
+  return getHandleData (&hData, item, buffer, bufsize);
+}
+
+//******************************************************
+// Get handle data
+//******************************************************
+canStatus CANLIBAPI
+canGetHandleData (const CanHandle hnd, int item, void *buffer,
+                  const size_t bufsize)
+{
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  if (hData->valid == FALSE) {
+    return canERR_PARAM;
+  }
+
+  return getHandleData (hData, item, buffer, bufsize);
+}
 
 //===========================================================================
 canStatus CANLIBAPI canObjBufFreeAll (const CanHandle hnd)
@@ -1508,4 +1588,23 @@ void CANLIBAPI canInitializeLibrary (void)
 
   Initialized = TRUE;
   return;
+}
+
+static canStatus check_bitrate (const CanHandle hnd, unsigned int bitrate)
+{
+  canStatus    ret;
+  unsigned int max_bitrate;
+
+  ret = canGetHandleData(hnd, canCHANNELDATA_MAX_BITRATE, &max_bitrate, sizeof(max_bitrate));
+
+  if (ret != canOK) {
+    return ret;
+  }
+  
+  if (max_bitrate) {
+    if (bitrate > max_bitrate) {
+      return canERR_PARAM;
+    }
+  }
+  return canOK;
 }

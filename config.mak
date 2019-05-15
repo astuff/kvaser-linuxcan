@@ -82,8 +82,9 @@ $(KV_MODULE_NAME)-objs := $(OBJS)
 
 KBUILD_EXTRA_SYMBOLS = $(PWD)/../common/Module.symvers
 
+CHECK_LOGFILE = checklog.txt
 
-.PHONY: kv_module install clean
+.PHONY: kv_module install clean check
 
 kv_module:
 	@echo --------------------------------------------------------------------
@@ -95,6 +96,17 @@ kv_module:
 install: kv_module
 	@echo --------------------------------------------------------------------
 	@echo "You need to manually install by running 'sudo ./installscript.sh'"
+	@echo --------------------------------------------------------------------
+
+check:
+# Install cppcheck with 'sudo apt-get install cppcheck'
+	@echo --------------------------------------------------------------------
+ifeq ($(CHECK_SUPPRESS),)
+		cppcheck -I ../include/ -I ../../Tmp  -I /usr/include -I /usr/include/linux --enable=all --suppress=toomanyconfigs . > $(CHECK_LOGFILE) 2>&1
+else
+		cppcheck -I ../include/ -I ../../Tmp  -I /usr/include -I /usr/include/linux --enable=all --suppressions-list=$(CHECK_SUPPRESS) --suppress=toomanyconfigs . > $(CHECK_LOGFILE) 2>&1
+endif
+	@cat $(CHECK_LOGFILE)
 	@echo --------------------------------------------------------------------
 
 clean:

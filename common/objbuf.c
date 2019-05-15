@@ -182,8 +182,10 @@ static void objbuf_write_all (OS_IF_TASK_QUEUE_HANDLE *work)
     rd = atomic_read(&fileNodePtr->objbufActive);
     new_rd = rd & ~done_mask;
   } while (atomic_cmpxchg(&fileNodePtr->objbufActive, rd, new_rd) != rd);
-#else
+#elif LINUX_VERSION_CODE < KERNEL_VERSION(4, 3, 0)
   atomic_clear_mask(done_mask, &fileNodePtr->objbufActive);
+#else
+  atomic_and(done_mask, &fileNodePtr->objbufActive);
 #endif
 
   if (active_mask != done_mask) {

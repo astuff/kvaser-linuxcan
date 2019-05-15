@@ -192,3 +192,33 @@ unsigned int calculateCRC32(void *buf, unsigned int bufsiz)
   return ~crc;            /* transmit complement, per CRC-32 spec */
 }
 EXPORT_SYMBOL(calculateCRC32);
+
+/*
+  reports a usb root hub id.
+  the id is composed of 2 parts, the bus-number and the device-number
+*/
+
+unsigned int get_usb_root_hub_id (struct usb_device *udev)
+{
+  struct usb_device *tmp = udev;
+  int done               = 0;
+  unsigned int retval;
+  
+  while (!done)
+  {
+    if (tmp->parent)
+    {
+      tmp = tmp->parent;
+    }
+    else
+    {
+      done = 1;
+    }
+  }
+
+  retval = (((unsigned int)tmp->bus->busnum) & 0x0000FFFF) << 16;
+  retval |= ((unsigned int)tmp->devnum & 0x0000FFFF);
+
+  return retval;
+}
+EXPORT_SYMBOL(get_usb_root_hub_id);

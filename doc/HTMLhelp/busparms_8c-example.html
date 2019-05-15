@@ -195,6 +195,9 @@ function toggleVisibility(linkObj) {
   <span class="keywordtype">int</span> j;
   <a class="code" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canHandle</a> h [2];
   
+  (void)argc; <span class="comment">// Unused.</span>
+  (void)argv; <span class="comment">// Unused.</span>
+  
   <span class="keywordflow">for</span>(j = 0 ; j &lt; 2 ; j++) {
     h[j] = <a name="a2"></a><a class="code" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel</a>(j, <a name="a3"></a><a class="code" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a> | <a name="a4"></a><a class="code" href="canlib_8h.html#a161c14f3b9d1e5cff276c6246a651fcd">canOPEN_REQUIRE_EXTENDED</a>);
     <span class="keywordflow">if</span> (h[j] &lt; 0) {
@@ -235,7 +238,7 @@ function toggleVisibility(linkObj) {
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.15) - Generated on Mon Mar 7 2016</small>
+<small>Kvaser Linux CANLIB (canlib 5.16) - Generated on Sun May 22 2016</small>
 </address>
 </body>
 </html>

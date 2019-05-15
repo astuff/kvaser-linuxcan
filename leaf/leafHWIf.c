@@ -71,7 +71,8 @@
 #include "debug.h"
 #include "hwnames.h"
 #include "vcan_ioctl.h"
-
+#include "util.h"
+#include "capabilities.h"
 
 // Get a minor range for your devices from the usb maintainer
 // Use a unique set for each driver
@@ -120,7 +121,6 @@ static int leaf_get_chipstate(VCanChanData *vChd);
 static int leaf_get_time(VCanCardData *vCard, unsigned long *time);
 static int leaf_flush_tx_buffer(VCanChanData *vChan);
 static void leaf_schedule_send(VCanCardData *vCard, VCanChanData *vChan);
-static unsigned long leaf_get_hw_rx_q_len(VCanChanData *vChan);
 static unsigned long leaf_get_hw_tx_q_len(VCanChanData *vChan);
 static int leaf_objbuf_exists(VCanChanData *chd, int bufType, int bufNo);
 static int leaf_objbuf_free(VCanChanData *chd, int bufType, int bufNo);
@@ -140,6 +140,9 @@ static int leaf_objbuf_set_msg_count(VCanChanData *chd, int bufType, int bufNo,
 static int leaf_objbuf_send_burst(VCanChanData *chd, int bufType, int bufNo,
                                   int burstLen);
 
+static int leaf_tx_interval  (VCanChanData *chd, unsigned int *interval);
+static int leaf_capabilities (VCanCardData *vCard, uint32_t vcan_cmd);
+
 static VCanDriverData driverData;
 
 static VCanHWInterface hwIf = {
@@ -157,7 +160,6 @@ static VCanHWInterface hwIf = {
   .flushSendBuffer   = leaf_flush_tx_buffer,
   .getRxErr          = leaf_get_rx_err,
   .getTxErr          = leaf_get_tx_err,
-  .rxQLen            = leaf_get_hw_rx_q_len,
   .txQLen            = leaf_get_hw_tx_q_len,
   .requestChipState  = leaf_get_chipstate,
   .requestSend       = leaf_schedule_send,
@@ -171,6 +173,7 @@ static VCanHWInterface hwIf = {
   .objbufSetPeriod   = leaf_objbuf_set_period,
   .objbufSetMsgCount = leaf_objbuf_set_msg_count,
   .objbufSendBurst   = leaf_objbuf_send_burst,
+  .tx_interval       = leaf_tx_interval
 };
 
 
@@ -222,14 +225,16 @@ static void   leaf_write_bulk_callback(struct urb *urb);
 static int    leaf_allocate(VCanCardData **vCard);
 static void   leaf_deallocate(VCanCardData *vCard);
 
-static void   leaf_start(VCanCardData *vCard);
+static int    leaf_start(VCanCardData *vCard);
 
 static int    leaf_tx_available(VCanChanData *vChan);
 static int    leaf_transmit(VCanCardData *vCard);
 static int    leaf_send_and_wait_reply(VCanCardData *vCard, filoCmd *cmd,
                                        filoCmd *replyPtr,
                                        unsigned char cmdNr,
-                                       unsigned char transId);
+                                       unsigned char transId,
+                                       unsigned char check_trans_id);
+
 static int    leaf_queue_cmd(VCanCardData *vCard, filoCmd *cmd,
                              unsigned int timeout);
 
@@ -511,18 +516,18 @@ static void le_to_cpu (filoCmd *cmd)
     le32_to_cpus(&cmd->logMessage.id);
     break;
   case CMD_LOG_TRIG:
-    le16_to_cpus(&cmd->logTrigger.time[0]);
-    le16_to_cpus(&cmd->logTrigger.time[1]);
-    le16_to_cpus(&cmd->logTrigger.time[2]);
-    le32_to_cpus(&cmd->logTrigger.preTrigger);
-    le32_to_cpus(&cmd->logTrigger.postTrigger);
+    le16_to_cpus(&cmd->logTrig.time[0]);
+    le16_to_cpus(&cmd->logTrig.time[1]);
+    le16_to_cpus(&cmd->logTrig.time[2]);
+    le32_to_cpus(&cmd->logTrig.preTrigger);
+    le32_to_cpus(&cmd->logTrig.postTrigger);
     break;
   case CMD_LOG_RTC_TIME:
     le16_to_cpus(&cmd->logRtcTime.date);
     le16_to_cpus(&cmd->logRtcTime.time);
     le16_to_cpus(&cmd->logRtcTime.bitrate0L);
     le32_to_cpus(&cmd->logRtcTime.bitrate1L);
-    le32_to_cpus(&cmd->logTrigger.postTrigger);
+    le32_to_cpus(&cmd->logTrig.postTrigger);
     break;
   case CMD_RX_STD_MESSAGE:
   case CMD_RX_EXT_MESSAGE:
@@ -930,15 +935,7 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
       memcpy(vCard->ean, &cmd->getCardInfoResp.EAN[0], 8);
       vCard->hwRevisionMajor   = cmd->getCardInfoResp.hwRevision;
       vCard->hwRevisionMinor   = 0;
-      vCard->capabilities = VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES    |
-                            VCAN_CHANNEL_CAP_RECEIVE_ERROR_FRAMES |
-                            VCAN_CHANNEL_CAP_TIMEBASE_ON_CARD     |
-                            VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION  |
-                            VCAN_CHANNEL_CAP_ERROR_COUNTERS       |
-                            VCAN_CHANNEL_CAP_EXTENDED_CAN         |
-                            VCAN_CHANNEL_CAP_TXREQUEST            |
-                            VCAN_CHANNEL_CAP_TXACKNOWLEDGE;
-      vCard->hw_type      = cmd->getCardInfoResp.hwType;
+      vCard->hw_type           = cmd->getCardInfoResp.hwType;
       break;
 
     case CMD_GET_CARD_INFO_2:
@@ -1008,6 +1005,11 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
         DEBUGPRINT(6, (TXT("Auto tx buffer\n")));
         vCard->card_flags |= DEVHND_CARD_AUTO_TX_OBJBUFS;
       }
+
+      if (cmd->getSoftwareInfoResp.swOptions & SWOPTION_CAP_REQ) {
+        vCard->card_flags |= DEVHND_CARD_EXTENDED_CAPABILITIES;
+      }
+
       if (cmd->getSoftwareInfoResp.swOptions & SWOPTION_TIMEOFFSET_VALID) {
         DEBUGPRINT(6, (TXT("Time offset\n")));
         dev->time_offset_valid = 1;
@@ -1341,24 +1343,16 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
   list_for_each_safe(currHead, tmpHead, &dev->replyWaitList)
   {
     currNode = list_entry(currHead, WaitNode, list);
-      if (currNode->cmdNr == cmd->head.cmdNo &&
-          leaf_get_trans_id(cmd) == currNode->transId) {
-        memcpy(currNode->replyPtr, cmd, cmd->head.cmdLen);
-        DEBUGPRINT(4, (TXT ("Match: cN->cmdNr(%d) == cmd->cmdNo(%d) && ")
-                       TXT2("_get_trans_id(%d) == cN->transId(%d)\n"),
-                       currNode->cmdNr, cmd->head.cmdNo,
-                       leaf_get_trans_id(cmd), currNode->transId));
-        os_if_up_sema(&currNode->waitSemaphore);
-      }
-#if DEBUG
-      else {
-        DEBUGPRINT(4, (TXT ("No match: cN->cmdNr(%d) == cmd->cmdNo(%d) && ")
-                       TXT2("_get_trans_id(%d) == cN->transId(%d)\n"),
-                       currNode->cmdNr, cmd->head.cmdNo,
-                       leaf_get_trans_id(cmd), currNode->transId));
-      }
-#endif
-
+    if (currNode->cmdNr == cmd->head.cmdNo &&
+        ((leaf_get_trans_id(cmd) == currNode->transId) ||
+         !currNode->check_trans_id)) {
+      memcpy(currNode->replyPtr, cmd, cmd->head.cmdLen);
+      DEBUGPRINT(4, (TXT ("Match: cN->cmdNr(%d) == cmd->cmdNo(%d) && ")
+                     TXT2("_get_trans_id(%d) == cN->transId(%d)\n"),
+                     currNode->cmdNr, cmd->head.cmdNo,
+                     leaf_get_trans_id(cmd), currNode->transId));
+      os_if_up_sema(&currNode->waitSemaphore);
+    }
   }
   os_if_spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
 } // _handle_command
@@ -1762,7 +1756,7 @@ static void leaf_get_card_info_dummy (VCanCardData* vCard)
   cmd.transId = CMD_GET_SOFTWARE_INFO_REQ;
 
   leaf_send_and_wait_reply(vCard, (filoCmd *)&cmd, &reply,
-                           CMD_GET_SOFTWARE_INFO_RESP, cmd.transId);
+                           CMD_GET_SOFTWARE_INFO_RESP, cmd.transId, 1);
 
   DEBUGPRINT(2, (TXT("Using fw version: %d.%d.%d, Max Tx: %d\n"),
                  vCard->firmwareVersionMajor,
@@ -1775,7 +1769,7 @@ static void leaf_get_card_info_dummy (VCanCardData* vCard)
   card_cmd.transId = CMD_GET_CARD_INFO_REQ;
 
   leaf_send_and_wait_reply(vCard, (filoCmd *)&card_cmd, &reply,
-                           CMD_GET_CARD_INFO_RESP, card_cmd.transId);
+                           CMD_GET_CARD_INFO_RESP, card_cmd.transId, 1);
   DEBUGPRINT(2, (TXT("channels: %d, s/n: %d, hwrev: %u\n"),
                  reply.getCardInfoResp.channelCount,
                  (int)reply.getCardInfoResp.serialNumber,
@@ -1786,7 +1780,7 @@ static void leaf_get_card_info_dummy (VCanCardData* vCard)
     auto_cmd.cmdNo       = CMD_AUTO_TX_BUFFER_REQ;
     auto_cmd.requestType = AUTOTXBUFFER_CMD_GET_INFO;
     leaf_send_and_wait_reply(vCard, (filoCmd *)&auto_cmd, &reply,
-                             CMD_AUTO_TX_BUFFER_RESP, auto_cmd.requestType);
+                             CMD_AUTO_TX_BUFFER_RESP, auto_cmd.requestType, 1);
     DEBUGPRINT(2, (TXT("objbufs supported, count=%d resolution=%d\n"),
                    dev->autoTxBufferCount, dev->autoTxBufferResolution));
   }
@@ -1811,7 +1805,7 @@ static void leaf_response_timer (unsigned long voidWaitNode)
 //
 static int leaf_send_and_wait_reply (VCanCardData *vCard, filoCmd *cmd,
                                      filoCmd *replyPtr, unsigned char cmdNr,
-                                     unsigned char transId)
+                                     unsigned char transId, unsigned char check_trans_id)
 {
   LeafCardData       *dev = vCard->hwCardData;
   struct timer_list  waitTimer;
@@ -1830,9 +1824,10 @@ static int leaf_send_and_wait_reply (VCanCardData *vCard, filoCmd *cmd,
   }
 
   os_if_init_sema(&waitNode.waitSemaphore);
-  waitNode.replyPtr  = replyPtr;
-  waitNode.cmdNr     = cmdNr;
-  waitNode.transId   = transId;
+  waitNode.replyPtr      = replyPtr;
+  waitNode.cmdNr         = cmdNr;
+  waitNode.transId       = transId;
+  waitNode.check_trans_id = check_trans_id;
 
   waitNode.timedOut  = 0;
 
@@ -2258,7 +2253,11 @@ static int leaf_plugin (struct usb_interface *interface,
 
 
   // Start up vital stuff
-  leaf_start(vCard);
+  {
+    int r;
+    r = leaf_start(vCard);
+  }
+
 
   // Let the user know what node this device is now attached to
   DEBUGPRINT(2, (TXT("------------------------------\n")));
@@ -2286,7 +2285,7 @@ error:
 //
 // Init stuff, called from end of _plugin
 //
-static void leaf_start (VCanCardData *vCard)
+static int leaf_start (VCanCardData *vCard)
 {
   LeafCardData *dev = (LeafCardData *)vCard->hwCardData;
   OS_IF_THREAD rx_thread;
@@ -2328,6 +2327,31 @@ static void leaf_start (VCanCardData *vCard)
   vCard->driverData = &driverData;
   vCanInitData(vCard);
 
+  if (vCard->card_flags & DEVHND_CARD_EXTENDED_CAPABILITIES) {
+    int r;
+    r = leaf_capabilities (vCard, VCAN_CHANNEL_CAP_SILENTMODE);
+    if (r != VCAN_STAT_OK) return r;
+
+    r = leaf_capabilities (vCard, VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES);
+    if (r != VCAN_STAT_OK) return r;
+
+    r = leaf_capabilities (vCard, VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION);
+    if (r != VCAN_STAT_OK) return r;
+
+    r = leaf_capabilities (vCard, VCAN_CHANNEL_CAP_ERROR_COUNTERS);
+    if (r != VCAN_STAT_OK) return r;
+  }
+
+  set_capability_value (vCard,
+                        VCAN_CHANNEL_CAP_EXTENDED_CAN  |
+                        VCAN_CHANNEL_CAP_TXREQUEST     |
+                        VCAN_CHANNEL_CAP_TXACKNOWLEDGE,
+                        0xFFFFFFFF,
+                        0xFFFFFFFF,
+                        MAX_CARD_CHANNELS);
+
+
+  return VCAN_STAT_OK;
 } // _start
 
 
@@ -2636,7 +2660,7 @@ static int leaf_get_busparams (VCanChanData *vChan, VCanBusParams *par)
 
   ret = leaf_send_and_wait_reply(vChan->vCard, (filoCmd *)&cmd, &reply,
                                  CMD_GET_BUSPARAMS_RESP,
-                                 cmd.getBusparamsReq.transId);
+                                 cmd.getBusparamsReq.transId, 1);
 
   if (ret == VCAN_STAT_OK) {
     DEBUGPRINT(5, (TXT ("Chan(%d): Freq (%d) SJW (%d) TSEG1 (%d) TSEG2 (%d) ")
@@ -2722,7 +2746,7 @@ static int leaf_get_chipstate (VCanChanData *vChan)
 
   ret = leaf_send_and_wait_reply(vCard, (filoCmd *)&cmd, &reply,
                                  CMD_CHIP_STATE_EVENT,
-                                 cmd.getChipStateReq.transId);
+                                 cmd.getChipStateReq.transId, 1);
 
   return ret;
 } // _get_chipstate
@@ -2758,7 +2782,7 @@ static int leaf_bus_on (VCanChanData *vChan)
 
   ret = leaf_send_and_wait_reply(vCard, (filoCmd *)&cmd, &reply,
                                  CMD_START_CHIP_RESP,
-                                 cmd.startChipReq.transId);
+                                 cmd.startChipReq.transId, 1);
   if (ret == VCAN_STAT_OK) {
     vChan->isOnBus = 1;
 
@@ -2790,7 +2814,7 @@ static int leaf_bus_off (VCanChanData *vChan)
   cmd.startChipReq.transId  = (unsigned char)vChan->channel;
 
   ret = leaf_send_and_wait_reply(vCard, (filoCmd *)&cmd, &reply,
-                                 CMD_STOP_CHIP_RESP, cmd.startChipReq.transId);
+                                 CMD_STOP_CHIP_RESP, cmd.startChipReq.transId, 1);
   if (ret == VCAN_STAT_OK) {
     leaf_get_chipstate(vChan);
 
@@ -2905,17 +2929,6 @@ static int leaf_get_rx_err (VCanChanData *vChan)
   //return vChan->rxErrorCounter;
 } // _get_rx_err
 
-
-//======================================================================
-//  Read receive queue length in hardware/firmware
-//
-static unsigned long leaf_get_hw_rx_q_len (VCanChanData *vChan)
-{
-  DEBUGPRINT(3, (TXT("leaf: _get_hw_rx_q_len\n")));
-
-  // qqq Why _tx_ channel buffer?
-  return queue_length(&vChan->txChanQueue);
-} // _get_hw_rx_q_len
 
 
 //======================================================================
@@ -3058,7 +3071,7 @@ static int leaf_outstanding_sync (VCanChanData *vChan)
 
   // CMD_READ_CLOCK_RESP seem to always return 0 as transid
   ret = leaf_send_and_wait_reply(vCard, (filoCmd *)&cmd, &reply,
-                                 CMD_READ_CLOCK_RESP, 0);
+                                 CMD_READ_CLOCK_RESP, 0, 1);
   if (ret == VCAN_STAT_OK) {
     *time = timestamp_in_10us(vCard, reply.readClockResp.time);
   }
@@ -3498,6 +3511,79 @@ static int leaf_objbuf_send_burst (VCanChanData *chd, int bufType, int bufNo,
   return (ret != VCAN_STAT_OK) ? VCAN_STAT_NO_MEMORY : VCAN_STAT_OK;
 }
 
+static int leaf_tx_interval (VCanChanData *chd, unsigned int *interval) {
+  filoCmd cmd;
+  filoCmd reply;
+  VCanCardData  *vCard = chd->vCard;
+  int r;
+
+  memset(&cmd, 0, sizeof cmd);
+
+  cmd.txInterval.cmdLen  = sizeof(cmdTxInterval);
+  cmd.txInterval.cmdNo   = CMD_TX_INTERVAL_REQ;
+  cmd.txInterval.channel = (unsigned char)chd->channel;
+
+  cmd.txInterval.interval = *interval;
+  r = leaf_send_and_wait_reply(vCard, &cmd, &reply, CMD_TX_INTERVAL_RESP, cmd.txInterval.channel, 1);
+
+  if (r != 0)
+    return r;
+
+  if (reply.txInterval.status != VCAN_STAT_OK)
+    return VCAN_STAT_BAD_PARAMETER;
+  
+  *interval = reply.txInterval.interval;
+  return r;
+}
+
+static int leaf_capabilities (VCanCardData *vCard, uint32_t vcan_cmd) {
+  filoCmd  cmd;
+  filoCmd  reply;
+  int      r;
+  uint32_t value, mask;
+  uint8_t  sub_cmd = convert_vcan_to_hydra_cmd (vcan_cmd);
+
+  if (!vcan_cmd) {
+    return VCAN_STAT_BAD_PARAMETER;
+  }
+
+  memset(&cmd, 0, sizeof cmd);
+
+  cmd.capabilitiesReq.cmdNo    = CMD_GET_CAPABILITIES_REQ;
+  cmd.capabilitiesReq.subCmdNo = sub_cmd;
+  cmd.capabilitiesReq.cmdLen   = sizeof(cmdCapabilitiesReq);
+
+  r = leaf_send_and_wait_reply(vCard, &cmd, &reply, CMD_GET_CAPABILITIES_RESP, 0, 0);
+
+  if (r != VCAN_STAT_OK) return r;
+
+  if (reply.capabilitiesResp.status != CAP_STATUS_OK) return VCAN_STAT_FAIL;
+
+  switch (reply.capabilitiesResp.subCmdNo) {
+    case CAP_SUB_CMD_SILENT_MODE:
+      value = reply.capabilitiesResp.silentMode.value;
+      mask  = reply.capabilitiesResp.silentMode.mask;
+      break;
+    case CAP_SUB_CMD_ERRFRAME:
+      value = reply.capabilitiesResp.errframeCap.value;
+      mask  = reply.capabilitiesResp.errframeCap.mask;
+      break;
+    case CAP_SUB_CMD_BUS_STATS:
+      value = reply.capabilitiesResp.busstatCap.value;
+      mask  = reply.capabilitiesResp.busstatCap.mask;
+      break;
+    case CAP_SUB_CMD_ERRCOUNT_READ:
+      value = reply.capabilitiesResp.errcountCap.value;
+      mask  = reply.capabilitiesResp.errcountCap.mask;
+      break;
+    default: return VCAN_STAT_BAD_PARAMETER; break;
+  }
+
+  set_capability_value (vCard, vcan_cmd, value, 0xFFFFFFFF, MAX_CARD_CHANNELS);
+  set_capability_mask  (vCard, vcan_cmd, mask,  0xFFFFFFFF, MAX_CARD_CHANNELS);
+
+  return r;
+}
 
 
 

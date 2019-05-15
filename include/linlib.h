@@ -79,6 +79,10 @@ typedef int LinHandle;
 #  define CompilerAssert(exp) extern char _CompilerAssert[(exp) ? 1 : -1]
 #endif
 
+typedef unsigned char BYTE;
+typedef unsigned int DWORD;
+typedef unsigned int HANDLE;
+typedef unsigned int BOOL;
 
 /**
  * \name Return codes from the LINlib functions

@@ -69,6 +69,7 @@
 #include "debug.h"
 #include "hwnames.h"
 #include "vcan_ioctl.h"
+#include "capabilities.h"
 
 // Get a minor range for your devices from the usb maintainer
 // Use a unique set for each driver
@@ -118,7 +119,6 @@ static int usbcan_get_chipstate(VCanChanData *vChd);
 static int usbcan_get_time(VCanCardData *vCard, unsigned long *time);
 static int usbcan_flush_tx_buffer(VCanChanData *vChan);
 static void usbcan_schedule_send(VCanCardData *vCard, VCanChanData *vChan);
-static unsigned long usbcan_get_hw_rx_q_len(VCanChanData *vChan);
 static unsigned long usbcan_get_hw_tx_q_len(VCanChanData *vChan);
 static int usbcan_objbuf_exists(VCanChanData *chd, int bufType, int bufNo);
 static int usbcan_objbuf_free(VCanChanData *chd, int bufType, int bufNo);
@@ -151,7 +151,6 @@ static VCanHWInterface hwIf = {
   .flushSendBuffer   = usbcan_flush_tx_buffer,
   .getRxErr          = usbcan_get_rx_err,
   .getTxErr          = usbcan_get_tx_err,
-  .rxQLen            = usbcan_get_hw_rx_q_len,
   .txQLen            = usbcan_get_hw_tx_q_len,
   .requestChipState  = usbcan_get_chipstate,
   .requestSend       = usbcan_schedule_send,
@@ -1389,15 +1388,19 @@ static void DEVINIT usbcan_get_card_info (VCanCardData* vCard)
   memcpy(vCard->ean, &reply.getCardInfoResp.EAN[0], 8);
   vCard->hwRevisionMajor = (reply.getCardInfoResp.hwRevision >> 4);
   vCard->hwRevisionMinor = (reply.getCardInfoResp.hwRevision & 0xf);
-  // qqq This should be per channel!
-  vCard->capabilities = VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES    |
+
+  set_capability_value (vCard,
+                        VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES    |
                         VCAN_CHANNEL_CAP_RECEIVE_ERROR_FRAMES |
                         VCAN_CHANNEL_CAP_TIMEBASE_ON_CARD     |
                         VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION  |
                         VCAN_CHANNEL_CAP_ERROR_COUNTERS       |
                         VCAN_CHANNEL_CAP_EXTENDED_CAN         |
                         VCAN_CHANNEL_CAP_TXREQUEST            |
-                        VCAN_CHANNEL_CAP_TXACKNOWLEDGE;
+                        VCAN_CHANNEL_CAP_TXACKNOWLEDGE,
+                        0xFFFFFFFF,
+                        0xFFFFFFFF,
+                        MAX_CARD_CHANNELS);
 
   vCard->hw_type      = HWTYPE_DEMETER;
 
@@ -2370,16 +2373,6 @@ static int usbcan_get_rx_err (VCanChanData *vChan)
 } // _get_rx_err
 
 
-//======================================================================
-//  Read receive queue length in hardware/firmware
-//
-static unsigned long usbcan_get_hw_rx_q_len (VCanChanData *vChan)
-{
-  DEBUGPRINT(3, (TXT("usbcan: _get_hw_rx_q_len\n")));
-
-  // qqq Why _tx_ channel buffer?
-  return queue_length(&vChan->txChanQueue);
-} // _get_hw_rx_q_len
 
 
 //======================================================================

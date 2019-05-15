@@ -58,7 +58,6 @@
 #define _MHYDRA_HW_IF_H_
 
 
-
 #include "osif_kernel.h"
 #include "hydra_host_cmds.h"
 #include "objbuf.h"
@@ -67,62 +66,54 @@
 /* defines */
 /*****************************************************************************/
 
-#define DEVICE_NAME_STRING                    "mhydra"
+#define DEVICE_NAME_STRING            "mhydra"
 // Maximum number of channels for a device of this type.
-#define HYDRA_MAX_CARD_CHANNELS                      5
-#define HYDRA_MAX_DRIVER_CHANNELS                  128
+#define HYDRA_MAX_CARD_CHANNELS       5U
+#define HYDRA_MAX_DRIVER_CHANNELS     128U
 
-#define KV_MHYDRA_MAIN_RCV_BUF_SIZE                 16
-#define KV_MHYDRA_TX_CMD_BUF_SIZE                   16
-#define MHYDRA_CMD_RESP_WAIT_TIME                 5000
-#define HYDRA_MAX_OUTSTANDING_TX                   200
+#define KV_MHYDRA_MAIN_RCV_BUF_SIZE   16U
+#define KV_MHYDRA_TX_CMD_BUF_SIZE     16U
+#define MHYDRA_CMD_RESP_WAIT_TIME     5000U
+#define HYDRA_MAX_OUTSTANDING_TX      200U
 
 
 // Bits in the CxSTRH register in the M32C.
-#define M32C_BUS_RESET    0x01    // Chip is in Reset state
-#define M32C_BUS_ERROR    0x10    // Chip has seen a bus error
-#define M32C_BUS_PASSIVE  0x20    // Chip is error passive
-#define M32C_BUS_OFF      0x40    // Chip is bus off
+#define M32C_BUS_RESET                0x01U    // Chip is in Reset state
+#define M32C_BUS_ERROR                0x10U    // Chip has seen a bus error
+#define M32C_BUS_PASSIVE              0x20U    // Chip is error passive
+#define M32C_BUS_OFF                  0x40U    // Chip is bus off
 
-#define MAX_HE_COUNT            64
+#define MAX_HE_COUNT                  64U
 
 #if DEBUG
-#   define MHYDRA_Q_CMD_WAIT_TIME                  800
+#   define MHYDRA_Q_CMD_WAIT_TIME     800
 #else
-#   define MHYDRA_Q_CMD_WAIT_TIME                  200
+#   define MHYDRA_Q_CMD_WAIT_TIME     200
 #endif
 
 
 /* Channel specific data */
-typedef struct MhydraChanData
-{
+typedef struct MhydraChanData {
   /* These are the number of outgoing packets residing in the device */
-  unsigned int outstanding_tx;
-  OS_IF_LOCK   outTxLock;
-
-
-  unsigned long          timestamp_correction_value;
-
-  OBJECT_BUFFER          *objbufs;
-
-  CAN_MSG                current_tx_message[HYDRA_MAX_OUTSTANDING_TX];
-
-  } MhydraChanData;
+  uint32_t      outstanding_tx;
+  OS_IF_LOCK    outTxLock;
+  uint64_t      timestamp_correction_value;
+  OBJECT_BUFFER *objbufs;
+  CAN_MSG       current_tx_message[HYDRA_MAX_OUTSTANDING_TX];
+} MhydraChanData;
 
 
 
 /*  Cards specific data */
 typedef struct MhydraCardData {
-
   // Map channel (0,1,2,...) to HE (6-bit number meaningful only to fw)
-  unsigned char   channel2he[HYDRA_MAX_CARD_CHANNELS];
-  unsigned char   he2channel[MAX_HE_COUNT];
+  uint8_t   channel2he[HYDRA_MAX_CARD_CHANNELS];
+  uint8_t   he2channel[MAX_HE_COUNT];
+  uint32_t  max_outstanding_tx;
+  int32_t   autoTxBufferCount;
+  int32_t   autoTxBufferResolution;
 
-  unsigned int     max_outstanding_tx;
-  int              autoTxBufferCount;
-  int              autoTxBufferResolution;
-
-  OS_IF_LOCK       replyWaitListLock;
+  OS_IF_LOCK  replyWaitListLock;
   struct list_head replyWaitList;
 
   /* Structure to hold all of our device specific stuff */
@@ -130,44 +121,47 @@ typedef struct MhydraCardData {
   OS_IF_WQUEUE                *txTaskQ;
   OS_IF_TASK_QUEUE_HANDLE     txWork;
 
-  hydraHostCmd                txCmdBuffer[KV_MHYDRA_TX_CMD_BUF_SIZE]; /* Control messages */
-  Queue              txCmdQueue;
+  hydraHostCmdExt txCmdBuffer[KV_MHYDRA_TX_CMD_BUF_SIZE]; /* Control messages */
+  Queue           txCmdQueue;
 
   // busparams
-  unsigned long freq;
-  unsigned char sjw;
-  unsigned char tseg1;
-  unsigned char tseg2;
-  unsigned char samples;
+  uint64_t  freq;
+  uint8_t   sjw;
+  uint8_t   tseg1;
+  uint8_t   tseg2;
+  uint8_t   samples;
 
-  struct usb_device       *udev;               // save off the usb device pointer
-  struct usb_interface    *interface;          // the interface for this device
+  struct usb_device       *udev;        // save off the usb device pointer
+  struct usb_interface    *interface;   // the interface for this device
 
-  unsigned char *         bulk_in_buffer;      // the buffer to receive data
-  size_t                  bulk_in_size;        // the size of the receive buffer
-  __u8                    bulk_in_endpointAddr;// the address of the bulk in endpoint
+  uint8_t   *bulk_in_buffer;            // the buffer to receive data
+  size_t    bulk_in_size;               // the size of the receive buffer
+  __u8      bulk_in_endpointAddr;       // the address of the bulk in endpoint
 
-  unsigned int            bulk_in_MaxPacketSize;
+  uint32_t  bulk_in_MaxPacketSize;
 
-  unsigned char *         bulk_out_buffer;     // the buffer to send data
-  size_t                  bulk_out_size;       // the size of the send buffer
+  uint8_t   *bulk_out_buffer;           // the buffer to send data
+  size_t    bulk_out_size;              // the size of the send buffer
 
-  unsigned int            bulk_out_MaxPacketSize;
+  uint32_t  bulk_out_MaxPacketSize;
 
-  struct urb *            write_urb;           // the urb used to send data
-  struct urb *            read_urb;            // the urb used to receive data
-  __u8                    bulk_out_endpointAddr;//the address of the bulk out endpoint
-  OS_IF_SEMAPHORE         write_finished;       // wait for the write to finish
+  struct urb *write_urb;                // the urb used to send data
+  __u8        bulk_out_endpointAddr;    // the address of the bulk out endpoint
+  OS_IF_SEMAPHORE   write_finished;     // wait for the write to finish
 
-  volatile int            present;              // if the device is not disconnected
-  OS_IF_SEMAPHORE         sem;                  // locks this structure
+  int32_t  present;                     // if the device is not disconnected
+  OS_IF_SEMAPHORE   sem;                // locks this structure
 
-  VCanCardData           *vCard;
+  VCanCardData  *vCard;
 
   // General data (from Windows version)
   // Time stamping timer frequency in MHz
-  unsigned long  hires_timer_fq;
-  unsigned long  time_offset_valid;
+  uint64_t  hires_timer_fq;
+  uint64_t  time_offset_valid;
+
+  uint32_t max_bitrate;
+  uint8_t rxCmdBuffer[sizeof(hydraHostCmdExt)];
+  uint32_t rxCmdBufferLevel;
 
 } MhydraCardData;
 

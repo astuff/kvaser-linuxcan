@@ -2,7 +2,6 @@
 
 # Kvaser CAN driver                     
 # usbcanII.sh - start/stop usbcan and create/delete inodes  
-# this script can be used if hotplugging doesn't work
 # 
 #                 Copyright 2012 by Kvaser AB, Mölndal, Sweden
 #                         http://www.kvaser.com

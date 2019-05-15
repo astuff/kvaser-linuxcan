@@ -1,7 +1,6 @@
 #!/bin/sh
 # Kvaser CAN driver                     
 # leaf.sh - start/stop leaf and create/delete device files  
-# this script can be used if hotplugging doesn't work
 #
 #                 Copyright 2012 by Kvaser AB, Mölndal, Sweden
 #                         http://www.kvaser.com

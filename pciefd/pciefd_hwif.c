@@ -99,6 +99,7 @@
 #include "debug.h"
 #include "util.h"
 #include "vcan_ioctl.h"
+#include "capabilities.h"
 
 #include "hwnames.h"
 
@@ -168,7 +169,6 @@ static int pciCanFlushSendBuffer (VCanChanData *vChan);
 static int pciCanProcRead (struct seq_file* m, void* v);
 
 static int pciCanRequestChipState (VCanChanData *vChd);
-static unsigned long pciCanRxQLen(VCanChanData *vChd);
 static unsigned long pciCanTxQLen(VCanChanData *vChd);
 static void pciCanRequestSend (VCanCardData *vCard, VCanChanData *vChan);
 
@@ -189,7 +189,6 @@ static VCanHWInterface hwIf = {
   .flushSendBuffer    = pciCanFlushSendBuffer,
   .getTxErr           = pciCanGetTxErr,
   .getRxErr           = pciCanGetRxErr,
-  .rxQLen             = pciCanRxQLen,
   .txQLen             = pciCanTxQLen,
   .requestChipState   = pciCanRequestChipState,
   .requestSend        = pciCanRequestSend,
@@ -933,10 +932,10 @@ static void printCardInfo(VCanCardData *vCard)
   if (vCard->firmwareVersionMajor != PCIEFD_FPGA_MAJOR_VER) {
     vCard->card_flags |= DEVHND_CARD_REFUSE_TO_USE_CAN;
     INITPRINT("\n    *** ERROR: Unsupported firmware version %d.%d.%d. Please upgrade to at least %d.0.1\n\n",
-	      vCard->firmwareVersionMajor,
-	      vCard->firmwareVersionMinor,
-	      vCard->firmwareVersionBuild,
-	      PCIEFD_FPGA_MAJOR_VER);
+              vCard->firmwareVersionMajor,
+              vCard->firmwareVersionMinor,
+              vCard->firmwareVersionBuild,
+              PCIEFD_FPGA_MAJOR_VER);
   }
 
   freq = IORD_SYSID_BUS_FREQUENCY(hCard->sysidBase);
@@ -1144,7 +1143,7 @@ static int DEVINIT getCardInfo(VCanCardData *vCard)
 
         os_if_kernel_free(param_image);
 
-	return VCAN_STAT_OK;
+        return VCAN_STAT_OK;
       }
     }
 
@@ -1186,17 +1185,20 @@ static int DEVINIT pciCanProbe (VCanCardData *vCard)
 
   vCard->hwRevisionMinor = 0;
 
-  vCard->capabilities =
-    VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES    |
-    VCAN_CHANNEL_CAP_RECEIVE_ERROR_FRAMES |
-    VCAN_CHANNEL_CAP_TIMEBASE_ON_CARD     |
-    VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION  |
-    VCAN_CHANNEL_CAP_ERROR_COUNTERS       |
-    VCAN_CHANNEL_CAP_EXTENDED_CAN         |
-    VCAN_CHANNEL_CAP_TXREQUEST            |
-    VCAN_CHANNEL_CAP_TXACKNOWLEDGE        |
-    VCAN_CHANNEL_CAP_CANFD                |
-    VCAN_CHANNEL_CAP_CANFD_NONISO;
+  set_capability_value (vCard,
+                        VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES    |
+                        VCAN_CHANNEL_CAP_RECEIVE_ERROR_FRAMES |
+                        VCAN_CHANNEL_CAP_TIMEBASE_ON_CARD     |
+                        VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION  |
+                        VCAN_CHANNEL_CAP_ERROR_COUNTERS       |
+                        VCAN_CHANNEL_CAP_EXTENDED_CAN         |
+                        VCAN_CHANNEL_CAP_TXREQUEST            |
+                        VCAN_CHANNEL_CAP_TXACKNOWLEDGE        |
+                        VCAN_CHANNEL_CAP_CANFD                |
+                        VCAN_CHANNEL_CAP_CANFD_NONISO,
+                        0xFFFFFFFF,
+                        0xFFFFFFFF,
+                        MAX_CARD_CHANNELS);
 
   if(vCard->nrChannels > MAX_CARD_CHANNELS) {
     vCard->nrChannels = MAX_CARD_CHANNELS;
@@ -1329,13 +1331,13 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
   unsigned long   brp;
   unsigned long   mode;
   unsigned long   freq;
+  unsigned long   recalc_freq;
   unsigned int    tseg1;
   unsigned int    tseg2;
   unsigned int    sjw;
   unsigned long   irqFlags;
   unsigned long   btrn, btrd=0;
   uint32_t bus_load_prescaler;
-  uint64_t        tmp;
 
   freq  = par->freq;
   sjw   = par->sjw;
@@ -1345,78 +1347,68 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
   quantaPerCycle = tseg1 + tseg2 + 1;
 
   DEBUGPRINT(2, "Set CAN/Arbitration params: bitrate:%lu, tseg1:%u, tseg2:%u, sjw:%u\n",
-	     freq, tseg1, tseg2, sjw);
+             freq, tseg1, tseg2, sjw);
 
   if (quantaPerCycle == 0 || freq == 0) {
     DEBUGPRINT(1,"Error: Bad parameter\n");
     return VCAN_STAT_BAD_PARAMETER;
   }
 
-  brp = (hCard->frequency * 8) / (freq * quantaPerCycle);
+  brp = hCard->frequency / (freq * quantaPerCycle);
 
-  if ((brp & 0x7) != 0) {
-    DEBUGPRINT(1,"Error: brp residual f:%lu s1:%u s2:%u\n",freq,tseg1,tseg2);
+  recalc_freq = hCard->frequency / (brp * quantaPerCycle);
+  if (recalc_freq != freq) {
+    DEBUGPRINT(1,"Error: CAN prescaler residual. The parameters bitrate:%lu tseg1:%u tseg2:%u gives this bitrate:%lu\n",
+               freq,tseg1,tseg2, recalc_freq);
     return VCAN_STAT_BAD_PARAMETER;
   }
 
-  brp = brp >> 3;
-
-  if (brp   < 1 || brp   > 8192 || // 13-bits 1 + 0..8191
-      sjw   < 1 || sjw   >   16 || // 4-bits  1 + 0..15
-      tseg1 < 1 || tseg1 >  512 || // 9-bits  1 + 0..511
-      tseg2 < 1 || tseg2 >   32) { // 5-bits  1 + 0..31
-    DEBUGPRINT(1,"Error: Other checks can/arbitration phase brp:%lu sjw:%u tseg1:%u tseg2:%u\n",brp,sjw,tseg1,tseg2);
-    return VCAN_STAT_BAD_PARAMETER;
-  }
-  
   btrn = PCIEFD_BTR_SEG2(tseg2-1) | PCIEFD_BTR_SEG1(tseg1-1) | PCIEFD_BTR_SJW(sjw-1) | PCIEFD_BTR_BRP(brp-1);
 
   bus_load_prescaler = calcBusloadPrescaler(quantaPerCycle, brp);
 
-  if(hwSupportCanFD(hChd->canControllerBase))
-    {
-      freq  = par->freq_brs;
-      sjw   = par->sjw_brs;
-      tseg1 = par->tseg1_brs;
-      tseg2 = par->tseg2_brs;
+  if(hwSupportCanFD(hChd->canControllerBase)) {
+    freq  = par->freq_brs;
+    sjw   = par->sjw_brs;
+    tseg1 = par->tseg1_brs;
+    tseg2 = par->tseg2_brs;
 
-      quantaPerCycle = tseg1 + tseg2 + 1;
+    quantaPerCycle = tseg1 + tseg2 + 1;
 
-      DEBUGPRINT(2, "Set CAN FD Data phase params: bitrate:%lu, tseg1:%u, tseg2:%u, sjw:%u\n",
-		 freq, tseg1, tseg2, sjw);
-      
-      if (quantaPerCycle == 0 || freq == 0) {
-        DEBUGPRINT(1,"Error: Bad parameter\n");
-        return VCAN_STAT_BAD_PARAMETER;
-      }
-
-      // Perform calculations on 64-bit value
-      tmp = (uint64_t)hCard->frequency * 8192ULL;
-      do_div(tmp,(freq*quantaPerCycle));
-
-      brp = (unsigned long)tmp;
-
-      brp = brp >> 13;
-      if (brp > CANFD_MAX_PRESCALER_VALUE) {
-        DEBUGPRINT(1,"[%s, %d] Error: prescaler (%lu) out of limits (>%u)\n", __FILE__, __LINE__, brp, 
-                   CANFD_MAX_PRESCALER_VALUE);
-        return VCAN_STAT_BAD_PARAMETER;
-      }
-
-      if (brp   < 1 || brp   > 8192 || // 13-bits 1 + 0..8191
-          sjw   < 1 || sjw   >   16 || // 4-bits  1 + 0..15
-          tseg1 < 1 || tseg1 >  512 || // 9-bits  1 + 0..511
-          tseg2 < 1 || tseg2 >   32) { // 5-bits  1 + 0..31
-        DEBUGPRINT(1,"Error: Other checks can fd data phase brp:%lu sjw:%u tseg1:%u tseg2:%u\n",brp,sjw,tseg1,tseg2);
-        return VCAN_STAT_BAD_PARAMETER;
-      }
-
-      btrd = PCIEFD_BTR_SEG2(tseg2-1) | PCIEFD_BTR_SEG1(tseg1-1) | PCIEFD_BTR_SJW(sjw-1) | PCIEFD_BTR_BRP(brp-1);
-
-      if (OPEN_AS_CAN != vChd->canFdMode) {
-        bus_load_prescaler = calcBusloadPrescaler(quantaPerCycle, brp);
-      }
+    if (quantaPerCycle == 0 || freq == 0) {
+      DEBUGPRINT(1,"Error: Bad parameter\n");
+      return VCAN_STAT_BAD_PARAMETER;
     }
+
+    brp = hCard->frequency / (freq * quantaPerCycle);
+
+    recalc_freq = hCard->frequency / (brp * quantaPerCycle);
+    if (recalc_freq != freq) {
+      DEBUGPRINT(1,"Error: CAN FD prescaler residual. The parameters bitrate:%lu tseg1:%u tseg2:%u give this bitrate:%lu\n",
+                 freq,tseg1,tseg2, recalc_freq);
+      return VCAN_STAT_BAD_PARAMETER;
+    }
+
+    if (brp > CANFD_MAX_PRESCALER_VALUE) {
+      DEBUGPRINT(1,"[%s, %d] Error: prescaler (%lu) out of limits (>%u)\n", __FILE__, __LINE__, brp,
+                 CANFD_MAX_PRESCALER_VALUE);
+      return VCAN_STAT_BAD_PARAMETER;
+    }
+
+    if (brp   < 1 || brp   > 8192 || // 13-bits 1 + 0..8191
+        sjw   < 1 || sjw   >   16 || // 4-bits  1 + 0..15
+        tseg1 < 1 || tseg1 >  512 || // 9-bits  1 + 0..511
+        tseg2 < 1 || tseg2 >   32) { // 5-bits  1 + 0..31
+      DEBUGPRINT(1,"Error: Other checks can fd data phase brp:%lu sjw:%u tseg1:%u tseg2:%u\n",brp,sjw,tseg1,tseg2);
+      return VCAN_STAT_BAD_PARAMETER;
+    }
+
+    btrd = PCIEFD_BTR_SEG2(tseg2-1) | PCIEFD_BTR_SEG1(tseg1-1) | PCIEFD_BTR_SJW(sjw-1) | PCIEFD_BTR_BRP(brp-1);
+
+    if (OPEN_AS_CAN != vChd->canFdMode) {
+      bus_load_prescaler = calcBusloadPrescaler(quantaPerCycle, brp);
+    }
+  }
 
   // Use mutex to allow this process to sleep
   os_if_down_sema(&hChd->busOnMutex);
@@ -2997,13 +2989,6 @@ static int pciCanGetRxErr (VCanChanData *vChd)
 }
 
 
-//======================================================================
-//  Read receive queue length in hardware/firmware
-//======================================================================
-static unsigned long pciCanRxQLen (VCanChanData *vChd)
-{
-  return queue_length(&vChd->txChanQueue);
-}
 
 
 //======================================================================

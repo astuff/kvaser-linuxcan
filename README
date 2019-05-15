@@ -151,16 +151,8 @@ In the same files, the following lines are added to blacklist SocketCAN:
 /usr/sbin/leaf.sh        (start/stop leaf driver;        by udev or manually)
 /usr/sbin/mhydra.sh      (start/stop mhydra driver;      by udev or manually)
 
-* Module hotplug support
+* udev rules
 ----------------------------------
-If /etc/hotplug exists:
-/etc/hotplug/usbcanII.usermap
-/etc/hotplug/usb/usbcanII
-/etc/hotplug/leaf.usermap
-/etc/hotplug/usb/leaf
-/etc/hotplug/mhydra.usermap
-/etc/hotplug/usb/mhydra
-
 /etc/udev/rules.d/10-kvaser.rules
 
 * Include files for canlib library

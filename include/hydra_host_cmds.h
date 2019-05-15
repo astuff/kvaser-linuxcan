@@ -1,5 +1,5 @@
 /*
-**                Copyright 2014 by Kvaser AB, M�lndal, Sweden
+**                Copyright 2014 by Kvaser AB, Mölndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -52,13 +52,11 @@
 #ifndef HYDRA_HOST_CMDS_H_
 #define HYDRA_HOST_CMDS_H_
 
-#include "debug.h"
+#include <linux/types.h>
 
 #ifdef HYDRA_PRIVATE
 #   include "hydra_host_private_cmds.h"
 #endif
-
-#   include <linux/types.h>
 
 #define CMD_RX_STD_MESSAGE                12
 #define CMD_TX_CAN_MESSAGE                33
@@ -134,7 +132,9 @@
 #define CMD_SET_IO_PORTS_REQ                         86
 #define CMD_GET_IO_PORTS_REQ                         87
 #define CMD_GET_IO_PORTS_RESP                        88
-// 89-96 can be used
+// 89-94 can be used
+#define CMD_GET_CAPABILITIES_REQ                     95
+#define CMD_GET_CAPABILITIES_RESP                    96
 #define CMD_GET_TRANSCEIVER_INFO_REQ                 97
 #define CMD_GET_TRANSCEIVER_INFO_RESP                98
 #define CMD_MEMO_CONFIG_MODE                         99
@@ -208,85 +208,248 @@
 #define CMD_SET_DEVICE_MODE                         204
 #define CMD_GET_DEVICE_MODE                         205
 
+#define CMD_UNKNOWN_COMMAND                         209
+
+
+#define FD_CMD_RANGE                                0xE0
+#define FD_CMD_MASK                                 0xF0
+#define CMD_HAS_REFPOOL(X) (((X) & FD_CMD_MASK) == FD_CMD_RANGE)
+
+#define CMD_TX_CAN_MESSAGE_FD                       224 //0xE0
+#define CMD_TX_ACKNOWLEDGE_FD                       225
+#define CMD_RX_MESSAGE_FD                           226
+#define CMD_AUTOTX_MESSAGE_FD                       227
+#define CMD_RESERVED_FD_4                           228
+#define CMD_RESERVED_FD_5                           229
+#define CMD_RESERVED_FD_6                           230
+#define CMD_RESERVED_FD_7                           231
+#define CMD_RESERVED_FD_8                           232
+#define CMD_RESERVED_FD_9                           233
+#define CMD_RESERVED_FD_A                           234
+#define CMD_RESERVED_FD_B                           235
+#define CMD_RESERVED_FD_C                           236
+#define CMD_RESERVED_FD_D                           237
+#define CMD_RESERVED_FD_E                           238
+#define CMD_RESERVED_FD_F                           239
+
+#define CMD_EXTENDED                                255
+
+
 #define MEMO_STATUS_SUCCESS         0
 #define MEMO_STATUS_MORE_DATA       1
 #define MEMO_STATUS_UNKNOWN_COMMAND 2
 #define MEMO_STATUS_FAILED          3
 #define MEMO_STATUS_EOF             4
 
+
 typedef struct {
-  unsigned char   subCmd;
-  unsigned char   reserved;
-  unsigned short  data2;           // Sector count for disk reads
-  uint32_t        data1;           // Sector number for disk reads
-  unsigned char   data[20];
+  uint8_t     d[20];
+} hdata20_t;
+
+// These are the diagnostics data sent via CMD_TCP_KEEPALIVE.
+typedef struct {
+  uint8_t     version;
+  union {
+    struct {
+      uint8_t     medium;
+      uint8_t     tx_queue_max;
+      int8_t      rssi_min;
+      uint16_t    rx_wnd_min;
+      uint16_t    tx_wnd_min;
+      uint16_t    rtt_max;
+    } v1;
+    struct {
+      uint8_t     d[15];
+    } diagRawData16_t;
+  };
+} hDiagnostics;
+
+#define DIAGNOSTICS_VERSION 1
+
+#define SCRIPT_CTRL_ERR_SUCCESS               0
+#define SCRIPT_CTRL_ERR_NO_MORE_PROCESSES     1
+#define SCRIPT_CTRL_ERR_FILE_NOT_FOUND        2
+#define SCRIPT_CTRL_ERR_OPEN_FILE_ERR         3
+#define SCRIPT_CTRL_ERR_OPEN_FILE_NO_MEM      4
+#define SCRIPT_CTRL_ERR_FILE_READ_ERR         5
+#define SCRIPT_CTRL_ERR_LOAD_FILE_ERR         6
+#define SCRIPT_CTRL_ERR_OUT_OF_CODE_MEM       7
+#define SCRIPT_CTRL_ERR_FILE_REWIND_FAIL      8
+#define SCRIPT_CTRL_ERR_LOAD_FAIL             9
+#define SCRIPT_CTRL_ERR_SETUP_FAIL           10
+#define SCRIPT_CTRL_ERR_SETUP_FUN_TABLE_FAIL 11
+#define SCRIPT_CTRL_ERR_SETUP_PARAMS_FAIL    12
+#define SCRIPT_CTRL_ERR_PROCESSES_NOT_FOUND  13
+#define SCRIPT_CTRL_ERR_START_FAILED         14
+#define SCRIPT_CTRL_ERR_STOP_FAILED          15
+#define SCRIPT_CTRL_ERR_SPI_BUSY             16
+#define SCRIPT_CTRL_ERR_PROCESS_NOT_STOPPED  17
+#define SCRIPT_CTRL_ERR_PROCESS_NOT_RUNNING  18
+#define SCRIPT_CTRL_ERR_ENVVAR_NOT_FOUND     19
+
+#define SCRIPT_CTRL_ERR_UNKNOWN_COMMAND      20
+#define SCRIPT_CTRL_ERR_PROCESS_NOT_LOADED   21
+
+#define SCRIPT_CTRL_ERR_COMPILER_VERSION     22
+
+#define SCRIPT_CTRL_ERR_NOT_IMPLEMENTED      43
+
+
+// cmdScriptCtrlReXX payload union
+typedef union
+{
+  struct {                          // SCRIPT_CMD_SCRIPT_EVENT
+    int32_t     eventType;
+    int32_t     eventNo;
+    uint32_t    eventData;
+  } cmdScriptEvent;
+
+  struct {                          //  SCRIPT_CMD_SCRIPT_LOAD_REMOTE_DATA
+    char length;
+    char data[15];
+  } cmdScriptLoad;
+
+  struct {                          // SCRIPT_CMD_SCRIPT_LOAD
+    uint8_t     d[16];
+  } cmdRawData16_t;
+
+  struct {                          // SCRIPT_CMD_SCRIPT_QUERY_STATUS
+    uint32_t    scriptStatus;
+  } cmdScriptInfo;
+
+  struct {                          // SCRIPT_CMD_SCRIPT_STOP
+    int8_t      mode;
+  } cmdScriptStop;
+
+} hscriptCtrlPayload;
+
+
+typedef struct {
+  uint8_t     scriptNo;       // which script to deliver command to
+  uint8_t     channel;
+  uint8_t     reserved[2];
+  uint32_t     subCmd;        // command specifys what the data contains
+  hscriptCtrlPayload  payload;       // data associated with event
+} hcmdScriptCtrlReq;
+
+typedef struct {
+  uint8_t     scriptNo;
+  uint8_t     reserved[3];
+  uint32_t     subCmd;
+  uint32_t     status;
+  hscriptCtrlPayload  payload;
+} hcmdScriptCtrlResp;
+
+
+#define M32_ENVVAR_GET_INFO      1
+#define M32_ENVVAR_GET_MAX_SIZE  2
+
+#define M32_ENVVAR_TYPE_UNKNOWN  -1
+#define M32_ENVVAR_TYPE_INT       1
+#define M32_ENVVAR_TYPE_FLOAT     2
+#define M32_ENVVAR_TYPE_STRING    3
+
+// union to transfer data to/from device in cmdEnvvarCtrlReXXX
+typedef union {
+  struct {
+    uint32_t    hash;
+    int32_t     type;
+    int32_t     length;
+  } cmdGetInfo;   // M32_ENVVAR_GET_INFO
+  struct {
+    int32_t     maxLength;
+  } cmdMaxLength; // M32_ENVVAR_GET_MAX_SIZE
+} henvvarData;
+
+
+typedef struct {
+  uint8_t     channel;
+  uint8_t     reserved[3];
+  uint32_t    subCmd;         // command
+  uint8_t     data[16];
+} hcmdEnvvarCtrlReq;
+
+typedef struct {
+  uint8_t     channel;
+  uint8_t     reserved[3];
+  uint32_t    subCmd;         // command
+  uint32_t    status;
+  uint8_t     data[16];
+} hcmdEnvvarCtrlResp;
+
+typedef struct {
+  uint8_t     subCmd;
+  uint8_t     reserved;
+  uint16_t    data2;           // Sector count for disk reads
+  uint32_t    data1;           // Sector number for disk reads
+  uint8_t     data[20];
 } hcmdMemoGetDataReq;
 
 typedef struct {
-  unsigned char   subCmd;
-  unsigned char   dataLen;
-  unsigned short  offset;
-  unsigned char   data[20];        // Data, or status (dioStat in 0 and lioStat in 1)
-  unsigned char   status;          // MEMO_STATUS_xxx
-  unsigned char   reserved;
+  uint8_t     subCmd;
+  uint8_t     dataLen;
+  uint16_t    offset;
+  uint8_t     data[20];        // Data, or status (dioStat in 0 and lioStat in 1)
+  uint8_t     status;          // MEMO_STATUS_xxx
+  uint8_t     reserved;
 } hcmdMemoGetDataResp;
 
 typedef struct {
-  unsigned char   subCmd;
-  unsigned char   reserved[3];
-  uint32_t        data1;           // Sector number for disk reads
-  unsigned short  data2;           // Sector count for disk reads
-  unsigned char   reserved2[14];
+  uint8_t     subCmd;
+  uint8_t     reserved[3];
+  uint32_t    data1;           // Sector number for disk reads
+  uint16_t    data2;           // Sector count for disk reads
+  uint8_t     reserved2[14];
 } hcmdMemoPutDataStartReq;
 
 typedef struct {
-  unsigned char  subCmd;
-  unsigned char  dataLen;
-  unsigned short offset;
-  unsigned char  data[20];
-  unsigned short reserved;
+  uint8_t     subCmd;
+  uint8_t     dataLen;
+  uint16_t    offset;
+  uint8_t     data[20];
+  uint16_t    reserved;
 } hcmdMemoPutDataReq;
 
 typedef struct {
-  unsigned char  subCmd;
-  unsigned char  dataLen;
-  unsigned char  status;
-  unsigned char  reserved;
-  unsigned char  data[20];
+  uint8_t     subCmd;
+  uint8_t     dataLen;
+  uint8_t     status;
+  uint8_t     reserved;
+  uint8_t     data[20];
 } hcmdMemoPutDataResp;
 
 typedef struct {
-  unsigned char  subCmd;
-  unsigned char  reserved[3];
+  uint8_t     subCmd;
+  uint8_t     reserved[3];
 } hcmdMemoAsyncopStartReq;
 
 typedef struct {
-  unsigned char  subCmd;
-  unsigned char  status;
-  unsigned short reserved;
+  uint8_t     subCmd;
+  uint8_t     status;
+  uint16_t    reserved;
 } hcmdMemoAsyncopStartResp;
 
 typedef struct {
-  unsigned char  subCmd;
-  unsigned char  status;
-  unsigned short reserved;
+  uint8_t     subCmd;
+  uint8_t     status;
+  uint16_t    reserved;
 } hcmdMemoAsyncopFinishedResp;
 
 typedef struct {
-  unsigned char  subCmd;
-  unsigned char  reserved[3];
+  uint8_t     subCmd;
+  uint8_t     reserved[3];
 } hcmdMemoAsyncopGetDataReq;
 
 typedef struct {
-  unsigned char  subCmd;
-  unsigned char  status;
-  unsigned char  reserved[2];
-  unsigned char  data[20];
+  uint8_t     subCmd;
+  uint8_t     status;
+  uint8_t     reserved[2];
+  uint8_t     data[20];
 } hcmdMemoAsyncopGetDataResp;
 
 typedef struct {
-  unsigned char  subCmd;
-  unsigned char  reserved[3];
+  uint8_t     subCmd;
+  uint8_t     reserved[3];
 } hcmdMemoAsyncopCancelReq;
 
 
@@ -323,46 +486,45 @@ typedef struct {
 
 
 typedef struct {
-  unsigned short  fat_size;                // Size of the FAT, in sectors
-  unsigned short  fat_type;                // 12 or 16 depending on FAT type.
-  unsigned short  dir_entries;             // Number of directory entries in the root dir
-  unsigned short  cluster_size;            // Two-logarithm of the cluster size in sectors
-  uint32_t        fat1_start;              // First FAT starts in this sector
-  uint32_t        first_data_sector;       // First sector available for data
-  uint32_t        last_data_sector;        // Last sector available for data
+  uint16_t    fat_size;                // Size of the FAT, in sectors
+  uint16_t    fat_type;                // 12 or 16 depending on FAT type.
+  uint16_t    dir_entries;             // Number of directory entries in the root dir
+  uint16_t    cluster_size;            // Two-logarithm of the cluster size in sectors
+  uint32_t    fat1_start;              // First FAT starts in this sector
+  uint32_t    first_data_sector;       // First sector available for data
+  uint32_t    last_data_sector;        // Last sector available for data
 } hMemoDataFsInfo;
 
 typedef struct {
-  uint32_t  logfile_sectors;          // Number of sectors in log file
-  uint32_t  first_param_sector;       // First sector for param.lif
-  uint32_t  last_param_sector;        // Last sector for param.lif
-  uint32_t  first_dbase_sector;       // First sector for databases (if any)
-  uint32_t  last_dbase_sector;        // Last sector for databases (if any)
+  uint32_t    logfile_sectors;          // Number of sectors in log file
+  uint32_t    first_param_sector;       // First sector for param.lif
+  uint32_t    last_param_sector;        // Last sector for param.lif
+  uint32_t    first_dbase_sector;       // First sector for databases (if any)
+  uint32_t    last_dbase_sector;        // Last sector for databases (if any)
 } hMemoDataFsInfoB;
 
 typedef struct {
-  unsigned char   productRev;
-  unsigned char   oemId[2];
-  unsigned char   reserved1;
-  uint32_t        mfgId;
-  char            productName[10];
-  unsigned short  dateCode;
+  uint8_t     productRev;
+  uint8_t     oemId[2];
+  uint8_t     reserved1;
+  uint32_t    mfgId;
+  char        productName[10];
+  uint16_t    dateCode;
 } hMemoDataDiskInfoA;
 
 typedef struct {
-  uint32_t        serialNumber;
-  unsigned char   disk_type;
-  unsigned char   version;
-  unsigned char   read_time;
-  unsigned char   wr_factor;
-  unsigned char   file_format;
-  unsigned char   erase_value;
-  unsigned short  read_blk_size;
-  unsigned short  wr_blk_size;
-  unsigned short  trans_speed;
-  uint32_t        data_size;
+  uint32_t    serialNumber;
+  uint8_t     disk_type;
+  uint8_t     version;
+  uint8_t     read_time;
+  uint8_t     wr_factor;
+  uint8_t     file_format;
+  uint8_t     erase_value;
+  uint16_t    read_blk_size;
+  uint16_t    wr_blk_size;
+  uint16_t    trans_speed;
+  uint32_t    data_size;
 } hMemoDataDiskInfoB;
-
 
 #define MEMO_POWER_BAT_FAULT      0x01    // Battery fault of some kind
 #define MEMO_POWER_BAT_CHARGING   0x02    // Battery is charging
@@ -374,61 +536,64 @@ typedef struct {
 #define MEMO_TEMPERATURE_FAILURE  0       // Failed measuring temperature
 #define MEMO_TEMPERATURE_MEMO2    1       // Temperature is encoded as in Memo2 (NTC 10K connected to 3.3V)
 #define MEMO_TEMPERATURE_MHYDRA   2
+#define MEMO_TEMPERATURE_MEMO5    3
 
 typedef struct {
-  unsigned char   diskPresent;
-  unsigned char   configMode;
-  unsigned char   diskWriteProtected;
-  unsigned char   temperatureEncoding;    // Encoding of 'temperature' field
-  unsigned short  powerStatus;            // MEMO_POWER_xxx flags
-  unsigned short  temperature;            // Temperature, raw value
-  unsigned char   cpldVersion;            // CPLD version number
-  unsigned char   reserved[1];
-  unsigned short  reserved1;
-  unsigned short  battery;                // Battery voltage, raw value
-  unsigned char   reserved2[6];
+  uint8_t     diskPresent;
+  uint8_t     configMode;
+  uint8_t     diskWriteProtected;
+  uint8_t     temperatureEncoding;    // Encoding of 'temperature' field
+  uint16_t    powerStatus;            // MEMO_POWER_xxx flags
+  uint16_t    temperature;            // Temperature, raw value
+  uint8_t     cpldVersion;            // CPLD version number
+  uint8_t     reserved[1];
+  uint16_t    reserved1;
+  uint16_t    battery;                // Battery voltage, raw value
+  uint8_t     reserved2[6];
 } hMemoDataMiscInfo;
 
 typedef struct {
-  unsigned char   second;
-  unsigned char   minute;
-  unsigned char   hour;
-  unsigned char   day;
-  unsigned char   month;
-  unsigned char   year;
-  unsigned short  padding2;
+  uint8_t     second;
+  uint8_t     minute;
+  uint8_t     hour;
+  uint8_t     day;
+  uint8_t     month;
+  uint8_t     year;
+  uint16_t    padding2;
 } hMemoDataRtcInfo;
 
 typedef struct {
-  uint32_t      maxDataSize;
-  uint32_t      dbaseSpace;
-  uint32_t      reserveSpace;
-  unsigned char fileSystem;
-  unsigned char reserved[7];
+  uint32_t    maxDataSize;
+  uint32_t    dbaseSpace;
+  uint32_t    reserveSpace;
+  uint8_t     fileSystem;
+  uint8_t     reserved[7];
 } hMemoInitDiskReq;
 
 typedef struct {
-  unsigned char dioStatus;
-  unsigned char lioStatus;
-  unsigned char reserved[10];
+  uint8_t     dioStatus;
+  uint8_t     lioStatus;
+  uint8_t     reserved[10];
 } hMemoInitDiskResp;
 
 typedef struct hcanErrorFrameData_s {
-  unsigned char busStatus;
-  unsigned char errorFactor;
-  unsigned char txErrorCounter;
-  unsigned char rxErrorCounter;
+  uint8_t     busStatus;
+  uint8_t     errorFactor;
+  uint8_t     txErrorCounter;
+  uint8_t     rxErrorCounter;
 } hcanErrorFrameData_t;
 
 
 
+
+
 #define SOUND_SUBCOMMAND_INIT         0
-#define SOUND_SUBCOMMAND_BEEP         1                     
-#define SOUND_SUBCOMMAND_NOTE         2              
-#define SOUND_SUBCOMMAND_DISABLE      3              
+#define SOUND_SUBCOMMAND_BEEP         1
+#define SOUND_SUBCOMMAND_NOTE         2
+#define SOUND_SUBCOMMAND_DISABLE      3
 
 #define LED_SUBCOMMAND_ALL_LEDS_ON    0
-#define LED_SUBCOMMAND_ALL_LEDS_OFF   1  
+#define LED_SUBCOMMAND_ALL_LEDS_OFF   1
 #define LED_SUBCOMMAND_LED_0_ON       2
 #define LED_SUBCOMMAND_LED_0_OFF      3
 #define LED_SUBCOMMAND_LED_1_ON       4
@@ -443,6 +608,16 @@ typedef struct hcanErrorFrameData_s {
 #define LED_SUBCOMMAND_LED_5_OFF      13
 #define LED_SUBCOMMAND_LED_6_ON       14
 #define LED_SUBCOMMAND_LED_6_OFF      15
+#define LED_SUBCOMMAND_LED_7_ON       16
+#define LED_SUBCOMMAND_LED_7_OFF      17
+#define LED_SUBCOMMAND_LED_8_ON       18
+#define LED_SUBCOMMAND_LED_8_OFF      19
+#define LED_SUBCOMMAND_LED_9_ON       20
+#define LED_SUBCOMMAND_LED_9_OFF      21
+#define LED_SUBCOMMAND_LED_10_ON      22
+#define LED_SUBCOMMAND_LED_10_OFF     23
+#define LED_SUBCOMMAND_LED_11_ON      24
+#define LED_SUBCOMMAND_LED_11_OFF     25
 
 #define CONFIG_DATA_CHUNK                             24
 
@@ -458,21 +633,28 @@ typedef struct hcanErrorFrameData_s {
 #define MSGFLAG_NERR                0x04        // NERR active during this msg
 #define MSGFLAG_WAKEUP              0x08        // Msg rcv'd in wakeup mode
 #define MSGFLAG_REMOTE_FRAME        0x10        // Msg is a remote frame
-#define MSGFLAG_RESERVED_1          0x20        // Reserved for future usage
+#define MSGFLAG_EXTENDED_ID         0x20        // Extended id.
 #define MSGFLAG_TX                  0x40        // TX acknowledge
 #define MSGFLAG_TXRQ                0x80        // TX request
+#define MSGFLAG_EDL             0x010000        // Obsolete, use MSGFLAG_FDF instead
+#define MSGFLAG_FDF             0x010000        // Message is an FD message (CAN FD)
+#define MSGFLAG_BRS             0x020000        // Message is sent/received with bit rate switch (CAN FD)
+#define MSGFLAG_ESI             0x040000        // Sender of the message is in error passive mode (CAN FD)
 
 #define MSGFLAG_EXT                 0x20        // Extended message
 
 
+// This one is added to the identifier to mean an extended CAN identifier
+// #define DRIVER_EXT_FLAG             0x80000000
+
+
 /////////////////////////
 // Chip status flags
-#define BUSSTAT_BUSOFF              0x01
-#define BUSSTAT_ERROR_PASSIVE       0x02
-#define BUSSTAT_ERROR_WARNING       0x04
-#define BUSSTAT_ERROR_ACTIVE        0x08
-#define BUSSTAT_BUSOFF_RECOVERY     0x10
-#define BUSSTAT_IGNORING_ERRORS     0x20
+#define BUSSTAT_FLAG_ERR_ACTIVE  0x00
+#define BUSSTAT_FLAG_RESET       0x01
+#define BUSSTAT_FLAG_BUS_ERROR   0x10
+#define BUSSTAT_FLAG_ERR_PASSIVE 0x20
+#define BUSSTAT_FLAG_BUSOFF      0x40
 
 
 ////////////////////////
@@ -537,7 +719,11 @@ typedef struct hcanErrorFrameData_s {
 #define SWOPTION_CPU_FQ_MASK          0x60L
 #define SWOPTION_80_MHZ_CLK           0x20L // hires timers run at 80 MHZ
 #define SWOPTION_24_MHZ_CLK           0x40L // hires timers run at 24 MHZ
-
+#define SWOPTION_DELAY_MSGS          0x100L // Firmware supports delay messages.
+#define SWOPTION_USE_HYDRA_EXT       0x200L // Firmware supports extended Hydra commands
+#define SWOPTION_CANFD_CAP           0x400L // Software supports CAN-FD.
+#define SWOPTION_NONISO_CAP          0x800L // Software supports NON-ISO.
+#define SWOPTION_CAP_REQ            0x1000L // Software supporte CMD_GET_CAPABILITIES_REQ
 
 // CMD_SET_AUTO_TX_REQ and _RESP enum values
 #define AUTOTXBUFFER_CMD_GET_INFO     1     // Get implementation information
@@ -553,10 +739,13 @@ typedef struct hcanErrorFrameData_s {
 #define AUTOTXBUFFER_CAP_TIMED_TX         0x01    // Periodic transmission
 #define AUTOTXBUFFER_CAP_AUTO_RESP_DATA   0x02    // Auto response to data frames
 #define AUTOTXBUFFER_CAP_AUTO_RESP_RTR    0x04    // Auto response to RTR
+#define AUTOTXBUFFER_CAP_CANFD            0x08    // FD capable
 
 // Use these message flags with cmdSetAutoTxBuffer.flags
 #define AUTOTXBUFFER_MSG_REMOTE_FRAME     0x10    // Msg is a remote frame
 #define AUTOTXBUFFER_MSG_EXT              0x80    // Extended identifier
+#define AUTOTXBUFFER_MSG_FDF              0x100   // msg is canfd
+#define AUTOTXBUFFER_MSG_BRS              0x200   // msg is canfd and brs
 
 // For CMD_SOFTSYNC_ONOFF
 #define SOFTSYNC_OFF          0
@@ -570,38 +759,61 @@ typedef struct hcanErrorFrameData_s {
 #define CAN_TIME_STAMP_REF_CANTIMER   3
 
 
+// for script control
+#define SCRIPT_CMD_SCRIPT_START                 0x1
+#define SCRIPT_CMD_SCRIPT_STOP                  0x2
+#define SCRIPT_CMD_SCRIPT_EVENT                 0x4
+#define SCRIPT_CMD_SCRIPT_LOAD                  0x5
+#define SCRIPT_CMD_SCRIPT_QUERY_STATUS          0x6
+#define SCRIPT_CMD_SCRIPT_LOAD_REMOTE_START     0x7
+#define SCRIPT_CMD_SCRIPT_LOAD_REMOTE_DATA      0x8
+#define SCRIPT_CMD_SCRIPT_LOAD_REMOTE_FINISH    0x9
+#define SCRIPT_CMD_SCRIPT_UNLOAD                0xA
+
+// script status info
+// SCRIPT_CMD_SCRIPT_QUERY_STATUS
+#define SCRIPT_STATUS_LOADED    0x1
+#define SCRIPT_STATUS_RUNNING   0x2
+
+// For CMD_SET_DEVICE_MODE et al. Bitmask values.
+#define DEVICEMODE_INTERFACE    0x00
+#define DEVICEMODE_LOGGER       0x01
+
+
 /*
 ** Command Structs
 */
 
 typedef struct {
-  unsigned char cmdLen;  // The length of the whole packet (i.e. including this byte)
-  unsigned char cmdNo;
+  uint8_t     cmdLen;  // The length of the whole packet (i.e. including this byte)
+  uint8_t     cmdNo;
 } hcmdLogHead;
 
+
+
 typedef struct {
-  uint32_t       timeL;
-  uint32_t       timeH;
-  uint8_t        key;
-  uint8_t        padding[19];
+  uint32_t    timeL;
+  uint32_t    timeH;
+  uint8_t     key;
+  uint8_t     padding[19];
 } hcmdImpKey;
 
 typedef struct {
-  uint32_t       timeL;
-  uint32_t       timeH;
-  unsigned short len;      //  2 byte
-  unsigned char  flags;    //  1 byte, 0: tpFollows, 1: Res first, 2: Res last
-  unsigned char  reserved; //  1 byte unused
-  char  string[16];        // 16 byte
+  uint32_t    timeL;
+  uint32_t    timeH;
+  uint16_t    len;        //  2 byte
+  uint8_t     flags;      //  1 byte, 0: tpFollows, 1: Res first, 2: Res last
+  uint8_t     reserved;   //  1 byte unused
+  char        string[16]; // 16 byte
 } hcmdPrintf;
 
 typedef struct {
-  uint32_t       addr;     //  4 byte
-  uint32_t       addr2;    //  4 byte
-  unsigned short len;      //  2 byte
-  unsigned char  flags;    //  1 byte, 0: tpFollows, 1: Res first, 2: Res last
-  unsigned char  reserved; //  1 byte unused
-  unsigned char  data[16]; // 16 byte
+  uint32_t    addr;     //  4 byte
+  uint32_t    addr2;    //  4 byte
+  uint16_t    len;      //  2 byte
+  uint8_t     flags;    //  1 byte, 0: tpFollows, 1: Res first, 2: Res last
+  uint8_t     reserved; //  1 byte unused
+  uint8_t     data[16]; // 16 byte
 } hcmdMemory;
 
 typedef struct {
@@ -609,7 +821,7 @@ typedef struct {
 } hcmdFatalError;
 
 typedef struct {
-  uint32_t       data[7];
+  uint32_t    data[7];  // 28 bytes
 } hcmdMeasure;
 
 #define CMDPRINTF_TPFOLLOW_FLAG  0x01
@@ -617,10 +829,10 @@ typedef struct {
 #define CMDPRINTF_RESLAST_FLAG   0x04
 
 typedef struct {
-  uint32_t       timeL;
-  uint32_t       timeH;
-  uint8_t        status;
-  uint8_t        padding[19];
+  uint32_t    timeL;
+  uint32_t    timeH;
+  uint8_t     status; //  1 byte
+  uint8_t     padding[19];
 } hresPrintf;
 
 #define HM_STATUS_OK 1
@@ -639,408 +851,425 @@ typedef struct {
 #define TRPDATA_STATUS_ABORT       3  // Error, abort the complete transfer
 
 typedef struct {
-  unsigned char len;
-  unsigned char flags;   /* 1: EOF, 2: ASCII, 4: DIT, 8: RESW */
-  unsigned char status;
-  unsigned char padding[1];
-  unsigned char data[24];
+  uint8_t     len;
+  uint8_t     flags;   /* 1: EOF, 2: ASCII, 4: DIT, 8: RESW */
+  uint8_t     status;
+  uint8_t     padding[1];
+  uint8_t     data[24];
 } htrpData;
 
 
-/*
-** Command Structs
-*/
-#if !defined(__IAR_SYSTEMS_ICC__)
-#  include <pshpack1.h>
-#endif
-
 typedef struct {
-  uint8_t   he;        // Set to zero if not known
-  uint8_t   channels;
-  uint16_t  reserved;
-  char      name[16];
+  uint8_t     he;        // Set to zero if not known
+  uint8_t     channels;
+  uint16_t    reserved;
+  char        name[16];
 } hcmdRegisterHeReq;
 
 typedef struct {
-  uint8_t he;
+  uint8_t     he;
 } hcmdRegisterHeResp;
 
 struct hydraHostCmd;
 
 typedef struct {
-  uint8_t channel;
-  uint8_t reserved[3];
-  struct  hydraHostCmd *next;
-  char    name[16];
+  uint8_t     channel;
+  uint8_t     reserved1[3];
+  uint32_t    reserved2;
+  char        name[16];
 } hcmdQueryAddrHeReq;
 
 typedef struct {
-  uint8_t he;
+  uint8_t     he;
 } hcmdQueryAddrHeResp;
 
 typedef struct {
-  uint8_t enable;
-  uint8_t he;
-  uint8_t channel;
+  uint8_t     enable;
+  uint8_t     he;
+  uint8_t     channel;
 } hcmdListenToHeReq;
 
 typedef struct {
-  uint8_t status;
+  uint8_t     status;
 } hcmdListenToHeResp;
 
 typedef struct {
-  uint8_t he;
+  uint8_t     he;
 } hcmdQueryNextHeReq;
 
 typedef struct {
-  uint8_t he;
-  uint8_t channels;
-  uint8_t reserved[2];
-  char    name[16];
+  uint8_t     he;
+  uint8_t     channels;
+  uint8_t     reserved[2];
+  char        name[16];
 } hcmdQueryNextHeResp;
 
+
+#define MAX_LOGGED_CAN_DATABYTES 8
+
 typedef struct {
-    unsigned char   cmdLen;
-    unsigned char   cmdNo;
-    unsigned char   channel;
-    unsigned char   flags;
-    unsigned short  time[3];
-    unsigned char   dlc;
-    unsigned char   padding;
-    uint32_t        id;
-    unsigned char   data[8];
+  uint8_t     cmdLen;
+  uint8_t     cmdNo;
+  uint8_t     channel;
+  uint8_t     flags;
+  uint16_t    time[3];
+  uint8_t     dlc;
+  uint8_t     padding;
+  uint32_t    id;        // incl. CAN_IDENT_IS_EXTENDED
+  uint8_t     data[MAX_LOGGED_CAN_DATABYTES];
 } hcmdLogMessage;
 
 typedef struct {
-    unsigned char   cmdLen;
-    unsigned char   cmdNo;
-    unsigned char   channel;
+  uint8_t     cmdLen;
+  uint8_t     cmdNo;
+  uint8_t     channel;
 
-    unsigned char   action_type;
-    uint32_t        action_param;
+  uint8_t     action_type;
+  uint32_t    action_param;
 
-    unsigned short  statement_idx;
-    unsigned short  action_idx;
+  uint16_t    statement_idx;
+  uint16_t    action_idx;
 } hcmdLogAction;
 
 typedef struct
 {
-    unsigned char   cmdLen;
-    unsigned char   cmdNo;
-    unsigned char   type;
-    unsigned char   padding;
-    unsigned short  trigNo;
-    unsigned short  time[3];
-    uint32_t        preTrigger;
-    uint32_t        postTrigger;
+  uint8_t     cmdLen;
+  uint8_t     cmdNo;
+  uint8_t     type;
+  uint8_t     padding;
+  uint16_t    trigNo;
+  uint16_t    time[3];
+  uint32_t    preTrigger;
+  uint32_t    postTrigger;
 } hcmdLogTrig;
 
 typedef struct
 {
-    unsigned char cmdLen;
-    unsigned char cmdNo;
-    unsigned char verMajor;            // File version number
-    unsigned char verMinor;            // File version number
-    unsigned int  unixTime;            // Seconds since 1970
-    unsigned char hiresTimerFqMHz;     // High-resolution timer frequency, in MHz
-    unsigned char padding[11];
+  uint8_t     cmdLen;
+  uint8_t     cmdNo;
+  uint8_t     verMajor;            // File version number
+  uint8_t     verMinor;            // File version number
+  unsigned int   unixTime;            // Seconds since 1970
+  uint8_t     hiresTimerFqMHz;     // High-resolution timer frequency, in MHz
+  uint8_t     padding[11];
 } hcmdLogRtcTime;
 
-typedef struct { 
-    uint32_t        id;
-    unsigned char   data[8];
-    unsigned char   dlc;
-    unsigned char   flags;
-    unsigned short  transId;
-    unsigned char   channel;
-    unsigned char   padding[11];
+typedef struct {
+  uint32_t    id;
+  uint8_t     data[8];
+  uint8_t     dlc;
+  uint8_t     flags;
+  uint16_t    transId;
+  uint8_t     channel;
+  uint8_t     padding[11];
 } hcmdTxCanMessage;
 
 typedef struct {
-  uint32_t        id;
-  unsigned char   data[8];
-  unsigned char   dlc;
-  unsigned char   flags;
-  unsigned short  time[3];
-  unsigned char   padding[8];
+  uint32_t    id;
+  uint8_t     data[8];
+  uint8_t     dlc;
+  uint8_t     flags;
+  uint16_t    time[3];
+  uint8_t     padding[8];
 } hcmdTxAck;
 
 typedef struct {
-    unsigned char   reserved1;
-    unsigned char   reserved2;
-    unsigned short  time[3];
-    unsigned short  padding;
+  uint8_t     reserved1;
+  uint8_t     reserved2;
+  uint16_t    time[3];
+  uint16_t    padding;
 } hcmdTxRequest;
 
 typedef struct {
-    uint32_t      bitRate;
-    unsigned char tseg1;
-    unsigned char tseg2;
-    unsigned char sjw;
-    unsigned char noSamp;
-    unsigned char channel;
-    unsigned char padding[19];
-} hcmdSetBusparamsReq;
+  uint8_t     cmdLen;
+  uint8_t     cmdNo;
+  uint8_t     channel;
+  uint8_t     status;
+  uint32_t    interval;
+} hcmdTxInterval;
 
 typedef struct {
-    unsigned char param_type;
-    unsigned char reserved[27];
+  uint32_t    bitRate;
+  uint8_t     tseg1;
+  uint8_t     tseg2;
+  uint8_t     sjw;
+  uint8_t     noSamp;
+  uint8_t     reserved;
+  uint8_t     padding[3];
+  uint32_t    bitRateFd;
+  uint8_t     tseg1Fd;
+  uint8_t     tseg2Fd;
+  uint8_t     sjwFd;
+  uint8_t     noSampFd;
+  uint8_t     open_as_canfd;
+  uint8_t     padding2[7];
+} hcmdSetBusparamsReq;
+
+#define BUSPARAM_FLAG_CANFD  0x01
+
+typedef struct {
+  uint8_t     param_type;
+  uint8_t     reserved[27];
 } hcmdGetBusparamsReq;
 
 typedef struct {
-    uint32_t      bitRate;
-    unsigned char tseg1;
-    unsigned char tseg2;
-    unsigned char sjw;
-    unsigned char noSamp;
-    unsigned char channel;
-    unsigned char padding[19];
+  uint32_t    bitRate;
+  uint8_t     tseg1;
+  uint8_t     tseg2;
+  uint8_t     sjw;
+  uint8_t     noSamp;
+  uint8_t     reserved[20];
 } hcmdGetBusparamsResp;
 
 typedef struct {
-    unsigned char   reserved;
+  uint8_t     reserved;
 } hcmdGetChipStateReq;
 
 typedef struct {
-    unsigned short time[3];
-    unsigned char txErrorCounter;
-    unsigned char rxErrorCounter;
-    unsigned char busStatus;
-    unsigned char channel;
-    unsigned char padding[18];
+  uint16_t     time[3];
+  uint8_t     txErrorCounter;
+  uint8_t     rxErrorCounter;
+  uint8_t     busStatus;
+  uint8_t     reserved[19];
 } hcmdChipStateEvent;
 
 typedef struct {
-    unsigned char driverMode;
-    unsigned char reserved;
+  uint8_t     driverMode;
+  uint8_t     reserved;
 } hcmdSetDrivermodeReq;
 
 typedef struct {
-    unsigned char reserved;
+  uint8_t     reserved;
 } hcmdGetDrivermodeReq;
 
 typedef struct {
-    unsigned char driverMode;
-    unsigned char reserved;
+  uint8_t     driverMode;
+  uint8_t     reserved;
 } hcmdGetDrivermodeResp;
 
 typedef struct {
-    unsigned char reserved;
+  uint8_t     reserved;
 } hcmdResetChipReq;
 
 typedef struct {
-    unsigned char reserved;
+  uint8_t     reserved;
 } hcmdResetCardReq;
 
 typedef struct {
-    unsigned char reserved;
+  uint8_t     reserved;
 } hcmdStartChipReq;
 
 typedef struct {
-    unsigned char reserved;
+  uint8_t     reserved;
 } hcmdStartChipResp;
 
 typedef struct {
-    unsigned char reserved;
+  uint8_t     reserved;
 } hcmdStopChipReq;
 
 typedef struct {
-    unsigned char reserved;
+  uint8_t     reserved;
 } hcmdStopChipResp;
 
 typedef struct {
-    unsigned char flags;
+  uint8_t     flags;
 } hcmdReadClockReq;
 
 typedef struct {
-    unsigned short  time[3];
-    unsigned short  padding2;
+  uint16_t    time[3];
+  uint16_t    padding2;
 } hcmdReadClockResp;
 
 typedef struct {
-    unsigned char reserved;
+  uint8_t     reserved;
 } hcmdSelfTestReq;
 
 typedef struct {
-    uint32_t  results;
+  uint32_t    results;
 } hcmdSelfTestResp;
 
 typedef struct {
-      signed char dataLevel;
+  int8_t      dataLevel;
 } hcmdGetCardInfo2Req;
 
 typedef struct {
-    unsigned char pcb_id[24];
-    uint32_t      oem_unlock_code;
+  uint8_t     pcb_id[24];
+  uint32_t    oem_unlock_code;
 } hcmdGetCardInfo2Resp;
 
 typedef struct {
-      signed char dataLevel;
+  int8_t      dataLevel;
 } hcmdGetCardInfoReq;
 
 typedef struct {
-    uint32_t      serialNumber;
-    uint32_t      clockResolution;
-    uint32_t      mfgDate;
-    unsigned char EAN[8];
-    unsigned char hwRevision;
-    unsigned char usbHsMode;
-    unsigned char hwType;
-    unsigned char canTimeStampRef;
-    unsigned char channelCount;
+  uint32_t    serialNumber;
+  uint32_t    clockResolution;
+  uint32_t    mfgDate;
+  uint8_t     EAN[8];
+  uint8_t     hwRevision;
+  uint8_t     usbHsMode;
+  uint8_t     hwType;
+  uint8_t     canTimeStampRef;
+  uint8_t     channelCount;
 } hcmdGetCardInfoResp;
 
 typedef struct {
-    unsigned char reserved;
+  uint8_t     reserved;
 } hcmdGetInterfaceInfoReq;
 
 typedef struct {
-    uint32_t        channelCapabilities;
-    unsigned char   canChipType;
-    unsigned char   canChipSubType;
-    unsigned short  padding;
+  uint32_t    channelCapabilities;
+  uint8_t     canChipType;
+  uint8_t     canChipSubType;
+  uint16_t     padding;
 } hcmdGetInterfaceInfoResp;
 
 typedef struct {
-  unsigned char reserved[28];
+  uint8_t     reserved[28];
 } hcmdGetSoftwareInfoReq;
 
 typedef struct {
-    uint32_t        reserved1;
-    uint32_t        reserved2;
-    unsigned short  maxOutstandingTx;
-    unsigned short  padding1;
-    uint32_t        padding[4];
+  uint32_t    reserved1;
+  uint32_t    reserved2;
+  uint16_t    maxOutstandingTx;
+  uint16_t    padding1;
+  uint32_t    padding[4];
 } hcmdGetSoftwareInfoResp;
 
+
 typedef struct {
-  unsigned char reserved[28];
+  uint8_t     useHydraExt;
+  uint8_t     reserved[27];
 } hcmdGetSoftwareDetailsReq;
 
 typedef struct {
-  uint32_t  swOptions;
-  uint32_t  swVersion;
-  uint32_t  swName;
-  uint32_t  EAN[2];
-  uint32_t  maxBitrate;
-  uint32_t  padding[1];
+  uint32_t    swOptions;
+  uint32_t    swVersion;
+  uint32_t    swName;
+  uint32_t    EAN[2];
+  uint32_t    maxBitrate;
+  uint32_t    padding[1];
 } hcmdGetSoftwareDetailsResp;
 
 
 typedef struct {
-    unsigned char   reserved;
+    uint8_t     reserved;
 } hcmdGetBusLoadReq;
 
 typedef struct {
-    unsigned short  time[3];         // "Absolute" timestamp
-    unsigned short  sample_interval; // Sampling interval in microseconds
-    unsigned short  active_samples;  // Number of samples where tx or rx was active
-    unsigned short  delta_t;         // Milliseconds since last response
-    unsigned char   reserved;
+  uint16_t    time[3];         // "Absolute" timestamp
+  uint16_t    sample_interval; // Sampling interval in microseconds
+  uint16_t    active_samples;  // Number of samples where tx or rx was active
+  uint16_t    delta_t;         // Milliseconds since last response
+  uint8_t     reserved;
 } hcmdGetBusLoadResp;
 
 typedef struct {
-    unsigned char reserved;
+  uint8_t     reserved;
 } hcmdResetStatisticsReq;
 
 typedef struct {
-    unsigned char reserved;
+  uint8_t     reserved;
 } hcmdCheckLicenseReq;
 
 typedef struct {
-    uint32_t  licenseMask;
-    uint32_t  kvaserLicenseMask;
+  uint32_t    licenseMask;
+  uint32_t    kvaserLicenseMask;
 } hcmdCheckLicenseResp;
 
 typedef struct {
-    unsigned short  time[3];
-    unsigned char   reserved;
-    unsigned char   errorCode;
-    unsigned short  addInfo1;
-    unsigned short  addInfo2;
+  uint16_t     time[3];
+  uint8_t     reserved;
+  uint8_t     errorCode;
+  uint16_t     addInfo1;
+  uint16_t     addInfo2;
 } hcmdErrorEvent;
 
+
 typedef struct {
-    unsigned char flags;
-    unsigned char reserved;
+  uint8_t     flags;
+  uint8_t     reserved;
 } hcmdFlushQueue;
 
-typedef struct {
-    unsigned char reserved;
-} hcmdNoCommand;
 
 typedef struct {
-    unsigned char reserved;
+  uint8_t     reserved;
+} hcmdNoCommand;
+
+
+typedef struct {
+  uint8_t     reserved;
 } hcmdResetErrorCounter;
 
 typedef struct {
-    unsigned short  time[3];
-    unsigned char   flags;
-    unsigned char   reserved;
-    unsigned char   txErrorCounter;
-    unsigned char   rxErrorCounter;
-    unsigned char   busStatus;
-    unsigned char   errorFactor;
+  uint16_t    time[3];
+  uint8_t     flags;
+  uint8_t     reserved;
+  uint8_t     txErrorCounter;
+  uint8_t     rxErrorCounter;
+  uint8_t     busStatus;
+  uint8_t     errorFactor;
 } hcmdCanErrorEvent;
 
 typedef struct {
-    unsigned char lineMode;
-    unsigned char resistorNet;
-    unsigned char reserved;
+  uint8_t     lineMode;
+  uint8_t     resistorNet;
+  uint8_t     reserved;
 } hcmdSetTransceiverModeReq;
 
-typedef struct { 
-    unsigned short  time;
+typedef struct {
+  uint16_t    time;
 } hcmdInternalDummy;
 
 typedef struct {
-    unsigned char status;
+  uint8_t     status;
 } hcmdMemoCpldPrgResp;
 
 typedef struct {
-    unsigned char subCmd;
-    unsigned char padding;
-    unsigned char data[CONFIG_DATA_CHUNK];
+  uint8_t     subCmd;
+  uint8_t     padding;
+  uint8_t     data[CONFIG_DATA_CHUNK];
 } hcmdMemoCpldPrgReq;
 
 typedef struct {
-    unsigned char subCmd;
-    unsigned char padding;
-    signed short  timeout;
+  uint8_t     subCmd;
+  uint8_t     padding;
+  int16_t       timeout;
 } hcmdLedActionReq;
 
 typedef struct {
-    unsigned char subCmd;
+    uint8_t     subCmd;
 } hcmdLedActionResp;
 
 typedef struct {
-    unsigned char info;
+    uint8_t     info;
 } hcmdDiskFullInfo;
 
 typedef struct {
-  unsigned char userNo;
-  unsigned char paramNo;
-  unsigned char status;
-  unsigned char padding;
-  unsigned char data[8];
+  uint8_t     userNo;
+  uint8_t     paramNo;
+  uint8_t     status;
+  uint8_t     padding;
+  uint8_t     data[8];
 } hcmdReadUserParameter;
 
+
 typedef struct {
-    uint32_t        interval;
-    unsigned char   padding[4];
+  int32_t     interval;
+  uint8_t     padding[4];
 } hcmdMemoConfigModeReq;
 
 typedef struct {
-    unsigned char   diskStat;
-    unsigned char   configMode;
-    unsigned char   reserved[10];
+  uint8_t     diskStat;
+  uint8_t     configMode;
+  uint8_t     reserved[10];
 } hcmdMemoConfigModeResp;
 
 typedef struct {
-    unsigned char   subCmd;
-    unsigned char   padding;
-    unsigned short  freq;
-    unsigned short  duration;
+  uint8_t     subCmd;
+  uint8_t     padding;
+  uint16_t    freq;
+  uint16_t    duration;
 } hcmdSound;
 
 // port status
@@ -1061,163 +1290,255 @@ typedef struct {
 #define PORT_CONFIG_SET  5
 
 typedef struct {
-  uint32_t        pulseDur;
-  uint32_t        activeVal;
-  uint32_t        dormantVal;
-  uint32_t        portVal;
-  unsigned short  type;                // IO_PORT_TYPE_xxx
-  unsigned char   status;              // IO_PORT_STATUS_xxx
-  unsigned char   subCmd;              // PORT_CONFIG_SET, PORT_xxx
-  unsigned char   portNo;
-  unsigned char   padding[7];
+  uint32_t    pulseDur;
+  uint32_t    activeVal;
+  uint32_t    dormantVal;
+  uint32_t    portVal;
+  uint16_t    type;                // IO_PORT_TYPE_xxx
+  uint8_t     status;              // IO_PORT_STATUS_xxx
+  uint8_t     subCmd;              // PORT_CONFIG_SET, PORT_xxx
+  uint8_t     portNo;
+  uint8_t     padding[7];
 } hcmdIoPortCtrl;
 
 typedef struct {
-    unsigned char   portNo;             // Hardware-specific port #
-    unsigned char   padding[3];
-    uint32_t        portVal;            // Hardware-specific port value
+  uint8_t     portNo;             // Hardware-specific port #
+  uint8_t     padding[3];
+  uint32_t    portVal;            // Hardware-specific port value
 } hcmdSetIoPortsReq;
 
 typedef struct {
-    unsigned char   origReq[12];
-    unsigned char   portNo;             // Hardware-specific port #
-    unsigned char   padding[15];
+  uint8_t     origReq[12];
+  uint8_t     portNo;             // Hardware-specific port #
+  uint8_t     padding[15];
 } hcmdGetIoPortsReq;
 
 typedef struct {
-    uint32_t        portVal;            // Hardware-specific port value
-    unsigned char   origReq[12];
-    unsigned char   portNo;             // Hardware-specific port #
-    unsigned char   status;
-    unsigned char   padding[10];
+  uint32_t    portVal;            // Hardware-specific port value
+  uint8_t     origReq[12];
+  uint8_t     portNo;             // Hardware-specific port #
+  uint8_t     status;
+  uint8_t     padding[10];
 } hcmdGetIoPortsResp;
 
 typedef struct {
-    unsigned char mode;                 // Hardware-specific mode value
-    unsigned char padding[3];
+    uint8_t     mode;                 // Hardware-specific mode value
+    uint8_t     padding[3];
 } hcmdSetDeviceModeReq;
 
 typedef struct {
-    unsigned char mode;                 // Hardware-specific mode value
-    unsigned char status;
-    unsigned char padding[2];
+    uint8_t     mode;                 // Hardware-specific mode value
+    uint8_t     status;
+    uint8_t     padding[2];
 } hcmdGetDeviceModeResp;
 
 typedef struct {
-    unsigned char reserved;
+    uint8_t     reserved;
 } hcmdGetTransceiverInfoReq;
 
 typedef struct {
-  uint32_t      transceiverCapabilities;
-  unsigned char transceiverStatus;
-  unsigned char transceiverType;
-  unsigned char reserved;
+  uint32_t    transceiverCapabilities;
+  uint8_t     transceiverStatus;
+  uint8_t     transceiverType;
+  uint8_t     reserved;
 } hcmdGetTransceiverInfoResp;
 
 typedef struct {
-  unsigned short  rate;
-  unsigned short  pad2;
+  uint16_t    rate;
+  uint16_t    pad2;
 } hcmdSetHeartbeatRateReq;
 
 typedef struct {
-  unsigned short  time[3];
+  uint16_t    time[3];
 } hcmdHeartbeatResp;
 
 typedef struct {
-  uint32_t        interval;
-  unsigned char   requestType;
-  unsigned char   bufNo;
-  unsigned char   reserved;
-  unsigned char   padding;
-  uint32_t        id;
-  unsigned char   data[8];
-  unsigned char   dlc;
-  unsigned char   flags;
-  unsigned char   padding2[6];
+  uint32_t    id;
+  uint8_t     data[8];
+  uint8_t     dlc;
+  uint8_t     flags;
+  uint8_t     bufNo;
+  uint8_t     padding[13];
+} hcmdSetAutoTxBuffer;
+
+typedef struct {
+  uint32_t    interval;
+  uint8_t     requestType;
+  uint8_t     bufNo;
+  uint8_t     reserved;
+  uint8_t     padding;
+  uint32_t    id;
+  uint8_t     data[8];
+  uint8_t     dlc;
+  uint8_t     flags;
+  uint8_t     padding2[6];
 } hcmdAutoTxBufferReq;
 
 typedef struct {
-  unsigned char   responseType;
-  unsigned char   bufferCount;
-  unsigned short  capabilities;
-  uint32_t        timerResolution;
-  uint32_t        status;
+  uint8_t     responseType;
+  uint8_t     bufferCount;
+  uint16_t    capabilities;
+  uint32_t    timerResolution;
+  uint32_t    status;
 } hcmdAutoTxBufferResp;
 
 typedef struct {
-  unsigned short  time[3];
-  unsigned short  sofNr;
+  uint16_t    time[3];
+  uint16_t    sofNr;
 } hcmdTrefSofSeq;
 
 typedef struct {
-  unsigned short  onOff;
+  uint16_t    onOff;
 } hcmdSoftSyncOnOff;
 
+#define THROTTLE_FLAG_IS_REMOTE  0x01
+#define THROTTLE_FLAG_DO_READ    0x02
 typedef struct {
-  unsigned short  throttle;
+  uint16_t    throttle;
+  uint8_t     flags;
 } hcmdUsbThrottle;
 
 typedef struct {
-  unsigned char   subCmd;
-  unsigned char   status;
-  unsigned char   first;
-  unsigned char   data[14];
-  unsigned char   padding[11];
+  uint8_t     subCmd;
+  uint8_t     status;
+  uint8_t     first;
+  uint8_t     data[14];
+  uint8_t     padding[11];
 } hcmdGetExtendedInfoReq, hcmdGetExtendedInfoResp;
 
 typedef struct {
-  unsigned char   seqNo;
-  unsigned char   reserved1;
-  unsigned short  reserved2;
-  unsigned int    time;
-  unsigned char   data[16];
-  unsigned char   padding[4];
+  uint8_t     seqNo;
+  uint8_t     reserved1;
+  uint16_t    reserved2;
+  unsigned int   time;
+  uint8_t     data[16];
+  uint8_t     padding[4];
 } hcmdTcpKeepalive;
 
+
 typedef struct {
-  unsigned char   index;
-  unsigned char   data[16];
-  unsigned char   padding[11];
+  uint16_t    envvarLen;
+  uint8_t     channel;
+  uint8_t     padding2;
+  uint32_t    hash;
+} hcmdScriptEnvvarNotifyEvent;
+
+typedef struct {
+  uint8_t     index;
+  uint8_t     data[16];
+  uint8_t     padding[11];
 } hcmdNetworkDeviceName;
 
 typedef struct {
-  uint32_t        time_in_us;
-  unsigned char   padding[24];
+  uint32_t    time_in_us;
+  uint8_t     padding[24];
 } hcmdDevicePing;
+
+#define SCRIPT_ENVVAR_SUBCMD_SET_START     1
+#define SCRIPT_ENVVAR_SUBCMD_GET_START     2
+
+#define SCRIPT_ENVVAR_RESP_OK                 0
+#define SCRIPT_ENVVAR_RESP_UNKNOWN_VAR        1
+#define SCRIPT_ENVVAR_RESP_WRONG_VAR_LEN      2
+#define SCRIPT_ENVVAR_RESP_OUT_OF_MEMORY      3
 
 typedef union {
   struct {
-    unsigned short  bulkLen;
+    uint16_t    bulkLen;
   } cmdStartSet;
   struct {
-    unsigned short  startOffset;
-    unsigned short  payloadLengthWanted;
+    uint16_t    startOffset;
+    uint16_t    payloadLengthWanted;
   } cmdStartGet;
 } hcommandData;
 
 typedef struct {
-  char      name[16];           // CAN, LIN, WHATEVER
-  uint8_t   channel;            // 0, 1,... (combine with name)
-  uint8_t   reserved[11];
+  uint8_t     subCommand;
+  uint8_t     origin;
+  uint16_t    reserved;
+  uint32_t    hash;
+  hcommandData    subCmdData;
+} hcmdScriptEnvvarTransferCtrlReq;
+
+typedef struct {
+  uint8_t     subCommand;
+  uint8_t     resp;
+  uint16_t    reserved;
+  uint32_t    hash;
+} hcmdScriptEnvvarTransferCtrlResp;
+
+#define HYDRA_SCRIPT_ENVVAR_BULKSIZE 18
+
+typedef struct {
+  uint16_t    offset;
+  uint16_t    length;
+  uint32_t    hash;
+  uint8_t     origin;
+  uint8_t     bulkDone;
+  uint8_t     bulkData[HYDRA_SCRIPT_ENVVAR_BULKSIZE];
+} hcmdScriptEnvvarTransferBulk;
+
+typedef struct {
+  char    name[16];           // CAN, LIN, WHATEVER
+  uint8_t channel;            // 0, 1,... (combine with name)
+  uint8_t reserved[11];
 } hcmdMapChannelReq;
 
 
 typedef struct {
-  uint8_t   heAddress;         // Opaque for the driver.
-  uint8_t   position;          // Physical "position" in device
-  uint16_t  flags;             // Various flags, to be defined
-  uint8_t   reserved1[24];
+  uint8_t  heAddress;         // Opaque for the driver.
+  uint8_t  position;          // Physical "position" in device
+  uint16_t flags;             // Various flags, to be defined
+  uint8_t  reserved1[24];
 } hcmdMapChannelResp;
 
 typedef struct {
-  unsigned short  fileNo;            // File number
-  unsigned short  fileCount;         // Number of files on SD card
-  uint32_t        fileSize;
-  uint32_t        fileTime;
-  char            filename[14];        // Only 8.3
-  short           status;
+  uint16_t    fileNo;            // File number
+  uint16_t    fileCount;         // Number of files on SD card
+  uint32_t    fileSize;
+  uint32_t    fileTime;
+  char        filename[14];        // Only 8.3
+  int16_t     status;
 } hcmdFileInfo;
 
+//Sub commands in CMD_GET_CAPABILITIES_REQ
+#define CAP_SUB_CMD_DUMMY_NOT_IMPLEMENTED    0
+#define CAP_SUB_CMD_DUMMY_UNAVAILABLE        1
+#define CAP_SUB_CMD_SILENT_MODE              2
+#define CAP_SUB_CMD_ERRFRAME                 3
+#define CAP_SUB_CMD_BUS_STATS                4
+#define CAP_SUB_CMD_ERRCOUNT_READ            5
+
+
+typedef struct {
+  uint16_t  subCmdNo;
+  uint16_t  unused;
+  uint32_t padding[6];
+} hcmdCapabilitiesReq;
+
+typedef struct
+{
+  uint32_t mask;
+  uint32_t value;
+  uint32_t padding[4];
+}hchannelCap32_t;
+
+//Status codes in CMD_GET_CAPABILITIES_RESP 
+#define CAP_STATUS_OK 0
+#define CAP_STATUS_NOT_IMPLEMENTED 1
+#define CAP_STATUS_UNAVAILABLE 2
+
+typedef struct {
+  uint16_t  subCmdNo;
+  uint16_t  status;
+  union {
+    hchannelCap32_t silentMode;  // CAP_SUB_CMD_SILENT_MODE
+    hchannelCap32_t errframeCap; // CAP_SUB_CMD_ERRFRAME
+    hchannelCap32_t busstatCap;  // CAP_SUB_CMD_BUS_STATS
+    hchannelCap32_t errcountCap; // CAP_SUB_CMD_ERRCOUNT_READ    
+  };
+} hcmdCapabilitiesResp;
+   
 // Union for all logged messages.
 typedef union {
   hcmdLogHead                  logHead;
@@ -1226,6 +1547,74 @@ typedef union {
   hcmdLogRtcTime               logRtcTime;
   hcmdLogAction                logAction;
 } hydraHostCmdLog;
+
+// CAN FD messages
+#define MAX_LOGGED_DATABYTES 64
+
+typedef struct {
+  uint8_t     len;
+  uint8_t     logCmdNo;
+  uint8_t     channel;
+  uint8_t     dlc;
+  uint32_t    flags;
+  uint32_t    id;
+  uint32_t    time[2];
+  uint8_t     data[MAX_LOGGED_DATABYTES];
+} hcmdLogMessageFD;
+
+typedef struct
+{
+  uint8_t     len;
+  uint8_t     logCmdNo;
+  uint8_t     type;
+  uint8_t     channel;
+  uint32_t    time[2];
+  uint32_t    preTrigger;
+  uint32_t    postTrigger;
+  uint16_t    trigNo; // Bit mask showing which trigger was activated
+  uint8_t     padding2[2];
+} hcmdLogTrigFD;
+
+
+typedef struct
+{
+  uint8_t     len;
+  uint8_t     logCmdNo;
+  uint16_t    hiresTimerFqMHz;
+  uint32_t    unixTime;            // Seconds since 1970
+  uint32_t    unixTimeSubsecond;
+  uint32_t    time[2];             // sync with unixTime
+  uint32_t    padding2;
+} hcmdLogRtcTimeFD;
+
+typedef struct
+{
+  uint8_t     len;
+  uint8_t     logCmdNo;
+  uint8_t     lioMajor; // Lio major version
+  uint8_t     lioMinor; // Lio minor version
+  uint8_t     fwMajor;  // Firmware major version
+  uint8_t     fwMinor;  // Firmware major version
+  uint16_t    fwBuild;       // Firmware build version
+  uint32_t    serialNumber;  // Serial
+  uint32_t    eanHi;         // EANHI
+  uint32_t    eanLo;         // EANLO
+} hcmdLogVerFD;
+
+
+// Union for all logged CAN FD messages.
+typedef union {
+  hcmdLogHead                  logHead;
+  hcmdLogMessageFD             logMessageFD;
+  hcmdLogTrigFD                logTrigFD;
+  hcmdLogRtcTimeFD             logRtcTimeFD;
+  hcmdLogVerFD                 logVerFD;
+} hydraHostCmdLogFD;
+
+
+typedef struct {
+  uint8_t   unknownCmd;
+} hcmdUnknownCommandResp;
 
 
 // Well-known HEs
@@ -1240,20 +1629,20 @@ typedef union {
 #define HYDRA_CMD_SIZE          32
 
 typedef struct hydraHostCmd {
-  unsigned char  cmdNo;
+  uint8_t     cmdNo;
   union {
     struct {
-      unsigned char dstAddr    : 6;
-      unsigned char srcChannel : 2;
+      uint8_t     dstAddr    : 6;
+      uint8_t     srcChannel : 2;
     } cmdIOP;
-    unsigned char heAddress;    // 0..5: dstHE, 6..7: srcHE-msb-part
+    uint8_t     heAddress;    // 0..5: dstHE, 6..7: srcHE-msb-part
   };
   union {
     struct {
-      unsigned short transId : 12; //  0..11: Seq
-      unsigned short srcHE   : 4;  // 12..15: srcHe-lsb-part
+      uint16_t    transId : 12; //  0..11: Seq
+      uint16_t    srcHE   : 4;  // 12..15: srcHe-lsb-part
     } cmdIOPSeq;
-    unsigned short transId;     // 0..11 transId; 12..15 don't care
+    uint16_t    transId;     // 0..11 transId; 12..15 don't care
   };
 
   union {
@@ -1273,6 +1662,7 @@ typedef struct hydraHostCmd {
     hcmdTxCanMessage          txCanMessage;
     hcmdTxAck                 txAck;
     hcmdTxRequest             txRequest;
+    hcmdTxInterval            txInterval;
     hcmdSetBusparamsReq       setBusparamsReq;
 
     hcmdGetBusparamsReq       getBusparamsReq;
@@ -1343,6 +1733,7 @@ typedef struct hydraHostCmd {
     hcmdSetHeartbeatRateReq      setHeartbeatRateReq;
     hcmdHeartbeatResp            heartbeatResp;
 
+    hcmdSetAutoTxBuffer          setAutoTxBuffer;
     hcmdAutoTxBufferReq          autoTxBufferReq;
     hcmdAutoTxBufferResp         autoTxBufferResp;
 
@@ -1376,10 +1767,21 @@ typedef struct hydraHostCmd {
 
     hcmdTcpKeepalive             tcpKeepalive;
 
+    hcmdScriptCtrlReq            scriptCtrlReq;
+    hcmdScriptCtrlResp           scriptCtrlResp;
+
+    hcmdEnvvarCtrlReq            envvarCtrlReq;
+    hcmdEnvvarCtrlResp           envvarCtrlResp;
+
     hcmdNetworkDeviceName        networkDeviceNameReq;
     hcmdNetworkDeviceName        networkDeviceNameResp;
     hcmdDevicePing               devicePingReq;
     hcmdDevicePing               devicePingResp;
+
+    hcmdScriptEnvvarTransferCtrlReq  scriptEnvvarTransferCtrlReq;
+    hcmdScriptEnvvarTransferCtrlResp scriptEnvvarTransferCtrlResp;
+    hcmdScriptEnvvarTransferBulk     scriptEnvvarTransferBulk;
+    hcmdScriptEnvvarNotifyEvent      scriptEnvvarNotifyEvent;
 
     hcmdMapChannelReq             mapChannelReq;
     hcmdMapChannelResp            mapChannelResp;
@@ -1387,6 +1789,9 @@ typedef struct hydraHostCmd {
     hcmdGetSoftwareDetailsResp    getSoftwareDetailsResp;
     hcmdFileInfo                  fileInfo;
 
+    hcmdUnknownCommandResp        unknownCommandResp;
+    hcmdCapabilitiesReq           capabilitiesReq;
+    hcmdCapabilitiesResp          capabilitiesResp;
 
 #ifdef HYDRA_PRIVATE
     hcmdHydraOtherCommand        o;
@@ -1397,7 +1802,7 @@ typedef struct hydraHostCmd {
 
 #define HE_BITS    4
 #define CH_BITS    2
-#define SEQ_BITS   8
+#define SEQ_BITS   12
 #if (2 * CH_BITS + HE_BITS) > 8
 # error "Too many HE or CH bits!"
 #endif
@@ -1435,27 +1840,78 @@ typedef struct hydraHostCmd {
                          ((seq)                & SEQ_MASK);      \
   } while (0)
 
-// hydraHostCmd must be 32 bytes long!
-#if defined(CompilerAssert)
-CompilerAssert((sizeof(hydraHostCmd) == HYDRA_CMD_SIZE));
-// A basic sanity check of all structs:
-#define CHECK_ALIGNMENT(X) CompilerAssert((sizeof(X) % 4) == 0)
-CHECK_ALIGNMENT(hydraHostCmd                 );
 
-#endif
+// hydraHostCmd must be 32 bytes long!
+extern char xx[(sizeof(hydraHostCmd) == 32) ? 1 : -1];
+extern char xy[(sizeof(hydraHostCmd) % 4) == 0 ? 1 : -1];
+
+
+typedef struct {
+  uint32_t    flags;
+  uint32_t    id;
+  uint32_t    fpga_id;
+  uint32_t    fpga_control;
+  uint64_t    fpga_timestamp;
+  uint8_t     fpga_payload[64];
+} hcmdRxCanMessageFd;
+
+typedef struct {
+  uint32_t    flags;
+  uint32_t    id;
+  uint32_t    fpga_id;
+  uint32_t    fpga_control;
+  uint8_t     databytes;
+  uint8_t     dlc;
+  uint8_t     reserved4[6];
+  uint8_t     fpga_payload[64];
+} hcmdTxCanMessageFd;
+
+typedef struct {
+  uint8_t     requestType;
+  uint8_t     bufNo;
+  uint8_t     databytes;
+  uint8_t     dlc;
+  uint32_t    interval;
+  uint32_t    flags;
+  uint32_t    id;
+  uint8_t     data[64];
+} hcmdAutoTxMessageFd;
+
+typedef struct {
+  uint32_t    flags;
+  uint32_t    padding1;
+  uint64_t    fpga_timestamp;
+  uint32_t    padding2[2];
+} hcmdTxAckFd;
 
 //Used when cmdNo is 0xFF (CMD_EXTENDED)
 typedef struct {
-  unsigned char  cmdNo;
-  unsigned char  cmdIOP;
-  unsigned short cmdIOPSeq;
-  unsigned short cmdLen;
-  unsigned char  cmdNoExt;
-  unsigned char  Reserved;
+  uint8_t     cmdNo;
+  union {
+    struct {
+      uint8_t     dstAddr    : 6;
+      uint8_t     srcChannel : 2;
+    } cmdIOP;
+    uint8_t     heAddress;
+  };
+  union {
+    struct {
+      uint16_t    transId : 12;
+      uint16_t    srcHE   : 4;
+    } cmdIOPSeq;
+    uint16_t    transId;
+  };
+
+  uint16_t    cmdLen;
+  uint8_t     cmdNoExt;
+  uint8_t     Reserved;
 
   union {
-    int q;
-  } ;
+    hcmdRxCanMessageFd        rxCanMessageFd;
+    hcmdTxCanMessageFd        txCanMessageFd;
+    hcmdAutoTxMessageFd       autoTxMessageFd;
+    hcmdTxAckFd               txAckFd;
+  };
 } hydraHostCmdExt;
 
 #if !defined(__IAR_SYSTEMS_ICC__)

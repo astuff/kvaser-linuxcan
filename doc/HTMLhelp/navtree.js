@@ -96,6 +96,7 @@ var NAVTREE =
           [ "canGetBusOutputControl", "group___c_a_n.html#ga1683419d56af8afdbfc9184678c82fdd", null ],
           [ "canGetBusParams", "group___c_a_n.html#gaf2a734c0486030610389331685a3827a", null ],
           [ "canGetBusParamsFd", "group___c_a_n.html#gab620a5cd6249e2e53cf2a0099e7e8685", null ],
+          [ "canGetHandleData", "group___c_a_n.html#ga909e5c14b09fe76bad280475138d503e", null ],
           [ "canGetRawHandle", "group___c_a_n.html#gaa1229ae7635c051a8f7fe545d9d8007a", null ],
           [ "canOpenChannel", "group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300", null ],
           [ "canRead", "group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8", null ],
@@ -107,7 +108,7 @@ var NAVTREE =
           [ "canResetBus", "group___c_a_n.html#gaecc8b56e75cf68548af53b2d432079af", null ],
           [ "canSetBusOutputControl", "group___c_a_n.html#gafca31590718ac7101d065b0c18b2410e", null ],
           [ "canSetBusParams", "group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301", null ],
-          [ "canSetBusParamsC200", "group___c_a_n.html#ga1a3ba0ef73eee6b97e886730ac696935", null ],
+          [ "canSetBusParamsC200", "group___c_a_n.html#gac34c1577cae55385250e7412513c8cbd", null ],
           [ "canSetBusParamsFd", "group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14", null ],
           [ "canSetNotify", "group___c_a_n.html#gaa5dd0f277c7059169055321fbda87486", null ],
           [ "canTranslateBaud", "group___c_a_n.html#gaf38b95fce4930347d9986887ec046e13", null ],
@@ -158,6 +159,10 @@ var NAVTREE =
           [ "LINLIBAPI", "group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb", null ]
         ] ],
         [ "Typedefs", "group___l_i_n.html", [
+          [ "BOOL", "group___l_i_n.html#gac3247c51e4e3de674affb32998e133e2", null ],
+          [ "BYTE", "group___l_i_n.html#ga4ae1dab0fb4b072a66584546209e7d58", null ],
+          [ "DWORD", "group___l_i_n.html#ga798af1e30bc65f319c1a246cecf59e39", null ],
+          [ "HANDLE", "group___l_i_n.html#ga5ff89741beb6f252c7fdc9ca12bd9784", null ],
           [ "LinHandle", "group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a", null ]
         ] ],
         [ "Enumerations", "group___l_i_n.html", [

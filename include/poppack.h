@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**                Copyright 2012 by Kvaser AB, MÃ¶lndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -68,18 +68,33 @@
 #    endif
 #  elif defined(__C166__)
 #    pragma pack()
+#  elif defined(__LCC__)
+#    pragma pack(pop)
+#  elif defined(__MWERKS__)
+#    pragma pack(pop)
 #  elif defined(__BORLANDC__)
 #    if (__BORLANDC__ >= 0x460)
-#       pragma nopackwarning
-#       pragma pack(pop)
+#      pragma nopackwarning
+#      pragma pack(pop)
 #    else
-#       pragma option -a.
+#      pragma option -a.
 #    endif
+#  elif defined (__IAR_SYSTEMS_ICC)
+     /* IAR M16C 1.x */
+#    pragma alignment()
+#  elif defined (__IAR_SYSTEMS_ICC__)
+     /* IAR M32C 2.x */
+#    pragma pack(pop)
+#  elif defined (__GNUC__) && defined(__m32c__)
+     /* gcc 4.x m32c */
+#    pragma align reset
+#  elif defined(__GNUC__) && defined(__linux__)
+#    pragma pack()
+#  elif defined (__GNUC__) && defined(__arm__) && defined(__ARM_ARCH_4T__)
+     /* Do nothing */
+#  elif defined(__GCC__)
+#    pragma pack(pop)
 #  else
-#       pragma pack()
-//#    error Unsupported compiler.
+#    error Unsupported compiler.
 #  endif
 #endif /* ! (defined(lint) || defined(_lint) || defined(RC_INVOKED)) */
-
-
-

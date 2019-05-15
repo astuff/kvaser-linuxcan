@@ -53,7 +53,7 @@
 # 
 
 CC = gcc
-CFLAGS = -Wall -O2  -D_REENTRANT $(XTRA_CFLAGS) -I../../include
+CFLAGS = -Wall -Wextra -Werror -O2  -D_REENTRANT $(XTRA_CFLAGS) -I../../include
 LDFLAGS = -L..
 LDLIBS = -lcanlib -lpthread
 OBJS =\

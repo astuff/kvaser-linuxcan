@@ -70,4 +70,6 @@ else
 	RUNDIR := $(PWD)
 endif
 
+CHECK_SUPPRESS = suppressions.txt
+
 include $(RUNDIR)/../config.mak

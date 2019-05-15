@@ -96,7 +96,7 @@
 #include "memq.h"
 #include "hwnames.h"
 #include "vcan_ioctl.h"
-
+#include "capabilities.h"
 
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("KVASER");
@@ -143,7 +143,6 @@ static int pciCanInSync (VCanChanData *vChd);
 static int EXIT pciCanCloseAllDevices(void);
 static int pciCanProcRead (struct seq_file* m, void* v);
 static int pciCanRequestChipState (VCanChanData *vChd);
-static unsigned long pciCanRxQLen(VCanChanData *vChd);
 static unsigned long pciCanTxQLen(VCanChanData *vChd); 
 static void pciCanRequestSend (VCanCardData *vCard, VCanChanData *vChan);
 static int pciCanTime(VCanCardData *vCard, unsigned long *time);
@@ -185,7 +184,6 @@ static VCanHWInterface hwIf = {
     .flushSendBuffer   = pciCanFlushSendBuffer,
     .getRxErr          = pciCanGetRxErr,
     .getTxErr          = pciCanGetTxErr,
-    .rxQLen            = pciCanRxQLen,
     .txQLen            = pciCanTxQLen,
     .requestChipState  = pciCanRequestChipState,
     .requestSend       = pciCanRequestSend,
@@ -869,17 +867,20 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
                 vCard->serialNumber = cmd.getCardInfoResp.serialNumberLow;
                 vCard->hwRevisionMajor = cmd.getCardInfoResp.hwRevision >> 4;
                 vCard->hwRevisionMinor = cmd.getCardInfoResp.hwRevision & 0x0F;
+                vCard->hw_type         = HWTYPE_PCICAN_II;
 
-                vCard->capabilities = VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES    |
+                set_capability_value (vCard,
+                                      VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES    |
                                       VCAN_CHANNEL_CAP_RECEIVE_ERROR_FRAMES |
                                       VCAN_CHANNEL_CAP_TIMEBASE_ON_CARD     |
                                       VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION  |
                                       VCAN_CHANNEL_CAP_ERROR_COUNTERS       |
                                       VCAN_CHANNEL_CAP_EXTENDED_CAN         |
                                       VCAN_CHANNEL_CAP_TXREQUEST            |
-                                      VCAN_CHANNEL_CAP_TXACKNOWLEDGE;
-
-                vCard->hw_type      = HWTYPE_PCICAN_II;
+                                      VCAN_CHANNEL_CAP_TXACKNOWLEDGE,
+                                      0xFFFFFFFF,
+                                      0xFFFFFFFF,
+                                      MAX_CARD_CHANNELS);
 
                 if (hCd->isWaiting) {
                     os_if_wake_up_interruptible(&hCd->waitHwInfo);
@@ -1281,13 +1282,6 @@ static int pciCanGetRxErr (VCanChanData *vChd)
 }
 
 
-//======================================================================
-//  Read receive queue length in hardware/firmware
-//======================================================================
-static unsigned long pciCanRxQLen (VCanChanData *vChd)
-{
-    return queue_length(&vChd->txChanQueue);
-}
 
 
 //======================================================================

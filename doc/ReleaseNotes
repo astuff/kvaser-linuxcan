@@ -3,7 +3,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.15  
+Release notes for linuxcan V5.16  
 ================================================================
 
 Linux device drivers for
@@ -101,6 +101,30 @@ Known problems
      hardware, the same is not true for auto tx. The latter is only
      available if there is firmware support in the device.
      (This is the same as under Windows.)
+
+
+New Features and Fixed Problems in V5.16   (22-MAY-2016)
+===========================================================================
+    * CAN FD support (interface mode) for:
+        - Kvaser Memorator Pro 5xHS  (00778-9)
+        - Kvaser USBcan Pro 5xHS     (00779-6)
+        - Kvaser Leaf Pro HS v2      (00843-4)
+        - Kvaser USBcan Pro 2xHS v2  (00752-9)
+
+    * Replaced Windows types with stdint types.
+
+    * Added support for canGetHandleData.
+
+    * Added canCHANNELDATA_CHANNEL_CAP_MASK to read which capabilities are
+      confirmed dynamically by device.
+
+    * Implemented canIOCTL_TX_INTERVAL, canIOCTL_SET_BRLIMIT and
+      canCHANNELDATA_MAX_BITRATE.
+
+    * Removed obsolete USB hotplug support.
+    
+    * Fixed bug, where return value of canIOCTL_GET_RX_BUFFER_LEVEL was affected
+      by transmit buffer length.
 
 
 New Features and Fixed Problems in V5.15   (07-MAR-2016)

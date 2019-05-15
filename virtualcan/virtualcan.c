@@ -87,7 +87,7 @@
 #include "queue.h"
 #include "hwnames.h"
 #include "vcan_ioctl.h"
-
+#include "capabilities.h"
 
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("KVASER");
@@ -127,7 +127,6 @@ static int virtualTxAvailable (VCanChanData *vChd);
 static int EXIT virtualCloseAllDevices(void);
 static int virtualProcRead (struct seq_file* m, void* v);
 static int virtualRequestChipState (VCanChanData *vChd);
-static unsigned long virtualRxQLen(VCanChanData *vChd);
 static unsigned long virtualTxQLen(VCanChanData *vChd); 
 static void virtualRequestSend (VCanCardData *vCard, VCanChanData *vChan);
 
@@ -151,7 +150,6 @@ static VCanHWInterface hwIf = {
     .flushSendBuffer    = vCanFlushSendBuffer,
     .getTxErr           = virtualGetTxErr,
     .getRxErr           = virtualGetRxErr,
-    .rxQLen             = virtualRxQLen,
     .txQLen             = virtualTxQLen,
     .requestChipState   = virtualRequestChipState,
     .requestSend        = virtualRequestSend
@@ -220,12 +218,19 @@ static int virtualProbe (VCanCardData *vCd)
     }
     vCd->cardPresent = 1;
 
-    // qqq This should be per channel!
-    vCd->capabilities = VCAN_CHANNEL_CAP_EXTENDED_CAN         |
-                        VCAN_CHANNEL_CAP_VIRTUAL              |
-                        VCAN_CHANNEL_CAP_TXREQUEST            |
-                        VCAN_CHANNEL_CAP_TXACKNOWLEDGE;
-
+    set_capability_value (vCd,
+                          VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES    |
+                          VCAN_CHANNEL_CAP_RECEIVE_ERROR_FRAMES |
+                          VCAN_CHANNEL_CAP_EXTENDED_CAN         |
+                          VCAN_CHANNEL_CAP_VIRTUAL              |
+                          VCAN_CHANNEL_CAP_SIMULATED            |
+                          VCAN_CHANNEL_CAP_TXREQUEST            |
+                          VCAN_CHANNEL_CAP_TXACKNOWLEDGE        |
+                          VCAN_CHANNEL_CAP_CANFD,
+                          0xFFFFFFFF,
+                          0xFFFFFFFF,
+                          NR_CHANNELS);
+    
     vCd->hw_type      = HWTYPE_VIRTUAL;
 
     return 0;
@@ -387,16 +392,6 @@ static int virtualGetTxErr (VCanChanData *vChd)
 static int virtualGetRxErr (VCanChanData *vChd)
 {
     return 0; // qqq what do we do....
-}
-
-
-//======================================================================
-//  Read receive queue length in hardware/firmware
-//======================================================================
-static unsigned long virtualRxQLen (VCanChanData *vChd)
-{
-    // qqq Why _tx_ channel buffer?
-    return queue_length(&vChd->txChanQueue);
 }
 
 

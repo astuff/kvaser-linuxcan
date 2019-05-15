@@ -53,7 +53,10 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <linux/usb.h>
+
 void packed_EAN_to_BCD(unsigned char *ean, unsigned char *bcd);
 void packed_EAN_to_BCD_with_csum(unsigned char *ean, unsigned char *bcd);
 unsigned int calculateCRC32(void *buf, unsigned int bufsiz);
+unsigned int get_usb_root_hub_id (struct usb_device *udev);
 #endif

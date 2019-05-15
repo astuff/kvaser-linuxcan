@@ -62,12 +62,14 @@ KV_MODULE_NAME = kvcommon
 INCLUDES := $(src)/../include
 
 # source files
-SRCS := VCanOsIf.c objbuf.c osif_functions_kernel.c queue.c util.c softsync.c
+SRCS := VCanOsIf.c objbuf.c osif_functions_kernel.c queue.c util.c softsync.c capabilities.c
 
 ifneq ($(KERNELRELEASE),)
 	RUNDIR := $(src)
 else
 	RUNDIR := $(PWD)
 endif
+
+CHECK_SUPPRESS = suppressions.txt
 
 include $(RUNDIR)/../config.mak

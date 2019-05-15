@@ -57,7 +57,9 @@ LIBNAME = libcanlib.so
 LIBRARY = $(LIBNAME).1.1.0
 SONAME  = $(LIBNAME).1
 
-CFLAGS  += -Wall -DCANLIB_NAME_STRING=\"$(LIBRARY)\" -O2 -fomit-frame-pointer \
+ARCH := $(shell getconf LONG_BIT)
+
+CFLAGS  += -Wall -Werror -Wextra  -DCPU=$(ARCH) -DCANLIB_NAME_STRING=\"$(LIBRARY)\" -O2 -fomit-frame-pointer \
 	$(XTRA_CFLAGS) -pthread #-DPCMCIA_DEBUG=0
 CFLAGS  += -DSPLIT -DLINUX=1 -D_LINUX=1 # maybe remove in time
 CFLAGS  += $(ccflags-y)
@@ -87,8 +89,10 @@ else
   CFLAGS += $(KV_XTRA_CFLAGS_DEBUG)
 endif
 
+CHECKLOG_FILE = checklog.txt
 
-.PHONY:	all tarball rpm clean examples depend canlib
+
+.PHONY:	all tarball rpm clean examples depend canlib check
 
 all: $(LIBRARY) examples
 
@@ -128,6 +132,12 @@ install: canlib examples
 clean:	
 	rm -f $(OBJS) $(LIBRARY) $(DEPS) $(LIBNAME) $(LIBRARY) $(SONAME) $(TARBALL) *~
 	$(MAKE) -C examples clean
+
+check:
+	@echo --------------------------------------------------------------------
+	cppcheck -I ../include/ -I ../../Tmp  -I /usr/include -I /usr/include/linux --enable=all --suppress=toomanyconfigs . > $(CHECKLOG_FILE) 2>&1
+	@cat $(CHECKLOG_FILE)
+	@echo --------------------------------------------------------------------
 
 depend: $(DEPS)
 

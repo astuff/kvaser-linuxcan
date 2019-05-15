@@ -1,7 +1,6 @@
 #!/bin/sh
 # Kvaser CAN driver                     
 # mhydra.sh - start/stop mhydra and create/delete device files  
-# this script can be used if hotplugging doesn't work
 #
 #                 Copyright 2012 by Kvaser AB, M�lndal, Sweden
 #                         http://www.kvaser.com
