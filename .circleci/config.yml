@@ -14,17 +14,17 @@ jobs:
       - run:
           name: Build
           command: |
-            export KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*$' -o | sed -r 's/(.*)\./\1-/')-generic/build
+            export KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*' -o | sed -r 's/(.*)\./\1-/')-generic/build
             make
       - run:
           name: Test
           command: |
-            export KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*$' -o | sed -r 's/(.*)\./\1-/')-generic/build
+            export KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*' -o | sed -r 's/(.*)\./\1-/')-generic/build
             make check
       - run:
           name: Install
           command: |
-            export KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*$' -o | sed -r 's/(.*)\./\1-/')-generic/build
+            export KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*' -o | sed -r 's/(.*)\./\1-/')-generic/build
             make install
 
   bionic-gcc-7.4:
@@ -39,17 +39,17 @@ jobs:
       - run:
           name: Build
           command: |
-            export KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*$' -o | sed -r 's/(.*)\./\1-/')-generic/build
+            export KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*' -o | sed -r 's/(.*)\./\1-/')-generic/build
             make
       - run:
           name: Test
           command: |
-            export KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*$' -o | sed -r 's/(.*)\./\1-/')-generic/build
+            export KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*' -o | sed -r 's/(.*)\./\1-/')-generic/build
             make check
       - run:
           name: Install
           command: |
-            export KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*$' -o | sed -r 's/(.*)\./\1-/')-generic/build
+            export KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*' -o | sed -r 's/(.*)\./\1-/')-generic/build
             make install
 
 workflows:
