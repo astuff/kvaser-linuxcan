@@ -81,11 +81,16 @@ $(document).ready(function(){initNavTree('page_linlib.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#section_user_guide_lin_intro">Using the LIN Bus</a></li>
+<ul><li class="level1"><a href="#section_user_guide_lin_lib_1">Description</a></li>
+<li class="level1"><a href="#section_user_guide_lin_intro">Using the LIN Bus</a></li>
 <li class="level1"><a href="#section_user_guide_lin_frame_identifiers">LIN Frame Identifiers</a></li>
+<li class="level1"><a href="#section_user_guide_lin_where_to_go_from_here">Where to go from here</a></li>
 </ul>
 </div>
-<div class="textblock"><h1><a class="anchor" id="section_user_guide_lin_intro"></a>
+<div class="textblock"><h1><a class="anchor" id="section_user_guide_lin_lib_1"></a>
+Description</h1>
+<p>The LINlib library is used to interact with the LIN bus. Similar to the <a class="el" href="page_canlib.html">CAN bus API (CANlib)</a>, it holds functions to set bus parameters, go bus on/off and read/write LIN messages.</p>
+<h1><a class="anchor" id="section_user_guide_lin_intro"></a>
 Using the LIN Bus</h1>
 <p>Using the LIN bus requires special hardware, e.g. Kvaser Leaf Professional LIN, Kvaser Hybrid 2xCAN/LIN or Kvaser Hybrid Pro 2xCAN/LIN.</p>
 <p>The CAN API calls are not directly suitable for the LIN bus. Instead, a new API is provided that enables you to use the LIN bus as easily as you use the CAN bus. The function calls in the LIN API all have names starting with lin, e.g <a class="el" href="group___l_i_n.html#gaca2d874c870f16c11a4e8e158817d8bf">linReadMessage()</a>.</p>
@@ -97,14 +102,17 @@ LIN Frame Identifiers</h1>
 <p>IDs 0x3C and 0x3D are used for diagnostics frames and behave somewhat differently compared to the regular frames.<br />
  0x3C is called the master request frame and 0x3D is called the slave response frame.<br />
  Diagnostic frames should contain eight bytes of data and use the classic checksum (even if <a class="el" href="linlib_8h.html#a937225a25c3c24efabf7c8438ccecd09">LIN_ENHANCED_CHECKSUM</a> is specified).<br />
- 0x3D is single shot and its slave message buffer is automatically cleared upon reception of a 0x3C or 0x3D. </p>
+ 0x3D is single shot and its slave message buffer is automatically cleared upon reception of a 0x3C or 0x3D.</p>
+<h1><a class="anchor" id="section_user_guide_lin_where_to_go_from_here"></a>
+Where to go from here</h1>
+<p>For futher information check the LINlib references in the Modules tab. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
+    <li class="footer"> (canlib 5.27) Sun Mar 3 2019</li>
   </ul>
 </div>
 </body>

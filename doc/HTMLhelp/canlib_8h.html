@@ -109,6 +109,7 @@ Data Structures</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:ad1f2b460c7780224a9dbc0f8f8a4918a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ad1f2b460c7780224a9dbc0f8f8a4918a">canINVALID_HANDLE</a>&#160;&#160;&#160;(-1)</td></tr>
+<tr class="memdesc:ad1f2b460c7780224a9dbc0f8f8a4918a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicates an invalid <a class="el" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canHandle</a>.  <a href="#ad1f2b460c7780224a9dbc0f8f8a4918a">More...</a><br /></td></tr>
 <tr class="separator:ad1f2b460c7780224a9dbc0f8f8a4918a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canOPEN_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canOPEN_xxx"></a> These defines are used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>. </p>
@@ -171,7 +172,7 @@ Macros</h2></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="BAUD_xxx"></a><a class="anchor" id="canBITRATE_xxx"></a><a class="anchor" id="canFD_BITRATE_xxx"></a></p>
 <p>Common bus speeds. Used in <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gac34c1577cae55385250e7412513c8cbd">canSetBusParamsC200()</a>. The values are translated in canlib, <a class="el" href="group___c_a_n.html#gaf38b95fce4930347d9986887ec046e13">canTranslateBaud()</a>.</p>
 <dl class="section note"><dt>Note</dt><dd>The <a class="el" href="canlib_8h.html#BAUD_xxx">BAUD_xxx</a> names are only retained for compatibility.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_misc.html#section_user_guide_misc_bitrate">Bit Rate Constants</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_can">Set CAN Bitrate</a>, <a class="el" href="page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_canfd">Set CAN FD Bitrate</a> </dd></dl>
 </div></td></tr>
 <tr class="memitem:ac823cae7d94763607a7ca40fcdb5196d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ac823cae7d94763607a7ca40fcdb5196d">canBITRATE_1M</a>&#160;&#160;&#160;(-1)</td></tr>
 <tr class="separator:ac823cae7d94763607a7ca40fcdb5196d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -612,8 +613,12 @@ Macros</h2></td></tr>
 <tr class="separator:a917e47b0cab806f58ff40c44ca306f8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada265ce8e62e94e850381ad1c645945f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ada265ce8e62e94e850381ad1c645945f">canIOCTL_SET_BRLIMIT</a>&#160;&#160;&#160;43</td></tr>
 <tr class="separator:ada265ce8e62e94e850381ad1c645945f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbc1fa43a63d15364c3006b7d61afccc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#adbc1fa43a63d15364c3006b7d61afccc">canIOCTL_SET_USB_THROTTLE_SCALED</a>&#160;&#160;&#160;41</td></tr>
+<tr class="separator:adbc1fa43a63d15364c3006b7d61afccc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a209b1bfbe11114d7b1b72d447672bcb4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a209b1bfbe11114d7b1b72d447672bcb4">canIOCTL_SET_THROTTLE_SCALED</a>&#160;&#160;&#160;41</td></tr>
 <tr class="separator:a209b1bfbe11114d7b1b72d447672bcb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02f9d2480cbecb5e7018a75bba25eeeb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a02f9d2480cbecb5e7018a75bba25eeeb">canIOCTL_GET_USB_THROTTLE_SCALED</a>&#160;&#160;&#160;42</td></tr>
+<tr class="separator:a02f9d2480cbecb5e7018a75bba25eeeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a668aff1bb8e1ff96d50c8bded8706d48"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a668aff1bb8e1ff96d50c8bded8706d48">canIOCTL_GET_THROTTLE_SCALED</a>&#160;&#160;&#160;42</td></tr>
 <tr class="separator:a668aff1bb8e1ff96d50c8bded8706d48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5abee158dc1d1872a75dd9483a699b6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ab5abee158dc1d1872a75dd9483a699b6">canIOCTL_RESET_OVERRUN_COUNT</a>&#160;&#160;&#160;44</td></tr>
@@ -842,6 +847,10 @@ Macros</h2></td></tr>
 <tr class="separator:ad3446e6e4785a80e6181d8460d7bf966"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a615221bf13f09e226d9f2fc0a2bdf0ce"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a615221bf13f09e226d9f2fc0a2bdf0ce">kvIO_INFO_GET_MODULE_NUMBER</a>&#160;&#160;&#160;14</td></tr>
 <tr class="separator:a615221bf13f09e226d9f2fc0a2bdf0ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e0ee3b9360531d5a5976a5cfa4ddeed"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a7e0ee3b9360531d5a5976a5cfa4ddeed">kvIO_INFO_GET_SERIAL_NUMBER</a>&#160;&#160;&#160;15</td></tr>
+<tr class="separator:a7e0ee3b9360531d5a5976a5cfa4ddeed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9fc705004cd541512dbaa6b16af2d32"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aa9fc705004cd541512dbaa6b16af2d32">kvIO_INFO_GET_FW_VERSION</a>&#160;&#160;&#160;16</td></tr>
+<tr class="separator:aa9fc705004cd541512dbaa6b16af2d32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">kvIO_INFO_SET_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="kvIO_INFO_SET_xxx"></a></p>
 <p>These defines are used in <a class="el" href="group__kv__io.html#ga88dda296acccff6acbc979a94b961188">kvIoPinSetInfo()</a>. The value range for each property is specified in the manufacturer's user manual. </p>
@@ -1313,7 +1322,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Used in <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gac34c1577cae55385250e7412513c8cbd">canSetBusParamsC200()</a>. Indicate a bitrate of 250 kbit/s. </p>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="tutorial_2c_2_monitor_can_channel_8c-example.html#a9">tutorial/c/MonitorCanChannel.c</a>, and <a class="el" href="tutorial_2c_2_send_message_8c-example.html#a6">tutorial/c/SendMessage.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a id="ae72ee3c12379c4817de3b53c7cc6d89c"></a>
@@ -1328,7 +1338,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Used in <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gac34c1577cae55385250e7412513c8cbd">canSetBusParamsC200()</a>. Indicate a bitrate of 500 kbit/s. </p>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2open_channels_8c-example.html#a4">how-to/c/openChannels.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a id="a9f0ad5c28bc92808241f2307c907cbbb"></a>
@@ -1891,7 +1902,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to a 64-bit (8 bytes) area which receives the firmware revision number on the card. This number consists of four 16-bit words: the major revision, the minor revision, the release number and the build number, listed in order from the most significant to the least significant. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a14">listChannels.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2list_channels_8c-example.html#a7">how-to/c/listChannels.c</a>, and <a class="el" href="list_channels_8c-example.html#a14">listChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -1940,7 +1951,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to a 64-bit (8 bytes) area which receives the serial number of the card. If the card doesn't have a serial number, 0 is returned. The serial number is an 8-byte unsigned integer. Currently, no products are using all 8 bytes; at most 4 bytes are used. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a13">listChannels.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2list_channels_8c-example.html#a6">how-to/c/listChannels.c</a>, and <a class="el" href="list_channels_8c-example.html#a13">listChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -1973,7 +1984,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to a 8-byte area which receives the UPC (EAN) number for the card. If there is no UPC number, the buffer is filled with zeros. The UPC (EAN) number is coded as a BCD string with the LSB first, so e.g. 733-0130-00122-0 is coded as 0x30001220 0x00073301. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a12">listChannels.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2list_channels_8c-example.html#a5">how-to/c/listChannels.c</a>, and <a class="el" href="list_channels_8c-example.html#a12">listChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -1990,7 +2001,8 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to a 32-bit unsigned integer which receives the channel number on the card. </p>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2list_channels_8c-example.html#a8">how-to/c/listChannels.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a id="a7eeb70e7c666f629ca3762f4692469ae"></a>
@@ -2052,6 +2064,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd>Use <a class="el" href="canlib_8h.html#afc7edc82e3d370444c3b83c66a9c6479">canCHANNELDATA_DEVDESCR_ASCII</a> instead.</dd></dl>
 <p>This define is used in <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to an area which receives a zero-terminated string with a clear-text name of the channel.</p>
 <dl class="section note"><dt>Note</dt><dd>Use of this item code is no longer recommended. The returned channel name doesn't contain the exact hardware type (it just contains the device family) and uses zero-based channel numbering, which is not user friendly. Instead, use e.g. <a class="el" href="canlib_8h.html#afc7edc82e3d370444c3b83c66a9c6479">canCHANNELDATA_DEVDESCR_ASCII</a> and <a class="el" href="canlib_8h.html#a4e0823a649d26191cde50f2c4fa5a65d">canCHANNELDATA_CHAN_NO_ON_CARD</a> to build your own channel name.</dd></dl>
@@ -2090,8 +2103,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
+<dl class="section note"><dt>Note</dt><dd>If no channel name is set, <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a41e892edb8f1b6f9f609599df8e20bdf">canERR_NOT_IMPLEMENTED</a> will be returned, regardless of channel name is supported in the device or not.</dd></dl>
 <p><em>buffer</em> is a user supplied byte array of length 'bufsize' (at least one byte long) to which the null terminated UTF-8 coded channel name will be placed. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a15">listChannels.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2list_channels_8c-example.html#a9">how-to/c/listChannels.c</a>, and <a class="el" href="list_channels_8c-example.html#a15">listChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -2108,7 +2122,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to a buffer which receives the product name of the device as a zero-terminated ASCII string. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a10">listChannels.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2list_channels_8c-example.html#a4">how-to/c/listChannels.c</a>, and <a class="el" href="list_channels_8c-example.html#a10">listChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -2169,6 +2183,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>Use <a class="el" href="canlib_8h.html#afc7edc82e3d370444c3b83c66a9c6479">canCHANNELDATA_DEVDESCR_ASCII</a> instead.</dd></dl>
 <p>This define is used in <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to a CHAR array of at least 32 characters which receives the current device name as a <code>NULL</code> terminated ASCII string.</p>
 <p>If device name is not set or the device does not support this functionality, an error will be returned. </p><dl class="section note"><dt>Note</dt><dd>Not implemented in linux. </dd></dl>
@@ -2725,7 +2740,7 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>Used in <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a> when using the CAN FD protocol. Indicates a bitrate of 1.0 Mbit/s and sampling point at 80%. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="canfdmonitor_8c-example.html#a6">canfdmonitor.c</a>, and <a class="el" href="canfdwrite_8c-example.html#a8">canfdwrite.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="canfdmonitor_8c-example.html#a6">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a8">canfdwrite.c</a>, and <a class="el" href="how-to_2c_2open_channels_8c-example.html#a9">how-to/c/openChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -2772,7 +2787,8 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>Used in <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a> when using the CAN FD protocol. Indicates a bitrate of 0.5 Mbit/s and sampling point at 80%. </p>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2open_channels_8c-example.html#a7">how-to/c/openChannels.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a id="ac1d8bd40554b1433f00e4f1bca3f7a8e"></a>
@@ -3467,6 +3483,8 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 
+<p>Indicates an invalid <a class="el" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canHandle</a>. </p>
+
 </div>
 </div>
 <a id="ac5cc3132d209cce6dc311c215508f881"></a>
@@ -3480,10 +3498,12 @@ Not implemented in linux. </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The following canIOCTL code is deprecated. It is recommended to use <a class="el" href="canlib_8h.html#ab5abee158dc1d1872a75dd9483a699b6">canIOCTL_RESET_OVERRUN_COUNT</a> to reset overrun status (Note that CAN error counters are never updated on device and will be briefly changed back to their original values after this call)</p>
+<p>Note that CAN error counters are never updated on device and will be briefly changed back to their original values after this call.</p>
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> and <em>buflen</em> refers to this functions arguments.</p>
 <p>Tells CANlib to clear the CAN error counters. The contents of <em>buf</em> and <em>buflen</em> are ignored. CAN error counters on device side are NOT updated.</p>
-<dl class="section note"><dt>Note</dt><dd>Not implemented in linux. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>It is recommended to use <a class="el" href="canlib_8h.html#ab5abee158dc1d1872a75dd9483a699b6">canIOCTL_RESET_OVERRUN_COUNT</a> to reset overrun status.</dd>
+<dd>
+Not implemented in linux. </dd></dl>
 
 </div>
 </div>
@@ -3654,6 +3674,7 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> mentioned below refers to this functions argument.</p>
+<p>Returns the round trip time to a device.</p>
 <p><em>buf</em> points to a <code>DWORD</code> that contains the roundtrip time measured in milliseconds.</p>
 <dl class="section note"><dt>Note</dt><dd>Not implemented in linux. </dd></dl>
 
@@ -3671,7 +3692,7 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> mentioned below refers to this functions argument.</p>
-<p><em>buf</em> points at a <code>DWORD</code> which receives the current RX queue level. The returned value is approximative (this is because not all hardware supports retrieving the queue levels. In that case a best-effort guess is returned. Also note that a device with embedded CPU will report its queue levels to the host computer after a short delay that depends on the bus traffic intensity, and consequently the value returned by the call to <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a> might be a few milliseconds old.) </p>
+<p><em>buf</em> points at a <code>DWORD</code> which receives the current RX queue level. The returned value is approximative, this is because not all hardware supports retrieving the queue levels. In that case a best-effort guess is returned. Also note that a device with embedded CPU will report its queue levels to the host computer after a short delay that depends on the bus traffic intensity, and consequently the value returned by the call to <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a> might be a few milliseconds old. </p>
 
 </div>
 </div>
@@ -3756,7 +3777,7 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> mentioned below refers to this functions argument.</p>
-<p><em>buf</em> points at a <code>DWORD</code> which receives the current TX queue level. The returned value is approximative (this is because not all hardware supports retrieving the queue levels. In that case a best-effort guess is returned. Also note that a device with embedded CPU will report its queue levels to the host computer after a short delay that depends on the bus traffic intensity, and consequently the value returned by the call to <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a> might be a few milliseconds old.) </p>
+<p><em>buf</em> points at a <code>DWORD</code> which receives the current TX queue level. The returned value is approximative, this is because not all hardware supports retrieving the queue levels. In that case a best-effort guess is returned. Also note that a device with embedded CPU will report its queue levels to the host computer after a short delay that depends on the bus traffic intensity, and consequently the value returned by the call to <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a> might be a few milliseconds old. </p>
 
 </div>
 </div>
@@ -3794,6 +3815,22 @@ Not implemented in linux. </dd></dl>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>.</p>
 <dl class="section note"><dt>Note</dt><dd>This is only intended for internal use. </dd></dl>
+
+</div>
+</div>
+<a id="a02f9d2480cbecb5e7018a75bba25eeeb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02f9d2480cbecb5e7018a75bba25eeeb">&#9670;&nbsp;</a></span>canIOCTL_GET_USB_THROTTLE_SCALED</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canIOCTL_GET_USB_THROTTLE_SCALED&#160;&#160;&#160;42</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000004">Deprecated:</a></b></dt><dd>Use <a class="el" href="canlib_8h.html#a668aff1bb8e1ff96d50c8bded8706d48">canIOCTL_GET_THROTTLE_SCALED</a> instead</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Not implemented in linux. </dd></dl>
 
 </div>
 </div>
@@ -3875,7 +3912,7 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> and <em>buflen</em> refers to this functions arguments.</p>
-<p>Tells CANlib to "prefer" extended identifiers; that is, if you send a message with <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a> and don't specify <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> nor <a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>, <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> will be assumed. The contents of <em>buf</em> and <em>buflen</em> are ignored. <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> et al will set <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> and/or <a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a> as usual and are not affected by this call.</p>
+<p>Tells CANlib to "prefer" extended identifiers; that is, if you send a message with <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a> and don't specify <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> nor <a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>, <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> will be assumed and the most significant bits of the identifier will be cut off. The contents of <em>buf</em> and <em>buflen</em> are ignored. <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> et al will set <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> and/or <a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a> as usual and are not affected by this call.</p>
 <dl class="section note"><dt>Note</dt><dd>Not implemented in linux. </dd></dl>
 
 </div>
@@ -3960,6 +3997,7 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> mentioned below refers to this functions argument.</p>
+<p>This function enables or disables automatic time reset on bus on. By default, this is enabled, so the timer will automatically reset when a handle goes on bus.</p>
 <p><em>buf</em> points to a DWORD. If the value is zero, the CAN clock will not be reset at buson for the handle. Otherwise, the CAN clock will be reset at buson.</p>
 <p>Default value is <code>1</code>, the CAN clock will be reset at buson. </p>
 
@@ -3993,6 +4031,7 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> mentioned below refers to this functions argument.</p>
+<p>This function turns error frame reporting on or off. If it is off, the channel handle will ignore any error frames it receives.</p>
 <p><em>buf</em> points to an unsigned byte. If the value is zero, the reporting of error frames is turned off for the handle. Otherwise, error frame reporting is turned on.</p>
 <p>Default value is <code>1</code>, error frame reporting is turned on.</p>
 <dl class="section note"><dt>Note</dt><dd>Not implemented in linux. </dd></dl>
@@ -4050,9 +4089,8 @@ Not implemented in linux. </dd></dl>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> mentioned below refers to this functions argument.</p>
 <p>Use this function code to set the size of the receive buffer for a specific handle. <em>buf</em> points to an unsigned integer which contains the new size (number of messages) of the receive buffer.</p>
-<dl class="section note"><dt>Note</dt><dd>The receive buffer consumes system non-paged pool memory, which is a limited resource. Do not increase the receive buffer size unless you have good reasons to do so.</dd>
-<dd>
-You can't use this function code when the channel is on bus.</dd>
+<p>The receive buffer consumes system non-paged pool memory, which is a limited resource. Do not increase the receive buffer size unless you have good reasons to do so.</p>
+<dl class="section note"><dt>Note</dt><dd>You can't use this function code when the channel is on bus.</dd>
 <dd>
 Not implemented in linux. </dd></dl>
 
@@ -4087,7 +4125,7 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> mentioned below refers to this functions argument.</p>
-<p><em>buf</em> points to a DWORD which contains the desired time-stamp clock resolution in microseconds. The default value is 1000 microseconds, i.e. one millisecond.</p>
+<p>The timer scale determines how precisely the channel's timestamps will be displayed without changing the accuracy of the clock. <em>buf</em> points to a DWORD which contains the desired time-stamp clock resolution in microseconds. The default value is 1000 microseconds, i.e. one millisecond.</p>
 <dl class="section note"><dt>Note</dt><dd>The accuracy of the clock isn't affected. </dd></dl>
 
 </div>
@@ -4104,6 +4142,7 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> mentioned below refers to this functions argument.</p>
+<p>Enabling transmit Acknowledges on a channel results in that channel receiving a message with the TXACK flag enabled every time a message is successfully transmitted.</p>
 <p><em>buf</em> points to a DWORD which contains</p>
 <ul>
 <li>0: to turn Transmit Acknowledges off. </li>
@@ -4126,6 +4165,7 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> mentioned below refers to this functions argument.</p>
+<p>Turns transmit requests on or off. If transmit requests are enabled on a channel, the channel will receive a message any time it writes a message to the channel.</p>
 <p><em>buf</em> points to a <code>DWORD</code> which contains</p>
 <ul>
 <li><code>0</code> to turn Transmit Requests off. </li>
@@ -4148,6 +4188,22 @@ Not implemented in linux. </dd></dl>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>.</p>
 <dl class="section note"><dt>Note</dt><dd>This is only intended for internal use. </dd></dl>
+
+</div>
+</div>
+<a id="adbc1fa43a63d15364c3006b7d61afccc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbc1fa43a63d15364c3006b7d61afccc">&#9670;&nbsp;</a></span>canIOCTL_SET_USB_THROTTLE_SCALED</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canIOCTL_SET_USB_THROTTLE_SCALED&#160;&#160;&#160;41</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000003">Deprecated:</a></b></dt><dd>Use <a class="el" href="canlib_8h.html#a209b1bfbe11114d7b1b72d447672bcb4">canIOCTL_SET_THROTTLE_SCALED</a> instead.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Not implemented in linux. </dd></dl>
 
 </div>
 </div>
@@ -4281,8 +4337,8 @@ Not implemented in linux. </dd></dl>
 </div><div class="memdoc">
 <p>Allow opening of virtual channels as well as physical channels.</p>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_virtual.html">Virtual Channels</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a6">cancount.c</a>, <a class="el" href="canmonitor_8c-example.html#a14">canmonitor.c</a>, <a class="el" href="simplewrite_8c-example.html#a14">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a6">writeloop.c</a>.</dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_device_and_channel.html#section_user_guide_virtual">Virtual Channels</a> </dd></dl>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a6">cancount.c</a>, <a class="el" href="canmonitor_8c-example.html#a14">canmonitor.c</a>, <a class="el" href="simplewrite_8c-example.html#a14">simplewrite.c</a>, <a class="el" href="tutorial_2c_2_monitor_can_channel_8c-example.html#a7">tutorial/c/MonitorCanChannel.c</a>, <a class="el" href="tutorial_2c_2_send_message_8c-example.html#a4">tutorial/c/SendMessage.c</a>, and <a class="el" href="writeloop_8c-example.html#a6">writeloop.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -4299,7 +4355,7 @@ Not implemented in linux. </dd></dl>
 </div><div class="memdoc">
 <p>The channel will use the CAN FD protocol, ISO compliant. This also means that messages with <a class="el" href="canstat_8h.html#canFDMSG_xxx">canFDMSG_xxx</a> flags can now be used.</p>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="canfdmonitor_8c-example.html#a4">canfdmonitor.c</a>, and <a class="el" href="canfdwrite_8c-example.html#a4">canfdwrite.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="canfdmonitor_8c-example.html#a4">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a4">canfdwrite.c</a>, and <a class="el" href="how-to_2c_2open_channels_8c-example.html#a5">how-to/c/openChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -4335,9 +4391,10 @@ Not implemented in linux. </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Don't allow sharing of this circuit between applications.</p>
+<p>Don't allow sharing of this CANlib channel between applications.</p>
+<p>Two or more applications can share the same CAN channel. You can, for example, have one application send messages on the bus and another application that just monitors the bus. If this is not desired (for performance or other reasons) you can open an exclusive handle to a channel. This means that no other application can open a handle to the same channel. Do this by passing the <a class="el" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a> flag in the flags argument to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>.</p>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a4">busparms.c</a>, <a class="el" href="cancount_8c-example.html#a4">cancount.c</a>, <a class="el" href="canfdwrite_8c-example.html#a5">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a12">canmonitor.c</a>, <a class="el" href="simplewrite_8c-example.html#a12">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a4">writeloop.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a4">busparms.c</a>, <a class="el" href="cancount_8c-example.html#a4">cancount.c</a>, <a class="el" href="canfdwrite_8c-example.html#a5">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a12">canmonitor.c</a>, <a class="el" href="how-to_2c_2open_channels_8c-example.html#a6">how-to/c/openChannels.c</a>, <a class="el" href="simplewrite_8c-example.html#a12">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a4">writeloop.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -4617,7 +4674,8 @@ reporting" by calling <a class="el" href="group__can__general.html#gaeaa24db97af
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Don't allow sharing of this circuit between applications.</p>
+<p>Don't allow sharing of this CANlib channel between applications.</p>
+<p>Two or more applications can share the same CAN channel. You can, for example, have one application send messages on the bus and another application that just monitors the bus. If this is not desired (for performance or other reasons) you can open an exclusive handle to a channel. This means that no other application can open a handle to the same channel. Do this by passing the <a class="el" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a> flag in the flags argument to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>.</p>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> </p>
 
 </div>
@@ -4633,7 +4691,8 @@ reporting" by calling <a class="el" href="group__can__general.html#gaeaa24db97af
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Don't allow sharing of this circuit between applications.</p>
+<p>Don't allow sharing of this CANlib channel between applications.</p>
+<p>Two or more applications can share the same CAN channel. You can, for example, have one application send messages on the bus and another application that just monitors the bus. If this is not desired (for performance or other reasons) you can open an exclusive handle to a channel. This means that no other application can open a handle to the same channel. Do this by passing the <a class="el" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a> flag in the flags argument to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>.</p>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> </p>
 
 </div>
@@ -4649,7 +4708,8 @@ reporting" by calling <a class="el" href="group__can__general.html#gaeaa24db97af
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Don't allow sharing of this circuit between applications.</p>
+<p>Don't allow sharing of this CANlib channel between applications.</p>
+<p>Two or more applications can share the same CAN channel. You can, for example, have one application send messages on the bus and another application that just monitors the bus. If this is not desired (for performance or other reasons) you can open an exclusive handle to a channel. This means that no other application can open a handle to the same channel. Do this by passing the <a class="el" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a> flag in the flags argument to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>.</p>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> </p>
 
 </div>
@@ -5044,6 +5104,22 @@ reporting" by calling <a class="el" href="group__can__general.html#gaeaa24db97af
 
 </div>
 </div>
+<a id="aa9fc705004cd541512dbaa6b16af2d32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9fc705004cd541512dbaa6b16af2d32">&#9670;&nbsp;</a></span>kvIO_INFO_GET_FW_VERSION</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_GET_FW_VERSION&#160;&#160;&#160;16</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a> to get the FW version number.</p>
+<p>An unsigned 32-bit integer that contains the software version number of the submodule the pin belongs to. This number consists of two 16-bit words, where the most significant word represents the major and the least significant the minor software version number. Read-only. </p>
+
+</div>
+</div>
 <a id="a615221bf13f09e226d9f2fc0a2bdf0ce"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a615221bf13f09e226d9f2fc0a2bdf0ce">&#9670;&nbsp;</a></span>kvIO_INFO_GET_MODULE_NUMBER</h2>
 
@@ -5139,6 +5215,22 @@ reporting" by calling <a class="el" href="group__can__general.html#gaeaa24db97af
 <p>This define is used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a>.</p>
 <p>A float that contains the lower range limit in volts. Read-only.</p>
 <dl class="section note"><dt>Note</dt><dd>This is not applicable for relay pins. </dd></dl>
+
+</div>
+</div>
+<a id="a7e0ee3b9360531d5a5976a5cfa4ddeed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e0ee3b9360531d5a5976a5cfa4ddeed">&#9670;&nbsp;</a></span>kvIO_INFO_GET_SERIAL_NUMBER</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_GET_SERIAL_NUMBER&#160;&#160;&#160;15</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a> to get the serial number.</p>
+<p>An unsigned 32-bit integer that contains the serial number of the submodule the pin belongs to. Read-only. </p>
 
 </div>
 </div>
@@ -6070,7 +6162,7 @@ reporting" by calling <a class="el" href="group__can__general.html#gaeaa24db97af
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="canlib_8h.html">canlib.h</a></li>
-    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
+    <li class="footer"> (canlib 5.27) Sun Mar 3 2019</li>
   </ul>
 </div>
 </body>

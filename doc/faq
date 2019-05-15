@@ -122,7 +122,7 @@ A7.3
 
 --------------------------------------------------------------------------------
 Q8
-    When I execute 'sudo make install' I see a warning like this in the output
+    When I execute 'sudo make install' I get a warning like this in the output
     from make:
 
     ***********************************************************************
@@ -145,7 +145,7 @@ A9
 
 --------------------------------------------------------------------------------
 Q10
-    I see warnings like this in the kernel log:
+    I get warnings like this in the kernel log:
 
     [ 266.950566] mhydra: disagrees about version of symbol vCanInit
     [ 266.950570] mhydra: Unknown symbol vCanInit (err -22)
@@ -158,7 +158,7 @@ A10
 
 --------------------------------------------------------------------------------
 Q11
-    I see warnings like this in the kernel log:
+    I get warnings like this in the kernel log:
 
     [ 321.875210] kvcommon: disagrees about version of symbol module_layout
 
@@ -169,7 +169,7 @@ A11
 
 --------------------------------------------------------------------------------
 Q12
-    I see errors like this in syslog:
+    I get errors like this in syslog:
 
     apr 19 16:05:38 mypc /usr/sbin/mhydra.sh[22789]: modprobe: ERROR: could not insert 'mhydra': Required key not available
     apr 19 16:05:38 mypc systemd-udevd[22776]: Process '/usr/sbin/mhydra.sh start' failed with exit code 1.
@@ -248,4 +248,51 @@ A15
     linuxcan by executing 'sudo make uninstall', since linuxcan will blacklist
     the SocketCAN modules. More information regarding SocketCAN can be found at
     http://elinux.org/CAN_Bus
+
+--------------------------------------------------------------------------------
+Q16
+    When I execute 'make' I get warnings like these in the output from make:
+
+    *****************************************************
+    WARNING: Secure Boot is enabled on <hostname>!
+             When Secure Boot is enabled, driver modules
+             need to be signed with a valid private key
+             in order to be loaded by the kernel.
+    *****************************************************
+
+    or
+
+    *****************************************************
+    WARNING: EFI is used on <hostname>!
+             It looks like Secure Boot is enabled!
+             When Secure Boot is enabled, driver modules
+             need to be signed with a valid private key
+             in order to be loaded by the kernel.
+    *****************************************************
+
+    or
+
+    *****************************************************
+    WARNING: EFI is used on <hostname>!
+             It looks like Secure Boot is disabled.
+             When Secure Boot is enabled, driver modules
+             need to be signed with a valid private key
+             in order to be loaded by the kernel.
+    *****************************************************
+
+    or
+
+    *****************************************************
+    WARNING: EFI is used on <hostname>!
+             Not able to determine whether Secure Boot is
+             enabled or disabled.
+             When Secure Boot is enabled, driver modules
+             need to be signed with a valid private key
+             in order to be loaded by the kernel.
+    *****************************************************
+
+
+A16
+    We try to determine if you are using EFI and if secure boot is enabled.
+    See A12 in this FAQ for more details.
 

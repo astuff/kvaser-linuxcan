@@ -91,30 +91,31 @@ SUBDIRS   = $(USERLIBS) $(DRIVERS)
 
 reverse=$(if $(1),$(call reverse,$(wordlist 2,$(words $(1)),$(1)))) $(firstword $(1))
 
+KDIR ?= /lib/modules/`uname -r`/build
+define print_versions
+	echo '$1 building linuxcan v'`sed -n 's/^version=//g; s/_/./g; s/\([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).\(beta\)\?/\1 \2/p' moduleinfo.txt`
+	echo '  User    : '$(USER)
+	echo '  System  : '`uname -a`
+	echo '  CC      : '$(CC)
+	echo '  CC ver. : '`$(CC) -dumpversion`
+	echo '  KDIR    : '$(KDIR)
+	echo ''
+endef
+
 #---------------------------------------------------------------------------
 # RULES
-.PHONY: print_versions canlib linlib common leaf mhydra pcican pcican2 usbcanII virtualcan pciefd install uninstall clean check load
+.PHONY: print_versions_start canlib linlib common leaf mhydra pcican pcican2 usbcanII virtualcan pciefd install uninstall clean check load
 
-all: print_versions $(SUBDIRS)
+all: print_versions_start $(SUBDIRS)
 	@echo
-	@echo Done building linuxcan
-	@echo
+	@$(call print_versions, Done)
+	@$(call check_for_kvaser_usb_devices)
+	@$(call check_for_secure_boot)
 
-KDIR ?= /lib/modules/`uname -r`/build
-print_versions:
-	@echo 'Building linuxcan v'`sed -n 's/^version=//g; s/_/./g; s/\([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).\(beta\)\?/\1 \2/p' moduleinfo.txt`
-	@echo '  User    : '$(USER)
-	@echo '  System  : '`uname -a`
-	@echo '  CC      : '$(CC)
-	@echo '  CC ver. : '`$(CC) -dumpversion`
-	@echo '  KDIR    : '$(KDIR)
-	@if lsusb -d 0bfd: > /dev/null ; then \
-		echo '*****************************************************'; \
-		echo 'WARNING: Found connected Kvaser USB device(s)!'; \
-		echo '         Unplug them before installing the drivers.'; \
-		echo '*****************************************************'; \
-	fi
-	@echo
+print_versions_start:
+	@$(call print_versions, Start)
+	@$(call check_for_kvaser_usb_devices)
+	@$(call check_for_secure_boot)
 
 canlib:
 	$(MAKE) -C canlib examples
@@ -172,3 +173,64 @@ clean:
 	rm -f modules.order Module.symvers
 	rm -rf .tmp_versions
 	find . -name "checklog.txt"|xargs rm -f
+
+
+define check_for_kvaser_usb_devices
+	if lsusb -d 0bfd: > /dev/null ; then \
+		echo '*****************************************************'; \
+		echo 'WARNING: Found connected Kvaser USB device(s)!'; \
+		echo '         Unplug them before installing the drivers.'; \
+		echo '*****************************************************'; \
+		echo ''; \
+	fi
+endef
+
+HOSTNAME ?= $(shell uname -n)
+EFI_SYS_PATH ?= /sys/firmware/efi
+EFI_SECUREBOOT_PATH ?= $(EFI_SYS_PATH)/efivars/SecureBoot-8be4df61-93ca-11d2-aa0d-00e098032b8c
+define check_for_secure_boot
+	if test -d $(EFI_SYS_PATH) ; then \
+		if which mokutil > /dev/null 2>&1 ; then \
+			if mokutil --sb-state | grep --silent -v 'SecureBoot disabled' ; then \
+				echo '*****************************************************'; \
+				echo 'WARNING: Secure Boot is enabled on <$(HOSTNAME)>!'; \
+				echo '         When Secure Boot is enabled, driver modules'; \
+				echo '         need to be signed with a valid private key' ; \
+				echo '         in order to be loaded by the kernel.'; \
+				echo '*****************************************************'; \
+				echo ''; \
+			fi \
+		elif test -f $(EFI_SECUREBOOT_PATH) ; then \
+			if od --skip-bytes=4 --read-bytes=1 -An -t u1 $(EFI_SECUREBOOT_PATH) | grep --silent 1 ; then \
+				echo '*****************************************************'; \
+				echo 'WARNING: EFI is used on <$(HOSTNAME)>!'; \
+				echo '         It looks like Secure Boot is enabled!'; \
+				echo '         When Secure Boot is enabled, driver modules'; \
+				echo '         need to be signed with a valid private key' ; \
+				echo '         in order to be loaded by the kernel.'; \
+				echo '*****************************************************'; \
+				echo ''; \
+			else \
+				echo '*****************************************************'; \
+				echo 'WARNING: EFI is used on <$(HOSTNAME)>!'; \
+				echo '         It looks like Secure Boot is disabled.'; \
+				echo '         When Secure Boot is enabled, driver modules'; \
+				echo '         need to be signed with a valid private key' ; \
+				echo '         in order to be loaded by the kernel.'; \
+				echo '*****************************************************'; \
+				echo ''; \
+			fi \
+		else \
+			echo '*****************************************************'; \
+			echo 'WARNING: EFI is used on <$(HOSTNAME)>!'; \
+			echo '         Not able to determine whether Secure Boot is'; \
+			echo '         enabled or disabled.'; \
+			echo '         When Secure Boot is enabled, driver modules'; \
+			echo '         need to be signed with a valid private key' ; \
+			echo '         in order to be loaded by the kernel.'; \
+			echo '*****************************************************'; \
+			echo ''; \
+		fi \
+	fi
+endef
+

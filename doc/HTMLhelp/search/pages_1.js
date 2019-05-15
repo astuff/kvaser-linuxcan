@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['database_20api_20_28kvadblib_29',['Database API (kvaDbLib)',['../page_kvadblib.html',1,'']]]
+  ['bus_20errors',['Bus Errors',['../page_user_guide_bus_errors.html',1,'page_canlib']]]
 ];

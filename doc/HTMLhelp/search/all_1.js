@@ -14,5 +14,6 @@ var searchData=
   ['busload',['busLoad',['../structcan_bus_statistics__s.html#a10d3e5def5be80618a372a441eaadc2f',1,'canBusStatistics_s']]],
   ['busstatus',['busStatus',['../structcan_notify_data.html#a43a5205812ec3002d08fca45821efc3f',1,'canNotifyData']]],
   ['byte',['BYTE',['../linlib_8h.html#a4ae1dab0fb4b072a66584546209e7d58',1,'linlib.h']]],
-  ['bytetime',['byteTime',['../struct_lin_message_info.html#a49b9c16add79f98b4f26894ae8f44356',1,'LinMessageInfo']]]
+  ['bytetime',['byteTime',['../struct_lin_message_info.html#a49b9c16add79f98b4f26894ae8f44356',1,'LinMessageInfo']]],
+  ['bus_20errors',['Bus Errors',['../page_user_guide_bus_errors.html',1,'page_canlib']]]
 ];

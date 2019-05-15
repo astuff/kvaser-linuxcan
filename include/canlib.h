@@ -112,27 +112,33 @@
 /**
  *  \page page_canlib CAN bus API (CANlib)
  *
- * CANlib is a software product from KVASER that provides support for a wide range
- * of Kvasers CAN products. The CANlib API provides the application programmer
- * with a quick and easy access to the CAN network while supporting a
- * queue-oriented programming model.
+ * The CAN bus API (CANlib) is used to interact with Kvaser CAN devices
+ * connected to your computer and the CAN bus. At its core you have functions
+ * to set bus parameters (e.g. bit rate), go bus on/o and read/write CAN
+ * messages. You can also use CANlib to download and start t programs on
+ * supported devices. If you can see your device listed in the Kvaser Device
+ * Guide tool, it is connected and you can communicate with it through CANlib.
  *
- * CANlib supports both 32-bit and 64-bit programs under Windows and Linux. For
- * more detailed information about supported platforms, please contact \ref
- * page_user_guide_support.
+ * Contents:
  *
- * Where to go from here:
- *
- *    - \subpage page_user_guide - introductory text on how to use CANlib and also
- *      discusses various general topics that don't belong to any particular API
- *      call.
- *
- *    - \subpage page_core_api_calls - gives you a quick overview of the most
- *      important CANlib API calls.
- *
- *    - \subpage page_canlib_api_calls_grouped_by_function
- *
- *    Also see the \ref page_code_snippets and Examples section.
+ *  - \subpage page_user_guide_intro
+ *  - \subpage page_user_guide_init
+ *  - \subpage page_user_guide_device_and_channel
+ *  - \subpage page_user_guide_chips_channels
+ *  - \subpage page_user_guide_send_recv
+ *  - \subpage page_user_guide_bus_errors
+ *  - \subpage page_user_guide_time
+ *  - \subpage page_user_guide_version
+ *  - \subpage page_user_guide_threads
+ *  - \subpage page_user_guide_send_recv_asynch_not
+ *  - \subpage page_user_guide_kvscript
+ *  - \subpage page_user_guide_kviopin
+ *  - \subpage page_user_guide_send_recv_mailboxes
+ *  - \subpage page_user_guide_userdata
+ *  - \subpage page_user_guide_install
+ *  - \subpage page_user_guide_build
+ *  - \subpage page_canlib_api_calls_grouped_by_function
+ *  - \subpage page_user_guide_canlib_samples
 **/
 
 #ifndef _CANLIB_H_
@@ -147,7 +153,7 @@
 /** Handle to an opened circuit, created with \ref canOpenChannel(). */
 typedef int canHandle;
 
-# define canINVALID_HANDLE      (-1)
+# define canINVALID_HANDLE      (-1) ///< Indicates an invalid \ref canHandle
 
 /** Handle to an opened circuit, created with \ref canOpenChannel(). */
 typedef canHandle CanHandle;
@@ -192,7 +198,15 @@ typedef struct canNotifyData {
 #define canWANT_VIRTUAL                 0x0020
 
 /**
- * Don't allow sharing of this circuit between applications.
+ * Don't allow sharing of this CANlib channel between applications.
+ *
+ * Two or more applications can share the same CAN channel. You can, for
+ * example, have one application send messages on the bus and another
+ * application that just monitors the bus. If this is not desired (for
+ * performance or other reasons) you can open an exclusive handle to a
+ * channel. This means that no other application can open a handle to the same
+ * channel. Do this by passing the \ref canOPEN_EXCLUSIVE flag in the flags
+ * argument to \ref canOpenChannel().
  *
  * This define is used in \ref canOpenChannel()
  */
@@ -216,7 +230,7 @@ typedef struct canNotifyData {
  *
  * This define is used in \ref canOpenChannel().
  *
- * \sa \ref page_user_guide_virtual
+ * \sa \ref section_user_guide_virtual
  */
 # define canOPEN_ACCEPT_VIRTUAL         0x0020
 
@@ -377,7 +391,7 @@ typedef struct canNotifyData {
  *
  * \note The \ref BAUD_xxx names are only retained for compatibility.
  *
- * \sa \ref section_user_guide_misc_bitrate
+ * \sa \ref section_user_guide_init_bit_rate_can, \ref section_user_guide_init_bit_rate_canfd
  *
  * @{
  */
@@ -475,7 +489,7 @@ extern "C" {
  * \ref canOpenChannel() (or any other API call that requires initialization) is
  * called.
  *
- * \sa \ref section_code_snippets_caninitializelibrary
+ * \sa \ref page_user_guide_init
  *
  */
 void CANLIBAPI canInitializeLibrary (void);
@@ -501,7 +515,7 @@ void CANLIBAPI canInitializeLibrary (void);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_canclose
+ * \sa \ref section_user_guide_init_sel_channel_close
  * \sa \ref canOpenChannel(), \ref canBusOn(), \ref canBusOff()
  */
 canStatus CANLIBAPI canClose (const CanHandle hnd);
@@ -526,7 +540,7 @@ canStatus CANLIBAPI canClose (const CanHandle hnd);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_canbuson
+ * \sa \ref section_user_guide_send_recv_bus_on_off
  * \sa \ref canBusOff(), \ref canResetBus()
  *
  */
@@ -540,14 +554,15 @@ canStatus CANLIBAPI canBusOn (const CanHandle hnd);
  * \source_delphi   <b>function canBusOff(handle: canHandle): canStatus; </b>
  * \source_end
  *
- * Takes the specified channel off-bus.
+ * Takes the specified handle off-bus. If no other handle is active on the same
+ * channel, the channel will also be taken off-bus
  *
  * \param[in]  hnd  An open handle to a CAN channel.
  *
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_canbusoff
+ * \sa \ref section_user_guide_send_recv_bus_on_off
  * \sa \ref canBusOn(), \ref canResetBus()
  *
  */
@@ -576,8 +591,10 @@ canStatus CANLIBAPI canBusOff (const CanHandle hnd);
  * for each handle. The same applies to \ref canBusOn() - the physical channel will
  * not go off bus until the last handle to the channel goes off bus.
  *
- * \note Use \ref canSetBusParamsC200() to set the bus timing parameters in the
- *  ubiquitous 82c200 bit-timing register format.
+ * \note The value of sjw should normally be less than tseg1 and tseg2.
+ *
+ * Use \ref canSetBusParamsC200() to set the bus timing parameters in the
+ * ubiquitous 82c200 bit-timing register format.
  *
  * \param[in]  hnd       An open handle to a CAN controller.
  * \param[in]  freq      Bit rate (measured in bits per second); or one of the
@@ -594,9 +611,9 @@ canStatus CANLIBAPI canBusOff (const CanHandle hnd);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_bit_rate, \ref section_user_guide_misc_bitrate,
- * \ref section_user_guide_init_bit_rate, \ref section_code_snippets_cansetbusparams
- * \sa \ref canSetBusParamsC200(), \ref canGetBusParams()
+ * \sa \ref section_user_guide_init_bit_rate_can,
+ * \ref section_user_guide_init_bit_rate_canfd,
+ * \sa \ref canSetBusParamsFd(), \ref canSetBusParamsC200(), \ref canGetBusParams()
  *
  */
 canStatus CANLIBAPI canSetBusParams (const CanHandle hnd,
@@ -638,11 +655,11 @@ canStatus CANLIBAPI canSetBusParams (const CanHandle hnd,
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  */
-canStatus CANLIBAPI canSetBusParamsFd(const CanHandle hnd,
-                                      long freq_brs,
-                                      unsigned int tseg1_brs,
-                                      unsigned int tseg2_brs,
-                                      unsigned int sjw_brs);
+canStatus CANLIBAPI canSetBusParamsFd (const CanHandle hnd,
+                                       long freq_brs,
+                                       unsigned int tseg1_brs,
+                                       unsigned int tseg2_brs,
+                                       unsigned int sjw_brs);
 
 
 /**
@@ -672,7 +689,7 @@ canStatus CANLIBAPI canSetBusParamsFd(const CanHandle hnd,
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_bit_rate, \ref section_user_guide_init_bit_rate
+ * \sa \ref section_user_guide_init_bit_rate_can, \ref section_user_guide_init_bit_rate_can
  * \sa \ref canSetBusParams(), \ref canSetBusParamsC200()
  *
  */
@@ -812,9 +829,7 @@ canStatus CANLIBAPI canGetBusOutputControl (const CanHandle hnd,
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_user_guide_send_recv_filters,
- *     \ref section_user_guide_misc_code_and_mask,
- *     \ref section_code_snippets_can_accept
+ * \sa \ref section_user_guide_send_recv_filters
  */
 canStatus CANLIBAPI canAccept (const CanHandle hnd,
                                const long envelope,
@@ -924,7 +939,7 @@ canStatus CANLIBAPI canReadErrorCounters (const CanHandle hnd,
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_user_guide_send_recv_sending, \ref section_code_snippets_canwrite
+ * \sa \ref section_user_guide_send_recv_sending
  * \sa \ref canWriteSync(), \ref canWriteWait()
  *
  */
@@ -1006,9 +1021,9 @@ canStatus CANLIBAPI canWriteSync (const CanHandle hnd, unsigned long timeout);
  * \return \ref canERR_xxx (negative) if failure
  *
  * \sa \ref section_user_guide_send_recv_reading, \ref
- * section_user_guide_send_recv_mailboxes, \ref
- * section_code_snippets_canread, \ref
- * section_user_guide_time_accuracy_and_resolution
+ * page_user_guide_send_recv_mailboxes, \ref
+ * section_user_guide_send_recv_reading
+ * page_user_guide_time Time Measurement
  *
  * \sa \ref canReadSpecific(), \ref canReadSpecificSkip(), \ref canReadSync(),
  *     \ref canReadSyncSpecific(), \ref canReadWait()
@@ -1068,7 +1083,7 @@ canStatus CANLIBAPI canRead (const CanHandle hnd,
  * \sa \ref canRead(), \ref canReadSpecific(), \ref canReadSpecificSkip(),
  *  \ref canReadSyncSpecific(), \ref canReadSync()
  *
- * \sa \ref section_user_guide_time_accuracy_and_resolution
+ * \sa \ref page_user_guide_time Time Measurement
  */
 canStatus CANLIBAPI canReadWait (const CanHandle hnd,
                                  long *id,
@@ -1122,9 +1137,9 @@ canStatus CANLIBAPI canReadWait (const CanHandle hnd,
  *         There might be other messages in the queue, though.
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_user_guide_send_recv_mailboxes, \ref
+ * \sa \ref page_user_guide_send_recv_mailboxes, \ref
  * section_user_guide_send_recv_reading, \ref
- * section_user_guide_time_accuracy_and_resolution
+ * page_user_guide_time Time Measurement
  * \sa \ref canRead(), \ref canReadSpecificSkip(), \ref canReadSync(), \ref canReadSyncSpecific(),
  * \ref canReadWait()
  *
@@ -1241,7 +1256,7 @@ canStatus CANLIBAPI canReadSyncSpecific (const CanHandle hnd,
  * \return \ref canERR_xxx (negative) if failure
  *
  * \sa \ref section_user_guide_send_recv_reading, \ref
- * section_user_guide_time_accuracy_and_resolution
+ * page_user_guide_time Time Measurement
  * \sa \ref canRead(), \ref canReadSpecific(), \ref canReadSync(),
  * \ref canReadSyncSpecific(), \ref canReadWait()
  */
@@ -1352,7 +1367,7 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_cangeterrortext
+ * \sa \ref section_user_guide_canstatus
  *
  */
 canStatus CANLIBAPI canGetErrorText (canStatus err, char *buf, unsigned int bufsiz);
@@ -1382,7 +1397,7 @@ canStatus CANLIBAPI canGetErrorText (canStatus err, char *buf, unsigned int bufs
  *
  * \note Linux returns version number from libcanlib.so
  *
- * \sa \ref section_user_guide_build_driver_version
+ * \sa \ref page_user_guide_version
  * \sa \ref canGetVersionEx()
  *
  */
@@ -1399,9 +1414,9 @@ unsigned short CANLIBAPI canGetVersion (void);
  * \source_delphi   <b>function canIoCtl(handle: canHandle; func: Cardinal; buf: Pointer; buflen: Cardinal): canStatus;     </b>
  * \source_end
  *
- * This API call performs several different functions; these are described
- * below. The functions are handle-specific unless otherwise noted; this means
- * that they affect only the handle you pass to \ref canIoCtl(), whereas other open
+ * This API call performs several different functions (\ref canIOCTL_xxx). The
+ * functions are handle-specific unless otherwise noted; this means that they
+ * affect only the handle you pass to \ref canIoCtl(), whereas other open
  * handles will remain unaffected.  The contents of \a buf after the call is
  * dependent on the function code you specified.
  *
@@ -1481,8 +1496,8 @@ canStatus CANLIBAPI canReadTimer (const CanHandle hnd, unsigned long *time);
  * \return Returns a handle to the opened circuit, or \ref canERR_xxx
  *         (negative) if the call failed.
  *
- * \sa \ref section_code_snippets_canopenchannel,  \ref page_user_guide_virtual
- * \sa \ref canGetNumberOfChannels(), \ref canGetChannelData(), \ref canIoCtl()
+ * \sa \ref page_user_guide_chips_channels,  \ref section_user_guide_virtual
+ * \sa \ref canClose(), \ref canGetNumberOfChannels(), \ref canGetChannelData(), \ref canIoCtl()
  *
  */
 CanHandle CANLIBAPI canOpenChannel (int channel, int flags);
@@ -1504,7 +1519,7 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_cangetchanneldata, \ref page_user_guide_virtual
+ * \sa \ref section_user_guide_unique_device, \ref section_user_guide_virtual
  * \sa \ref canGetChannelData()
  */
 canStatus CANLIBAPI canGetNumberOfChannels (int *channelCount);
@@ -1561,7 +1576,7 @@ canStatus CANLIBAPI canGetNumberOfChannels (int *channelCount);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_cangetchanneldata
+ * \sa \ref section_user_guide_unique_device
  * \sa \ref canGetNumberOfChannels()
  */
 canStatus CANLIBAPI canGetChannelData (int channel,
@@ -1708,6 +1723,8 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canCHANNELDATA_TRANS_UPC_NO               12
 
   /**
+   * \deprecated Use \ref canCHANNELDATA_DEVDESCR_ASCII instead.
+   *
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
@@ -1966,6 +1983,8 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #  define canCHANNELDATA_BUS_TYPE                  30
 
   /**
+   * \deprecated Use \ref canCHANNELDATA_DEVDESCR_ASCII instead.
+   *
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
@@ -2109,6 +2128,9 @@ canStatus CANLIBAPI canGetChannelData (int channel,
   /**
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
+   *
+   * \note If no channel name is set, \ref canERR_NOT_IMPLEMENTED will be
+   * returned, regardless of channel name is supported in the device or not.
    *
    * \a buffer is a user supplied byte array of length 'bufsize' (at
    * least one byte long) to which the null terminated UTF-8 coded
@@ -2295,10 +2317,11 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * functions arguments.
    *
    * Tells CANlib to "prefer" extended identifiers; that is, if you send a
-   * message with \ref canWrite() and don't specify \ref canMSG_EXT nor \ref canMSG_STD,
-   * \ref canMSG_EXT will be assumed. The contents of \a buf and \a buflen are
-   * ignored. \ref canRead() et al will set \ref canMSG_EXT and/or \ref canMSG_STD as usual
-   * and are not affected by this call.
+   * message with \ref canWrite() and don't specify \ref canMSG_EXT nor \ref
+   * canMSG_STD, \ref canMSG_EXT will be assumed and the most significant bits
+   * of the identifier will be cut off. The contents of \a buf and \a buflen
+   * are ignored. \ref canRead() et al will set \ref canMSG_EXT and/or \ref
+   * canMSG_STD as usual and are not affected by this call.
    *
    * \note Not implemented in linux.
    */
@@ -2319,10 +2342,9 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canIOCTL_PREFER_STD             2
 
   /**
-   * The following canIOCTL code is deprecated.
-   * It is recommended to use \ref canIOCTL_RESET_OVERRUN_COUNT to reset overrun status
-   * (Note that CAN error counters are never updated on device and will be briefly
-   * changed back to their original values after this call)
+   *
+   * Note that CAN error counters are never updated on device and will be briefly
+   * changed back to their original values after this call.
    *
    * This define is used in \ref canIoCtl(), \a buf and \a buflen refers to this
    * functions arguments.
@@ -2330,6 +2352,8 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * Tells CANlib to clear the CAN error counters. The contents of \a buf and \a
    * buflen are ignored. CAN error counters on device side are NOT updated.
    *
+   * \note It is recommended to use \ref canIOCTL_RESET_OVERRUN_COUNT to
+   * reset overrun status.
    *
    * \note Not implemented in linux.
    */
@@ -2339,9 +2363,13 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
    * functions argument.
    *
-   * \a buf points to a DWORD which contains the desired time-stamp clock
-   * resolution in microseconds. The default value is 1000 microseconds, i.e.
-   * one millisecond.
+
+   * The timer scale determines how precisely the channel's timestamps will be
+   * displayed without changing the accuracy of the clock. \a buf points to a
+   * DWORD which contains the desired time-stamp clock resolution in
+   * microseconds. The default value is 1000 microseconds, i.e.  one
+   * millisecond.
+
    *
    * \note The accuracy of the clock isn't affected.
    */
@@ -2350,6 +2378,10 @@ canStatus CANLIBAPI canGetChannelData (int channel,
   /**
    * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
    * functions argument.
+   *
+   * Enabling transmit Acknowledges on a channel results in that channel receiving a
+   * message with the TXACK flag enabled every time a message is successfully
+   * transmitted.
    *
    * \a buf points to a DWORD which contains
    *
@@ -2369,12 +2401,12 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * functions argument.
    *
    * \a buf points at a \c DWORD which receives the current RX queue level. The
-   * returned value is approximative (this is because not all hardware supports
+   * returned value is approximative, this is because not all hardware supports
    * retrieving the queue levels. In that case a best-effort guess is
    * returned. Also note that a device with embedded CPU will report its queue
    * levels to the host computer after a short delay that depends on the bus
    * traffic intensity, and consequently the value returned by the call to
-   * \ref canIoCtl() might be a few milliseconds old.)
+   * \ref canIoCtl() might be a few milliseconds old.
    */
 #define canIOCTL_GET_RX_BUFFER_LEVEL              8
 
@@ -2383,12 +2415,12 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * functions argument.
    *
    * \a buf points at a \c DWORD which receives the current TX queue level. The
-   * returned value is approximative (this is because not all hardware supports
+   * returned value is approximative, this is because not all hardware supports
    * retrieving the queue levels. In that case a best-effort guess is
    * returned. Also note that a device with embedded CPU will report its queue
    * levels to the host computer after a short delay that depends on the bus
    * traffic intensity, and consequently the value returned by the call to
-   * \ref canIoCtl() might be a few milliseconds old.)
+   * \ref canIoCtl() might be a few milliseconds old.
    */
 #define canIOCTL_GET_TX_BUFFER_LEVEL              9
 
@@ -2427,6 +2459,10 @@ canStatus CANLIBAPI canGetChannelData (int channel,
   /**
    * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
    * functions argument.
+   *
+   * Turns transmit requests on or off. If transmit requests are enabled on a
+   * channel, the channel will receive a message any time it writes a message
+   * to the channel.
    *
    * \a buf points to a \c DWORD which contains
    *
@@ -2560,9 +2596,9 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * specific handle. \a buf points to an unsigned integer which contains the
    * new size (number of messages) of the receive buffer.
    *
-   * \note The receive buffer consumes system non-paged pool memory, which is a
-   *       limited resource. Do not increase the receive buffer size unless you
-   *       have good reasons to do so.
+   * The receive buffer consumes system non-paged pool memory, which is a
+   * limited resource. Do not increase the receive buffer size unless you have
+   * good reasons to do so.
    *
    * \note You can't use this function code when the channel is on bus.
    *
@@ -2585,8 +2621,12 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 # define canIOCTL_GET_USB_THROTTLE                29
 
   /**
-   * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
-   * functions argument.
+   * This define is used in \ref canIoCtl(), \a buf mentioned below refers to
+   * this functions argument.
+   *
+   * This function enables or disables automatic time reset on bus on. By
+   * default, this is enabled, so the timer will automatically reset when a
+   * handle goes on bus.
    *
    * \a buf points to a DWORD. If the value is zero, the CAN clock will not be
    * reset at buson for the handle. Otherwise, the CAN clock will be reset at
@@ -2629,6 +2669,9 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
    * functions argument.
    *
+   * This function turns error frame reporting on or off. If it is off, the
+   * channel handle will ignore any error frames it receives.
+   *
    * \a buf points to an unsigned byte. If the value is zero, the reporting of
    * error frames is turned off for the handle. Otherwise, error frame reporting
    * is turned on.
@@ -2657,6 +2700,8 @@ canStatus CANLIBAPI canGetChannelData (int channel,
   /**
    * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
    * functions argument.
+   *
+   * Returns the round trip time to a device.
    *
    * \a buf points to a \c DWORD that contains the roundtrip time measured in
    * milliseconds.
@@ -2753,6 +2798,12 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    */
 #  define canIOCTL_SET_BRLIMIT                            43
 
+  /**
+   * \deprecated Use \ref canIOCTL_SET_THROTTLE_SCALED instead.
+   *
+   * \note Not implemented in linux.
+   */
+#  define canIOCTL_SET_USB_THROTTLE_SCALED                41
 
   /**
    * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
@@ -2770,6 +2821,12 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    */
 #  define canIOCTL_SET_THROTTLE_SCALED                    41
 
+  /**
+   * \deprecated Use \ref canIOCTL_GET_THROTTLE_SCALED instead
+   *
+   * \note Not implemented in linux.
+   */
+#  define canIOCTL_GET_USB_THROTTLE_SCALED                42
 
   /**
    * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
@@ -2850,8 +2907,7 @@ typedef struct {
  * \return \ref canERR_xxx (negative) if failure
  *
  *
- * \sa \ref section_code_snippets_bit_rate, \ref section_user_guide_misc_bitrate
- * \sa \ref canSetBusParams()
+ * \sa \ref section_user_guide_init_bit_rate_can, \ref canSetBusParams()
  */
 canStatus CANLIBAPI canSetBusParamsC200 (const CanHandle hnd, unsigned char btr0, unsigned char btr1);
 
@@ -3007,7 +3063,7 @@ canStatus CANLIBAPI canGetDriverMode (const CanHandle hnd, int *lineMode, int *r
  *
  * \return The return value is desired version number.
  *
- * \sa \ref section_user_guide_build_driver_version
+ * \sa \ref page_user_guide_version
  */
 unsigned int CANLIBAPI canGetVersionEx (unsigned int itemCode);
 
@@ -3146,8 +3202,7 @@ canStatus CANLIBAPI canObjBufWrite (const CanHandle hnd,
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_user_guide_misc_code_and_mask,
- *     \ref section_user_guide_send_recv_obj_buf
+ * \sa \ref section_user_guide_send_recv_obj_buf
  */
 canStatus CANLIBAPI canObjBufSetFilter (const CanHandle hnd,
                                         int idx,
@@ -3468,8 +3523,7 @@ canStatus CANLIBAPI canUnloadLibrary (void);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_can_accept,
- *     \ref section_user_guide_misc_code_and_mask
+ * \sa \ref section_user_guide_send_recv_filters
  * \sa  \ref canAccept()
  */
 canStatus CANLIBAPI canSetAcceptanceFilter (const CanHandle hnd,
@@ -3751,7 +3805,7 @@ typedef struct kvTimeDomainData_s {
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvtimedomainxxx
+ * \sa \ref section_user_guide_time_domain
  * \sa \ref kvTimeDomainDelete()
  */
 kvStatus CANLIBAPI kvTimeDomainCreate (kvTimeDomain *domain);
@@ -3775,7 +3829,7 @@ kvStatus CANLIBAPI kvTimeDomainCreate (kvTimeDomain *domain);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvtimedomainxxx
+ * \sa \ref section_user_guide_time_domain
  * \sa \ref kvTimeDomainCreate()
  */
 kvStatus CANLIBAPI kvTimeDomainDelete (kvTimeDomain domain);
@@ -3802,7 +3856,7 @@ kvStatus CANLIBAPI kvTimeDomainDelete (kvTimeDomain domain);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvtimedomainxxx
+ * \sa \ref section_user_guide_time_domain
  * \sa \ref kvTimeDomainCreate()
  */
 kvStatus CANLIBAPI kvTimeDomainResetTime (kvTimeDomain domain);
@@ -3828,7 +3882,7 @@ kvStatus CANLIBAPI kvTimeDomainResetTime (kvTimeDomain domain);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvtimedomainxxx
+ * \sa \ref section_user_guide_time_domain
  * \sa \ref kvTimeDomainCreate()
  */
 kvStatus CANLIBAPI kvTimeDomainGetData (kvTimeDomain domain,
@@ -3854,7 +3908,7 @@ kvStatus CANLIBAPI kvTimeDomainGetData (kvTimeDomain domain,
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvtimedomainxxx
+ * \sa \ref section_user_guide_time_domain
  * \sa \ref kvTimeDomainCreate(), \ref kvTimeDomainRemoveHandle()
  */
 kvStatus CANLIBAPI kvTimeDomainAddHandle(kvTimeDomain domain,
@@ -4199,7 +4253,7 @@ kvStatus CANLIBAPI kvReadDeviceCustomerData (const CanHandle hnd,
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvscriptstart
+ * \sa \ref section_user_guide_kvscript_start_stop
  * \sa \ref kvScriptLoadFile(), \ref kvScriptStop()
  */
 kvStatus CANLIBAPI kvScriptStart (const CanHandle hnd, int slotNo);
@@ -4232,7 +4286,7 @@ kvStatus CANLIBAPI kvScriptStart (const CanHandle hnd, int slotNo);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvscriptstart
+ * \sa \ref section_user_guide_kvscript_start_stop
  * \sa \ref kvScriptLoadFile(), \ref kvScriptStart()
  */
 kvStatus CANLIBAPI kvScriptStop (const CanHandle hnd, int slotNo, int mode);
@@ -4253,6 +4307,7 @@ kvStatus CANLIBAPI kvScriptStop (const CanHandle hnd, int slotNo, int mode);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
+ * \sa \ref section_user_guide_kvscript_loading
  * \sa \ref kvScriptLoadFile(), \ref kvScriptStop()
  */
 kvStatus CANLIBAPI kvScriptUnload (const CanHandle hnd, int slotNo);
@@ -4279,7 +4334,7 @@ kvStatus CANLIBAPI kvScriptUnload (const CanHandle hnd, int slotNo);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvscriptsendevent
+ * \sa \ref section_user_guide_kvscript_send_event
  */
 kvStatus CANLIBAPI kvScriptSendEvent (const CanHandle hnd,
                                       int slotNo,
@@ -4310,7 +4365,7 @@ kvStatus CANLIBAPI kvScriptSendEvent (const CanHandle hnd,
  * \return A \ref kvEnvHandle handle (positive) to an envvar if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvscriptenvvarxxx
+ * \sa \ref section_user_guide_kvscript_envvar
  * \sa \ref kvScriptEnvvarClose()
  */
 kvEnvHandle CANLIBAPI kvScriptEnvvarOpen (const CanHandle hnd,
@@ -4357,7 +4412,7 @@ kvStatus CANLIBAPI kvScriptEnvvarClose (kvEnvHandle eHnd);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvscriptenvvarxxx
+ * \sa \ref section_user_guide_kvscript_envvar
  * \sa \ref kvScriptEnvvarOpen(), \ref kvScriptEnvvarGetInt(), \ref kvScriptEnvvarSetFloat(),
  * \ref kvScriptEnvvarSetData()
  */
@@ -4381,7 +4436,7 @@ kvStatus CANLIBAPI kvScriptEnvvarSetInt (kvEnvHandle eHnd, int val);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvscriptenvvarxxx
+ * \sa \ref section_user_guide_kvscript_envvar
  * \sa \ref kvScriptEnvvarOpen(), \ref kvScriptEnvvarSetInt(), \ref kvScriptEnvvarGetFloat(),
  * \ref kvScriptEnvvarGetData()
  *
@@ -4406,7 +4461,7 @@ kvStatus CANLIBAPI kvScriptEnvvarGetInt (kvEnvHandle eHnd, int *val);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvscriptenvvarxxx
+ * \sa \ref section_user_guide_kvscript_envvar
  * \sa \ref kvScriptEnvvarOpen(), \ref kvScriptEnvvarGetFloat(), \ref kvScriptEnvvarSetInt(),
  * \ref kvScriptEnvvarSetData()
  */
@@ -4431,7 +4486,7 @@ kvStatus CANLIBAPI kvScriptEnvvarSetFloat (kvEnvHandle eHnd, float val);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvscriptenvvarxxx
+ * \sa \ref section_user_guide_kvscript_envvar
  * \sa \ref kvScriptEnvvarOpen(), \ref kvScriptEnvvarSetFloat(), \ref kvScriptEnvvarGetInt(),
  * \ref kvScriptEnvvarGetData()
  */
@@ -4459,7 +4514,7 @@ kvStatus CANLIBAPI kvScriptEnvvarGetFloat (kvEnvHandle eHnd, float *val);
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvscriptenvvarxxx
+ * \sa \ref section_user_guide_kvscript_envvar
  * \sa \ref kvScriptEnvvarOpen(), \ref kvScriptEnvvarGetData(), \ref kvScriptEnvvarSetInt(),
  * \ref kvScriptEnvvarSetFloat()
  */
@@ -4489,7 +4544,7 @@ kvStatus CANLIBAPI kvScriptEnvvarSetData (kvEnvHandle eHnd,
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvscriptenvvarxxx
+ * \sa \ref section_user_guide_kvscript_envvar
  * \sa \ref kvScriptEnvvarOpen(), \ref kvScriptEnvvarSetData(), \ref kvScriptEnvvarGetInt(),
  * \ref kvScriptEnvvarGetFloat()
  */
@@ -4519,7 +4574,7 @@ kvStatus CANLIBAPI kvScriptEnvvarGetData (kvEnvHandle eHnd,
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvscriptstart
+ * \sa \ref section_user_guide_kvscript_loading
  * \sa \ref kvScriptLoadFile(), \ref kvFileCopyToDevice(), \ref kvScriptStart(),
  * \ref kvScriptStop()
  */
@@ -4551,7 +4606,7 @@ kvStatus CANLIBAPI kvScriptLoadFileOnDevice (const CanHandle hnd,
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref section_code_snippets_kvscriptstart
+ * \sa \ref section_user_guide_kvscript_loading
  * \sa \ref kvScriptLoadFileOnDevice(), \ref kvFileCopyToDevice(), \ref kvScriptStart(),
  * \ref kvScriptStop()
  */
@@ -5142,7 +5197,23 @@ kvStatus CANLIBAPI kvReadTimer64 (const CanHandle hnd, uint64_t *time);
    * An unsigned 32-bit integer that contains the module number
    * the pin belongs to. The number starts from 0. Read-only.
    */
-#define kvIO_INFO_GET_MODULE_NUMBER             14
+#define kvIO_INFO_GET_MODULE_NUMBER                14
+  /**
+   * This define is used in \ref kvIoPinGetInfo() to get the serial number.
+   *
+   * An unsigned 32-bit integer that contains the serial number
+   * of the submodule the pin belongs to. Read-only.
+   */
+#define kvIO_INFO_GET_SERIAL_NUMBER                15
+  /**
+   * This define is used in \ref kvIoPinGetInfo() to get the FW version number.
+   *
+   * An unsigned 32-bit integer that contains the software version number
+   * of the submodule the pin belongs to. This number consists of two 16-bit words,
+   * where the most significant word represents the major and the least significant
+   * the minor software version number. Read-only.
+   */
+#define kvIO_INFO_GET_FW_VERSION                   16
  /** @} */
 
 

@@ -160,6 +160,22 @@ struct file_operations fops = {
 };
 
 
+static int is_same_card(VCanCardNumberData *data, VCanCardData *vCard)
+{
+  if (memcmp(vCard->ean, data->ean, sizeof(vCard->ean)) == 0) {
+    return vCard->serialNumber == data->serialNumber;
+  }
+  return 0;
+}
+
+static void set_cardnumberdata(unsigned int index, VCanCardData *vCard)
+{
+  memcpy(vCard->driverData->cardNumbers[index].ean, vCard->ean, sizeof(vCard->driverData->cardNumbers[index].ean));
+  vCard->driverData->cardNumbers[index].serialNumber = vCard->serialNumber;
+  vCard->driverData->cardNumbers[index].active = 1;
+  vCard->cardNumber = index;
+}
+
 //======================================================================
 // Time
 //======================================================================
@@ -177,10 +193,24 @@ int vCanTime (VCanCardData *vCard, uint64_t *time)
 }
 EXPORT_SYMBOL(vCanTime);
 
+void kv_do_gettimeofday (struct timeval *tv)
+{
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0))
+  struct timespec64 now;
+
+  ktime_get_real_ts64(&now);
+  tv->tv_sec = now.tv_sec;
+  tv->tv_usec = now.tv_nsec / 1000;
+#else
+  do_gettimeofday(tv);
+#endif /* KERNEL_VERSION >= 5.0.0 */
+}
+EXPORT_SYMBOL(kv_do_gettimeofday);
+
 struct timeval vCanCalc_dt (struct timeval *start) {
   struct timeval stop;
 
-  do_gettimeofday (&stop);
+  kv_do_gettimeofday (&stop);
 
   if (stop.tv_usec >= start->tv_usec) {
     stop.tv_usec -= start->tv_usec;
@@ -302,6 +332,7 @@ void vCanCardRemoved (VCanChanData *chd)
 {
   VCanOpenFileNode *fileNodePtr;
   unsigned long     openLock_irqFlags;
+  int i;
 
   spin_lock_irqsave(&chd->openLock, openLock_irqFlags);
   for (fileNodePtr = chd->openFileList; fileNodePtr != NULL;
@@ -311,6 +342,15 @@ void vCanCardRemoved (VCanChanData *chd)
     wake_up_interruptible(&fileNodePtr->rcv.rxWaitQ);
   }
   spin_unlock_irqrestore(&chd->openLock, openLock_irqFlags);
+
+  if (chd->vCard != NULL && chd->vCard->driverData != NULL) {
+    for (i = 0; i < chd->vCard->driverData->maxCardnumber; i++) {
+      if (is_same_card(&chd->vCard->driverData->cardNumbers[i], chd->vCard)) {
+        chd->vCard->driverData->cardNumbers[i].active = 0;
+        break;
+      }
+    }
+  }
 }
 EXPORT_SYMBOL(vCanCardRemoved);
 
@@ -581,6 +621,9 @@ int vCanOpen (struct inode *inode, struct file *filp)
   atomic_inc(&chanData->fileOpenCount);
   openFileNodePtr->next  = chanData->openFileList;
   chanData->openFileList = openFileNodePtr;
+
+  chanData->driverMode = 0;
+
   spin_unlock_irqrestore(&chanData->openLock, irqFlags);
 
   // We want a pointer to the node as private_data
@@ -836,7 +879,7 @@ static int ioctl_non_blocking (VCanOpenFileNode *fileNodePtr,
       VCAN_IOCTL_READ_T ioctl_read;
       VCanRead          readOpt;
 
-      do_gettimeofday (&start);
+      kv_do_gettimeofday (&start);
 
       if (copy_from_user(&ioctl_read, (VCAN_IOCTL_READ_T *)arg,
                          sizeof(VCAN_IOCTL_READ_T))) {
@@ -1472,9 +1515,9 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
     //------------------------------------------------------------------
     case VCAN_IOC_GET_CARD_NUMBER:
       {
-        int minorNr = chd->minorNr;
-        ArgPtrOut(sizeof(int));
-        put_user_ret(minorNr, (int *)arg, -EFAULT);
+        uint32_t cardNumber = chd->vCard->cardNumber;
+        ArgPtrOut(sizeof(uint32_t));
+        put_user_ret(cardNumber, (uint32_t *)arg, -EFAULT);
       }
       break;
     //------------------------------------------------------------------
@@ -2753,11 +2796,16 @@ unsigned int vCanPoll (struct file *filp, poll_table *wait)
 //======================================================================
 // Init common data structures for one card
 //======================================================================
+
 int vCanInitData (VCanCardData *vCard)
 {
   unsigned int  chNr;
   int           minorsUsed = 0;
   int           minor;
+  unsigned int  i;
+  uint8_t       found = 0;
+  int           inactive_index = -1;
+  int           free_index = -1;
   VCanCardData *cardData   = vCard->driverData->canCards;
   VCanChanData *chanData;
 
@@ -2775,6 +2823,35 @@ int vCanInitData (VCanCardData *vCard)
   DEBUGPRINT(4, (TXT("vCanInitCardData: minorsUsed 0x%x \n"), minorsUsed));
 
   vCard->usPerTick = 10; // Currently, a tick is 10us long
+
+  // reserve cardNumber
+  for (i = 0; i < vCard->driverData->maxCardnumber; i++) {
+    if (is_same_card(&vCard->driverData->cardNumbers[i], vCard)) {
+      found = 1;
+      vCard->cardNumber = i;
+      vCard->driverData->cardNumbers[i].active = 1;
+      DEBUGPRINT(4, (TXT("re-use existing entry for serial number %u: cardno %u\n"), vCard->serialNumber, i));
+      break;
+    } else if (free_index < 0 && vCard->driverData->cardNumbers[i].serialNumber == 0) {
+      free_index = i;
+    } else if (inactive_index < 0 && vCard->driverData->cardNumbers[i].active == 0) {
+      inactive_index = i;
+    }
+  }
+
+  if (!found) {
+    if (free_index > -1) {
+      DEBUGPRINT(4, (TXT("allocated new entry for serial number %u: cardno %u\n"), vCard->serialNumber, free_index));
+      set_cardnumberdata(free_index, vCard);
+    } else if (inactive_index > -1) {
+      DEBUGPRINT(4, (TXT("use inactive entry for serial number %u: cardno %u\n"), vCard->serialNumber, inactive_index));
+      set_cardnumberdata(inactive_index, vCard);
+    } else {
+      vCard->cardNumber = vCard->driverData->maxCardnumber - 1;
+      printk(KERN_INFO "%s: There is no available cardNumber entry for device with serial number %u. Highest cardNumber %u will be reused.\n",
+             vCard->driverData->deviceName, vCard->serialNumber, vCard->cardNumber);
+    }
+  }
 
   for (chNr = 0; chNr < vCard->nrChannels; chNr++) {
     VCanChanData *vChd = vCard->chanData[chNr];
@@ -2852,15 +2929,25 @@ int vCanInit (VCanDriverData *driverData, unsigned max_channels)
   hwIf = driverData->hwIf;
   memset(driverData, 0, sizeof(VCanDriverData));
 
+  driverData->cardNumbers = kmalloc(sizeof(VCanCardNumberData) * max_channels, GFP_KERNEL);
+  if(driverData->cardNumbers==NULL) {
+    DEBUGPRINT(1, ("kmalloc() of cardNumbers failed"));
+    return -1;
+  }
+  memset(driverData->cardNumbers, 0, (sizeof(VCanCardNumberData)* max_channels));
+  driverData->maxCardnumber = max_channels;
+
   spin_lock_init(&driverData->canCardsLock);
 
   result = hwIf->initAllDevices();
   if (result == -ENODEV) {
     DEBUGPRINT(1, (TXT("No Kvaser %s cards found!\n"), driverData->deviceName));
+    kfree(driverData->cardNumbers);
     return -1;
   } else if (result != 0) {
     DEBUGPRINT(1, (TXT("Error (%d) initializing Kvaser %s driver!\n"), result,
                    driverData->deviceName));
+    kfree(driverData->cardNumbers);
     return -1;
   }
 
@@ -2871,6 +2958,7 @@ int vCanInit (VCanDriverData *driverData, unsigned max_channels)
                               hwIf           // client data
                               )) {
     DEBUGPRINT(1, (TXT("Error creating proc read entry!\n")));
+    kfree(driverData->cardNumbers);
     hwIf->closeAllDevices();
     return -1;
   }
@@ -2881,6 +2969,7 @@ int vCanInit (VCanDriverData *driverData, unsigned max_channels)
   if (result < 0) {
     DEBUGPRINT(1, ("alloc_chrdev_region(%u, %s) error = %d\n",
                    max_channels, driverData->deviceName, result));
+    kfree(driverData->cardNumbers);
     hwIf->closeAllDevices();
     return -1;
   }
@@ -2892,12 +2981,12 @@ int vCanInit (VCanDriverData *driverData, unsigned max_channels)
   result = cdev_add(&driverData->cdev, devno, max_channels);
   if (result < 0) {
     DEBUGPRINT(1, ("cdev_add() error = %d\n", result));
+    kfree(driverData->cardNumbers);
     hwIf->closeAllDevices();
     return -1;
   }
 
-
-  do_gettimeofday(&driverData->startTime);
+  kv_do_gettimeofday(&driverData->startTime);
 
   return 0;
 }
@@ -2918,6 +3007,7 @@ void vCanCleanup (VCanDriverData *driverData)
   }
   remove_proc_entry(driverData->deviceName, NULL /* parent dir */);
   driverData->hwIf->closeAllDevices();
+  kfree(driverData->cardNumbers);
 }
 EXPORT_SYMBOL(vCanCleanup);
 //======================================================================

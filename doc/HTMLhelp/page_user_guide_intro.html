@@ -82,8 +82,8 @@ $(document).ready(function(){initNavTree('page_user_guide_intro.html','');});
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#section_user_guide_intro_hello">Hello, CAN!</a></li>
-<li class="level1"><a href="#section_user_guide_intro_programmers">Programmer&#39;s Overview</a></li>
-<li class="level1"><a href="#section_user_guide_intro_redistributable">Redistributable Files in CANlib SDK</a></li>
+<li class="level1"><a href="#section_user_guide_canstatus">Error checking</a></li>
+<li class="level1"><a href="#section_core_api_calls">CANlib Core API Calls</a></li>
 </ul>
 </div>
 <div class="textblock"><h1><a class="anchor" id="section_user_guide_intro_hello"></a>
@@ -100,29 +100,30 @@ Hello, CAN!</h1>
 <li>Inactivate the CAN chip.</li>
 <li>Close the channel.</li>
 </ol>
-<p><b>What does it not do?</b> Almost all error checking is omitted for brevity.</p>
-<h1><a class="anchor" id="section_user_guide_intro_programmers"></a>
-Programmer's Overview</h1>
-<p>The CANlib API consists exclusively of functions. Most of the functions return a status code of type <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>, which is a negative number if the call failed and <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if the call succeeded.</p>
-<p>Several functions accept pointer arguments. In most cases where an argument is a pointer, NULL can be passed.</p>
-<p>The first call to the library must be a call to <a class="el" href="group__can__general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1">canInitializeLibrary()</a>. This function will initialize the library.</p>
-<p>The next call is likely to be a call to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>, which returns a handle to a specific CAN circuit. This handle is then used to all subsequent calls to the library.</p>
-<p><a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> may return several different error codes, one of which is <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a55c8bbcb0145b27275508325ece58a1c">canERR_NOTFOUND</a>. This means that the channel specified in the first parameter was not found. This is usually caused by a hardware or setup problem. Please refer to the troubleshooting guide if this occurs.</p>
-<p>Next, suitable bus parameters should be set. This is done by a call to <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a>. CANlib provides several default parameter settings for the most common bus speeds (for example, 1M, 500k, 250k and 125k).</p>
-<p>When this is done, we can safely go on-bus by calling <a class="el" href="group___c_a_n.html#ga99c7c99cc71580f8099a1407f4f9ea1a">canBusOn()</a>.</p>
-<p>You transmit messages by calling <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>. Received messages are buffered by CANlib and can be read by calling <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> or any of its relatives. If you want to have a notification when a CAN message arrives; this is done by calling <a class="el" href="group___c_a_n.html#gaa5dd0f277c7059169055321fbda87486">canSetNotify</a>.</p>
-<p>You can temporarily take the circuit off-bus by calling <a class="el" href="group___c_a_n.html#gaf1786cfbfd542b18b9c599d278837bd9">canBusOff()</a>. Final circuit cleanup is done by calling <a class="el" href="group___c_a_n.html#ga49525373a4d08d93c651ec10f79dd36b">canClose()</a>.</p>
-<h1><a class="anchor" id="section_user_guide_intro_redistributable"></a>
-Redistributable Files in CANlib SDK</h1>
-<p>You may use and distribute the source code found in the SAMPLES directory in your own applications without restrictions. </p>
+<p><b>What does it not do?</b> Almost all error checking is omitted for brevity, see <a class="el" href="page_user_guide_intro.html#section_user_guide_canstatus">Error checking</a>.</p>
+<h1><a class="anchor" id="section_user_guide_canstatus"></a>
+Error checking</h1>
+<p>The CANlib API consists exclusively of functions. Most of the functions return a status code of type <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>, which is a negative number if the call failed, see <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a>, and <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if the call succeeded.</p>
+<p>To get a textual description of an error code, use <a class="el" href="group__can__general.html#ga01a7a415c95c579750bcdd95a1d245c4">canGetErrorText()</a></p>
+<p><b>Example</b>. Error checking of <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> and using <a class="el" href="group__can__general.html#ga01a7a415c95c579750bcdd95a1d245c4">canGetErrorText()</a> to print a textual message.</p>
+<div class="fragment"><div class="line"><span class="comment">// Print status message if stat contains an error code</span></div><div class="line"><span class="keyword">static</span> <span class="keywordtype">void</span> checkStatus(<span class="keywordtype">char</span>* <span class="keywordtype">id</span>, <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> stat)</div><div class="line">{</div><div class="line">  <span class="keywordflow">if</span> (stat != <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a>) {</div><div class="line">    <span class="keywordtype">char</span> buf[100];</div><div class="line">    buf[0] = <span class="charliteral">&#39;\0&#39;</span>;</div><div class="line">    <span class="comment">// Retreive informational text about the status code</span></div><div class="line">    <a class="code" href="group__can__general.html#ga01a7a415c95c579750bcdd95a1d245c4">canGetErrorText</a>(stat, buf, <span class="keyword">sizeof</span>(buf));</div><div class="line">    printf(<span class="stringliteral">&quot;%s: failed, stat=%d (%s)\n&quot;</span>, <span class="keywordtype">id</span>, (<span class="keywordtype">int</span>)stat, buf);</div><div class="line">    exit(1);</div><div class="line">  }</div><div class="line">} <span class="comment">// checkStatus</span></div><div class="line"></div><div class="line"><span class="comment">// We check the status returned by the call to canSetBusParams</span></div><div class="line">stat = <a class="code" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams</a>(hnd, <a class="code" href="canlib_8h.html#a87f618db13ec4f48610def72cfb40969">canBITRATE_250K</a>, 0, 0, 0, 0, 0);</div><div class="line">checkStatus(<span class="stringliteral">&quot;canSetBusParams&quot;</span>, stat);</div></div><!-- fragment --><h1><a class="anchor" id="section_core_api_calls"></a>
+CANlib Core API Calls</h1>
+<p>The following calls can be considered the CANlib "core" as they are essential for almost any program that uses the CAN bus.</p><ul>
+<li><a class="el" href="group__can__general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1">canInitializeLibrary()</a> see <a class="el" href="page_user_guide_init.html#section_user_guide_init_lib_init">Library Initialization</a></li>
+<li><a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> and <a class="el" href="group___c_a_n.html#ga49525373a4d08d93c651ec10f79dd36b">canClose()</a> see <a class="el" href="page_user_guide_chips_channels.html">Open Channel</a></li>
+<li><a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a> see <a class="el" href="page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_can">Set CAN Bitrate</a> and <a class="el" href="page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_canfd">Set CAN FD Bitrate</a></li>
+<li><a class="el" href="group___c_a_n.html#ga99c7c99cc71580f8099a1407f4f9ea1a">canBusOn()</a> and <a class="el" href="group___c_a_n.html#gaf1786cfbfd542b18b9c599d278837bd9">canBusOff()</a> see <a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_bus_on_off">Bus On / Bus Off</a></li>
+<li><a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> and <a class="el" href="group___c_a_n.html#gac01f98e282609b5f6aaf2b1eabfb83ec">canReadWait()</a> see <a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_reading">Reading Messages</a></li>
+<li><a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a> and <a class="el" href="group___c_a_n.html#ga304cb3a7bc2874c1f8ad361a911bcd5f">canWriteSync()</a> see section_user_guide_send_recv_sending </li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li><li class="navelem"><a class="el" href="page_user_guide.html">CANlib User&#39;s Guide</a></li>
-    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
+    <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li>
+    <li class="footer"> (canlib 5.27) Sun Mar 3 2019</li>
   </ul>
 </div>
 </body>

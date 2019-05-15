@@ -213,7 +213,7 @@ Not all CAN boards support different masks for standard and extended CAN identif
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_filters">Message Filters</a>, <a class="el" href="page_user_guide_misc.html#section_user_guide_misc_code_and_mask">Code and Mask Format</a>, <a class="el" href="page_code_snippets.html#section_code_snippets_can_accept">canAccept / canSetAcceptanceFilter Example</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_filters">Acceptance Filters</a> </dd></dl>
 
 </div>
 </div>
@@ -232,7 +232,7 @@ Not all CAN boards support different masks for standard and extended CAN identif
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Takes the specified channel off-bus.</p>
+<p>Takes the specified handle off-bus. If no other handle is active on the same channel, the channel will also be taken off-bus</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel.</td></tr>
@@ -242,10 +242,10 @@ Not all CAN boards support different masks for standard and extended CAN identif
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_code_snippets.html#section_code_snippets_canbusoff">canBusOff Example</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_bus_on_off">Bus On / Bus Off</a> </dd>
 <dd>
 <a class="el" href="group___c_a_n.html#ga99c7c99cc71580f8099a1407f4f9ea1a">canBusOn()</a>, <a class="el" href="group___c_a_n.html#gaecc8b56e75cf68548af53b2d432079af">canResetBus()</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a16">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a16">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a17">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a26">canmonitor.c</a>, <a class="el" href="simplewrite_8c-example.html#a26">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a12">writeloop.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a16">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a16">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a17">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a26">canmonitor.c</a>, <a class="el" href="simplewrite_8c-example.html#a26">simplewrite.c</a>, <a class="el" href="tutorial_2c_2_monitor_can_channel_8c-example.html#a11">tutorial/c/MonitorCanChannel.c</a>, <a class="el" href="tutorial_2c_2_send_message_8c-example.html#a10">tutorial/c/SendMessage.c</a>, and <a class="el" href="writeloop_8c-example.html#a12">writeloop.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -275,10 +275,10 @@ Not all CAN boards support different masks for standard and extended CAN identif
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_code_snippets.html#section_code_snippets_canbuson">canBusOn Example</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_bus_on_off">Bus On / Bus Off</a> </dd>
 <dd>
 <a class="el" href="group___c_a_n.html#gaf1786cfbfd542b18b9c599d278837bd9">canBusOff()</a>, <a class="el" href="group___c_a_n.html#gaecc8b56e75cf68548af53b2d432079af">canResetBus()</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a9">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a9">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a11">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a23">canmonitor.c</a>, <a class="el" href="simplewrite_8c-example.html#a23">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a9">writeloop.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a9">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a9">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a11">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a23">canmonitor.c</a>, <a class="el" href="simplewrite_8c-example.html#a23">simplewrite.c</a>, <a class="el" href="tutorial_2c_2_monitor_can_channel_8c-example.html#a10">tutorial/c/MonitorCanChannel.c</a>, <a class="el" href="tutorial_2c_2_send_message_8c-example.html#a7">tutorial/c/SendMessage.c</a>, and <a class="el" href="writeloop_8c-example.html#a9">writeloop.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -308,10 +308,10 @@ Not all CAN boards support different masks for standard and extended CAN identif
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_code_snippets.html#section_code_snippets_canclose">canClose Example</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_chips_channels.html#section_user_guide_init_sel_channel_close">Close Channel</a> </dd>
 <dd>
 <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>, <a class="el" href="group___c_a_n.html#ga99c7c99cc71580f8099a1407f4f9ea1a">canBusOn()</a>, <a class="el" href="group___c_a_n.html#gaf1786cfbfd542b18b9c599d278837bd9">canBusOff()</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a17">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a17">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a18">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a27">canmonitor.c</a>, <a class="el" href="read_timer_test_8c-example.html#a5">readTimerTest.c</a>, <a class="el" href="simplewrite_8c-example.html#a27">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a13">writeloop.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a17">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a17">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a18">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a27">canmonitor.c</a>, <a class="el" href="read_timer_test_8c-example.html#a5">readTimerTest.c</a>, <a class="el" href="simplewrite_8c-example.html#a27">simplewrite.c</a>, <a class="el" href="tutorial_2c_2_monitor_can_channel_8c-example.html#a12">tutorial/c/MonitorCanChannel.c</a>, <a class="el" href="tutorial_2c_2_send_message_8c-example.html#a11">tutorial/c/SendMessage.c</a>, and <a class="el" href="writeloop_8c-example.html#a13">writeloop.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -492,7 +492,7 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_code_snippets.html#section_code_snippets_bit_rate">Bit Rate Examples</a>, <a class="el" href="page_user_guide_init.html#section_user_guide_init_bit_rate">Bit Rate and Other Bus Parameters</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_can">Set CAN Bitrate</a>, <a class="el" href="page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_can">Set CAN Bitrate</a> </dd>
 <dd>
 <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a>, <a class="el" href="group___c_a_n.html#gac34c1577cae55385250e7412513c8cbd">canSetBusParamsC200()</a> </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a7">busparms.c</a>.</dd>
@@ -797,10 +797,10 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns a handle to the opened circuit, or <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if the call failed.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_code_snippets.html#section_code_snippets_canopenchannel">canOpenChannel Example</a>, <a class="el" href="page_user_guide_virtual.html">Virtual Channels</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_chips_channels.html">Open Channel</a>, <a class="el" href="page_user_guide_device_and_channel.html#section_user_guide_virtual">Virtual Channels</a> </dd>
 <dd>
-<a class="el" href="group__can__general.html#ga65169ca633cd30aa92b8a80e28a5378b">canGetNumberOfChannels()</a>, <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a3">busparms.c</a>, <a class="el" href="cancount_8c-example.html#a3">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a3">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a3">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a11">canmonitor.c</a>, <a class="el" href="read_timer_test_8c-example.html#a3">readTimerTest.c</a>, <a class="el" href="simplewrite_8c-example.html#a11">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a3">writeloop.c</a>.</dd>
+<a class="el" href="group___c_a_n.html#ga49525373a4d08d93c651ec10f79dd36b">canClose()</a>, <a class="el" href="group__can__general.html#ga65169ca633cd30aa92b8a80e28a5378b">canGetNumberOfChannels()</a>, <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a> </dd></dl>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a3">busparms.c</a>, <a class="el" href="cancount_8c-example.html#a3">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a3">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a3">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a11">canmonitor.c</a>, <a class="el" href="how-to_2c_2open_channels_8c-example.html#a2">how-to/c/openChannels.c</a>, <a class="el" href="read_timer_test_8c-example.html#a3">readTimerTest.c</a>, <a class="el" href="simplewrite_8c-example.html#a11">simplewrite.c</a>, <a class="el" href="tutorial_2c_2_monitor_can_channel_8c-example.html#a6">tutorial/c/MonitorCanChannel.c</a>, <a class="el" href="tutorial_2c_2_send_message_8c-example.html#a3">tutorial/c/SendMessage.c</a>, and <a class="el" href="writeloop_8c-example.html#a3">writeloop.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -872,7 +872,7 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
 <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a734089f351bc421c230bf8b6cd9b1e8e">canERR_NOMSG</a> (negative) if there was no message available. </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_reading">Reading Messages</a>, <a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_mailboxes">Message Mailboxes</a>, <a class="el" href="page_code_snippets.html#section_code_snippets_canread">canRead Example</a>, <a class="el" href="page_user_guide_time.html#section_user_guide_time_accuracy_and_resolution">Time Stamping Accuracy and Resolution</a></dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_reading">Reading Messages</a>, <a class="el" href="page_user_guide_send_recv_mailboxes.html">Message Mailboxes</a>, <a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_reading">Reading Messages</a> page_user_guide_time Time Measurement</dd>
 <dd>
 <a class="el" href="group___c_a_n.html#gafb5e475233ef14ccf9084f610caba560">canReadSpecific()</a>, <a class="el" href="group___c_a_n.html#ga0eecb6695653d4dc6a4c0bb884a1b261">canReadSpecificSkip()</a>, <a class="el" href="group___c_a_n.html#ga16356f4d646240ff2e640773d21f4d76">canReadSync()</a>, <a class="el" href="group___c_a_n.html#ga4b21a0e2547c1435c378d13e6803acef">canReadSyncSpecific()</a>, <a class="el" href="group___c_a_n.html#gac01f98e282609b5f6aaf2b1eabfb83ec">canReadWait()</a> </dd></dl>
 
@@ -1005,7 +1005,7 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
 <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a734089f351bc421c230bf8b6cd9b1e8e">canERR_NOMSG</a> (negative) if a matching message was not found. There might be other messages in the queue, though. </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_mailboxes">Message Mailboxes</a>, <a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_reading">Reading Messages</a>, <a class="el" href="page_user_guide_time.html#section_user_guide_time_accuracy_and_resolution">Time Stamping Accuracy and Resolution</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv_mailboxes.html">Message Mailboxes</a>, <a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_reading">Reading Messages</a>, <a class="el" href="page_user_guide_time.html">Time Measurement</a> Time Measurement </dd>
 <dd>
 <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a>, <a class="el" href="group___c_a_n.html#ga0eecb6695653d4dc6a4c0bb884a1b261">canReadSpecificSkip()</a>, <a class="el" href="group___c_a_n.html#ga16356f4d646240ff2e640773d21f4d76">canReadSync()</a>, <a class="el" href="group___c_a_n.html#ga4b21a0e2547c1435c378d13e6803acef">canReadSyncSpecific()</a>, <a class="el" href="group___c_a_n.html#gac01f98e282609b5f6aaf2b1eabfb83ec">canReadWait()</a> </dd></dl>
 
@@ -1079,7 +1079,7 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
 <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a734089f351bc421c230bf8b6cd9b1e8e">canERR_NOMSG</a> if there was no matching message available. All other messages (if any!) were discarded. </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_reading">Reading Messages</a>, <a class="el" href="page_user_guide_time.html#section_user_guide_time_accuracy_and_resolution">Time Stamping Accuracy and Resolution</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_reading">Reading Messages</a>, <a class="el" href="page_user_guide_time.html">Time Measurement</a> Time Measurement </dd>
 <dd>
 <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a>, <a class="el" href="group___c_a_n.html#gafb5e475233ef14ccf9084f610caba560">canReadSpecific()</a>, <a class="el" href="group___c_a_n.html#ga16356f4d646240ff2e640773d21f4d76">canReadSync()</a>, <a class="el" href="group___c_a_n.html#ga4b21a0e2547c1435c378d13e6803acef">canReadSyncSpecific()</a>, <a class="el" href="group___c_a_n.html#gac01f98e282609b5f6aaf2b1eabfb83ec">canReadWait()</a> </dd></dl>
 
@@ -1295,8 +1295,8 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a>, <a class="el" href="group___c_a_n.html#gafb5e475233ef14ccf9084f610caba560">canReadSpecific()</a>, <a class="el" href="group___c_a_n.html#ga0eecb6695653d4dc6a4c0bb884a1b261">canReadSpecificSkip()</a>, <a class="el" href="group___c_a_n.html#ga4b21a0e2547c1435c378d13e6803acef">canReadSyncSpecific()</a>, <a class="el" href="group___c_a_n.html#ga16356f4d646240ff2e640773d21f4d76">canReadSync()</a></dd>
 <dd>
-<a class="el" href="page_user_guide_time.html#section_user_guide_time_accuracy_and_resolution">Time Stamping Accuracy and Resolution</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a10">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a10">canfdmonitor.c</a>, and <a class="el" href="canmonitor_8c-example.html#a24">canmonitor.c</a>.</dd>
+<a class="el" href="page_user_guide_time.html">Time Measurement</a> Time Measurement </dd></dl>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a10">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a10">canfdmonitor.c</a>, <a class="el" href="canmonitor_8c-example.html#a24">canmonitor.c</a>, and <a class="el" href="tutorial_2c_2_monitor_can_channel_8c-example.html#a2">tutorial/c/MonitorCanChannel.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -1462,7 +1462,7 @@ Not implemented in linux.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_code_snippets.html#section_code_snippets_can_accept">canAccept / canSetAcceptanceFilter Example</a>, <a class="el" href="page_user_guide_misc.html#section_user_guide_misc_code_and_mask">Code and Mask Format</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_filters">Acceptance Filters</a> </dd>
 <dd>
 <a class="el" href="group___c_a_n.html#gaa4ffd2fad1932ad5763c2c923a1a12d8">canAccept()</a> </dd></dl>
 
@@ -1568,7 +1568,8 @@ Not implemented in linux.</dd></dl>
 <p>The library provides default values for <em>tseg1</em>, <em>tseg2</em>, <em>sjw</em> and <em>noSamp</em> when <em>freq</em> is specified to one of the pre-defined constants, <a class="el" href="canlib_8h.html#canBITRATE_xxx">canBITRATE_xxx</a> for classic CAN and <a class="el" href="canlib_8h.html#canFD_BITRATE_xxx">canFD_BITRATE_xxx</a> for CAN FD.</p>
 <p>If <em>freq</em> is any other value, no default values are supplied by the library.</p>
 <p>If you are using multiple handles to the same physical channel, for example if you are writing a threaded application, you must call <a class="el" href="group___c_a_n.html#gaf1786cfbfd542b18b9c599d278837bd9">canBusOff()</a> once for each handle. The same applies to <a class="el" href="group___c_a_n.html#ga99c7c99cc71580f8099a1407f4f9ea1a">canBusOn()</a> - the physical channel will not go off bus until the last handle to the channel goes off bus.</p>
-<dl class="section note"><dt>Note</dt><dd>Use <a class="el" href="group___c_a_n.html#gac34c1577cae55385250e7412513c8cbd">canSetBusParamsC200()</a> to set the bus timing parameters in the ubiquitous 82c200 bit-timing register format.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The value of sjw should normally be less than tseg1 and tseg2.</dd></dl>
+<p>Use <a class="el" href="group___c_a_n.html#gac34c1577cae55385250e7412513c8cbd">canSetBusParamsC200()</a> to set the bus timing parameters in the ubiquitous 82c200 bit-timing register format.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN controller. </td></tr>
@@ -1584,10 +1585,10 @@ Not implemented in linux.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_code_snippets.html#section_code_snippets_bit_rate">Bit Rate Examples</a>, <a class="el" href="page_user_guide_misc.html#section_user_guide_misc_bitrate">Bit Rate Constants</a>, <a class="el" href="page_user_guide_init.html#section_user_guide_init_bit_rate">Bit Rate and Other Bus Parameters</a>, <a class="el" href="page_code_snippets.html#section_code_snippets_cansetbusparams">canSetBusParams Example</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_can">Set CAN Bitrate</a>, <a class="el" href="page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_canfd">Set CAN FD Bitrate</a>, </dd>
 <dd>
-<a class="el" href="group___c_a_n.html#gac34c1577cae55385250e7412513c8cbd">canSetBusParamsC200()</a>, <a class="el" href="group___c_a_n.html#gaf2a734c0486030610389331685a3827a">canGetBusParams()</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a6">busparms.c</a>, <a class="el" href="cancount_8c-example.html#a7">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a5">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a7">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a21">canmonitor.c</a>, <a class="el" href="simplewrite_8c-example.html#a15">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a7">writeloop.c</a>.</dd>
+<a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a>, <a class="el" href="group___c_a_n.html#gac34c1577cae55385250e7412513c8cbd">canSetBusParamsC200()</a>, <a class="el" href="group___c_a_n.html#gaf2a734c0486030610389331685a3827a">canGetBusParams()</a> </dd></dl>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a6">busparms.c</a>, <a class="el" href="cancount_8c-example.html#a7">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a5">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a7">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a21">canmonitor.c</a>, <a class="el" href="how-to_2c_2open_channels_8c-example.html#a3">how-to/c/openChannels.c</a>, <a class="el" href="simplewrite_8c-example.html#a15">simplewrite.c</a>, <a class="el" href="tutorial_2c_2_monitor_can_channel_8c-example.html#a8">tutorial/c/MonitorCanChannel.c</a>, <a class="el" href="tutorial_2c_2_send_message_8c-example.html#a5">tutorial/c/SendMessage.c</a>, and <a class="el" href="writeloop_8c-example.html#a7">writeloop.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -1644,9 +1645,7 @@ Not implemented in linux.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_code_snippets.html#section_code_snippets_bit_rate">Bit Rate Examples</a>, <a class="el" href="page_user_guide_misc.html#section_user_guide_misc_bitrate">Bit Rate Constants</a> </dd>
-<dd>
-<a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_can">Set CAN Bitrate</a>, <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> </dd></dl>
 
 </div>
 </div>
@@ -1709,7 +1708,7 @@ Not implemented in linux.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="canfdmonitor_8c-example.html#a7">canfdmonitor.c</a>, and <a class="el" href="canfdwrite_8c-example.html#a9">canfdwrite.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="canfdmonitor_8c-example.html#a7">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a9">canfdwrite.c</a>, and <a class="el" href="how-to_2c_2open_channels_8c-example.html#a8">how-to/c/openChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -1946,10 +1945,10 @@ Not implemented in linux.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_sending">Sending Messages</a>, <a class="el" href="page_code_snippets.html#section_code_snippets_canwrite">canWrite Example</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_sending">Sending Messages</a> </dd>
 <dd>
 <a class="el" href="group___c_a_n.html#ga304cb3a7bc2874c1f8ad361a911bcd5f">canWriteSync()</a>, <a class="el" href="group___c_a_n.html#ga47d03bfcc31e290284e65211b61f15f3">canWriteWait()</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="canfdwrite_8c-example.html#a12">canfdwrite.c</a>, and <a class="el" href="simplewrite_8c-example.html#a24">simplewrite.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="canfdwrite_8c-example.html#a12">canfdwrite.c</a>, <a class="el" href="simplewrite_8c-example.html#a24">simplewrite.c</a>, and <a class="el" href="tutorial_2c_2_send_message_8c-example.html#a8">tutorial/c/SendMessage.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -1994,7 +1993,7 @@ Not implemented in linux.</dd></dl>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>, <a class="el" href="group___c_a_n.html#ga47d03bfcc31e290284e65211b61f15f3">canWriteWait()</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="canfdwrite_8c-example.html#a16">canfdwrite.c</a>, and <a class="el" href="simplewrite_8c-example.html#a25">simplewrite.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="canfdwrite_8c-example.html#a16">canfdwrite.c</a>, <a class="el" href="simplewrite_8c-example.html#a25">simplewrite.c</a>, and <a class="el" href="tutorial_2c_2_send_message_8c-example.html#a9">tutorial/c/SendMessage.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -2076,7 +2075,7 @@ Not implemented in linux.</dd></dl>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
+    <li class="footer"> (canlib 5.27) Sun Mar 3 2019</li>
   </ul>
 </div>
 </body>

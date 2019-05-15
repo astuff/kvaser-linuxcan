@@ -356,6 +356,7 @@ static int mhydra_send_and_wait_reply_memo (VCanCardData  *vCard,
 #define USB_ATI_MEMO_PRO_2HS_V2_PRODUCT_ID    269 // ATI Memorator Pro 2xHS v2 (00971-4)
 #define USB_HYBRID_PRO_CANLIN_PRODUCT_ID      270 // Kvaser Hybrid Pro 2xCAN/LIN (01042-0)
 #define USB_BLACKBIRD_PRO_HS_V2_PRODUCT_ID    271 // Kvaser BlackBird Pro HS v2 (00983-7)
+#define USB_MEMO_LIGHT_HS_V2_PRODUCT_ID       272 // Kvaser Memorator Light HS v2 (01058-1)
 
 // Table of devices that work with this driver
 static struct usb_device_id mhydra_table [] = {
@@ -373,6 +374,7 @@ static struct usb_device_id mhydra_table [] = {
   { USB_DEVICE(KVASER_VENDOR_ID, USB_ATI_MEMO_PRO_2HS_V2_PRODUCT_ID)},
   { USB_DEVICE(KVASER_VENDOR_ID, USB_HYBRID_PRO_CANLIN_PRODUCT_ID)},
   { USB_DEVICE(KVASER_VENDOR_ID, USB_BLACKBIRD_PRO_HS_V2_PRODUCT_ID)},
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_MEMO_LIGHT_HS_V2_PRODUCT_ID)},
 
 
   { 0 }  // Terminating entry
@@ -2478,7 +2480,7 @@ int mhydra_queue_cmd (VCanCardData *vCard, hydraHostCmd *cmd, unsigned int timeo
   struct timeval t_start;
   unsigned int wait_ms = timeout_ms;
 
-  do_gettimeofday(&t_start);
+  kv_do_gettimeofday(&t_start);
 
   init_waitqueue_entry(&wait, current);
   queue_add_wait_for_space(&dev->txCmdQueue, &wait);
@@ -2622,7 +2624,8 @@ static int mhydra_plugin (struct usb_interface *interface,
        (udev->descriptor.idProduct != USB_ATI_USBCAN_PRO_2HS_V2_PRODUCT_ID) &&
        (udev->descriptor.idProduct != USB_ATI_MEMO_PRO_2HS_V2_PRODUCT_ID) &&
        (udev->descriptor.idProduct != USB_HYBRID_PRO_CANLIN_PRODUCT_ID) &&
-       (udev->descriptor.idProduct != USB_BLACKBIRD_PRO_HS_V2_PRODUCT_ID)
+       (udev->descriptor.idProduct != USB_BLACKBIRD_PRO_HS_V2_PRODUCT_ID) &&
+       (udev->descriptor.idProduct != USB_MEMO_LIGHT_HS_V2_PRODUCT_ID)
       )
      )
   {
@@ -2690,6 +2693,10 @@ static int mhydra_plugin (struct usb_interface *interface,
     case USB_BLACKBIRD_PRO_HS_V2_PRODUCT_ID:
       DEBUGPRINT(2, (TXT("\nKVASER ")));
       DEBUGPRINT(2, (TXT("Kvaser BlackBird Pro HS v2 plugged in\n")));
+      break;
+    case USB_MEMO_LIGHT_HS_V2_PRODUCT_ID:
+      DEBUGPRINT(2, (TXT("\nKVASER ")));
+      DEBUGPRINT(2, (TXT("Kvaser Memorator Light HS v2 plugged in\n")));
       break;
 
     default:
@@ -5118,7 +5125,7 @@ static int mhydra_memo_put_data(const VCanChanData *chd, int subcmd,
     }
   }
 
-  DEBUGPRINT(4, (TXT ("qqqmac: mhydra_memo_put_data subcommand:%d\n"), subcmd));
+  DEBUGPRINT(4, (TXT ("mhydra_memo_put_data subcommand:%d\n"), subcmd));
   while (r == 0 && (offset < (unsigned) bufsiz)) {
     memset(&cmd, 0, sizeof(cmd));
     len = min((int) (bufsiz - offset), (int) sizeof(cmd.memoPutDataReq.data));

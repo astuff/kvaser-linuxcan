@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Install</title>
+<title>Windows Advanced Topics</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -77,69 +77,70 @@ $(document).ready(function(){initNavTree('page_user_guide_install.html','');});
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Install </div>  </div>
+<div class="title">Windows Advanced Topics </div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#section_user_guide_build_installation_supported_systems">Supported systems</a><ul><li class="level2"><a href="#section_user_guide_build_installation_supported_systems_1">Supported operating systems.</a></li>
-<li class="level2"><a href="#section_user_guide_build_installation_supported_systems_2">Supported hardware</a></li>
-</ul>
-</li>
-<li class="level1"><a href="#section_user_guide_build_installation_whats_new">What&#39;s new in this release?</a></li>
-<li class="level1"><a href="#section_user_guide_build_installation_driver_installation">Driver installation</a></li>
-<li class="level1"><a href="#section_user_guide_build_installation_hardware">Hardware installation</a><ul><li class="level2"><a href="#section_user_guide_build_installation_hardware_1">Hardware installation PCI Cards</a></li>
-</ul>
-</li>
-<li class="level1"><a href="#section_user_guide_build_driver_version">Version Checking</a></li>
+<ul><li class="level1"><a href="#section_user_guide_build_installation_verification_3">Windows Installation troubleshooting</a></li>
+<li class="level1"><a href="#section_user_guide_build_installation_advanced_2">Running the installation in silent mode</a></li>
+<li class="level1"><a href="#section_user_guide_build_installation_custom">Custom Driver Install</a></li>
+<li class="level1"><a href="#section_user_guide_build_installation_debug">Using Debug DLLs</a></li>
 </ul>
 </div>
-<div class="textblock"><h1><a class="anchor" id="section_user_guide_build_installation_supported_systems"></a>
-Supported systems</h1>
-<h2><a class="anchor" id="section_user_guide_build_installation_supported_systems_1"></a>
-Supported operating systems.</h2>
-<p>For a full list of supported operating systems, read the Release notes.</p>
-<h2><a class="anchor" id="section_user_guide_build_installation_supported_systems_2"></a>
-Supported hardware</h2>
-<p>For a full list of which hardware types this release supports, read the Release notes.</p>
-<h1><a class="anchor" id="section_user_guide_build_installation_whats_new"></a>
-What's new in this release?</h1>
-<p>The Release notes describes in detail all changes in this and earlier releases.</p>
-<h1><a class="anchor" id="section_user_guide_build_installation_driver_installation"></a>
-Driver installation</h1>
-<p>Read the README-file for how to build and install the drivers.</p>
-<h1><a class="anchor" id="section_user_guide_build_installation_hardware"></a>
-Hardware installation</h1>
-<h2><a class="anchor" id="section_user_guide_build_installation_hardware_1"></a>
-Hardware installation PCI Cards</h2>
-<ol type="1">
-<li>If your computer is running you need to shut it down and <b>turn the power off</b> before you try to install the card.</li>
-<li>Install the card in a free PCI slot. <b>Be sure it is firmly seated</b>.</li>
-<li>Start the computer.</li>
+<div class="textblock"><h1><a class="anchor" id="section_user_guide_build_installation_verification_3"></a>
+Windows Installation troubleshooting</h1>
+<ul>
+<li>Windows will display the "Found New Hardware Wizard" the first time you plug in a USB device in a USB port where a device of this type hasn't been used before. This is a design feature in Windows. If the "Found New Hardware Wizard" is displayed, just click the Next and OK buttons and let Windows search for the drivers. It will find them automatically.</li>
+<li>If a device is marked with a yellow question mark in the Device Manager, try to right click at it and select Uninstall. Then physically remove the device and reinsert it, or reboot the computer. The "Found New Hardware Wizard" should then be displayed. As described above, just click the Next and OK buttons and let Windows reinstall the drivers automatically.</li>
+<li>If the installation still seems to be faulty, check the <b>Control Panel | Kvaser Device Guide | Diagnostics tab</b>. Look for error messages. (These are clearly labeled as such.)</li>
+<li>You should also check the <b>Control Panel | Administrative Tools | Event Log</b>. Errors from the driver routines are found in the System log. The Source column tells you which driver produced the error.</li>
+<li>Many installation problems are solved by a reboot followed by a reinstallation of the driver package.</li>
+<li>Many of our devices have LEDs that can tell you something about the health of the device. For example, a Kvaser Leaf or PCIcan II that flashes quickly (around one flash per second) with the green LED typically has a firmware configuration problem. The LED flashing is described in detail in the hardware manual of the device in question.</li>
+<li>There are a number of scripts installed together with the drivers that can be useful when solving some more awkward problems. Go to the directory where you installed the drivers (typically c:\Program Files\Kvaser\Drivers) and read the file 00readme-scripts.txt.</li>
+</ul>
+<h1><a class="anchor" id="section_user_guide_build_installation_advanced_2"></a>
+Running the installation in silent mode</h1>
+<p>You can run the installation packages in silent mode, meaning that no user interaction is required. (Please note that user action still is needed when inserting the hardware). To do this, use the /S switch when starting the installation, e.g.</p>
+<p>kvaser_drivers_setup.exe /S</p>
+<pre class="fragment">The installer may exit with an exit code:
+0	Normal execution (no error)
+1	Installation aborted by user (cancel button)
+2	Installation aborted by script
+100	The virtual CAN driver, and/or the network enumerator driver, failed to start.
+	You should restart the computer and run the installation again.
+</pre><dl class="section note"><dt>Note</dt><dd>You will still get popup messages <b>from Windows</b> when the drivers are installed. This is by design - newer versions of Windows warn the user that privileged code is about to be installed. To avoid this you can do either of:<br />
+<ul>
+<li>Install Kvaser's certificate in the machine's Trusted Publisher store.</li>
+<li>Deploy Kvaser's certificate automatically in a Windows domain using a GPO.</li>
+<li>Click the Always trust software from Kvaser AB button. </li>
+</ul>
+</dd>
+<dd>
+These three things will give the same result, namely the installation of Kvaser's certificate in the Trusted Publisher store. The popup message will then not be showed.</dd></dl>
+<h1><a class="anchor" id="section_user_guide_build_installation_custom"></a>
+Custom Driver Install</h1>
+<p>If you want to include the driver installation program with your application, or deploy them within your organization, you are welcome to do so but you are invited to contact us first at <a href="#" onclick="location.href='mai'+'lto:'+'sup'+'po'+'rt@'+'kv'+'ase'+'r.'+'com'; return false;">suppo<span style="display: none;">.nosp@m.</span>rt@k<span style="display: none;">.nosp@m.</span>vaser<span style="display: none;">.nosp@m.</span>.com</a> to discuss the technical details, join pre-release notification mailing lists and so on.</p>
+<p>If you want to integrate the driver installation program into your own setup program, you can run it in silent mode by using the /S switch. All drivers will then be installed into their default location and no questions will be asked.</p>
+<p>You can also run the installer with the /DISABLE switch to opt-out from installing certain parts of the driver package. The syntax is </p><div class="fragment"><div class="line">/DISABLE=section[,section...]</div></div><!-- fragment --><p> <b>Section</b> is one of:</p><ol type="1">
+<li>GUI : the GUI tools, such as Kvaser Device Guide, the Blackbird configuration program, and the network device selector (also used toghether with Blackbird)</li>
+<li>STARTMENU : the shortcuts in the Start Menu.</li>
+<li>J2534 : registering of the J2534 driver.</li>
+<li>ALL : all of the above as well as any sections that might be added in future releases.</li>
 </ol>
-<dl class="section attention"><dt>Attention</dt><dd>The PCI cards contain devices sensitive to ESD. Be sure to follow common-sense ESD guidelines, e.g. wear a wrist strap, and avoid touching the electronic components on the board.</dd></dl>
-<h1><a class="anchor" id="section_user_guide_build_driver_version"></a>
-Version Checking</h1>
-<p>CANlib versions are denoted by two numbers, the "major version" and the "minor
-  version". Usually the version is presented as these two numbers separated by a period. For example, CANlib 3.6 has major version 3 and minor version 6.</p>
-<p>You may want to make your application determine which version of CANlib is installed on the computer it is running on. There are several ways of obtaining version information.</p>
-<p>First, it is necessary to observe that CANlib consists of several files, each one with a version number. Your application must check all these version numbers to be certain that</p>
-<p>As a rule, files in CANlib has two version numbers:</p>
-<ol type="1">
-<li>The <b>file version</b> number. This consists of a major version number, a minor version number, and a build number. The file version number uniquely identifies a particular file but doesn't say much about which version of CANlib is installed on the computer.</li>
-<li>The file <b>product number</b>. This number uniquely identifies the version of CANlib that the file belongs to.</li>
-</ol>
-<p>Use <a class="el" href="group__can__general.html#ga0803bc56e8695150563a48df2c14db5f">canGetVersionEx()</a> to get the version of the CANlib API DLL. This function allows you to get both the file and the product version number of the API DLL.</p>
-<p>Use <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a> to get the version numbers of the second-level DLL and the driver file. This information may vary from channel to channel.</p>
-<p>You can also use <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a> to obtain information about the firmware revision for a particular channel.</p>
-<dl class="section note"><dt>Note</dt><dd>When testing the version numbers, it is good practice to allow a later version to be installed. That is, don't check for equality with a specific version number. Instead, check that the major version number of the installed version is greater than or equal to the desired version, and if it is equal, check that the minor version number of the installed version is greater than or equal to the desired version. </dd></dl>
+<p>Example: </p><div class="fragment"><div class="line">kvaser_drivers_setup_whcp.exe /S /DISABLE=GUI,J2534</div></div><!-- fragment --><h1><a class="anchor" id="section_user_guide_build_installation_debug"></a>
+Using Debug DLLs</h1>
+<p>CANlib SDK is shipped with a number of debug DLLs and drivers; look in the …\sys\debug directory of the CANlib SDK. The debug DLLs will send information to the debugger (using the Win32 OutputDebugString API) and might help you in trouble-shooting your application or a particular installation.</p>
+<p>To use the debug DLLs or drivers, you have to copy them yourself to the Windows system directory, overwriting the existing DLL or driver. Then remove and reinsert the hardware or restart the computer.</p>
+<dl class="section note"><dt>Note</dt><dd>Never attempt to deploy the debug DLLs or drivers with your application. End users are likely not to appreciate it.</dd></dl>
+<p>To see the debug information, you can use the excellent dbgview.exe program freely available from <a href="http://technet.microsoft.com/sysinternals">http://technet.microsoft.com/sysinternals</a>. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li><li class="navelem"><a class="el" href="page_user_guide.html">CANlib User&#39;s Guide</a></li>
-    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
+    <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li>
+    <li class="footer"> (canlib 5.27) Sun Mar 3 2019</li>
   </ul>
 </div>
 </body>

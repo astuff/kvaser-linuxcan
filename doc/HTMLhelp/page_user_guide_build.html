@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Compiling and Linking</title>
+<title>Compiling and Compatibility</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -77,25 +77,62 @@ $(document).ready(function(){initNavTree('page_user_guide_build.html','');});
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Compiling and Linking </div>  </div>
+<div class="title">Compiling and Compatibility </div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#section_user_guide_build_compiling_linking">Compiling and Linking Your Code</a></li>
+<ul><li class="level1"><a href="#section_porting_code_older">Compatibility</a></li>
+<li class="level1"><a href="#section_user_guide_build_compiling_linking">Compiling and Linking Your Code</a></li>
+<li class="level1"><a href="#section_user_guide_build_installation_deploy">Deploying Your Application</a></li>
+<li class="level1"><a href="#section_user_guide_intro_redistributable">Redistributable Files in CANlib SDK</a></li>
 </ul>
 </div>
-<div class="textblock"><h1><a class="anchor" id="section_user_guide_build_compiling_linking"></a>
+<div class="textblock"><h1><a class="anchor" id="section_porting_code_older"></a>
+Compatibility</h1>
+<p>The CANlib API is designed to be upwards compatible; that is, an application written using a certain version of the SDK will run without modifications on a system where any newer version of the drivers are installed.</p>
+<p>For example, if you develop an application using CANlib SDK version 3.7, the application will run without modifications on systems where driver 3.7, 3.8, ... is installed.</p>
+<p>When you use the SDK to create an application, you use header files and import libraries. There's no need to recompile or relink your application if you want to run it on a system where a newer driver is installed. All runtime code is contained in the DLLs and the device driver files. The files in the SDK just contains API and constant definitions, and import libraries that reference the runtime DLLs.</p>
+<p>In short, compile once, run anywhere!</p>
+<h1><a class="anchor" id="section_user_guide_build_compiling_linking"></a>
 Compiling and Linking Your Code</h1>
 <p>You will need to </p><div class="fragment"><div class="line"><span class="preprocessor">#include kvmlib.h</span></div></div><!-- fragment --><p>in your programs and link with libkvmlib.so.</p>
-<dl class="section note"><dt>Note</dt><dd>libkvmlib.so is dependent on libkvamemolib.so and libkvamemolib0700.so. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>libkvmlib.so is dependent on libkvamemolib.so and libkvamemolib0700.so.</dd></dl>
+<h1><a class="anchor" id="section_user_guide_build_installation_deploy"></a>
+Deploying Your Application</h1>
+<p>As an application programmer, you may want to distribute canlib32.dll together with your application. If you choose to do so, you should place it in the application's directory. In this way you will not break any other applications on the computer.</p>
+<p>If you install canlib32.dll on the target system, and the rest of the device drivers are not installed, any call you make to canlib32.dll will return an error code. You should be prepared for this situation and handle the error code in a constructive way in your application.</p>
+<p>It is also possible to programmatically install the required device driver without user intervention.</p>
+<h1><a class="anchor" id="section_user_guide_intro_redistributable"></a>
+Redistributable Files in CANlib SDK</h1>
+<p>The following files included in the CANLIB SDK may be redistributed with your application, provided they are only used together with genuine Kvaser hardware.</p>
+<ul>
+<li>canlib32.dll<br />
+ API for CAN applications.</li>
+<li>canlibCLSNET.dll<br />
+ API for CAN applications in the .NET environment.</li>
+<li>sing32.dll<br />
+ API for emulating Softing's CAN API.</li>
+<li>vcand32.dll<br />
+ API for emulating Vector Informatik's CAN API.</li>
+<li>j1587lib.dll<br />
+ J1587 API DLL (for Kvaser Linx)</li>
+<li>kv121032.dll<br />
+ RP1210A/B API DLL</li>
+<li>kvj2534.dll, kvj2534c.dll, kvj2534i.dll<br />
+ SAE J2534 API DLL</li>
+<li>linlib.dll<br />
+ API for LIN applications.</li>
+</ul>
+<p>You may use and distribute the source code found in the SAMPLES directory in your own applications without restrictions.</p>
+<p>Please contact <a class="el" href="page_support.html">Kvaser Support</a> if you would like to redistribute any file not found in this list. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li><li class="navelem"><a class="el" href="page_user_guide.html">CANlib User&#39;s Guide</a></li>
-    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
+    <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li>
+    <li class="footer"> (canlib 5.27) Sun Mar 3 2019</li>
   </ul>
 </div>
 </body>

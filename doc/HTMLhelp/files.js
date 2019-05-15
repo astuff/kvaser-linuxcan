@@ -6,6 +6,7 @@ var files =
     [ "kvaMemoLibXML.h", "kva_memo_lib_x_m_l_8h.html", "kva_memo_lib_x_m_l_8h" ],
     [ "kvlclib.h", "kvlclib_8h.html", "kvlclib_8h" ],
     [ "kvmlib.h", "kvmlib_8h.html", "kvmlib_8h" ],
+    [ "kvrlib.h", "kvrlib_8h.html", null ],
     [ "linlib.h", "linlib_8h.html", "linlib_8h" ],
     [ "obsolete.h", "obsolete_8h.html", "obsolete_8h" ]
 ];

@@ -296,7 +296,8 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser Mini PCI Express HS v2",                     {0x30010383, 0x00073301}},
           {"Kvaser Hybrid Pro 2xCAN/LIN",                       {0x30010420, 0x00073301}},
           {"Kvaser BlackBird Pro HS v2",                        {0x30009837, 0x00073301}},
-          {"Kvaser Ethercan HS",                                {0x30009769, 0x00073301}}
+          {"Kvaser Ethercan HS",                                {0x30009769, 0x00073301}},
+          {"Kvaser Memorator Light HS v2",                      {0x30010581, 0x00073301}}
 };
 
 static canStatus check_bitrate (const CanHandle hnd, unsigned int bitrate);
@@ -1359,7 +1360,7 @@ unsigned int CANLIBAPI canGetVersionEx(unsigned int itemCode)
           return (CANLIB_PRODUCT_MAJOR_VERSION << 8) + CANLIB_MINOR_VERSION;
 
       case canVERSION_CANLIB32_PRODVER32:
-          return (CANLIB_MAJOR_VERSION << 16) +
+          return (CANLIB_PRODUCT_MAJOR_VERSION << 16) +
                  (CANLIB_MINOR_VERSION << 8) +
                  prod_letter;
 

@@ -394,7 +394,7 @@ typedef enum {
 /** @} */
 
 /**
- * \name Message information flags, < 0x100
+ * \name Message information flags, CAN (canMSG_xxx)
  * \anchor canMSG_xxx
  *
  * The following flags can be returned from \ref canRead() et al, or passed to
@@ -412,9 +412,15 @@ typedef enum {
  */
 #define canMSG_MASK             0x00ff      ///< Used to mask the non-info bits
 #define canMSG_RTR              0x0001      ///< Message is a remote request
-#define canMSG_STD              0x0002      ///< Message has a standard ID
-#define canMSG_EXT              0x0004      ///< Message has an extended ID
-#define canMSG_WAKEUP           0x0008      ///< Message to be sent / was received in wakeup mode
+
+/**
+ * Message has a standard ID. If a message has an extended identifier but no
+ * \ref canMSG_EXT flag, the most significant bits of the identifier will be
+ * cut off.
+ */
+#define canMSG_STD      0x0002   ///< Message has a standard (11-bit) identifier
+#define canMSG_EXT      0x0004   ///< Message has an extended (29-bit) identifier
+#define canMSG_WAKEUP   0x0008   ///< Message is a WAKEUP message (SWC hardware.)
 
 /**
  * NERR was active during the message
@@ -434,11 +440,11 @@ typedef enum {
  * See the TJA1054 data sheet (available from Philips) for more detailed
  * information.
  */
-#define canMSG_NERR             0x0010
-#define canMSG_ERROR_FRAME      0x0020      ///< Message is an error frame
-#define canMSG_TXACK            0x0040      ///< Message is a TX ACK (msg is really sent)
-#define canMSG_TXRQ             0x0080      ///< Message is a TX REQUEST (msg is transfered to the chip)
-#define canMSG_DELAY_MSG        0x0100      ///< Message is NOT sent on the bus. The transmission of messages are delayed. The dlc specifies the delay in milliseconds (1..1000).
+#define canMSG_NERR             0x0010   ///< NERR was active during the message (TJA1054 hardware)
+#define canMSG_ERROR_FRAME      0x0020   ///< Message represents an error frame.
+#define canMSG_TXACK            0x0040   ///< Message is a TX ACK (msg has really been sent)
+#define canMSG_TXRQ             0x0080   ///< Message is a TX REQUEST (msg was transfered to the chip)
+#define canMSG_DELAY_MSG        0x0100   ///< Message is NOT sent on the bus. The transmission of messages are delayed. The dlc specifies the delay in milliseconds (1..1000).
 
 // single shot flags:
 #define canMSG_SINGLE_SHOT      0x1000000      ///< Message is Single Shot, try to send once, no retransmission. This flag can only be used with transmitted messages.
@@ -447,7 +453,7 @@ typedef enum {
 
 
 /**
- * \name canFDMSG_xxx
+ * \name Message information flags, CAN FD (canFDMSG_xxx)
  * \anchor canFDMSG_xxx
  *
  * Flags used in the CAN FD protocol. Set \ref canOPEN_CAN_FD in \ref
@@ -465,7 +471,7 @@ typedef enum {
 /** @} */
 
 /**
- * \name Message error flags
+ * \name Message error flags (canMsgERR_xxx)
  * \anchor canMSGERR_xxx
  *
  * \note Not all hardware platforms can detect the difference between hardware

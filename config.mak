@@ -124,7 +124,7 @@ KV_KERNEL_SRC_DIR := $(KDIR)
 
 #---------------------------------------------------------------------------
 # export these flags to compilation
-KV_XTRA_COMMON_FLAGS = -DLINUX=1 $(foreach INC,$(INCLUDES),-I$(INC)) -Werror -Wall
+KV_XTRA_COMMON_FLAGS = -DLINUX=1 $(foreach INC,$(INCLUDES),-I$(INC)) -Wall
 
 # GCC 4.9 is the first version with Wdate-time
 ifeq ($(GCC_MAJ_VERSION_GTEQ_5),1)
@@ -136,6 +136,10 @@ ifeq ($(GCC_MIN_VERSION_GTEQ_9),1)
 endif # GCC_MIN >= 9
 endif # GCC_MAJ >= 4
 endif # GCC_MAJ >= 5
+
+ifeq ($(KV_PCIEFD_DMA_32BIT),1)
+  KV_XTRA_COMMON_FLAGS += -DKV_PCIEFD_DMA_32BIT=1
+endif # KV_PCIEFD_DMA_32BIT
 
 export KV_XTRA_CFLAGS       = $(KV_XTRA_COMMON_FLAGS) $(KV_NDEBUGFLAGS) -DWIN32=0
 export KV_XTRA_CFLAGS_DEBUG = $(KV_XTRA_COMMON_FLAGS) $(KV_DEBUGFLAGS)  -DWIN32=0
@@ -165,7 +169,7 @@ kv_module:
 	@echo --------------------------------------------------------------------
 	@echo "building $(KV_MODULE_NAME) $(IS_DEBUG)"
 	@echo "Kernel src:" $(KV_KERNEL_SRC_DIR)
-	$(MAKE) -C $(KV_KERNEL_SRC_DIR) SUBDIRS=$(PWD) modules
+	$(MAKE) -C $(KV_KERNEL_SRC_DIR) M=$(PWD) modules
 	@echo --------------------------------------------------------------------
 
 install:

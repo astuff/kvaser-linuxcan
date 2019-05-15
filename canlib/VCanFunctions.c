@@ -149,6 +149,7 @@ static uint32_t convert_channel_info_flags (uint32_t vflags);
 #define ERROR_WHEN_NEQ 0
 #define ERROR_WHEN_LT  1
 static int check_args (void* buf, uint32_t buf_len, uint32_t limit, uint32_t method);
+static canStatus vCanSetBusOutputControl (HandleData *hData, unsigned int drivertype);
 
 //******************************************************
 // Compare handles
@@ -606,6 +607,15 @@ static canStatus vCanOpenChannel (HandleData *hData)
     }
 
     hData->report_access_errors = 0;
+
+    if (my_arg.wants_init_access) {
+      canStatus status;
+      status = vCanSetBusOutputControl(hData, canDRIVER_NORMAL);
+      if (status < canOK) {
+        close(hData->fd);
+        return status;
+      }
+    }
   }
 
   ret = ioctl(hData->fd, VCAN_IOC_GET_CHAN_CAP, &capability);

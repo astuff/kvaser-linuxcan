@@ -119,6 +119,15 @@
 #include "hwnames.h"
 
 
+// Force 32-bit DMA addresses
+#ifdef KV_PCIEFD_DMA_32BIT
+#undef KV_PCIEFD_DMA_64BIT
+#else
+#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+#define KV_PCIEFD_DMA_64BIT 1
+#endif /* CONFIG_ARCH_DMA_ADDR_T_64BIT */
+#endif /* KV_PCIEFD_DMA_32BIT */
+
 #ifdef PCIEFD_DEBUG
 //
 // If you do not define PCIEFD_DEBUG at all, all the debug code will be
@@ -300,7 +309,7 @@ static int dmaInit(VCanCardData *vCard)
   PciCanCardData *hCard = vCard->hwCardData;
   struct device *dev = &hCard->dev->dev;
 
-#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+#ifdef KV_PCIEFD_DMA_64BIT
   if (!dma_set_mask(dev, DMA_BIT_MASK(64))) {
     hCard->useDmaAddr64 = 1;
     DEBUGPRINT(3,"Use 64-bit dma address mask\n");
@@ -365,8 +374,8 @@ static int setupBusMasterTranslationTable(VCanCardData * vCard, int pos, dmaCtxB
   // Every table entry is 64 bits, two table entries are used for each channel.
   unsigned int tabEntryOffset = 0x1000+pos*8;
 
-#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-  DEBUGPRINT(3,"CONFIG_ARCH64\n");
+#ifdef KV_PCIEFD_DMA_64BIT
+  DEBUGPRINT(3,"KV_PCIEFD_DMA_64BIT\n");
 
   if(hCard->useDmaAddr64)
     {
@@ -385,7 +394,7 @@ static int setupBusMasterTranslationTable(VCanCardData * vCard, int pos, dmaCtxB
                  OFFSET_FROM_BASE(hCard->pcieBar0Base, tabEntryOffset) );
       iowrite32(0, OFFSET_FROM_BASE(hCard->pcieBar0Base, tabEntryOffset+4) );
 
-#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+#ifdef KV_PCIEFD_DMA_64BIT
     }
 #endif
 

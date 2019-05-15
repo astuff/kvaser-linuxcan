@@ -1867,6 +1867,8 @@ typedef struct {
 #define IO_PIN_INFO_ANALOG_VALUE_ABOVE           12
 #define IO_PIN_INFO_ANALOG_VALUE_BELOW           13
 #define IO_PIN_INFO_MODULE_NUMBER                14
+#define IO_PIN_INFO_SERIAL_NUMBER                15
+#define IO_PIN_INFO_FW_VERSION                   16
 
 #define IO_PIN_TYPE_UNKNOWN                       0
 #define IO_PIN_TYPE_DIGITAL                       1

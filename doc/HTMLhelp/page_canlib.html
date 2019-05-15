@@ -80,22 +80,35 @@ $(document).ready(function(){initNavTree('page_canlib.html','');});
 <div class="title">CAN bus API (CANlib) </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>CANlib is a software product from KVASER that provides support for a wide range of Kvasers CAN products. The CANlib API provides the application programmer with a quick and easy access to the CAN network while supporting a queue-oriented programming model.</p>
-<p>CANlib supports both 32-bit and 64-bit programs under Windows and Linux. For more detailed information about supported platforms, please contact <a class="el" href="page_user_guide_support.html">Kvaser Support</a>.</p>
-<p>Where to go from here:</p>
+<div class="textblock"><p>The CAN bus API (CANlib) is used to interact with Kvaser CAN devices connected to your computer and the CAN bus. At its core you have functions to set bus parameters (e.g. bit rate), go bus on/o and read/write CAN messages. You can also use CANlib to download and start t programs on supported devices. If you can see your device listed in the Kvaser Device Guide tool, it is connected and you can communicate with it through CANlib.</p>
+<p>Contents:</p>
 <ul>
-<li><a class="el" href="page_user_guide.html">CANlib User's Guide</a> - introductory text on how to use CANlib and also discusses various general topics that don't belong to any particular API call.</li>
-<li><a class="el" href="page_core_api_calls.html">CANlib Core API Calls</a> - gives you a quick overview of the most important CANlib API calls.</li>
+<li><a class="el" href="page_user_guide_intro.html">Introduction</a></li>
+<li><a class="el" href="page_user_guide_init.html">Initialization</a></li>
+<li><a class="el" href="page_user_guide_device_and_channel.html">Devices and Channels</a></li>
+<li><a class="el" href="page_user_guide_chips_channels.html">Open Channel</a></li>
+<li><a class="el" href="page_user_guide_send_recv.html">Send and Receive CAN Messages</a></li>
+<li><a class="el" href="page_user_guide_bus_errors.html">Bus Errors</a></li>
+<li><a class="el" href="page_user_guide_time.html">Time Measurement</a></li>
+<li><a class="el" href="page_user_guide_version.html">Version Checking</a></li>
+<li><a class="el" href="page_user_guide_threads.html">Using Threads</a></li>
+<li><a class="el" href="page_user_guide_send_recv_asynch_not.html">Asynchronous Notification</a></li>
+<li><a class="el" href="page_user_guide_kvscript.html">t Programming</a></li>
+<li><a class="el" href="page_user_guide_kviopin.html">I/O Pin Handling</a></li>
+<li><a class="el" href="page_user_guide_send_recv_mailboxes.html">Message Mailboxes</a></li>
+<li><a class="el" href="page_user_guide_userdata.html">User Data in Kvaser Devices</a></li>
+<li><a class="el" href="page_user_guide_install.html">Windows Advanced Topics</a></li>
+<li><a class="el" href="page_user_guide_build.html">Compiling and Compatibility</a></li>
 <li><a class="el" href="page_canlib_api_calls_grouped_by_function.html">CANlib API Calls Grouped by Function</a></li>
+<li><a class="el" href="page_user_guide_canlib_samples.html">Sample Programs (CANlib)</a> </li>
 </ul>
-<p>Also see the <a class="el" href="page_code_snippets.html">Code snippets</a> and Examples section. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
+    <li class="footer"> (canlib 5.27) Sun Mar 3 2019</li>
   </ul>
 </div>
 </body>

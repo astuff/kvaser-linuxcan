@@ -143,6 +143,7 @@ static void virtualRequestSend (VCanCardData *vCard, VCanChanData *vChan);
 
 static int virtualTransmitMessage (VCanChanData *vChd, CAN_MSG *m);
 static int virtual_special_ioctl_handler(VCanOpenFileNode *fileNodePtr, unsigned int ioctl_cmd, unsigned long arg);
+static int virtualGetTransceiverType(VCanChanData *vChd, unsigned int *transceiver_type);
 
 static VCanDriverData driverData;
 
@@ -167,6 +168,7 @@ static VCanHWInterface hwIf = {
     .special_ioctl_handler = virtual_special_ioctl_handler,
     .getCardInfo        = vCanGetCardInfo,
     .getCardInfo2       = vCanGetCardInfo2,
+    .get_transceiver_type = virtualGetTransceiverType,
 };
 
 
@@ -464,6 +466,16 @@ static unsigned long virtualTxQLen (VCanChanData *vChd)
 
     // Return zero because we don't have any hw-buffers.
     return qLen;
+}
+
+
+//======================================================================
+//  Get transceiver type
+//======================================================================
+static int virtualGetTransceiverType(VCanChanData *vChd, unsigned int *transceiver_type)
+{
+  *transceiver_type = VCAN_TRANSCEIVER_TYPE_NONE;
+  return 0;
 }
 
 

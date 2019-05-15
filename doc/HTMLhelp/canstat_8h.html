@@ -189,7 +189,7 @@ Macros</h2></td></tr>
 <tr class="memitem:a3b1c56fe475153972bf7116a0c1cba53"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a3b1c56fe475153972bf7116a0c1cba53">canSTAT_OVERRUN</a>&#160;&#160;&#160;(<a class="el" href="canstat_8h.html#a7b3f46760938cbc79f0a81f297f1e2b4">canSTAT_HW_OVERRUN</a> | <a class="el" href="canstat_8h.html#a81051d406447b59ebfbf6ed31e1478a1">canSTAT_SW_OVERRUN</a>)</td></tr>
 <tr class="memdesc:a3b1c56fe475153972bf7116a0c1cba53"><td class="mdescLeft">&#160;</td><td class="mdescRight">For convenience.  <a href="#a3b1c56fe475153972bf7116a0c1cba53">More...</a><br /></td></tr>
 <tr class="separator:a3b1c56fe475153972bf7116a0c1cba53"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader">Message information flags, &lt; 0x100</div></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Message information flags, CAN (canMSG_xxx)</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canMSG_xxx"></a> The following flags can be returned from <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> et al, or passed to <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>.</p>
 <p>All flags and/or combinations of them are meaningful for received messages.</p>
 <p><a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3">canMSG_RTR</a>, <a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>, <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a>, <a class="el" href="canstat_8h.html#a616183e2ed8ca81976463914e47b35e1">canMSG_WAKEUP</a> and <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a> are meaningful also for transmitted messages. <a class="el" href="canstat_8h.html#a2a882491f16d0c536a34ac65f847d35e">canMSG_SINGLE_SHOT</a> is only for transmission.</p>
@@ -202,24 +202,25 @@ Macros</h2></td></tr>
 <tr class="memdesc:a687df04559a9995e0bec503655454eb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message is a remote request.  <a href="#a687df04559a9995e0bec503655454eb3">More...</a><br /></td></tr>
 <tr class="separator:a687df04559a9995e0bec503655454eb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56000a3f22f1408c26db4dc731aa4a9e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>&#160;&#160;&#160;0x0002</td></tr>
-<tr class="memdesc:a56000a3f22f1408c26db4dc731aa4a9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message has a standard ID.  <a href="#a56000a3f22f1408c26db4dc731aa4a9e">More...</a><br /></td></tr>
+<tr class="memdesc:a56000a3f22f1408c26db4dc731aa4a9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message has a standard (11-bit) identifier.  <a href="#a56000a3f22f1408c26db4dc731aa4a9e">More...</a><br /></td></tr>
 <tr class="separator:a56000a3f22f1408c26db4dc731aa4a9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade936f23b4b303d64187b4c6589c9c10"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a>&#160;&#160;&#160;0x0004</td></tr>
-<tr class="memdesc:ade936f23b4b303d64187b4c6589c9c10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message has an extended ID.  <a href="#ade936f23b4b303d64187b4c6589c9c10">More...</a><br /></td></tr>
+<tr class="memdesc:ade936f23b4b303d64187b4c6589c9c10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message has an extended (29-bit) identifier.  <a href="#ade936f23b4b303d64187b4c6589c9c10">More...</a><br /></td></tr>
 <tr class="separator:ade936f23b4b303d64187b4c6589c9c10"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a616183e2ed8ca81976463914e47b35e1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a616183e2ed8ca81976463914e47b35e1">canMSG_WAKEUP</a>&#160;&#160;&#160;0x0008</td></tr>
-<tr class="memdesc:a616183e2ed8ca81976463914e47b35e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message to be sent / was received in wakeup mode.  <a href="#a616183e2ed8ca81976463914e47b35e1">More...</a><br /></td></tr>
+<tr class="memdesc:a616183e2ed8ca81976463914e47b35e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message is a WAKEUP message (SWC hardware.)  <a href="#a616183e2ed8ca81976463914e47b35e1">More...</a><br /></td></tr>
 <tr class="separator:a616183e2ed8ca81976463914e47b35e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f53f2fdeeb263cd2bf5d374e1dd59a2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a1f53f2fdeeb263cd2bf5d374e1dd59a2">canMSG_NERR</a>&#160;&#160;&#160;0x0010</td></tr>
+<tr class="memdesc:a1f53f2fdeeb263cd2bf5d374e1dd59a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">NERR was active during the message (TJA1054 hardware)  <a href="#a1f53f2fdeeb263cd2bf5d374e1dd59a2">More...</a><br /></td></tr>
 <tr class="separator:a1f53f2fdeeb263cd2bf5d374e1dd59a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade1b8ed815a4bc6ada6ec666e48e9cf8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a>&#160;&#160;&#160;0x0020</td></tr>
-<tr class="memdesc:ade1b8ed815a4bc6ada6ec666e48e9cf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message is an error frame.  <a href="#ade1b8ed815a4bc6ada6ec666e48e9cf8">More...</a><br /></td></tr>
+<tr class="memdesc:ade1b8ed815a4bc6ada6ec666e48e9cf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message represents an error frame.  <a href="#ade1b8ed815a4bc6ada6ec666e48e9cf8">More...</a><br /></td></tr>
 <tr class="separator:ade1b8ed815a4bc6ada6ec666e48e9cf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ef7ad2e558debdbf85921440961efcb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a5ef7ad2e558debdbf85921440961efcb">canMSG_TXACK</a>&#160;&#160;&#160;0x0040</td></tr>
-<tr class="memdesc:a5ef7ad2e558debdbf85921440961efcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message is a TX ACK (msg is really sent)  <a href="#a5ef7ad2e558debdbf85921440961efcb">More...</a><br /></td></tr>
+<tr class="memdesc:a5ef7ad2e558debdbf85921440961efcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message is a TX ACK (msg has really been sent)  <a href="#a5ef7ad2e558debdbf85921440961efcb">More...</a><br /></td></tr>
 <tr class="separator:a5ef7ad2e558debdbf85921440961efcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa73e5649dc11a61acbf41935bebe97bd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#aa73e5649dc11a61acbf41935bebe97bd">canMSG_TXRQ</a>&#160;&#160;&#160;0x0080</td></tr>
-<tr class="memdesc:aa73e5649dc11a61acbf41935bebe97bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message is a TX REQUEST (msg is transfered to the chip)  <a href="#aa73e5649dc11a61acbf41935bebe97bd">More...</a><br /></td></tr>
+<tr class="memdesc:aa73e5649dc11a61acbf41935bebe97bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message is a TX REQUEST (msg was transfered to the chip)  <a href="#aa73e5649dc11a61acbf41935bebe97bd">More...</a><br /></td></tr>
 <tr class="separator:aa73e5649dc11a61acbf41935bebe97bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace754df19009a6eeff09d866d68a3a27"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ace754df19009a6eeff09d866d68a3a27">canMSG_DELAY_MSG</a>&#160;&#160;&#160;0x0100</td></tr>
 <tr class="memdesc:ace754df19009a6eeff09d866d68a3a27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message is NOT sent on the bus. The transmission of messages are delayed. The dlc specifies the delay in milliseconds (1..1000).  <a href="#ace754df19009a6eeff09d866d68a3a27">More...</a><br /></td></tr>
@@ -233,7 +234,7 @@ Macros</h2></td></tr>
 <tr class="memitem:a26fbe7a0c3bccdd61a1b8f5875547ab0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a26fbe7a0c3bccdd61a1b8f5875547ab0">canMSG_ABL</a>&#160;&#160;&#160;0x4000000</td></tr>
 <tr class="memdesc:a26fbe7a0c3bccdd61a1b8f5875547ab0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Only together with canMSG_TXNACK, Single shot message was not sent because arbitration was lost. This flag is only used with received messages.  <a href="#a26fbe7a0c3bccdd61a1b8f5875547ab0">More...</a><br /></td></tr>
 <tr class="separator:a26fbe7a0c3bccdd61a1b8f5875547ab0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader">canFDMSG_xxx</div></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Message information flags, CAN FD (canFDMSG_xxx)</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canFDMSG_xxx"></a> Flags used in the CAN FD protocol. Set <a class="el" href="canlib_8h.html#a10aad075bfb9891aa98cf3c131977dc3">canOPEN_CAN_FD</a> in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> to enable the CAN FD protocol. </p>
 </div></td></tr>
 <tr class="memitem:a6f1046c663cdef60425ac4f821aa6dcc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a6f1046c663cdef60425ac4f821aa6dcc">canFDMSG_MASK</a>&#160;&#160;&#160;0xff0000</td></tr>
@@ -251,7 +252,7 @@ Macros</h2></td></tr>
 <tr class="memitem:aa50c93236b2b28677bcae0f7c1ab3860"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#aa50c93236b2b28677bcae0f7c1ab3860">canFDMSG_ESI</a>&#160;&#160;&#160;0x040000</td></tr>
 <tr class="memdesc:aa50c93236b2b28677bcae0f7c1ab3860"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sender of the message is in error passive mode (CAN FD)  <a href="#aa50c93236b2b28677bcae0f7c1ab3860">More...</a><br /></td></tr>
 <tr class="separator:aa50c93236b2b28677bcae0f7c1ab3860"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader">Message error flags</div></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Message error flags (canMsgERR_xxx)</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canMSGERR_xxx"></a> </p><dl class="section note"><dt>Note</dt><dd>Not all hardware platforms can detect the difference between hardware overruns and software overruns, so your application should test for both conditions. You can use the symbol <a class="el" href="canstat_8h.html#adf0d578c7b25ede29a9733da44f08ab3">canMSGERR_OVERRUN</a> for this purpose. </dd></dl>
 </div></td></tr>
 <tr class="memitem:a8aeb91d8bc2c63b0ca547052a96b63cf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a8aeb91d8bc2c63b0ca547052a96b63cf">canMSGERR_MASK</a>&#160;&#160;&#160;0xff00</td></tr>
@@ -759,8 +760,8 @@ Enumerations</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Message is an error frame. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a11">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a11">canfdmonitor.c</a>, and <a class="el" href="canmonitor_8c-example.html#a25">canmonitor.c</a>.</dd>
+<p>Message represents an error frame. </p>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a11">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a11">canfdmonitor.c</a>, <a class="el" href="canmonitor_8c-example.html#a25">canmonitor.c</a>, and <a class="el" href="tutorial_2c_2_monitor_can_channel_8c-example.html#a3">tutorial/c/MonitorCanChannel.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -776,7 +777,7 @@ Enumerations</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Message has an extended ID. </p>
+<p>Message has an extended (29-bit) identifier. </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a13">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a14">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a13">canfdwrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a11">writeloop.c</a>.</dd>
 </dl>
 </div>
@@ -808,6 +809,8 @@ Enumerations</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>NERR was active during the message (TJA1054 hardware) </p>
 <p>NERR was active during the message</p>
 <p>The NERR flag is set by the CAN transceiver when certain CAN bus wire faults occur, namely: </p><ul>
 <li>CANH wire interrupted </li>
@@ -869,7 +872,8 @@ Enumerations</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Message has a standard ID. </p>
+<p>Message has a standard (11-bit) identifier. </p>
+<p>Message has a standard ID. If a message has an extended identifier but no <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> flag, the most significant bits of the identifier will be cut off. </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a12">cancount.c</a>.</dd>
 </dl>
 </div>
@@ -886,7 +890,7 @@ Enumerations</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Message is a TX ACK (msg is really sent) </p>
+<p>Message is a TX ACK (msg has really been sent) </p>
 
 </div>
 </div>
@@ -918,7 +922,7 @@ Enumerations</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Message is a TX REQUEST (msg is transfered to the chip) </p>
+<p>Message is a TX REQUEST (msg was transfered to the chip) </p>
 
 </div>
 </div>
@@ -934,7 +938,7 @@ Enumerations</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Message to be sent / was received in wakeup mode. </p>
+<p>Message is a WAKEUP message (SWC hardware.) </p>
 
 </div>
 </div>
@@ -1047,7 +1051,7 @@ Enumerations</h2></td></tr>
 </div><div class="memdoc">
 
 <p>HW buffer overrun. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_overruns">Overruns</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_bus_errors.html#section_user_guide_send_recv_overruns">Overruns</a> </dd></dl>
 
 </div>
 </div>
@@ -1080,7 +1084,7 @@ Enumerations</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Any overrun condition. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_overruns">Overruns</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_bus_errors.html#section_user_guide_send_recv_overruns">Overruns</a> </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a15">cancount.c</a>.</dd>
 </dl>
 </div>
@@ -1114,7 +1118,7 @@ Enumerations</h2></td></tr>
 </div><div class="memdoc">
 
 <p>SW buffer overrun. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_overruns">Overruns</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_bus_errors.html#section_user_guide_send_recv_overruns">Overruns</a> </dd></dl>
 
 </div>
 </div>
@@ -2326,7 +2330,7 @@ Enumerations</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="canstat_8h.html">canstat.h</a></li>
-    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
+    <li class="footer"> (canlib 5.27) Sun Mar 3 2019</li>
   </ul>
 </div>
 </body>

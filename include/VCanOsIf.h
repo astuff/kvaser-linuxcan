@@ -244,15 +244,24 @@ typedef struct VCanChanData
 struct VCanHWInterface;
 struct VCanCardData;
 
+typedef struct VCanCardNumberData
+{
+    unsigned char           ean[8];
+    uint32_t                serialNumber;
+    unsigned char           active;
+} VCanCardNumberData;
+
 typedef struct VCanDriverData
 {
-    int                     noOfDevices;
-    struct timeval          startTime;
-    char                   *deviceName;
-    struct VCanHWInterface *hwIf;
-    struct VCanCardData    *canCards;
-    spinlock_t              canCardsLock;
-    struct cdev             cdev;
+    int                       noOfDevices;
+    struct timeval            startTime;
+    char                      *deviceName;
+    struct VCanHWInterface    *hwIf;
+    struct VCanCardData       *canCards;
+    spinlock_t                canCardsLock;
+    struct cdev               cdev;
+    struct VCanCardNumberData *cardNumbers;
+    unsigned int              maxCardnumber;
 } VCanDriverData;
 
 /*  Cards specific data */
@@ -260,6 +269,7 @@ typedef struct VCanCardData
 {
     uint32_t                hw_type;
     uint32_t                card_flags;
+    uint32_t                cardNumber;
     unsigned int            nrChannels;
     uint32_t                serialNumber;
     unsigned char           ean[8];
@@ -435,6 +445,7 @@ extern struct file_operations fops;
 
 
 /* Functions */
+void            kv_do_gettimeofday (struct timeval *tv);
 int             vCanInitData(VCanCardData *chd);
 int             vCanTime(VCanCardData *vCard, uint64_t *time);
 int             vCanDispatchEvent(VCanChanData *chd, VCAN_EVENT *e);

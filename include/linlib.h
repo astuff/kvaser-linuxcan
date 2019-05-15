@@ -892,6 +892,11 @@ LinStatus LINLIBAPI linGetCanHandle(LinHandle h, unsigned int *canHandle);
 *
 *  \tableofcontents
 *
+* \section section_user_guide_lin_lib_1 Description
+* The LINlib library is used to interact with the LIN bus. Similar to the \ref
+* page_canlib, it holds functions to set bus parameters, go bus on/off and
+* read/write LIN messages.
+*
 * \section section_user_guide_lin_intro Using the LIN Bus
 *
 *   Using the LIN bus requires special hardware, e.g.
@@ -924,6 +929,10 @@ LinStatus LINLIBAPI linGetCanHandle(LinHandle h, unsigned int *canHandle);
 *   checksum (even if \ref LIN_ENHANCED_CHECKSUM is specified).\n
 *   0x3D is single shot and its slave message buffer is automatically cleared upon
 *   reception of a 0x3C or 0x3D.
+*
+* \section section_user_guide_lin_where_to_go_from_here Where to go from here
+*
+*   For futher information check the LINlib references in the Modules tab.
 *
 **/
 

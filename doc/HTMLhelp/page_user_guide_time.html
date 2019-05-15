@@ -81,49 +81,44 @@ $(document).ready(function(){initNavTree('page_user_guide_time.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#section_user_guide_time_general">Time Measurement</a></li>
-<li class="level1"><a href="#section_user_guide_time_accuracy_and_resolution">Time Stamping Accuracy and Resolution</a></li>
+<ul><li class="level1"><a href="#section_user_guide_time_accuracy_and_resolution_accuracy">Accuracy</a></li>
+<li class="level1"><a href="#section_user_guide_time_accuracy_and_resolution_resolution">Resolution</a></li>
+<li class="level1"><a href="#section_user_guide_time_domain">Time Domain</a></li>
 </ul>
 </div>
-<div class="textblock"><h1><a class="anchor" id="section_user_guide_time_general"></a>
-Time Measurement</h1>
-<p>CAN messages are time stamped as they arrive. This time stamping is, depending on your hardware platform, done either by the CAN interface hardware or by CANlib.</p>
+<div class="textblock"><p>CAN messages are time stamped as they arrive. This time stamping is, depending on your hardware platform, done either by the CAN interface hardware or by CANlib.</p>
 <p>In the former case, the <b>accuracy</b> is pretty good, in the order of 1 - 10 microseconds; when CANlib does the job, the accuracy is more like 100 microseconds to 10 milliseconds and you may experience a rather large jitter. This is because Windows is not a real-time operating system.</p>
 <p>The <b>resolution</b> of the time stamps is, by default, 1 ms. It can be changed to a better resolution if desired.</p>
 <p>Use <a class="el" href="canlib_8h.html#a04c2f80a23b992bf17591749192e8d48">canReadTimer()</a> to read the current time. You must pass the handle of an open channel to this API call; the return value is the current time using the clock of that channel.</p>
 <p>Use <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a> with a function code of <a class="el" href="canlib_8h.html#a5b5d43fc8968aa77e48ef8c8d3036c36">canIOCTL_SET_TIMER_SCALE</a> to change the resolution of the time stamps, if desired. This will not affect the accuracy of the time stamps.</p>
-<h1><a class="anchor" id="section_user_guide_time_accuracy_and_resolution"></a>
-Time Stamping Accuracy and Resolution</h1>
-<h2>Accuracy</h2>
+<h1><a class="anchor" id="section_user_guide_time_accuracy_and_resolution_accuracy"></a>
+Accuracy</h1>
 <p>The accuracy of the time stamps depends on the hardware.</p>
 <p>The members of the Kvaser Leaf family have an onboard CPU. The time stamp accuracy varies (check the hardware manual) but the high-end members have very precise time stamping. The accuracy can be as good as one microsecond depending on the hardware. If more than one Leaf is used, their clocks are automatically kept in sync by the Kvaser MagiSync&trade; technology.</p>
 <p>Other CAN interfaces, like the Kvaser Leaf, LAPcan and USBcan II, have an on-board CPU and clock and provide very accurate time stamps for incoming CAN messages. The accuracy is typically 10-20 microseconds.</p>
 <p>Certain interfaces, like the PCIcan (PCI) series of boards, don't have an on-board CPU so the driver relies on the clock in the PC to timestamp the incoming messages. As Windows is not a real-time operating system, this gives an accuracy which is in the order of one millisecond.</p>
-<h2>Resolution</h2>
+<h1><a class="anchor" id="section_user_guide_time_accuracy_and_resolution_resolution"></a>
+Resolution</h1>
 <p>The resolution of the time stamps is, by default, 1 ms. It can be changed by calling <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a> with the <a class="el" href="canlib_8h.html#a5b5d43fc8968aa77e48ef8c8d3036c36">canIOCTL_SET_TIMER_SCALE</a> function code.</p>
-<h2>LAPcan / LAPcan II note</h2>
-<p>LAPcan uses an on-board clock for creating the message time stamps. The resolution of this clock is 8 microseconds. The accuracy of the time stamps can vary from around 8 microseconds up to 100 microseconds, depending on the bus load and if you have one or two CAN busses connected. If two messages arrive at the same time, but on different busses, to LAPcan, the message on channel 1 will be handled first and will have the most accurate time stamp. The time stamp on the second message will be up to 100 microseconds "too late".</p>
-<h2>PCIcan II / USBcan Rugged / USBcan II / Kvaser Memorator note</h2>
+<h1><a class="anchor" id="section_user_guide_time_domain"></a>
+Time Domain</h1>
 <ul>
-<li>Use firmware 2.0 or later, and driver 3.5 or later, to get accurate timestamps. Previous firmware/driver made the timestamps in the driver.</li>
-<li>The on-board clock has a resolution of 10 microseconds, and the same note as for LAPcan/LAPcan II (above) applies.</li>
+<li><a class="el" href="group___time_domain_handling.html#gaef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate()</a></li>
+<li><a class="el" href="group___time_domain_handling.html#gaf42198d9685ffc7094fc4cd276ab1976">kvTimeDomainDelete()</a></li>
+<li><a class="el" href="group___time_domain_handling.html#gaf1857d6195e783c082b44a6e6cf9f745">kvTimeDomainResetTime()</a></li>
+<li><a class="el" href="group___time_domain_handling.html#gafab02cbe0c7fd8cfa65382d492d724b9">kvTimeDomainGetData()</a></li>
+<li><a class="el" href="group___time_domain_handling.html#ga73890ef75367c8536235bcc5a6370b26">kvTimeDomainAddHandle()</a></li>
+<li><a class="el" href="group___time_domain_handling.html#gad9f730b78a8755e4ec915f75d47e2c79">kvTimeDomainRemoveHandle()</a></li>
 </ul>
-<h2>PCcan / PCIcan note</h2>
-<p>PCcan and PCIcan do not have an on-board clock but uses the PC clock instead. On certain types of PCs, the on-board clock can jump forward with random intervals. The amount of time added to the clock is one to a few seconds. This is due to a bug in the PC hardware. For more information, check out Microsoft Knowledgebase Q274323. (The URL was, as of this writing, <a href="http://support.microsoft.com/kb/q274323/">http://support.microsoft.com/kb/q274323/</a>)</p>
-<h2>Kvaser Leaf notes</h2>
-<ul>
-<li>The accuracy of the time stamps depend on the type of Leaf.</li>
-<li>Kvaser MagiSync&trade; is not available in all types of Leafs.</li>
-<li>A prerequisite for Kvaser MagiSync&trade; to work efficiently is that all Leafs are connected (possibly via other hubs) to <b>the same root hub</b>, that is, <b>the same USB controller</b>. Use the <em>Kvaser Hardware</em> applet in the Control Panel to find out if this is the case. </li>
-</ul>
-</div></div><!-- contents -->
+<p><b>Example</b>. The following code fragment resets the time for some already opened channels. It also collects and interprets some data from a domain.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define NUMBER_OF_CHANNELS 3</span></div><div class="line"><a class="code" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd[NUMBER_OF_CHANNELS];</div><div class="line"><a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> stat;</div><div class="line"><span class="keywordtype">int</span> i;</div><div class="line"><a class="code" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a> tDomain;</div><div class="line"><a class="code" href="structkv_time_domain_data__s.html">kvTimeDomainData</a> tData;</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line"><span class="comment">// Create a time domain for my handles.</span></div><div class="line">stat = <a class="code" href="group___time_domain_handling.html#gaef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate</a>(&amp;tDomain);</div><div class="line"><span class="keywordflow">if</span> (stat &lt; 0) {</div><div class="line">    printf(<span class="stringliteral">&quot;Failed, status == %d\n&quot;</span>, stat);</div><div class="line">}</div><div class="line"></div><div class="line"><span class="comment">// Add the handles to the domain.</span></div><div class="line"><span class="keywordflow">for</span> (i = 0; i &lt; NUMBER_OF_CHANNELS; i++) {</div><div class="line">  stat = <a class="code" href="group___time_domain_handling.html#ga73890ef75367c8536235bcc5a6370b26">kvTimeDomainAddHandle</a>(tDomain, hnd[i]);</div><div class="line">  <span class="keywordflow">if</span> (stat &lt; 0) {</div><div class="line">      printf(<span class="stringliteral">&quot;Failed to add handle %u to tDomain, &quot;</span>, i);</div><div class="line">      printf(<span class="stringliteral">&quot;status == %d\n&quot;</span>, stat);</div><div class="line">  }</div><div class="line">}</div><div class="line"></div><div class="line"><span class="comment">// Request some data from the domain and try to interpret it.</span></div><div class="line">stat = <a class="code" href="group___time_domain_handling.html#gafab02cbe0c7fd8cfa65382d492d724b9">kvTimeDomainGetData</a>(tDomain, &amp;tData; <span class="keyword">sizeof</span>(tData));</div><div class="line"><span class="keywordflow">if</span> (stat &lt; 0) {</div><div class="line">    printf(<span class="stringliteral">&quot;Failed, status == %d\n&quot;</span>, stat);</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (tData.<a class="code" href="structkv_time_domain_data__s.html#ab8dca255d18320cb7bd22b0448d78fb7">nMagiSyncGroups</a> &gt; 1) {</div><div class="line">  printf(<span class="stringliteral">&quot;Consider connecting the Kvaser MagiSync&amp;tm; enabled &quot;</span>);</div><div class="line">  printf(<span class="stringliteral">&quot;interfaces through the same USB root hub!&quot;</span>);</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (tData.<a class="code" href="structkv_time_domain_data__s.html#ab8dca255d18320cb7bd22b0448d78fb7">nMagiSyncGroups</a> == 1) {</div><div class="line">  printf(<span class="stringliteral">&quot;All my Kvaser MagiSync&amp;tm; enabled interfaces are &quot;</span>);</div><div class="line">  printf(<span class="stringliteral">&quot;connected through the same USB root hub and hence &quot;</span>);</div><div class="line">  printf(<span class="stringliteral">&quot;perfectly synchronized!&quot;</span>);</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (tData.<a class="code" href="structkv_time_domain_data__s.html#aadd2929832bd903c78ddf59c21feea05">nMagiSyncedMembers</a> == NUMBER_OF_CHANNELS) {</div><div class="line">  printf(<span class="stringliteral">&quot;All handles have the Kvaser MagiSync&amp;tm; feature enabled!&quot;</span>);</div><div class="line">}</div><div class="line"></div><div class="line"><span class="comment">// Reset the time on all handles in tDomain.</span></div><div class="line">stat = <a class="code" href="group___time_domain_handling.html#gaf1857d6195e783c082b44a6e6cf9f745">kvTimeDomainResetTime</a>(tDomain);</div><div class="line"><span class="keywordflow">if</span> (stat &lt; 0) {</div><div class="line">  printf(<span class="stringliteral">&quot;Failed, status == %d\n&quot;</span>, stat);</div><div class="line">}</div><div class="line"></div><div class="line">...</div><div class="line"></div><div class="line"><span class="comment">// Final cleanup</span></div><div class="line">stat = <a class="code" href="group___time_domain_handling.html#gaf42198d9685ffc7094fc4cd276ab1976">kvTimeDomainDelete</a>(tDomain);</div><div class="line"><span class="keywordflow">if</span> (stat &lt; 0) {</div><div class="line">  printf(<span class="stringliteral">&quot;Failed, status == %d\n&quot;</span>, stat);</div><div class="line">}</div><div class="line"><span class="keywordflow">else</span> {</div><div class="line">  printf(<span class="stringliteral">&quot;All resources used by tDomain and its members &quot;</span>);</div><div class="line">  printf(<span class="stringliteral">&quot;returned to system&quot;</span>);</div><div class="line">}</div></div><!-- fragment --> </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li><li class="navelem"><a class="el" href="page_user_guide.html">CANlib User&#39;s Guide</a></li>
-    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
+    <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li>
+    <li class="footer"> (canlib 5.27) Sun Mar 3 2019</li>
   </ul>
 </div>
 </body>

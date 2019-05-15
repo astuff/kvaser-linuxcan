@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['memorator_20xml_20api_20_28kvamemolibxml_29',['Memorator XML API (kvaMemoLibXML)',['../page_kvamemolibxml.html',1,'']]],
-  ['memorator_20api_20_28kvmlib_29',['Memorator API (kvmlib)',['../page_kvmlib.html',1,'']]],
-  ['miscellaneous_20topics',['Miscellaneous Topics',['../page_user_guide_misc.html',1,'page_user_guide']]]
+  ['list_20can_20channels',['List CAN channels',['../page_example_c_channeldata.html',1,'page_user_guide_canlib_samples']]],
+  ['license_20and_20copyright',['License and Copyright',['../page_license_and_copyright.html',1,'']]],
+  ['lin_20bus_20api_20_28linlib_29',['LIN bus API (LINlib)',['../page_linlib.html',1,'']]]
 ];

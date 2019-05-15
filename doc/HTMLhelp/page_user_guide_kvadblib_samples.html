@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Compatibility</title>
+<title>Sample Programs (kvaDBLib)</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -58,7 +58,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('page_porting_code_older.html','');});
+$(document).ready(function(){initNavTree('page_user_guide_kvadblib_samples.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -77,21 +77,22 @@ $(document).ready(function(){initNavTree('page_porting_code_older.html','');});
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Compatibility </div>  </div>
+<div class="title">Sample Programs (kvaDBLib) </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>The CANlib API is designed to be upwards compatible; that is, an application written using a certain version of the SDK will run without modifications on a system where any newer version of the drivers are installed.</p>
-<p>For example, if you develop an application using CANlib SDK version 3.7, the application will run without modifications on systems where driver 3.7, 3.8, ... is installed.</p>
-<p>When you use the SDK to create an application, you use header files and import libraries. There's no need to recompile or relink your application if you want to run it on a system where a newer driver is installed. All runtime code is contained in the DLLs and the device driver files. The files in the SDK just contains API and constant definitions, and import libraries that reference the runtime DLLs.</p>
-<p>In short, compile once, run anywhere! </p>
+<div class="textblock"><p>This is a collection of C programs which all demonstrate various features of the kvaDBLib library included in the Kvaser CANlib SDK.</p>
+<ul>
+<li><a class="el" href="page_example_c_candb.html">Using CAN databases</a> gives an example of a program that can create, modify and use databases. When executed, it creates a small example database called temp.dlc.</li>
+<li><a class="el" href="page_example_c_gensig.html">Send database signal</a> generates various signals and sends them as CAN messages. </li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li><li class="navelem"><a class="el" href="page_user_guide.html">CANlib User&#39;s Guide</a></li>
-    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
+    <li class="navelem"><a class="el" href="page_kvadblib.html">Database API (kvaDbLib)</a></li>
+    <li class="footer"> (canlib 5.27) Sun Mar 3 2019</li>
   </ul>
 </div>
 </body>
