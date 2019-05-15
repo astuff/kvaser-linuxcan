@@ -1,6 +1,54 @@
 /*
-** Copyright 2002-2006 KVASER AB, Sweden.  All rights reserved.
-*/
+**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**                        http://www.kvaser.com
+**
+** This software is dual licensed under the following two licenses:
+** BSD-new and GPLv2. You may use either one. See the included
+** COPYING file for details.
+**
+** License: BSD-new
+** ===============================================================================
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**     * Redistributions of source code must retain the above copyright
+**       notice, this list of conditions and the following disclaimer.
+**     * Redistributions in binary form must reproduce the above copyright
+**       notice, this list of conditions and the following disclaimer in the
+**       documentation and/or other materials provided with the distribution.
+**     * Neither the name of the <organization> nor the
+**       names of its contributors may be used to endorse or promote products
+**       derived from this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**
+**
+** License: GPLv2
+** ===============================================================================
+** This program is free software; you can redistribute it and/or
+** modify it under the terms of the GNU General Public License
+** as published by the Free Software Foundation; either version 2
+** of the License, or (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**
+** ---------------------------------------------------------------------------
+**/
 
 /* vcanevt.h: Defines for CAN driver event
  * (CAN messages, timer events, statistic, ...)
@@ -9,11 +57,15 @@
 #ifndef VCANEVT_H
 #define VCANEVT_H
 
+#   if !defined(__KERNEL__)
+#      include <stdint.h>
+#   else
+#      include <linux/types.h>
+#   endif
+
 /***************************************************************************/
 
 #include <pshpack1.h>
-
-#include "hwnames.h"
 
 /***************************************************************************/
 
@@ -31,9 +83,9 @@ enum e_vevent_type {
 typedef unsigned char VeventTag;
 
 
-/* structure for V_RECEIVE_MSG, V_TRANSMIT_MSG */
+/* Structure for V_RECEIVE_MSG, V_TRANSMIT_MSG */
 
-/* message flags */
+/* Message flags */
 #define MAX_MSG_LEN 8
 #define EXT_MSG                     0x80000000 // signs an extended identifier
 #define VCAN_EXT_MSG_ID             EXT_MSG
@@ -53,14 +105,14 @@ typedef unsigned char VeventTag;
 #define VCAN_MSG_FLAG_TXRQ          0x80  /* Transmit Message stored into Controller  */
 
 struct s_vcan_msg {  /* 14 Bytes */
-         unsigned long id;
+         uint32_t      id;
          unsigned char flags;
          unsigned char dlc;
-         unsigned char data [MAX_MSG_LEN];
+         unsigned char data[MAX_MSG_LEN];
        };
 
 
-/* structure for V_CHIP_STATE */
+/* Structure for V_CHIP_STATE */
 
 #define CHIPSTAT_BUSOFF              0x01
 #define CHIPSTAT_ERROR_PASSIVE       0x02
@@ -74,30 +126,30 @@ struct s_vcan_chip_state {
        };
 
 
-/* structure for V_STATISTIC_STD */
+/* Structure for V_STATISTIC_STD */
 struct s_vcan_statistic_std {
-         unsigned long  stdData;
-         unsigned long  stdRemote;
-         unsigned long  errFrame;
+         uint32_t       stdData;
+         uint32_t       stdRemote;
+         uint32_t       errFrame;
          unsigned short busLoad; // 0.00-100.00%
        };
 
 
-/* structure for V_STATISTIC_EXT */
+/* Structure for V_STATISTIC_EXT */
 struct s_vcan_statistic_ext {
-         unsigned long  extData;
-         unsigned long  extRemote;
-         unsigned long  ovrFrame;
+         uint32_t extData;
+         uint32_t extRemote;
+         uint32_t ovrFrame;
        };
 
 
-/* structure for V_ERROR */
+/* Structure for V_ERROR */
 struct s_vcan_error {
          unsigned char code;
        };
 
 
-/* structure for SET_OUTPUT_MODE */
+/* Structure for SET_OUTPUT_MODE */
 #define OUTPUT_MODE_SILENT 0
 #define OUTPUT_MODE_NORMAL 1
 
@@ -144,13 +196,13 @@ union s_vcan_tag_data {
       };
 
 
-/* event type definition */
+/* Event type definition */
 struct s_vcan_event {
          VeventTag     tag;             // 1
          unsigned char chanIndex;       // 1
          unsigned char transId;         // 1
          unsigned char unused_1;        // 1 internal use only !!!!
-         unsigned long timeStamp;       // 4
+         uint32_t      timeStamp;            // 4
          union s_vcan_tag_data
                        tagData;         // 14 Bytes (_VMessage)
        };
@@ -165,8 +217,8 @@ typedef struct s_can_msg {
           unsigned char channel_index;
           unsigned char user_data;
           unsigned char unused_1;
-          unsigned long timestamp;
-          unsigned long id;
+          uint32_t      timestamp;
+          uint32_t      id;
           unsigned char flags;
           unsigned char length;
           unsigned char data [8];

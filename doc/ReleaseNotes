@@ -1,5 +1,5 @@
 /*
-** Copyright 2002-2006 KVASER AB, Sweden.  All rights reserved.
+** Copyright 2002-2012 KVASER AB, Sweden.  All rights reserved.
 */
 
 ================================================================
@@ -8,23 +8,30 @@ Release notes
 
 Linux device drivers for
 
-  *  KVASER LAPcan
-  *  KVASER LAPcan II 
-  *  KVASER PCIcan-S
-  *  KVASER PCIcan-D
-  *  KVASER PCIcan-Q
-  *  KVASER PCIcan II HS/HS
-  *  KVASER USBcanII HS/HS
-  *  KVASER USBcanII HS/LS
-  *  KVASER USBcanII HS
-  *  KVASER USBcanII Rugged HS/HS
-  *  KVASER USBcanII Rugged HS
-  *  KVASER Memorator HS/HS**
-  *  KVASER Memorator HS/LS**
-  
-  ** Only with USBcanII functionality. 
+  *  KVASER PCIcan
+  *  KVASER PCIcanx
+  *  KVASER PCIEcan
+  *  KVASER PC104+
+  *  KVASER PCI104
+  *  KVASER PCIcan II**
+  *  KVASER PCIcanx II**
+  *  KVASER USBcan II
+  *  KVASER USBcan II Rugged
+  *  KVASER USBcan Professional
+  *  KVASER USBcan R
+  *  KVASER Memorator***
+  *  KVASER Memorator Professional ****
+  *  KVASER Leaf Professional
+  *  KVASER Leaf SemiPro
+  *  KVASER Leaf Light
+  *  KVASER BlackBird SemiPro ****
+  *  KVASER OEM Mercury
+  *  KVASER OEM Leaf
+  *  KVASER Virtual CAN
 
-- Kvaser, December 28, 2005 - 
+  **   Recommended firmware > 3.0
+  ***  Only with USBcan II functionality. 
+  **** Only with USBcan Professional functionality. 
 
 
 ================================================================
@@ -37,11 +44,297 @@ http://www.kvaser.com.
 ================================================================
 Version info
 ================================================================
-   * Tested with Mandrake Linux 9.0 (2.4.19-16mdk) 
-     and Mandrake Linux  10.0 (2.6.3-7mdk)
-   * Compiled with gcc version 3.2 and 3.3.2
-   * Used version 2.2.5 and 2.3.3 of glibc
+
+   * Significant testing under x86_64 SMP Ubuntu 10.10 (2.6.35).
+   * Some testing under x86 SMP Ubuntu 11.04 (2.6.38).
+   * Some testing under x86 and x86_64 SMP Ubuntu 12.04 (3.2.0).
+   * Compiled with gcc version 4.2.4, 4.4.5, 4.5.2 and 4.6.3.
+   * Used glibc version 2.7, 2.12.1, 2.13 and 2.15.
+
+================================================================
+Information about version 4.82
+================================================================
+Build improvements for recent Linux distributions.
+Some bug fixes and improvements.
+
+KVASER LAPcan and LAPcanII are excluded from this release and on.
+System requirements: Linux 2.6/3.x (will not build as is on 2.4).
+
+NOTE! While SMP (and fully preemptible kernel) has seen significant
+      testing, it should still be considered somewhat experimental.
+      The same applies to use under 64 bit Linux.
+      Feedback on use under SMP enabled (or fully preemptible)
+      and 64 bit kernels is welcome.
+      See the FAQ for information on how to disable SMP.
+NOTE! Read 'Known problems in version 4.82' below carefully.
+
+
+================================================================
+Updates in version 4.82
+================================================================
+   * Added missing licence files.
+
+================================================================
+Updates in version 4.81
+================================================================
+   * Added missing licence headers
+   * Cleaning files using unifdef
+================================================================
+Updates in version 4.80
+================================================================
+   * Driver now supports linux kernels > 2.6
+   * Reworked make and install script.
+   * New ioctl command added to read out hardware revision.
+   * pcicanII needs firmware 3.0 or later.
+   * Added support for canReadSync
+   * Resolved bug related to x64 kernels in function vCanTime
+   * Added support for local echo, canIOCTL_SET_LOCAL_TXECHO 
+   * Added support for canCHANNELDATA_MFGNAME_ASCII and
+     canCHANNELDATA_DEVDESCR_ASCII using canGetChannelData.
+   
+================================================================
+Information about version 4.78 ALPHA
+================================================================
+Build improvements for recent Linux distributions.
+Supports additional Kvaser devices.
+Some bug fixes and improvements.
+
+KVASER LAPcan and LAPcan II are excluded from this release.
+System requirements: Linux 2.6 (will not build as is on 2.4).
+
+NOTE! While SMP (and fully preemptible kernel) has seen significant
+      testing, it should still be considered somewhat experimental.
+      The same applies to use under 64 bit Linux.
+      Feedback on use under SMP enabled (or fully preemptible)
+      and 64 bit kernels is welcome.
+      See the FAQ for information on how to disable SMP.
+NOTE! Read 'Known problems in version 4.78' below carefully.
+
+================================================================
+Updates in version 4.78 ALPHA
+================================================================
+   NOTE! This version of the driver is an ALPHA release that
+   has not been as extensively tested as would be preferred.
+
+   * Install script for pcican will now remove SocketCAN for Kvaser devices.
+     It will also blacklist SocketCAN/Kvaser to prevent it from auto-loading.
+   * Support for more recent Linux distributions.
+   * Improved support for tiny Linux distributions.
+   * Added support for 579-2 Kvaser USBcan R
+   * PCIcan driver can now be built with modifications to
+     work better when using SCHED_FIFO/RR (experimental).
+   * Experimental big endian support for Leaf.
+   * Improved behaviour at queue flushing and some corner-cases.
+
+
+================================================================
+Information about version 4.77 ALPHA
+================================================================
+Build improvements for recent Linux distributions.
+Some improvements.
+
+KVASER LAPcan and LAPcan II are excluded from this release.
+System requirements: Linux 2.6 (will not build as is on 2.4).
+
+NOTE! While SMP (and fully preemptible kernel) has seen significant
+      testing, it should still be considered somewhat experimental.
+      The same applies to use under 64 bit Linux.
+      Feedback on use under SMP enabled (or fully preemptible)
+      and 64 bit kernels is welcome.
+      See the FAQ for information on how to disable SMP.
+NOTE! Read 'Known problems in version 4.77' below carefully.
+
+================================================================
+Updates in version 4.77 ALPHA
+================================================================
+   NOTE! This version of the driver is an ALPHA release that
+   has not been as extensively tested as would be preferred.
+
+   * Better support for more recent Linux distributions.
+   * CANlib extensions:
+     canIoCtl now accepts canIOCTL_SET_TXRQ.
+     kvSetNotifyCallback added.
+   * PCIcanII driver can now be built with modifications to
+     work better when using SCHED_FIFO/RR (experimental).
+
+
+================================================================
+Information about version 4.76 ALPHA
+================================================================
+Some improvements.
+
+KVASER LAPcan and LAPcan II are excluded from this release.
+System requirements: Linux 2.6 (will not build as is on 2.4).
+
+NOTE! While SMP (and fully preemptible kernel) has seen significant
+      testing, it should still be considered somewhat experimental.
+      The same applies to use under 64 bit Linux.
+      Feedback on use under SMP enabled (or fully preemptible)
+      and 64 bit kernels is welcome.
+      See the FAQ for information on how to disable SMP.
+NOTE! Read 'Known problems in version 4.76' below carefully.
+
+================================================================
+Updates in version 4.76 ALPHA
+================================================================
+   NOTE! This version of the driver is an ALPHA release that
+   has not been as extensively tested as would be preferred.
+
+   * canObjBuf*() added.
+
+
+================================================================
+Information about version 4.75 ALPHA
+================================================================
+Modified to build on 64 bit Linux distributions.
+Build improvements for recent Linux distributions.
+Supports additional Kvaser devices.
+Significant bug fixes and improvements.
+
+KVASER LAPcan and LAPcan II are excluded from this release.
+System requirements: Linux 2.6 (will not build as is on 2.4).
+
+NOTE! While SMP (and fully preemptible kernel) has seen significant
+      testing, it should still be considered somewhat experimental.
+      The same applies to use under 64 bit Linux.
+      Feedback on use under SMP enabled (or fully preemptible)
+      and 64 bit kernels is welcome.
+      See the FAQ for information on how to disable SMP.
+NOTE! Read 'Known problems in version 4.75' below carefully.
+
+================================================================
+Updates in version 4.75 ALPHA
+================================================================
+   NOTE! This version of the driver is an ALPHA release that
+   has not been as extensively tested as would be preferred.
+
+   * Support for more recent Linux distributions.
+   * Support for 64 bit Linux distributions.
+   * Support for additional Kvaser devices.
+   * CANlib extensions:
+     canGetChannelData now accepts the canCHANNELDATA_x, where x
+     is CARD_SERIAL_NO, CARD_UPC_NO, CARD_FIRMWARE_REV, CARD_TYPE
+     or CHANNEL_CAP.
+     canOpenChannel now accepts canOPEN_ACCEPT_VIRTUAL.
+     canFlushReceive/TransmitQueue added.
+     canIoCtl now accepts canIOCTL_GET/SET_TIMER_SCALE.
+   * canClose() now tries to go off bus.
+   * canlib.h unified with the Windows version.
+   * DLC > 8 now supported.
+   * Timestamps now use 10 us resolution.
+   * Improved locking.
+
+
+================================================================
+Information about version 4.72 BETA
+================================================================
+Modified to build on recent Linux distributions.
+Supports additional Kvaser USB devices.
+CANlib now supports the enabling of TX acknowledge reporting.
+CANlib can now do callbacks on TX acknowledge.
+CANlib reports correct version number.
+Locking improvements.
+Some bug fixes.
+
+KVASER LAPcan and LAPcan II are excluded from this release.
+System requirements: Linux 2.4, 2.6 (only 2.6 for USBcanII and Leaf).
+
+NOTE! Only limited testing has been done under SMP so far.
+      Use on an SMP enabled (or fully preemptible) kernel is unsupported.
+      See the FAQ for solutions.
+NOTE! Read 'Known problems in version 4.72' below carefully.
+
+================================================================
+Updates in version 4.72 BETA
+================================================================
+   NOTE! This version of the driver is a BETA release that
+   does not support LAPcan or LAPcan II.
+
+   * Support for recent Linux distributions.
+   * Support for additional Kvaser USB devices.
+   * TX acknowledge support in CANlib.
+   * CANlib reports correct version number.
+   * Improved locking.
+
+
+================================================================
+Information about version 4.6 BETA
+================================================================
+Various changes for building on recent Linux distributions.
+All USB devices now use udev for hotplugging when available.
+Virtual CAN driver added.
+Locking improvements.
+Some structural changes and bug fixes.
+
+KVASER LAPcan and LAPcan II are excluded from this release.
+System requirements: Linux 2.4, 2.6 (only 2.6 for USBcanII and Leaf).
+
+NOTE! Not tested under SMP or with fully preemptive kernel.
+NOTE! Read 'Known problems in version 4.6' below carefully.
+
+================================================================
+Updates in version 4.6 BETA
+================================================================
+   NOTE! This version of the driver is a BETA release that
+   does not support LAPcan or LAPcan II.
+
+   * Support for recent Linux distributions.
+   * Added Virtual CAN driver.
+   * Improved locking.
+
+
+================================================================
+Information about version 4.5 BETA
+================================================================
+Fixed spinlock problem causing problems with newer kernels. 
+
+================================================================
+Updates in version 4.5 BETA
+================================================================
+   NOTE! This version of the driver is a BETA release for
+   KVASER Leaf Family, KVASER PC104+ and KVASER PCIcanx II.
+   For other Kvaser cards use version 4.2 of the driver.
+
   
+================================================================
+Information about version 4.4 BETA
+================================================================
+Small changes and solved bugs.
+
+================================================================
+Updates in version 4.4 BETA
+================================================================
+   NOTE! This version of the driver is a BETA release for 
+   KVASER Leaf Family, KVASER PC104+ and KVASER PCIcanx II. 
+   For other Kvaser cards use version 4.2 of the driver.
+
+
+================================================================
+Information about version 4.3 BETA
+================================================================
+Small changes and solved bugs.
+Added support for KVASER Leaf family, KVASER PCIcanx II and 
+KVASER PC104+. KVASER LAPcan and LAPcan II are excluded from this 
+release.
+KVASER PCIcanx II and KVASER PC104+ uses the KVASER PCIcan II driver.
+KVASER PCIcanx uses KVASER PCIcan driver.
+
+System requirements: Linux 2.4, 2.6 (only 2.6 for USBcan II, Leaf).
+
+NOTE! Not tested on SMP kernels.
+NOTE! The current driver only supports ONE USBcan II or Leaf device.
+NOTE! Read 'Known problems in version 4.3' below carefully.
+
+================================================================
+Updates in version 4.3 BETA
+================================================================
+   NOTE! This version of the driver is a BETA release for 
+   KVASER Leaf Family, KVASER PC104+ and KVASER PCIcanx II.
+
+   * Added support for KVASER Leaf family.
+   * Added support for KVASER PC104+ and KVASER PCIcanx II.
+
+
 ================================================================
 Information about version 4.2
 ================================================================
@@ -59,6 +352,7 @@ Updates in version 4.2
    * Added locking for pcicanII queues.
    * For USBcanII URB_ASYNC_UNLINK is removed from kernel source 
      code since kernel version 2.6.14.
+
  
 ================================================================
 Information about version 4.1 BETA
@@ -82,6 +376,7 @@ Updates in version 4.1 BETA
    * PCIcan II beta driver is now available.
    * No major changes for LAPcan and PCIcan drivers.
 
+
 ================================================================
 Updates in version 3.1
 ================================================================
@@ -94,6 +389,7 @@ New features in version 3.0
 ================================================================
    * LAPcan message buffer is now emptied correctly. 
    * LAPcan acceptance filters are not inverted anymore. 
+
   
 ================================================================
 Known problems in version 4.01 BETA:
@@ -122,56 +418,53 @@ Solved problems in 4.01 BETA:
 ================================================================
    * pcmcia_core is not loaded when PCIcan is loaded.
 
+
+================================================================  
+Known problems in version 4.78 ALPHA
 ================================================================
-Known problems in version 4.1 BETA:
+   * Lapcan is not working in this alpha version of the driver.
+
+   * Firmware bug in Leaf will cause it to start up in silent mode.
+     (Set it to normal mode manually using canSetBusOutputControl().)
+
+   * Firmware bug in old Leaf firmware will make the driver report
+     the wrong bus parameters when queried. Update the Leaf firmware.
+
+   * Virtual CAN driver will not behave as it perhaps should when
+     it is "off bus".
+
+   * PCIcanII may not report EAN (likely not real problem).
+
+   * Single channel PCIcanII may report two channels.
+
+   * It is possible to continue "using" a driver while it is
+     trying to shut down. Nothing useful will happen, but the driver
+     can be blocked from unloading indefinitely.
+
+   * While the driver implements auto response functionality for all
+     hardware, the same is not true for auto tx. The latter is only
+     available if there is firmware support in the device.
+     (This is the same as under Windows.)
+
+================================================================  
+Known problems in version 4.80 - 4.82
 ================================================================
-   * Do not eject a LAPcan card that is currently being 
-     used. This could cause a system crash.
-   
-   * Before removing LAPcan card please unload it 
-     ('cardctl eject') to avoid system crasch. This is known to 
-     happen for ISA to PCMCIA bridges such as SCM Microsystem Inc's 
-     SwapBox with VADEM VG-465 and 469.
-   
-   * During insertion of LAPcan card it is sometimes not recognized.
-     Instead it is recognized as a memory card. Eject card and reinsert it.
-     In case that does not help, restart computer.
-     See the PCMCIA-HOWTO in case of any further problem.
+   * Firmware bug in Leaf will cause it to start up in silent mode.
+     (Set it to normal mode manually using canSetBusOutputControl().)
 
-   * Doing 'make install' when LAPcan card is plugged in might 
-     cause error. Eject card before installing ('cardctl eject').
+   * Firmware bug in old Leaf firmware will make the driver report
+     the wrong bus parameters when queried. Update the Leaf firmware.
 
-   * During 24 hour tests canReadTimer have had the wrong 
-     value a few times.
-    * Firmware bug in PCIcanII and USBcanII that can cause a "jump" in 
-     the timestamps (655 ms). 
-     This can happen both with the message timestamps and the time read 
-     from canReadTimer(). 
+   * Virtual CAN driver will not behave as it perhaps should when
+     it is "off bus".
 
-================================================================
-Known problems in version 4.2:
-================================================================
-   * Do not eject a LAPcan card that is currently being 
-     used. This could cause a system crash.
-   
-   * Before removing LAPcan card please unload it 
-     ('cardctl eject') to avoid system crasch. This is known to 
-     happen for ISA to PCMCIA bridges such as SCM Microsystem Inc's 
-     SwapBox with VADEM VG-465 and 469.
-   
-   * During insertion of LAPcan card it is sometimes not recognized.
-     Instead it is recognized as a memory card. Eject card and reinsert it.
-     In case that does not help, restart computer.
-     See the PCMCIA-HOWTO in case of any further problem.
+   * Single channel PCIcanII may report two channels.
 
-   * Doing 'make install' when LAPcan card is plugged in might 
-     cause error. Eject card before installing ('cardctl eject').
+   * It is possible to continue "using" a driver while it is
+     trying to shut down. Nothing useful will happen, but the driver
+     can be blocked from unloading indefinitely.
 
-   * Firmware bug in PCIcanII and USBcanII that can cause a "jump" in 
-     the timestamps (655 ms). 
-     This can happen both with the message timestamps and the time read 
-     from canReadTimer(). 
-
-   * The Lapcan driver will not compile under kernel versions higher than 
-     2.6.12 due to changes in the pcmcia module. 
-
+   * While the driver implements auto response functionality for all
+     hardware, the same is not true for auto tx. The latter is only
+     available if there is firmware support in the device.
+     (This is the same as under Windows.)

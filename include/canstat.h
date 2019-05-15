@@ -1,9 +1,58 @@
 /*
-** Copyright 2002-2006 KVASER AB, Sweden.  All rights reserved.
-*/
+**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**                        http://www.kvaser.com
+**
+** This software is dual licensed under the following two licenses:
+** BSD-new and GPLv2. You may use either one. See the included
+** COPYING file for details.
+**
+** License: BSD-new
+** ===============================================================================
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**     * Redistributions of source code must retain the above copyright
+**       notice, this list of conditions and the following disclaimer.
+**     * Redistributions in binary form must reproduce the above copyright
+**       notice, this list of conditions and the following disclaimer in the
+**       documentation and/or other materials provided with the distribution.
+**     * Neither the name of the <organization> nor the
+**       names of its contributors may be used to endorse or promote products
+**       derived from this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**
+**
+** License: GPLv2
+** ===============================================================================
+** This program is free software; you can redistribute it and/or
+** modify it under the terms of the GNU General Public License
+** as published by the Free Software Foundation; either version 2
+** of the License, or (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**
+** ---------------------------------------------------------------------------
+**/
 
 #ifndef _CANSTAT_H_
 #define _CANSTAT_H_
+
 //
 // Don't forget to update canGetErrorText in canlib.c if this is changed!
 //
@@ -14,25 +63,36 @@ typedef enum {
     canERR_NOTFOUND        = -3,     // Specified hw not found
     canERR_NOMEM           = -4,     // Out of memory
     canERR_NOCHANNELS      = -5,     // No channels avaliable
-    canERR_INTERRUPTED     = -6,     // Interrupted by signal
-    canERR_TIMEOUT         = -7,     // Timeout ocurred
+    canERR_INTERRUPTED     = -6,     // Interrupted by signals
+    canERR_TIMEOUT         = -7,     // Timeout occurred
     canERR_NOTINITIALIZED  = -8,     // Lib not initialized
     canERR_NOHANDLES       = -9,     // Can't get handle
     canERR_INVHANDLE       = -10,    // Handle is invalid
+    canERR_INIFILE         = -11,    // Error in the ini-file (16-bit only)
     canERR_DRIVER          = -12,    // CAN driver type not supported
     canERR_TXBUFOFL        = -13,    // Transmit buffer overflow
     canERR_RESERVED_1      = -14,
     canERR_HARDWARE        = -15,    // Some hardware error has occurred
+    canERR_DYNALOAD        = -16,    // Can't find requested DLL
+    canERR_DYNALIB         = -17,    // DLL seems to be wrong version
+    canERR_DYNAINIT        = -18,    // Error when initializing DLL
     canERR_RESERVED_4      = -19,
     canERR_RESERVED_5      = -20,
     canERR_RESERVED_6      = -21,
     canERR_RESERVED_2      = -22,
     canERR_DRIVERLOAD      = -23,    // Can't find/load driver
+    canERR_DRIVERFAILED    = -24,    // DeviceIOControl failed; use Win32 GetLastError()
     canERR_NOCONFIGMGR     = -25,    // Can't find req'd config s/w (e.g. CS/SS)
     canERR_NOCARD          = -26,    // The card was removed or not inserted
     canERR_RESERVED_7      = -27,
+    canERR_REGISTRY        = -28,    // Error in the Registry
+    canERR_LICENSE         = -29,    // The license is not valid.
+    canERR_INTERNAL        = -30,    // Internal error in the driver.
+    canERR_NO_ACCESS       = -31,    // Access denied
+    canERR_NOT_IMPLEMENTED = -32,    // Requested function is not implemented
+
     // The last entry - a dummy so we know where NOT to place a comma.
-    canERR__RESERVED       = -31
+    canERR__RESERVED       = -33
 } canStatus;
 
 
@@ -41,20 +101,23 @@ typedef enum {
 
 
 //
-// Notification codes; appears in the notification message.
+// Notification codes; appears in the notification WM__CANLIB message.
 //
 #define canEVENT_RX             32000       // Receive event
 #define canEVENT_TX             32001       // Transmit event
 #define canEVENT_ERROR          32002       // Error event
 #define canEVENT_STATUS         32003       // Change-of-status event
+#define canEVENT_ENVVAR         32004       // Change-of- envvar
 
 //
 // These are used in the call to canSetNotify().
 //
+#define canNOTIFY_NONE          0           // Turn notifications off.
 #define canNOTIFY_RX            0x0001      // Notify on receive
 #define canNOTIFY_TX            0x0002      // Notify on transmit
 #define canNOTIFY_ERROR         0x0004      // Notify on error
 #define canNOTIFY_STATUS        0x0008      // Notify on (some) status changes
+#define canNOTIFY_ENVVAR        0x0010      // Notify on Envvar change
 
 //
 // Circuit status flags.
@@ -70,15 +133,20 @@ typedef enum {
 #define canSTAT_RXERR           0x00000100  // There has been at least one RX error of some sort
 #define canSTAT_HW_OVERRUN      0x00000200  // The has been at least one HW buffer overflow
 #define canSTAT_SW_OVERRUN      0x00000400  // The has been at least one SW buffer overflow
+//
+// For convenience.
+#define canSTAT_OVERRUN         (canSTAT_HW_OVERRUN | canSTAT_SW_OVERRUN)
 
 //
 // Message information flags, < 0x100
+// All flags and/or combinations of them are meaningful for received messages
+// RTR,STD,EXT,WAKEUP,ERROR_FRAME are meaningful also for transmitted messages
 //
 #define canMSG_MASK             0x00ff      // Used to mask the non-info bits
 #define canMSG_RTR              0x0001      // Message is a remote request
 #define canMSG_STD              0x0002      // Message has a standard ID
-#define canMSG_EXT              0x0004      // Message has a extended ID
-#define canMSG_WAKEUP           0x0008      // Message was received in wakeup mode
+#define canMSG_EXT              0x0004      // Message has an extended ID
+#define canMSG_WAKEUP           0x0008      // Message to be sent / was received in wakeup mode
 #define canMSG_NERR             0x0010      // NERR was active during the message
 #define canMSG_ERROR_FRAME      0x0020      // Message is an error frame
 #define canMSG_TXACK            0x0040      // Message is a TX ACK (msg is really sent)
@@ -104,10 +172,60 @@ typedef enum {
 #define canMSGERR_BIT           0xC000      // Any bit error.
 #define canMSGERR_BUSERR        0xF800      // Any RX error
 
+
+/*
+** Transceiver line modes.
+*/
+#define canTRANSCEIVER_LINEMODE_NA          0  // Not Affected/Not available.
+#define canTRANSCEIVER_LINEMODE_SWC_SLEEP   4  // SWC Sleep Mode.
+#define canTRANSCEIVER_LINEMODE_SWC_NORMAL  5  // SWC Normal Mode.
+#define canTRANSCEIVER_LINEMODE_SWC_FAST    6  // SWC High-Speed Mode.
+#define canTRANSCEIVER_LINEMODE_SWC_WAKEUP  7  // SWC Wakeup Mode.
+#define canTRANSCEIVER_LINEMODE_SLEEP       8  // Sleep mode for those supporting it.
+#define canTRANSCEIVER_LINEMODE_NORMAL      9  // Normal mode (the inverse of sleep mode) for those supporting it.
+#define canTRANSCEIVER_LINEMODE_STDBY      10  // Standby for those who support it
+#define canTRANSCEIVER_LINEMODE_TT_CAN_H   11  // Truck & Trailer: operating mode single wire using CAN high
+#define canTRANSCEIVER_LINEMODE_TT_CAN_L   12  // Truck & Trailer: operating mode single wire using CAN low
+#define canTRANSCEIVER_LINEMODE_OEM1       13  // Reserved for OEM apps
+#define canTRANSCEIVER_LINEMODE_OEM2       14  // Reserved for OEM apps
+#define canTRANSCEIVER_LINEMODE_OEM3       15  // Reserved for OEM apps
+#define canTRANSCEIVER_LINEMODE_OEM4       16  // Reserved for OEM apps
+
+#define canTRANSCEIVER_RESNET_NA            0
+#define canTRANSCEIVER_RESNET_MASTER        1
+#define canTRANSCEIVER_RESNET_MASTER_STBY   2
+#define canTRANSCEIVER_RESNET_SLAVE         3
+
+/*
+** Transceiver (logical) types. Also see src\include\hwnames.h and
+** registered document 048.
+*/
+#define canTRANSCEIVER_TYPE_UNKNOWN         0
+#define canTRANSCEIVER_TYPE_251             1
+#define canTRANSCEIVER_TYPE_252             2
+#define canTRANSCEIVER_TYPE_DNOPTO          3
+#define canTRANSCEIVER_TYPE_W210            4
+#define canTRANSCEIVER_TYPE_SWC_PROTO       5  // Prototype. 
+#define canTRANSCEIVER_TYPE_SWC             6
+#define canTRANSCEIVER_TYPE_EVA             7
+#define canTRANSCEIVER_TYPE_FIBER           8
+#define canTRANSCEIVER_TYPE_K251            9 // K-line + 82c251
+#define canTRANSCEIVER_TYPE_K              10 // K-line, without CAN
+#define canTRANSCEIVER_TYPE_1054_OPTO      11 // 1054 with optical isolation
+#define canTRANSCEIVER_TYPE_SWC_OPTO       12 // SWC with optical isolation
+#define canTRANSCEIVER_TYPE_TT             13 // B10011S truck-and-trailer
+#define canTRANSCEIVER_TYPE_1050           14 // TJA1050
+#define canTRANSCEIVER_TYPE_1050_OPTO      15 // TJA1050 with optical isolation
+#define canTRANSCEIVER_TYPE_1041           16  // 1041
+#define canTRANSCEIVER_TYPE_1041_OPTO      17  // 1041 with optical isolation
+#define canTRANSCEIVER_TYPE_RS485          18  // RS485 (i.e. J1708)
+#define canTRANSCEIVER_TYPE_LIN            19  // LIN
+#define canTRANSCEIVER_TYPE_KONE           20  // KONE
+#define canTRANSCEIVER_TYPE_LINX_LIN       64
+#define canTRANSCEIVER_TYPE_LINX_J1708     66
+#define canTRANSCEIVER_TYPE_LINX_K         68
+#define canTRANSCEIVER_TYPE_LINX_SWC       70
+#define canTRANSCEIVER_TYPE_LINX_LS        72
+
+
 #endif
-
-
-
-
-
-

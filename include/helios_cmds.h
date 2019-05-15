@@ -1,20 +1,64 @@
 /*
-** Copyright 2002-2006 KVASER AB, Sweden.  All rights reserved.
-*/
-
-/*
-**   This file is maintained in "m16firm/include" and shall be copied
-**   (and committed there) to any other location where it is used (e.g canlib)
+**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**                        http://www.kvaser.com
+**
+** This software is dual licensed under the following two licenses:
+** BSD-new and GPLv2. You may use either one. See the included
+** COPYING file for details.
+**
+** License: BSD-new
+** ===============================================================================
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**     * Redistributions of source code must retain the above copyright
+**       notice, this list of conditions and the following disclaimer.
+**     * Redistributions in binary form must reproduce the above copyright
+**       notice, this list of conditions and the following disclaimer in the
+**       documentation and/or other materials provided with the distribution.
+**     * Neither the name of the <organization> nor the
+**       names of its contributors may be used to endorse or promote products
+**       derived from this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**
+**
+** License: GPLv2
+** ===============================================================================
+** This program is free software; you can redistribute it and/or
+** modify it under the terms of the GNU General Public License
+** as published by the Free Software Foundation; either version 2
+** of the License, or (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **
 ** ---------------------------------------------------------------------------
-*/
+**/
 
 #ifndef _HELIOS_CMDS_H_
 #define _HELIOS_CMDS_H_
 
+#include "debug.h"
 #ifdef HELIOS_PRIVATE
 #   include "helios_private.h"
 #endif
+
+#   include <linux/types.h>
 
 #define CMD_RX_STD_MESSAGE                12
 #define CMD_TX_STD_MESSAGE                13
@@ -61,7 +105,7 @@
 #define CMD_MEMO_WRITE_CONFIG_REQ                    55
 #define CMD_MEMO_WRITE_CONFIG_RESP                   56
 #define CMD_MEMO_READ_CONFIG_REQ                     57
-#define CMD_MEMO_READ_CONFIG_RESP                    58           
+#define CMD_MEMO_READ_CONFIG_RESP                    58
 #define CMD_MEMO_ERASE_SECTOR_RESP                   59
 #define CMD_TX_REQUEST                               60
 #define CMD_SET_HEARTBEAT_RATE_REQ                   61
@@ -121,7 +165,7 @@
 #define UFILE_TARGET_PIGGY_BACK       1
 
 #define LED_SUBCOMMAND_ALL_LEDS_ON    0
-#define LED_SUBCOMMAND_ALL_LEDS_OFF   1  
+#define LED_SUBCOMMAND_ALL_LEDS_OFF   1
 #define LED_SUBCOMMAND_LED_0_ON       2
 #define LED_SUBCOMMAND_LED_0_OFF      3
 #define LED_SUBCOMMAND_LED_1_ON       4
@@ -154,8 +198,8 @@
 #define CONFIG_DATA_CHUNK                             24
 
 #define MEMO_CONFIG_SUBCMD_SET_INTERVAL                0
-#define MEMO_CONFIG_SUBCMD_GET_INTERVAL                1 
-#define MEMO_CONFIG_SUBCMD_UPDATE_TIMEOUT              2 
+#define MEMO_CONFIG_SUBCMD_GET_INTERVAL                1
+#define MEMO_CONFIG_SUBCMD_UPDATE_TIMEOUT              2
 
 ///////////////////////////////////////////////////////////
 
@@ -168,7 +212,7 @@
 //////////////////////////
 // CAN message flags
 #define MSGFLAG_ERROR_FRAME         0x01        // Msg is a bus error
-#define MSGFLAG_OVERRUN             0x02        // Msgs following this has been lost            
+#define MSGFLAG_OVERRUN             0x02        // Msgs following this has been lost
 #define MSGFLAG_NERR                0x04        // NERR active during this msg
 #define MSGFLAG_WAKEUP              0x08        // Msg rcv'd in wakeup mode
 #define MSGFLAG_REMOTE_FRAME        0x10        // Msg is a remote frame
@@ -287,7 +331,7 @@ typedef struct {
 ** multiple of 4.
 */
 
-typedef struct { 
+typedef struct {
     unsigned char  cmdLen;
     unsigned char  cmdNo;
     unsigned char  channel;
@@ -296,7 +340,7 @@ typedef struct {
     unsigned short time;
 } cmdRxCanMessage;
 
-typedef struct { 
+typedef struct {
     unsigned char  cmdLen;
     unsigned char  cmdNo;
     unsigned char  channel;
@@ -329,7 +373,7 @@ typedef struct {
     unsigned char cmdNo;
     unsigned char transId;
     unsigned char channel;
-    unsigned long bitRate;
+    uint32_t      bitRate;
     unsigned char tseg1;
     unsigned char tseg2;
     unsigned char sjw;
@@ -348,7 +392,7 @@ typedef struct {
     unsigned char cmdNo;
     unsigned char transId;
     unsigned char channel;
-    unsigned long bitRate;
+    uint32_t      bitRate;
     unsigned char tseg1;
     unsigned char tseg2;
     unsigned char sjw;
@@ -367,8 +411,8 @@ typedef struct {
     unsigned char cmdNo;
     unsigned char transId;
     unsigned char channel;
-    unsigned char txErrorCounter; 
-    unsigned char rxErrorCounter; 
+    unsigned char txErrorCounter;
+    unsigned char rxErrorCounter;
     unsigned short time;
     unsigned char busStatus;
     unsigned char padding;
@@ -471,7 +515,7 @@ typedef struct {
     unsigned char cmdNo;
     unsigned char transId;
     unsigned char padding;
-    unsigned long currentTime;
+    uint32_t      currentTime;
 } cmdClockOverflowEvent;
 
 typedef struct {
@@ -482,14 +526,14 @@ typedef struct {
 } cmdGetCardInfoReq;
 
 typedef struct {
-    unsigned char cmdLen;       
-    unsigned char cmdNo;        
-    unsigned char transId;      
-    unsigned char channelCount; 
-    unsigned long serialNumberLow; 
-    unsigned long serialNumberHigh; 
-    unsigned long clockResolution;
-    unsigned long mfgDate;
+    unsigned char cmdLen;
+    unsigned char cmdNo;
+    unsigned char transId;
+    unsigned char channelCount;
+    uint32_t      serialNumberLow;
+    uint32_t      serialNumberHigh;
+    uint32_t      clockResolution;
+    uint32_t      mfgDate;
     unsigned char EAN[8];       // LSB..MSB, then the check digit.
     unsigned char hwRevision;
     unsigned char padding;
@@ -508,10 +552,10 @@ typedef struct {
     unsigned char cmdNo;
     unsigned char transId;
     unsigned char channel;
-    unsigned long channelCapabilities;
+    uint32_t      channelCapabilities;
     unsigned char canChipType;
     unsigned char canChipSubType;
-    unsigned short  padding;
+    unsigned short padding;
 } cmdGetInterfaceInfoResp;
 
 typedef struct {
@@ -533,7 +577,7 @@ typedef struct {
     unsigned char  padding[6];
     // End modifications for 1.4. Driver must test for firmware version being
     // at least 1.4 if it wants to use the maxOutstandingTx value.
-    unsigned long  applicationVersion;
+    uint32_t       applicationVersion;
     unsigned short checkSum;
     unsigned short swOptions;
 } cmdGetSoftwareInfoResp;
@@ -575,8 +619,8 @@ typedef struct {
     unsigned char cmdNo;
     unsigned char transId;
     unsigned char padding;
-    unsigned long licenseMask;
-    unsigned long kvaserLicenseMask;
+    uint32_t      licenseMask;
+    uint32_t      kvaserLicenseMask;
 } cmdCheckLicenseResp;
 
 typedef struct {
@@ -629,7 +673,7 @@ typedef struct {
     unsigned char  busStatusCh0;
     unsigned char  busStatusCh1;
     unsigned short time;
-} cmdCanErrorEvent; 
+} cmdCanErrorEvent;
 
 typedef struct {
     unsigned char cmdLen;
@@ -660,9 +704,9 @@ typedef struct {
     unsigned short fat_type;                // 12 or 16 depending on FAT type.
     unsigned short dir_entries;             // Number of directory entries in the root dir
     unsigned short cluster_size;            // Two-logarithm of the cluster size in sectors
-    unsigned long  fat1_start;              // First FAT starts in this sector
-    unsigned long  first_data_sector;       // First sector available for data
-    unsigned long  last_data_sector;  
+    uint32_t       fat1_start;              // First FAT starts in this sector
+    uint32_t       first_data_sector;       // First sector available for data
+    uint32_t       last_data_sector;
 } cmdMemoGetFilesystemInfoStructResp;
 
 typedef struct {
@@ -679,8 +723,8 @@ typedef struct {
     unsigned char product_revision;
     unsigned char oem_id[2];
     char          product_name[10];
-    unsigned long m_id;
-    unsigned long serial_number;
+    uint32_t      m_id;
+    uint32_t      serial_number;
     unsigned short date_code;
     unsigned short padding;
 } cmdMemoGetDiskInfoStructResp;
@@ -698,12 +742,12 @@ typedef struct {
     unsigned char cmdNo;
     unsigned char transId;
     unsigned char padding;
-    
+
     unsigned char disk_type;
     unsigned char version;
     unsigned char read_time;
     unsigned char wr_factor;
-    
+
     unsigned char file_format;
     unsigned char erase_value;
     unsigned short read_blk_size;
@@ -711,7 +755,7 @@ typedef struct {
     unsigned short wr_blk_size;
     unsigned short trans_speed;
 
-    unsigned long data_size;
+    uint32_t       data_size;
 } cmdMemoGetDiskHWInfoStructResp;
 
 
@@ -735,7 +779,7 @@ typedef struct {
     unsigned char cmdNo;
     unsigned char transId;
     unsigned char subCmd;
-    unsigned long dataChunkReqNo;
+    uint32_t      dataChunkReqNo;
 } cmdMemoReadConfigReq;
 
 typedef struct {
@@ -849,7 +893,7 @@ typedef struct {
     unsigned char   cmdNo;
     unsigned char   transId;
     unsigned char   portNo;             // Hardware-specific port #
-    unsigned long   portVal;            // Hardware-specific port value
+    uint32_t        portVal;            // Hardware-specific port value
 } cmdSetIoPortsReq;
 
 typedef struct {
@@ -864,8 +908,8 @@ typedef struct {
     unsigned char   cmdNo;
     unsigned char   transId;
     unsigned char   portNo;             // Hardware-specific port #
-    unsigned long   portVal;            // Hardware-specific port value
-    unsigned long   padding;
+    uint32_t        portVal;            // Hardware-specific port value
+    uint32_t        padding;
     unsigned short  status;
     unsigned short  padding2;
 } cmdGetIoPortsResp;
@@ -875,8 +919,8 @@ typedef struct {
   unsigned char cmdNo;
   unsigned char transId;
   unsigned char subCmd;
-  unsigned long sectorNo;
-  unsigned long dataChunkReqNo;
+  uint32_t      sectorNo;
+  uint32_t      dataChunkReqNo;
 } cmdMemoReadSectorReq;
 
 typedef struct {
@@ -895,7 +939,7 @@ typedef struct {
   unsigned char cmdNo;
   unsigned char transId;
   unsigned char subCmd;
-  unsigned long sectorNo;
+  uint32_t      sectorNo;
   unsigned char data[CONFIG_DATA_CHUNK];
 } cmdMemoWriteSectorReq;
 
@@ -913,8 +957,8 @@ typedef struct {
   unsigned char cmdNo;
   unsigned char transId;
   unsigned char subCmd;
-  unsigned long sectorNo;
-  unsigned long count;
+  uint32_t      sectorNo;
+  uint32_t      count;
 } cmdMemoEraseSectorReq;
 
 typedef struct {
@@ -1040,7 +1084,7 @@ typedef struct {
   unsigned char cmdNo;
   unsigned char transId;
   unsigned char channel;
-  unsigned long transceiverCapabilities;
+  uint32_t      transceiverCapabilities;
   unsigned char transceiverStatus;
   unsigned char transceiverType;
   unsigned char padding[2];
@@ -1062,7 +1106,7 @@ typedef struct {
   unsigned short time;
 } cmdHeartbeatResp;
 
-typedef struct { 
+typedef struct {
   unsigned char  cmdLen;
   unsigned char  cmdNo;
   unsigned char  channel;
@@ -1087,7 +1131,7 @@ typedef struct {
   unsigned char  cmdNo;
   unsigned char  responseType;
   unsigned char  bufferCount;
-  unsigned long  timerResolution;
+  uint32_t       timerResolution;
   unsigned short capabilities;
   unsigned short padding0;
 } cmdAutoTxBufferResp;
@@ -1134,14 +1178,14 @@ typedef union {
   cmdReadClockReq              readClockReq;
   cmdReadClockResp             readClockResp;
   cmdSetTransceiverModeReq     setTransceiverModeReq;
-  
+
   cmdMemoGetFilesystemInfoStructReq   memoGetFilesystemInfoStructReq;
   cmdMemoGetFilesystemInfoStructResp  memoGetFilesystemInfoStructResp;
   cmdMemoGetDiskInfoStructReq         memoGetDiskInfoStructReq;
   cmdMemoGetDiskInfoStructResp        memoGetDiskInfoStructResp;
   cmdMemoGetDiskHWInfoStructReq       memoGetDiskHWInfoStructReq;
   cmdMemoGetDiskHWInfoStructResp      memoGetDiskHWInfoStructResp;
-  
+
   cmdMemoWriteConfigReq       memoWriteConfigReq;
   cmdMemoWriteConfigResp      memoWriteConfigResp;
   cmdMemoReadConfigReq        memoReadConfigReq;
@@ -1175,13 +1219,13 @@ typedef union {
   cmdWriteUfileResp           writeUfileResp;
   cmdWriteUfileReq            formatUfilesReq;
   cmdWriteUfileResp           formatUfilesResp;
-  
+
   cmdGetTransceiverInfoReq    getTransceiverInfoReq;
   cmdGetTransceiverInfoResp   getTransceiverInfoResp;
 
   cmdSetHeartbeatRateReq      setHeartbeatRateReq;
   cmdHeartbeatResp            heartbeatResp;
-  
+
   cmdSetAutoTxBuffer          setAutoTxBuffer;
   cmdAutoTxBufferReq          autoTxBufferReq;
   cmdAutoTxBufferResp         autoTxBufferResp;
@@ -1269,7 +1313,7 @@ CHECK_ALIGNMENT(cmdMemoReadConfigResp        );
 
 CHECK_ALIGNMENT(cmdMemoFormatDiskReq         );
 CHECK_ALIGNMENT(cmdMemoFormatDiskResp        );
-                                             
+
 CHECK_ALIGNMENT(cmdMemoGetRTCReq             );
 CHECK_ALIGNMENT(cmdMemoGetRTCResp            );
 CHECK_ALIGNMENT(cmdMemoSetRTCReq             );
@@ -1279,7 +1323,7 @@ CHECK_ALIGNMENT(cmdLedActionResp             );
 
 CHECK_ALIGNMENT(cmdMemoConfigModeReq         );
 CHECK_ALIGNMENT(cmdMemoConfigModeResp        );
-                                             
+
 CHECK_ALIGNMENT(cmdSetIoPortsReq             );
 CHECK_ALIGNMENT(cmdGetIoPortsReq             );
 CHECK_ALIGNMENT(cmdGetIoPortsResp            );
@@ -1307,7 +1351,6 @@ CHECK_ALIGNMENT(cmdHeartbeatResp             );
 CHECK_ALIGNMENT(cmdSetAutoTxBuffer           );
 CHECK_ALIGNMENT(cmdAutoTxBufferReq           );
 CHECK_ALIGNMENT(cmdAutoTxBufferResp          );
-
 
 CompilerAssert(sizeof(heliosCmd) <= MAX_CMD_LEN);
 #endif

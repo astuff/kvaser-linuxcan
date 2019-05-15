@@ -1,6 +1,54 @@
 /*
-** Copyright 2002-2006 KVASER AB, Sweden.  All rights reserved.
-*/
+**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**                        http://www.kvaser.com
+**
+** This software is dual licensed under the following two licenses:
+** BSD-new and GPLv2. You may use either one. See the included
+** COPYING file for details.
+**
+** License: BSD-new
+** ===============================================================================
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**     * Redistributions of source code must retain the above copyright
+**       notice, this list of conditions and the following disclaimer.
+**     * Redistributions in binary form must reproduce the above copyright
+**       notice, this list of conditions and the following disclaimer in the
+**       documentation and/or other materials provided with the distribution.
+**     * Neither the name of the <organization> nor the
+**       names of its contributors may be used to endorse or promote products
+**       derived from this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**
+**
+** License: GPLv2
+** ===============================================================================
+** This program is free software; you can redistribute it and/or
+** modify it under the terms of the GNU General Public License
+** as published by the Free Software Foundation; either version 2
+** of the License, or (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**
+** ---------------------------------------------------------------------------
+**/
 
 /* Kvaser CAN driver PCIcan hardware specific parts                    
 ** PCIcan definitions                                                    
@@ -15,11 +63,16 @@
 /* defines */
 /*****************************************************************************/
 
+// Use this to set alternate implementation.
+//#define TRY_RT_QUEUE
+
 #define DEVICE_NAME_STRING "pcican"
 #define MAX_CHANNELS 4
 #define PCICAN_MAX_DEV 16
 #define PCICAN_VENDOR  0x10e8
 #define PCICAN_ID 0x8406
+#define KVASER_VENDOR 0x1a07    // KVASER
+#define PCIECAN_ID 0x8          // KVASER PCIEcan
 // Standard value: Pushpull  (OCTP1|OCTN1|OCTP0|OCTN0|OCM1)
 #define OCR_DEFAULT_STD 0xDA
 // For Galathea piggyback.
@@ -53,44 +106,30 @@
 typedef struct PciCanChanData
 {
     /* Ports and addresses */
-    unsigned           sja1000;
-    unsigned           xilinxAddressOut;
-    unsigned           xilinxAddressCtrl;
-    unsigned           xilinxAddressIn;
+    void __iomem       *sja1000;
+    void __iomem       *xilinxAddressOut;
+    void __iomem       *xilinxAddressCtrl;
+    void __iomem       *xilinxAddressIn;
 
+    OS_IF_LOCK         lock;
+#if !defined(TRY_RT_QUEUE)
     OS_IF_TASK_QUEUE_HANDLE txTaskQ;
-    DALLAS_CONTEXT          chanEeprom;    
+#else
+    OS_IF_WQUEUE *txTaskQ;
+    OS_IF_TASK_QUEUE_HANDLE txWork;
+#endif
+    DALLAS_CONTEXT     chanEeprom;    
+    VCanChanData       *vChan;
 } PciCanChanData;
 
 /*  Cards specific data */
 typedef struct PciCanCardData {
     /* Ports and addresses */
-    unsigned           sjaBase;
-    unsigned           xilinx;
-    unsigned           pciIf;
+    void __iomem       *sjaBase;
+    void __iomem       *xilinx;
+    void __iomem       *pciIf;
+    int                irq;
     DALLAS_CONTEXT     cardEeprom;
 } PciCanCardData;
-
-int pciCanInitAllDevices(void);
-int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par);
-static int pciCanGetBusParams (VCanChanData *vChd, VCanBusParams *par);
-int pciCanSetOutputMode (VCanChanData *vChd, int silent);
-int pciCanSetTranceiverMode (VCanChanData *vChd, int linemode, int resnet);
-int pciCanBusOn (VCanChanData *vChd);
-int pciCanBusOff (VCanChanData *vChd);
-int pciCanResetCard (VCanCardData *vCd);
-int pciCanInitHW (VCanCardData *vCd);
-int pciCanGetTxErr(VCanChanData *vChd);
-int pciCanGetRxErr(VCanChanData *vChd);
-int pciCanTxAvailable (VCanChanData *vChd);
-static int pciCanTransmitMessage (VCanChanData *vChd, CAN_MSG *m);
-int pciCanCloseAllDevices(void);
-int pciCanProcRead (char *buf, char **start, off_t offset,
-                    int count, int *eof, void *data);
-int pciCanRequestChipState (VCanChanData *vChd);
-unsigned long pciCanRxQLen(VCanChanData *vChd);
-unsigned long pciCanTxQLen(VCanChanData *vChd); 
-int pciCanRequestSend (VCanCardData *vCard, VCanChanData *vChan);
-
 
 #endif  /* _PCICAN_HW_IF_H_ */

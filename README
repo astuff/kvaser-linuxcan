@@ -1,39 +1,70 @@
 /*
-** Copyright 2002-2005 KVASER AB, Sweden.  All rights reserved.
+** Copyright 2002-2012 KVASER AB, Sweden.  All rights reserved.
 */
 
 
-- Linux drivers for Kvaser LAPcan, PCIcan, PCIcan II and USBcanII -
+- Linux drivers for Kvaser PCIcan, PCIcan II, USBcanII and Leaf -
+
+  Interface   Product                  Driver Name  
+ -----------+------------------------+-------------
+  USB         Leaf Light               leaf         
+              Leaf SemiPro                          
+              Leaf Professional                     
+              Memorator Professional                
+              BlackBird                             
+ -----------+------------------------+-------------
+  USB         USBcanII                 usbcanII     
+              Memorator                             
+ -----------+------------------------+-------------
+  PCI         PCIcan                   pcican       
+              PCIcanx                               
+              PCIEcan                               
+ -----------+------------------------+-------------
+  PCI         PC104                    pcicanII     
+              PC104+                                
+              PCIcan II                             
+              PCIcanx II                            
+ -----------+------------------------+-------------
+
 
 System requirements:
 
-* Linux 2.4 or 2.6 (only 2.6 for USBcanII)
-* System setup for kernel compilation.
-* PCMCIA subsystem configured if you are using LAPcan.
-
-NOTE! The current driver only supports ONE USBcanII device.
-NOTE! Not tested on SMP kernels.
+* Linux 2.6 or later
+* Header files and compiler for kernel compilation.
+  In Ubuntu 12.04 e.g. this is accomplished by issuing the command:
+  
+    "sudo apt-get install build-essential"
+  
 NOTE! Read ReleaseNotes before using the driver.
+
 
 Compilation:
 
-* logged in as root do:
-  "make"/"make install" to build/install all drivers
+* To build all drivers:
 
-* to build just a single driver:
-  "make pcican_install"/ "make lapcan_install" 
+    "make"
+    
+  To install all drivers:
 
-View/change default settings in settings.mak.
+    "sudo make install"
+
+* To build just a single driver, go to the corresponding subdirectory:
+
+    "make"
+    "sudo ./installscript.sh" 
+
+* To build with debug printouts:
+
+    "make KV_DEBUG_ON=1"
+
+Debug levels and some other settings may be changed in config.mak.
 
 
 Usage:
 
-* Run depmod before loading the driver. 
-  This will create a dependency file that is needed for modprobe 
-  to load the correct module.
-* "pcican.sh start" or "pcicanII.sh start" to load driver.
-* "pcican.sh stop" or "pcicanII.sh stop" to unload driver.
-* LAPcan/LAPcanII and USBcanII will load when inserting the device.
+* "modprobe pcican" or "modprobe pcicanII" to load driver.
+* "modprobe -r pcican" or "modprobe -r pcicanII" to unload driver.
+* USBcanII and Leaf will load/unload when inserting/removing the device.
 * Try examples in /usr/doc/canlib/examples/.
 
 
@@ -43,36 +74,50 @@ Installed Files:
 
 * Driver modules
 ----------------------------------
-/lib/modules/`uname -r`/pcmcia/lapcan_cs.o (lapcan)
-/lib/modules/`uname -r`/kernel/drivers/char/kvpcican.o (pcican)
-/lib/modules/`uname -r`/kernel/drivers/char/kvpcicanII.o (pcicanII)
-/lib/modules/`uname -r`/kernel/drivers/usb/misc/usbcanII.ko (usbcanII)
-note: for kernel 2.6.x the module ending is .ko instead of .o.  
+/lib/modules/`uname -r`/kernel/drivers/char/kvpcican.ko (PCIcan)
+/lib/modules/`uname -r`/kernel/drivers/char/kvpcicanII.ko (PCIcanII)
+/lib/modules/`uname -r`/kernel/drivers/char/kvvirtualcan.ko (Virtualcan)
+/lib/modules/`uname -r`/kernel/drivers/usb/misc/usbcanII.ko (USBcanII)
+/lib/modules/`uname -r`/kernel/drivers/usb/misc/leaf.ko (Leaf)
 
 * Module setup
 ----------------------------------
-The following lines are added to /etc/modules.conf for PCIcan:
+The following lines are added to /etc/modprobe.conf for PCIcan:
 
     alias pcican kvpcican
     install kvpcican /usr/sbin/pcican.sh start
+    remove kvpcican /usr/sbin/pcican.sh stop
 
 The following lines are added to /etc/modules.conf for PCIcan II:
 
     alias pcicanII kvpcicanII
     install kvpcicanII /usr/sbin/pcicanII.sh start
+    remove kvpcicanII /usr/sbin/pcicanII.sh stop
 
-For LAPcan this goes into /etc/pcmcia/config:
+The following lines are added to /etc/modules.conf for Virtualcan:
 
-    device "lapcan_cs" class "can" module "lapcan_cs"
-    card "Kvaser LAPcan" manfid 0x01ee, 0x001d bind "lapcan_cs"
-    card "Kvaser LAPcan II" manfid 0x01ee, 0x0073 bind "lapcan_cs"
+    alias virtualcan kvvirtualcan
+    install virtualcan /usr/sbin/virtualcan.sh start
+    remove kvvirtualcan /usr/sbin/virtualcan.sh stop
+
 
 * Module loading
 ----------------------------------
-/etc/pcmcia/can (start/stop the lapcan driver from pcmcia subsystem)
-/usr/sbin/pcican.sh (start pcican driver; by modprobe or manually)
-/usr/sbin/pcicanII.sh (start pcicanII driver; by modprobe or manually)
+/usr/sbin/pcican.sh     (start/stop pcican driver;     by modprobe or manually)
+/usr/sbin/pcicanII.sh    (start/stop pcicanII driver;    by modprobe or manually)
+/usr/sbin/virtualcan.sh (start/stop virtualcan driver; by modprobe or manually)
+/usr/sbin/usbcanII.sh   (start/stop usbcanII driver;   by udev or manually)
+/usr/sbin/leaf.sh       (start/stop leaf driver;       by udev or manually)
 
+* Module hotplug support
+----------------------------------
+If /etc/hotplug exists:
+/etc/hotplug/usbcanII.usermap
+/etc/hotplug/usb/usbcanII
+/etc/hotplug/leaf.usermap
+/etc/hotplug/usb/leaf
+
+/etc/udev/rules.d/10-kvaser.rules
 
 * Include files for canlib library
 ----------------------------------
@@ -82,7 +127,7 @@ For LAPcan this goes into /etc/pcmcia/config:
 * Canlib library and links
 ----------------------------------
 /usr/lib/libcanlib.so
-/usr/lib/libcanlib.so.1.0.1
+/usr/lib/libcanlib.so.1.1.0
 /usr/lib/libcanlib.so.1
 
 * Canlib documentation

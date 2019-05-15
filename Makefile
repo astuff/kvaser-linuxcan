@@ -1,215 +1,107 @@
 # Main Makefile for the Kvaser Linux drivers.
-
-# include setting from these files
-include ./settings.mak
-include ./config.mak
-
-
+# 
+#                 Copyright 2012 by Kvaser AB, Mölndal, Sweden
+#                         http://www.kvaser.com
+# 
+#  This software is dual licensed under the following two licenses:
+#  BSD-new and GPLv2. You may use either one. See the included
+#  COPYING file for details.
+# 
+#  License: BSD-new
+#  ===============================================================================
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are met:
+#      * Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#      * Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in the
+#        documentation and/or other materials provided with the distribution.
+#      * Neither the name of the <organization> nor the
+#        names of its contributors may be used to endorse or promote products
+#        derived from this software without specific prior written permission.
+# 
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+#  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+#  DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+#  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+#  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+#  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+#  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+#  License: GPLv2
+#  ===============================================================================
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; either version 2
+#  of the License, or (at your option) any later version.
+# 
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# 
+#  ---------------------------------------------------------------------------
+# 
 
 #----------------------------------------
 # included in build
 #----------------------------------------
 USERLIBS  += canlib  
 
+DRIVERS   += leaf
+DRIVERS   += pcican
+DRIVERS   += pcican2
+DRIVERS   += usbcanII
+DRIVERS   += virtualcan
+
+#---------------------------------
+# Debug levels are defined in config.mak
+KV_DEBUG_ON=0
+export KV_DEBUG_ON
+
 #---------------------------------
 SUBDIRS   = $(USERLIBS) $(DRIVERS)
 
-#---------------------------------
-INSTALLS  = $(patsubst %,%_install,$(DRIVERS))
-
-
-#-----------------------------------------------------
-# Choose kernel
-
-ifeq ($(KV_KERNEL_VER), 2_4)
-	# explicitly 2.4
-	KV_BUILD_KERNEL   = 2_4
-	KV_KERNEL_SRC_DIR=$(KERNEL_SOURCE_DIR)
-else 
-  # explicitly 2.6
-	ifeq ($(KV_KERNEL_VER), 2_6)
-		KV_BUILD_KERNEL   =2_6
-		KV_KERNEL_SRC_DIR=$(KERNEL_SOURCE_DIR)
-	else
-		# default
-		KV_BUILD_KERNEL   =$(KV_DEFAULT_KERNEL)
-		KV_KERNEL_SRC_DIR =$(KV_DEFAULT_KERNEL_SRC_PATH)
-	endif
-endif
-
-
-#-----------------------------------------------------
-# select sub makefile
-ifeq ($(KV_BUILD_KERNEL),2_6)
-	KV_MAKEFILE_EXT     =   _26
-	KV_MAKEFLAGS_LAP    =   -C $(KV_KERNEL_SRC_DIR) SUBDIRS=$(PWD)/lapcan modules KV_DEBUG_ON=$(DEBUG_ON)
-	KV_MAKEFLAGS_USB    =   -C $(KV_KERNEL_SRC_DIR) SUBDIRS=$(PWD)/usbcanII modules KV_DEBUG_ON=$(DEBUG_ON)
-	KV_MAKEFLAGS_PCI    =   -C $(KV_KERNEL_SRC_DIR) SUBDIRS=$(PWD)/pcican modules KV_DEBUG_ON=$(DEBUG_ON)
-	KV_MAKEFLAGS_PCI2   =   -C $(KV_KERNEL_SRC_DIR) SUBDIRS=$(PWD)/pcicanII modules KV_DEBUG_ON=$(DEBUG_ON)
-	KV_INST_EXT         =   _26
-else
-	KV_MAKEFILE_EXT     =   _24 
-	KV_MAKEFLAGS_LAP    = 	-C lapcan sub KV_DEBUG_ON=$(DEBUG_ON)
-	KV_MAKEFLAGS_PCI    = 	-C pcican sub KV_DEBUG_ON=$(DEBUG_ON)
-	KV_MAKEFLAGS_PCI2   = 	-C pcicanII sub KV_DEBUG_ON=$(DEBUG_ON)
-	KV_MAKEFLAGS_USB    =   -C usbcanII sub KV_DEBUG_ON=$(DEBUG_ON)
-	KV_INST_EXT         = 
-endif
-
-
-# Includes
-INCLUDES := $(CURDIR)/include/
-
-
-# debug
-ifeq ($(BUILD_DEBUG),1)
-    DEBUG_ON=1
-    IS_DEBUG=DEBUG
-else
-	DEBUG_ON=0
-	IS_DEBUG=
-endif
-
-ifeq ($(DEBUG_ON),1)
-
-else
-	DEBUG_ON=0
-endif
-
-
-# these macros are exported to sub-makes
-export KV_KERNEL_SRC_DIR 
-export INCLUDES
-
-
 #---------------------------------------------------------------------------
 # RULES
-
-# should be here because otherwise make thinks it is made because we
-# have a dir named debug
-.PHONY: debug $(SUBDIRS)
-
+.PHONY: debug canlib leaf minipciecan pcican pcican2 usbcanII virtualcan install clean
 
 all:  $(SUBDIRS)
 
 canlib:
-	@echo --------------------------------------------------------------------
-	@echo "building CANLIB" $(IS_DEBUG)
-	@echo --------------------------------------------------------------------
-	cd canlib
-	cp ./canlib/Makefile$(KV_MAKEFILE_EXT) ./canlib/Makefile -f
-	cd ..
-	$(MAKE) -C canlib sub$(DEBUG_EXT)
-
-lapcan:
-	@echo --------------------------------------------------------------------
-	@echo "building LAPcan/LAPcanII" $(IS_DEBUG) 
-	@echo "Kernel src:" $(KERNEL_SOURCE_DIR)  
-	@echo --------------------------------------------------------------------
-	
-	cd lapcan
-	cp ./lapcan/Makefile$(KV_MAKEFILE_EXT) ./lapcan/Makefile -f
-	$(MAKE) $(KV_MAKEFLAGS_LAP)
-	cd ..
+	$(MAKE) -C canlib examples
 
 pcican:
-	@echo --------------------------------------------------------------------
-	@echo "building PCIcan" $(IS_DEBUG)
-	@echo "Kernel src:" $(KERNEL_SOURCE_DIR)  
-	@echo --------------------------------------------------------------------
-	cd ./pcican
-	cp ./pcican/Makefile$(KV_MAKEFILE_EXT) ./pcican/Makefile -f
-	$(MAKE) $(KV_MAKEFLAGS_PCI)
-	cd ..
+	@cd ./pcican; $(MAKE) kv_module
 
-pcicanII:
-	@echo --------------------------------------------------------------------
-	@echo "building PCIcanII" $(IS_DEBUG)
-	@echo "Kernel src:" $(KERNEL_SOURCE_DIR)  
-	@echo --------------------------------------------------------------------
-	cd ./pcicanII
-	cp ./pcicanII/Makefile$(KV_MAKEFILE_EXT) ./pcicanII/Makefile -f
-	$(MAKE) $(KV_MAKEFLAGS_PCI2)
-	cd ..
+minipciecan:
+	@cd ./minipciecan; $(MAKE) kv_module
+
+pcican2:
+	@cd ./pcican2; $(MAKE) kv_module
 
 usbcanII:
-	@echo --------------------------------------------------------------------
-	@echo "building USBcanII" $(IS_DEBUG)
-	@echo "Kernel src:" $(KERNEL_SOURCE_DIR)  
-	@echo --------------------------------------------------------------------
-	cd ./usbcanII
-	cp ./usbcanII/Makefile$(KV_MAKEFILE_EXT) ./usbcanII/Makefile -f
-	$(MAKE) $(KV_MAKEFLAGS_USB)
-	cd ..
+	@cd ./usbcanII; $(MAKE) kv_module
 
-debug: 
-	@echo -----------------------------------
-	@echo "Building DEBUG drivers"
-	@echo -----------------------------------
-	$(MAKE) DEBUG_ON=1 DEBUG_EXT=_debug
+leaf:
+	@cd ./leaf; $(MAKE) kv_module
 
-debug_install: 
-	@echo -----------------------------------
-	@echo "Building DEBUG drivers"
-	@echo -----------------------------------
-	$(MAKE) DEBUG_ON=1 DEBUG_EXT=_debug
-	@ . installscript_canlib.sh
-	@ . installscript_pcican$(KV_INST_EXT).sh
-	@ . installscript_lapcan$(KV_INST_EXT).sh
-	@ . installscript_pcicanII$(KV_INST_EXT).sh	
-	@ . installscript_usbcan$(KV_INST_EXT).sh	
-	
-canlib_install: canlib
-	@echo ----------------------------------
-	@echo "installing CANLIB"
-	@echo ----------------------------------
-	@ . installscript_canlib.sh
+virtualcan:
+	@cd ./virtualcan; $(MAKE) kv_module
 
-pcican_install: canlib_install pcican
-	@echo ----------------------------------
-	@echo "installing PCIcan"
-	@echo ----------------------------------
-	@ . installscript_pcican$(KV_INST_EXT).sh
-
-pcicanII_install: canlib_install  pcicanII
-	@echo ----------------------------------
-	@echo "installing PCIcanII"
-	@echo ----------------------------------
-	@ . installscript_pcicanII$(KV_INST_EXT).sh
-
-lapcan_install: canlib_install lapcan
-	@echo ----------------------------------
-	@echo "installing LAPcan/LAPcanII"
-	@echo ----------------------------------
-	@ . installscript_lapcan$(KV_INST_EXT).sh
-
-usbcan_install: canlib_install usbcanII 
-	@echo ----------------------------------
-	@echo "installing USBcanII"
-	@echo ----------------------------------
-	@ . installscript_usbcan$(KV_INST_EXT).sh
-
-usbcanII_install: canlib_install usbcanII 
-	@echo ----------------------------------
-	@echo "installing USBcanII"
-	@echo ----------------------------------
-	@ . installscript_usbcan$(KV_INST_EXT).sh
-	
-install: $(INSTALLS)
-
+install: $(DRIVERS)
+	@for dir in $(DRIVERS) ; do cd $$dir; echo Installing $$dir;./installscript.sh; cd ..; done
+	$(MAKE) -C canlib install
 
 clean:
-	@for dir in $(SUBDIRS) ; do $(MAKE) -C $$dir clean -f Makefile$(KV_MAKEFILE_EXT); done
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	@for dir in $(SUBDIRS) ; do cd $$dir; $(MAKE) clean; cd ..; done
+	rm -f modules.order Module.symvers
+	rm -rf .tmp_versions

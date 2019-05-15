@@ -1,649 +1,696 @@
 /*
-** Copyright 2002-2006 KVASER AB, Sweden.  All rights reserved.
-*/
+**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**                        http://www.kvaser.com
+**
+** This software is dual licensed under the following two licenses:
+** BSD-new and GPLv2. You may use either one. See the included
+** COPYING file for details.
+**
+** License: BSD-new
+** ===============================================================================
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**     * Redistributions of source code must retain the above copyright
+**       notice, this list of conditions and the following disclaimer.
+**     * Redistributions in binary form must reproduce the above copyright
+**       notice, this list of conditions and the following disclaimer in the
+**       documentation and/or other materials provided with the distribution.
+**     * Neither the name of the <organization> nor the
+**       names of its contributors may be used to endorse or promote products
+**       derived from this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**
+**
+** License: GPLv2
+** ===============================================================================
+** This program is free software; you can redistribute it and/or
+** modify it under the terms of the GNU General Public License
+** as published by the Free Software Foundation; either version 2
+** of the License, or (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**
+** ---------------------------------------------------------------------------
+**/
 
-#if LINUX
+//--------------------------------------------------
+// NOTE! module_versioning HAVE to be included first
+#include "module_versioning.h"
+//--------------------------------------------------
+
+#   include <linux/version.h>
+#   include <linux/slab.h>
 #   include <linux/sched.h>
 #   include <linux/interrupt.h>
 #   include <asm/io.h>
 #   include <asm/system.h>
 #   include <asm/bitops.h>
 #   include <asm/uaccess.h>
-#   if LINUX_2_6
-#       include <linux/workqueue.h>
-#       include <linux/wait.h>
-#       include <linux/completion.h>
-#   else
-#       include <linux/tqueue.h>
-#   endif
-#else
-#   include <windows.h>
-#   include <ceddk.h>
-#   include <Winbase.h>
-#endif
+#   include <linux/workqueue.h>
+#   include <linux/wait.h>
+#   include <linux/completion.h>
+#   include <linux/kthread.h>
+#   include <linux/module.h>
 
-// common
+// Common
 #include "osif_kernel.h"
 #include "osif_functions_kernel.h"
+#include "debug.h"
+
+#ifdef BREAKPOINTS
+short debug_break = 0x0000;
+#endif
+
 
 //////////////////////////////////////////////////////////////////////
 // os_if_write_port
 // write to port
 //////////////////////////////////////////////////////////////////////
-void os_if_write_port(unsigned regist, unsigned portAddr)
+void os_if_write_port (unsigned regist, unsigned portAddr)
 {
-#if LINUX
-    outb(regist,portAddr); 
-#else
-    WRITE_PORT_UCHAR((PUCHAR)portAddr, (UCHAR)regist);
-#endif
+  outb(regist, portAddr);
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_read_port
 // read from port
 //////////////////////////////////////////////////////////////////////
-unsigned int os_if_read_port(unsigned portAddr)
+unsigned int os_if_read_port (unsigned portAddr)
 {
-#if LINUX
-    return inb(portAddr);
-#else
-    return READ_PORT_UCHAR((PUCHAR)portAddr);
-#endif
+  return inb(portAddr);
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_queue_task
 // put task to queue/set event
 //////////////////////////////////////////////////////////////////////
-int os_if_queue_task(OS_IF_TASK_QUEUE_HANDLE *hnd)
+int os_if_queue_task (OS_IF_TASK_QUEUE_HANDLE *hnd)
 {
-#if LINUX
-    #if LINUX_2_6
-       return schedule_work(hnd); // ret nonzero if ok
-    #else
-       int ret = queue_task(hnd, &tq_immediate);
-       mark_bh(IMMEDIATE_BH);
-       return ret;
-    #endif 
-#else
-#           pragma message("qqq os_if_queue_task...")
-    SetEvent(hnd); // fifo empty event/ txTaskQ
-#endif
+  return schedule_work(hnd); // ret nonzero if ok
 }
 
 //////////////////////////////////////////////////////////////////////
-// os_if_queue_task
+// os_if_queue_task_not_default_queue
 // put task to queue/set event
 //////////////////////////////////////////////////////////////////////
-int os_if_queue_task_not_default_queue(OS_IF_WQUEUE *wq, OS_IF_TASK_QUEUE_HANDLE *hnd)
+int os_if_queue_task_not_default_queue (OS_IF_WQUEUE *wq,
+                                        OS_IF_TASK_QUEUE_HANDLE *hnd)
 {
-#if LINUX
-    #if LINUX_2_6
-       return queue_work(wq, hnd); // ret nonzero if ok
-    #else
-        int ret = queue_task(hnd, &tq_immediate);
-        mark_bh(IMMEDIATE_BH);
-       return ret;
-    #endif 
-#else
-#           pragma message("qqq os_if_queue_task...")
-    SetEvent(hnd); // fifo empty event/ txTaskQ
-#endif
+  return queue_work(wq, hnd); // ret nonzero if ok
 }
 
 
 
 //////////////////////////////////////////////////////////////////////
 // os_if_init_waitqueue_head
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_init_waitqueue_head(OS_IF_WAITQUEUE_HEAD *handle)
+void os_if_init_waitqueue_head (OS_IF_WAITQUEUE_HEAD *handle)
 {
-#if LINUX
-    init_waitqueue_head(handle);
-#else
-    *handle = CreateEvent(NULL, TRUE, FALSE, NULL); 
-#endif
+  init_waitqueue_head(handle);
 }
+
+
+//////////////////////////////////////////////////////////////////////
+// os_if_init_named_waitqueue_head
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_init_named_waitqueue_head (OS_IF_WAITQUEUE_HEAD *handle, char *name)
+{
+  init_waitqueue_head(handle);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// os_if_delete_waitqueue_head
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_delete_waitqueue_head (OS_IF_WAITQUEUE_HEAD *handle)
+{
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // os_if_init_waitqueue_entry
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_init_waitqueue_entry(OS_IF_WAITQUEUE *wait)
+void os_if_init_waitqueue_entry (OS_IF_WAITQUEUE *wait)
 {
-#if LINUX
-    #if LINUX_2_6
-        init_waitqueue_entry(wait, current);
-    #else        
-        init_waitqueue_entry(wait, current);
-    #endif
-#else
-
-#endif
+  init_waitqueue_entry(wait, current);
 }
 
 
 //////////////////////////////////////////////////////////////////////
 // os_if_add_wait_queue
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_add_wait_queue(OS_IF_WAITQUEUE_HEAD *waitQ, OS_IF_WAITQUEUE *wait)
+void os_if_add_wait_queue (OS_IF_WAITQUEUE_HEAD *waitQ, OS_IF_WAITQUEUE *wait)
 {
-#if LINUX
-    #if LINUX_2_6
-       add_wait_queue(waitQ, wait);
-    #else
-       add_wait_queue(waitQ, wait);
-    #endif
-#else
-#endif
+  add_wait_queue(waitQ, wait);
 }
 
 
 //////////////////////////////////////////////////////////////////////
 // os_if_remove_wait_queue
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_remove_wait_queue(OS_IF_WAITQUEUE_HEAD *waitQ, OS_IF_WAITQUEUE *wait)
+void os_if_remove_wait_queue (OS_IF_WAITQUEUE_HEAD *waitQ, OS_IF_WAITQUEUE *wait)
 {
-#if LINUX
-    #if LINUX_2_6
-        remove_wait_queue(waitQ, wait);
-    #else
-        remove_wait_queue(waitQ, wait);
-    #endif
-#else
-#endif
+  remove_wait_queue(waitQ, wait);
 }
 
 
 //////////////////////////////////////////////////////////////////////
 // os_if_wait_for_event_timeout
-// 
+//
 //////////////////////////////////////////////////////////////////////
-signed long os_if_wait_for_event_timeout(signed long timeout, OS_IF_WAITQUEUE *handle)
+signed long os_if_wait_for_event_timeout (signed long timeout,
+                                          OS_IF_WAITQUEUE *handle)
 {
-#if LINUX
-    #if LINUX_2_6
-        //return wait_event_interruptible_timeout(handle, condition, timeout);
-        return schedule_timeout(timeout);
-    #else
-        return schedule_timeout(timeout);
-    #endif
-#else
-    if(handle != 0) {
-        WaitForSingleObject(handle, timeout);
-        return 0; // qqq
-    }
-    // do not wakeup
-    else {
-        return 0;
-    }
-#endif
+  //return wait_event_interruptible_timeout(handle, condition,
+  //                                        msecs_to_jiffies(timeout) + 1);
+  return schedule_timeout(msecs_to_jiffies(timeout) + 1);
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_schedule_timeout_simple
-// 
+//
 //////////////////////////////////////////////////////////////////////
-signed long os_if_wait_for_event_timeout_simple(signed long timeout)
+signed long os_if_wait_for_event_timeout_simple (signed long timeout)
 {
-#if LINUX
-    #if LINUX_2_6
-        return schedule_timeout(timeout);
-    #else
-        return schedule_timeout(timeout);
-    #endif
-#else
-    return 0;
-#endif
+  return schedule_timeout(msecs_to_jiffies(timeout) + 1);
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_schedule
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_wait_for_event(OS_IF_WAITQUEUE_HEAD handle)
+void os_if_wait_for_event (OS_IF_WAITQUEUE_HEAD *handle)
 {
-#if LINUX
-    schedule();
-#else
-    // qqq
-    WaitForSingleObject(handle, INFINITE);
-#endif
+  // qqq Do a proper wait for event.
+  schedule();
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_wake_up_interruptible
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_wake_up_interruptible(OS_IF_WAITQUEUE_HEAD *handle)
+void os_if_wake_up_interruptible (OS_IF_WAITQUEUE_HEAD *handle)
 {
-#if LINUX
-    wake_up_interruptible(handle);
-#else
-    SetEvent(*handle);
-#endif
+  wake_up_interruptible(handle);
 }
 
 //////////////////////////////////////////////////////////////////////
-// os_if_up_sema
-// 
+// os_if_mark_event
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_up_sema(OS_IF_SEMAPHORE *var)
-{
-#if LINUX
-#   if LINUX_2_6
-        complete(var);
-        //os_if_wake_up_interruptible(var);
-#   else
-        up(var);
-#   endif
-#else
-        // WINCE
-#endif
-}
+
+//////////////////////////////////////////////////////////////////////
+// os_if_clear_event
+//
+//////////////////////////////////////////////////////////////////////
+
 
 //////////////////////////////////////////////////////////////////////
 // os_if_up_sema
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_down_sema(OS_IF_SEMAPHORE *var)
+void os_if_up_sema (OS_IF_SEMAPHORE *var)
 {
-#if LINUX
-#   if LINUX_2_6
-    wait_for_completion(var);
-    //interruptible_sleep_on(var);
-#   else
-    down(var);
-#   endif
-#else
-        // WINCE
-#endif
+  complete(var);
+  //os_if_wake_up_interruptible(var);
 }
+
+//////////////////////////////////////////////////////////////////////
+// os_if_down_sema
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_down_sema (OS_IF_SEMAPHORE *var)
+{
+  wait_for_completion(var);
+  // interruptible_sleep_on(var);
+}
+
+
 
 //////////////////////////////////////////////////////////////////////
 // os_if_init_sema
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_init_sema(OS_IF_SEMAPHORE *var)
+void os_if_init_sema (OS_IF_SEMAPHORE *var)
 {
-#if LINUX
-#   if LINUX_2_6
-    init_completion(var);
-    //os_if_init_waitqueue_head(var);
-#   else
-    sema_init(var, 0);
-#   endif
-#else
-        // WINCE
-#endif
+  init_completion(var);
+  //os_if_init_waitqueue_head(var);
 }
 
 //////////////////////////////////////////////////////////////////////
-// os_if_set_task_interruptible
-// 
+// os_if_delete_sema
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_set_task_interruptible()
+void os_if_delete_sema (OS_IF_SEMAPHORE *var)
 {
-#if LINUX
-    set_current_state(TASK_INTERRUPTIBLE);
-#else
-#endif
 }
 
-//////////////////////////////////////////////////////////////////////
-// os_if_set_task_uninterruptible
-// 
-//////////////////////////////////////////////////////////////////////
-void os_if_set_task_uninterruptible()
-{
-#if LINUX
-    set_current_state(TASK_UNINTERRUPTIBLE);
 
-#else
-#endif
-}
+
 //////////////////////////////////////////////////////////////////////
-// os_if_set_task_running
-// 
+// Time management functions
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_set_task_running()
-{
-#if LINUX
-    set_current_state(TASK_RUNNING);
-#else
-#endif
-}
 
 //////////////////////////////////////////////////////////////////////
 // os_if_get_timeout_time
-// 
+//
 //////////////////////////////////////////////////////////////////////
-unsigned long os_if_get_timeout_time()
+unsigned long os_if_get_timeout_time (void)
 {
-#if LINUX
-    return (jiffies + 1 * HZ);
-#else
-    return (GetTickCount() + 10000);
-#endif
+  return jiffies + 1 * HZ;
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_do_get_time_of_day
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_do_get_time_of_day(OS_IF_TIME_VAL *tv)
+void os_if_do_get_time_of_day (OS_IF_TIME_VAL *tv)
 {
-#if LINUX
-    do_gettimeofday(tv);
-#else
-    long tmpTime = GetTickCount();
-    tv->tv_sec  = tmpTime/1000;
-    tv->tv_usec = tmpTime%1000*1000;
-#endif
+  do_gettimeofday(tv);
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_is_rec_busy
-// 
+//
 //////////////////////////////////////////////////////////////////////
-int os_if_is_rec_busy(int nr, volatile unsigned long* addr)
+int os_if_is_rec_busy (int nr, volatile unsigned long *addr)
 {
-#if LINUX
-    return test_and_set_bit(nr, addr);
-#else
-    // qqq
-    return 1;
-#endif
+  return test_and_set_bit(nr, addr);
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_rec_not_busy
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_rec_not_busy(int nr, volatile unsigned long* addr)
+void os_if_rec_not_busy (int nr, volatile unsigned long *addr)
 {
-#if LINUX
-    return clear_bit(nr, addr);
-#else
-    // qqq
-#endif  
+  return clear_bit(nr, addr);
 }
 
 //////////////////////////////////////////////////////////////////////
-// os_if_spin_lock
-// 
+// Spin locks
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_spin_lock(OS_IF_LOCK* lock)
+
+//////////////////////////////////////////////////////////////////////
+// os_if_spin_lock_init
+//
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
+// os_if_spin_lock
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_spin_lock (OS_IF_LOCK *lock)
 {
-#if LINUX
-    spin_lock(lock);
-#else
-#endif
+  spin_lock(lock);
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_spin_unlock
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_spin_unlock(OS_IF_LOCK* lock)
+void os_if_spin_unlock (OS_IF_LOCK *lock)
 {
-#if LINUX
-    spin_unlock(lock);
-#else
-#endif
+  spin_unlock(lock);
 }
 
 //////////////////////////////////////////////////////////////////////
-// os_if_irq_disable
-// 
+// os_if_spin_lock_remove
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_irq_disable(OS_IF_LOCK *lock)
+void os_if_spin_lock_remove (OS_IF_LOCK *lock)
+{
+}
+
+//////////////////////////////////////////////////////////////////////
+// Interrupts
+//
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
+// os_if_irq_disable
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_irq_disable (OS_IF_LOCK *lock)
 {
 // qqq should work for 2_4 too!
-#if LINUX
-    #if LINUX_2_6
-        spin_lock_irq(lock);
-    #else
-        cli();
-    #endif
-#else
-#endif
+  spin_lock_irq(lock);
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_irq_enable
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_irq_enable(OS_IF_LOCK *lock)
+void os_if_irq_enable (OS_IF_LOCK *lock)
 {
-#if LINUX
-    // qqq should work for 2_4 too!
-    #if LINUX_2_6
-        spin_unlock_irq(lock);
-    #else
-        sti();
-    #endif
-#else
-#endif
+  spin_unlock_irq(lock);
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_irq_save
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_irq_save(OS_IF_LOCK *lock, unsigned long flags)
+void os_if_irq_save (OS_IF_LOCK *lock, unsigned long *flags)
 {
-#if LINUX
-    // not needed in 2_4
-    #if LINUX_2_6
-        spin_lock_irqsave(lock, flags);
-    #endif
-#else
-#endif
-
+  spin_lock_irqsave(lock, *flags);
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_irq_restore
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_irq_restore(OS_IF_LOCK *lock, unsigned long flags)
+void os_if_irq_restore (OS_IF_LOCK *lock, unsigned long flags)
 {
-#if LINUX
-    // not needed in 2_4
-    #if LINUX_2_6
-        spin_unlock_irqrestore(lock, flags);
-    #endif
-#else
-#endif
-
+  spin_unlock_irqrestore(lock, flags);
 }
 
 //////////////////////////////////////////////////////////////////////
-// os_if_get_user_data
-// 
+// os_if_spin_lock_irqsave
+//
 //////////////////////////////////////////////////////////////////////
-int os_if_get_user_data(void * to, const void * from, OS_IF_SIZE n)
+void os_if_spin_lock_irqsave (OS_IF_LOCK *lock, unsigned long *flags)
 {
-#if LINUX
-    return copy_to_user(to, from, n);
-#else
-    memcpy(to, from, n);
-    return 0;
-#endif
+  spin_lock_irqsave(lock, *flags);
+}
+
+//////////////////////////////////////////////////////////////////////
+// os_if_spin_unlock_irqrestore
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_spin_unlock_irqrestore (OS_IF_LOCK *lock, unsigned long flags)
+{
+  spin_unlock_irqrestore(lock, flags);
+}
+
+//////////////////////////////////////////////////////////////////////
+// os_if_spin_lock_softirq
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_spin_lock_softirq (OS_IF_LOCK *lock)
+{
+  spin_lock_bh(lock);
+}
+
+//////////////////////////////////////////////////////////////////////
+// os_if_spin_unlock_softirq
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_spin_unlock_softirq (OS_IF_LOCK *lock)
+{
+  spin_unlock_bh(lock);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Data transfer between user and kernel space
+//
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
+// os_if_get_user_data
+//
+//////////////////////////////////////////////////////////////////////
+int os_if_get_user_data (void *to, const void *from, OS_IF_SIZE n)
+{
+  return copy_to_user(to, from, n);
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_set_user_data
-// 
+//
 //////////////////////////////////////////////////////////////////////
-int os_if_set_user_data(void * to, const void * from, OS_IF_SIZE n)
+int os_if_set_user_data (void *to, const void *from, OS_IF_SIZE n)
 {
-#if LINUX
-    return copy_from_user(to, from, n);
-#else
-    memcpy(to, from, n);
-    return 0;
-#endif
+  return copy_from_user(to, from, n);
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_set_int
-// 
+//
 //////////////////////////////////////////////////////////////////////
-int os_if_set_int(int val, int* dest)
+int os_if_set_int (int val, int *dest)
 {
-#if LINUX
-    return put_user(val, dest); 
-#else
-    return 0;
-#endif
+  return put_user(val, dest);
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_get_int
-// 
+//
 //////////////////////////////////////////////////////////////////////
-int os_if_get_int(int* val, int* dest)
+int os_if_get_int (int *val, int *src)
 {
-#if LINUX
-    return get_user(*val, dest);    
-#else
-    return 0;
-#endif
+  return get_user(*val, src);
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_get_long
-// 
+//
 //////////////////////////////////////////////////////////////////////
-int os_if_get_long(long* val, long* dest)
+int os_if_get_long (long *val, long *src)
 {
-#if LINUX
-    return get_user(*val, dest);    
-#else
-    return 0;
-#endif
+  return get_user(*val, src);
 }
 
 
 
 //////////////////////////////////////////////////////////////////////
-// os_if_declare_task
-// 
+// Task management functions
+//
 //////////////////////////////////////////////////////////////////////
-OS_IF_WQUEUE* os_if_declare_task(char * name)
+
+//////////////////////////////////////////////////////////////////////
+// os_if_declare_task
+//
+//////////////////////////////////////////////////////////////////////
+OS_IF_WQUEUE* os_if_declare_task (char *name, OS_IF_TASK_QUEUE_HANDLE *taskQ)
 {
-#if LINUX
-#   if LINUX_2_6
-        return create_workqueue(name);
-#   else
-        return 0;
-#   endif
-#else
-        // wince
-#endif
+  return create_workqueue(name);
+}
+
+//////////////////////////////////////////////////////////////////////
+// os_if_declare_rt_task
+//
+//////////////////////////////////////////////////////////////////////
+OS_IF_WQUEUE* os_if_declare_rt_task (char *name, OS_IF_TASK_QUEUE_HANDLE *taskQ)
+{
+# if defined(create_rt_workqueue)
+  return create_rt_workqueue(name);
+# else
+  DEBUGOUT(1, (TXT("Failed to create realtime work queue. Do it manually!\n")));
+  return create_workqueue(name);
+# endif
 }
 
 //////////////////////////////////////////////////////////////////////
 // os_if_destroy_task
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_destroy_task(OS_IF_WQUEUE *wQueue)
+void os_if_destroy_task (OS_IF_WQUEUE *wQueue)
 {
-#if LINUX
-#   if LINUX_2_6
-        destroy_workqueue(wQueue);
-#   else
-#   endif
-#else
-        // wince
-#endif
+  destroy_workqueue(wQueue);
 }
+
 
 //////////////////////////////////////////////////////////////////////
 // os_if_init_task
-// 
+//
 //////////////////////////////////////////////////////////////////////
-void os_if_init_task(OS_IF_TASK_QUEUE_HANDLE *taskQ, void *function, void *data)
+void os_if_init_task (OS_IF_TASK_QUEUE_HANDLE *taskQ, void *function, void *data)
 {
-#if LINUX
-    #if LINUX_2_6
-        INIT_WORK(taskQ, function, data);
-    #else
-        taskQ->routine  = function;
-        taskQ->data     = data;
-    #endif
-#else
-#endif
+  // Work queue functions get the taskQ pointer in 2.6.20+.
+#  if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20))
+     INIT_WORK(taskQ, function, data);
+#  else
+     INIT_WORK(taskQ, function);
+#  endif
 }
 
 //////////////////////////////////////////////////////////////////////
-// os_if_read_lock
-// 
+// os_if_set_task_interruptible
+//
 //////////////////////////////////////////////////////////////////////
-
-void os_if_read_lock(rwlock_t *rw_lock, unsigned long flags)
+void os_if_set_task_interruptible (void)
 {
-#if LINUX
-    // do nothing
-#if LINUX_2_6
-    read_lock_irqsave(rw_lock, flags);
-#else
-#endif
-#else
-#endif    
+  set_current_state(TASK_INTERRUPTIBLE);
 }
 
 //////////////////////////////////////////////////////////////////////
-// os_if_read_lock
-// 
+// os_if_set_task_uninterruptible
+//
 //////////////////////////////////////////////////////////////////////
-
-void os_if_read_unlock(rwlock_t *rw_lock, unsigned long flags)
+void os_if_set_task_uninterruptible (void)
 {
-#if LINUX
-    // do nothing
-#if LINUX_2_6
-    read_unlock_irqrestore(rw_lock, flags);
-#else
-#endif
-#else
-#endif    
+  set_current_state(TASK_UNINTERRUPTIBLE);
 }
 
 //////////////////////////////////////////////////////////////////////
-// os_if_write_lock
-// 
+// os_if_set_task_running
+//
 //////////////////////////////////////////////////////////////////////
-
-void os_if_write_lock(rwlock_t *rw_lock, unsigned long flags)
+void os_if_set_task_running (void)
 {
-#if LINUX
-    // do nothing
-    #if LINUX_2_6
-        write_lock_irqsave(rw_lock, flags);
-    #endif
-#else
-#endif
+  set_current_state(TASK_RUNNING);
 }
 
 //////////////////////////////////////////////////////////////////////
-// os_if_write_lock
-// 
+// Read and write locks
+//
 //////////////////////////////////////////////////////////////////////
 
-void os_if_write_unlock(rwlock_t *rw_lock, unsigned long flags)
+//////////////////////////////////////////////////////////////////////
+// os_if_rwlock_init
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_rwlock_init (rwlock_t *lock)
 {
-#if LINUX
-    // do nothing
-    #if LINUX_2_6
-        write_unlock_irqrestore(rw_lock, flags);
-    #endif
-#else
-#endif
+  rwlock_init(lock);
 }
+
+//////////////////////////////////////////////////////////////////////
+// os_if_read_lock_irqsave
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_read_lock_irqsave (rwlock_t *rw_lock, unsigned long *flags)
+{
+  read_lock_irqsave(rw_lock, *flags);
+}
+
+//////////////////////////////////////////////////////////////////////
+// os_if_read_unlock_irqrestore
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_read_unlock_irqrestore (rwlock_t *rw_lock, unsigned long flags)
+{
+  read_unlock_irqrestore(rw_lock, flags);
+}
+
+//////////////////////////////////////////////////////////////////////
+// os_if_write_lock_irqsave
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_write_lock_irqsave (rwlock_t *rw_lock, unsigned long *flags)
+{
+  write_lock_irqsave(rw_lock, *flags);
+}
+
+//////////////////////////////////////////////////////////////////////
+// os_if_write_unlock_irqrestore
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_write_unlock_irqrestore (rwlock_t *rw_lock, unsigned long flags)
+{
+  write_unlock_irqrestore(rw_lock, flags);
+}
+
+//////////////////////////////////////////////////////////////////////
+// os_if_rwlock_remove
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_rwlock_remove (rwlock_t *lock)
+{
+}
+
+//////////////////////////////////////////////////////////////////////
+// System signals
+//
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
+// os_if_signal_pending
+//
+//////////////////////////////////////////////////////////////////////
+int os_if_signal_pending(void)
+{
+  return signal_pending(current);
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// Memory allocation functions
+//
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
+// os_if_kernel_malloc
+//
+//////////////////////////////////////////////////////////////////////
+void *os_if_kernel_malloc (size_t buffer_size)
+{
+  return kmalloc(buffer_size, GFP_KERNEL);
+}
+
+//////////////////////////////////////////////////////////////////////
+// os_if_kernel_free
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_kernel_free (void *mem_ptr)
+{
+  kfree(mem_ptr);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Thread management functions
+//
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
+// os_if_kernel_thread
+//
+//////////////////////////////////////////////////////////////////////
+OS_IF_THREAD os_if_kernel_thread (int (*thread)(void *context), void *context)
+{
+
+  return kthread_run(thread, context, "Kvaser kernel thread");
+}
+
+//////////////////////////////////////////////////////////////////////
+// os_if_remove_thread
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_remove_thread (OS_IF_THREAD thread)
+{
+}
+
+//////////////////////////////////////////////////////////////////////
+// os_if_exit_thread
+//
+//////////////////////////////////////////////////////////////////////
+void os_if_exit_thread (int result)
+{
+  module_put_and_exit(result);
+}
+
+void os_if_init_atomic_bit (OS_IF_ATOMIC_BIT *ab)
+{
+  // Nothing to do
+}
+
+void os_if_remove_atomic_bit (OS_IF_ATOMIC_BIT *ab)
+{
+  // Nothing to do
+}
+
