@@ -1,173 +1,15 @@
 version: 2
 jobs:
-  gcc-4.6:
-    docker:
-      - image: gcc:4.6.4
-    steps:
-      - checkout
-      - run:
-          name: Build
-          command: |
-            make
-      - run:
-          name: Test
-          command: |
-            make check
-      - run:
-          name: Install
-          command: |
-            make install
-
-  gcc-4.8:
-    docker:
-      - image: gcc:4.8.4
-    steps:
-      - checkout
-      - run:
-          name: Build
-          command: |
-            make
-      - run:
-          name: Test
-          command: |
-            make check
-      - run:
-          name: Install
-          command: |
-            make install
-
-  gcc-5.4:
-    docker:
-      - image: gcc:5.4.0
-    steps:
-      - checkout
-      - run:
-          name: Build
-          command: |
-            make
-      - run:
-          name: Test
-          command: |
-            make check
-      - run:
-          name: Install
-          command: |
-            make install
-
-  gcc-7.1:
-    docker:
-      - image: gcc:7.1.0
-    steps:
-      - checkout
-      - run:
-          name: Build
-          command: |
-            make
-      - run:
-          name: Test
-          command: |
-            make check
-      - run:
-          name: Install
-          command: |
-            make install
-
-  gcc-7.2:
-    docker:
-      - image: gcc:7.2.0
-    steps:
-      - checkout
-      - run:
-          name: Build
-          command: |
-            make
-      - run:
-          name: Test
-          command: |
-            make check
-      - run:
-          name: Install
-          command: |
-            make install
-
-  gcc-7.3:
-    docker:
-      - image: gcc:7.3.0
-    steps:
-      - checkout
-      - run:
-          name: Build
-          command: |
-            make
-      - run:
-          name: Test
-          command: |
-            make check
-      - run:
-          name: Install
-          command: |
-            make install
-
-  gcc-8.2:
-    docker:
-      - image: gcc:8.2.0
-    steps:
-      - checkout
-      - run:
-          name: Build
-          command: |
-            make
-      - run:
-          name: Test
-          command: |
-            make check
-      - run:
-          name: Install
-          command: |
-            make install
-
-  gcc-8.3:
-    docker:
-      - image: gcc:8.3.0
-    steps:
-      - checkout
-      - run:
-          name: Build
-          command: |
-            make
-      - run:
-          name: Test
-          command: |
-            make check
-      - run:
-          name: Install
-          command: |
-            make install
-
-  gcc-9.1:
-    docker:
-      - image: gcc:9.1.0
-    steps:
-      - checkout
-      - run:
-          name: Build
-          command: |
-            make
-      - run:
-          name: Test
-          command: |
-            make check
-      - run:
-          name: Install
-          command: |
-            make install
-
-  ubuntu-xenial:
+  xenial-gcc-5.3:
     docker:
       - image: ubuntu:xenial
     steps:
       - checkout
       - run:
+          name: Set Up Container
+          command: |
+            apt update -qq && apt install -y gcc make
+      - run:
           name: Build
           command: |
             make
@@ -180,11 +22,15 @@ jobs:
           command: |
             make install
 
-  ubuntu-bionic:
+  bionic-gcc-7.4:
     docker:
       - image: ubuntu:bionic
     steps:
       - checkout
+      - run:
+          name: Set Up Container
+          command: |
+            apt update -qq && apt install -y build-essential
       - run:
           name: Build
           command: |
@@ -200,16 +46,7 @@ jobs:
 
 workflows:
   version: 2
-  ros_build:
+  build:
     jobs:
-      - gcc-4.6
-      - gcc-4.8
-      - gcc-5.4
-      - gcc-7.1
-      - gcc-7.2
-      - gcc-7.3
-      - gcc-8.2
-      - gcc-8.3
-      - gcc-9.1
-      - ubuntu-xenial
-      - ubuntu-bionic
+      - xenial-gcc-5.3
+      - bionic-gcc-7.4
