@@ -51,17 +51,13 @@
 **/
 
 //
-// Linux/WinCE Leaf driver
+// Linux Leaf driver
 //
 
 #ifndef _LEAF_HW_IF_H_
 #define _LEAF_HW_IF_H_
 
 
-#if WIN32
-#include "vcanevt.h"
-#include "VCanOSif.h"
-#endif
 
 #include "osif_kernel.h"
 #include "filo_cmds.h"
@@ -72,7 +68,8 @@
 /*****************************************************************************/
 
 #define DEVICE_NAME_STRING                    "leaf"
-#define MAX_CHANNELS                               3
+#define MAX_CARD_CHANNELS                          3
+#define MAX_DRIVER_CHANNELS                      128
 #define KV_LEAF_MAIN_RCV_BUF_SIZE                 16
 #define KV_LEAF_TX_CMD_BUF_SIZE                   16
 #define LEAF_CMD_RESP_WAIT_TIME                 5000
@@ -102,7 +99,7 @@ typedef struct LeafChanData
   OS_IF_LOCK   outTxLock;
 
 
-  unsigned int           timestamp_correction_value;
+  unsigned long          timestamp_correction_value;
 
   OBJECT_BUFFER          *objbufs;
 
@@ -165,8 +162,8 @@ typedef struct LeafCardData {
 
   // General data (from Windows version)
   // Time stamping timer frequency in MHz
-  unsigned int  hires_timer_fq;
-  unsigned int  time_offset_valid;
+  unsigned long  hires_timer_fq;
+  unsigned long  time_offset_valid;
 
 } LeafCardData;
 

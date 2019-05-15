@@ -193,6 +193,7 @@ var NAVTREE =
     [ "Data Structures", "annotated.html", [
       [ "canNotifyData", "structcan_notify_data.html", null ],
       [ "canUserIoPortData", "structcan_user_io_port_data.html", null ],
+      [ "kvTimeDomainData_s", "structkv_time_domain_data__s.html", null ],
       [ "LinMessageInfo", "struct_lin_message_info.html", null ]
     ] ],
     [ "Data Structure Index", "classes.html", null ],

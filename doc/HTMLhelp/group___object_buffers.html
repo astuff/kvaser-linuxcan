@@ -620,7 +620,9 @@ Functions</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">idx</td><td>The index of the object buffer whose contents is to be defined. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>The CAN identifier of the message. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">msg</td><td>Points to the contents of the message. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">dlc</td><td>The length of the message. Must be at least 0 and at most 8 bytes. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dlc</td><td>The length of the message in bytes.<br/>
+ For Classic CAN dlc can be at most 8, unless <a class="el" href="canlib_8h.html#a933708eecbae36802f143ee06126301d">canOPEN_ACCEPT_LARGE_DLC</a> is used.<br/>
+ For CAN FD dlc can be one of the following 0-8, 12, 16, 20, 24, 32, 48, 64. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">flags</td><td>Message flags; a combination of the <a class="el" href="canstat_8h.html#canMSG_xxx">canMSG_xxx</a> flags.</td></tr>
   </table>
   </dd>
@@ -652,7 +654,7 @@ Functions</h2></td></tr>
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.12) - Generated on Mon Sep 21 2015</small>
+<small>Kvaser Linux CANLIB (canlib 5.15) - Generated on Mon Mar 7 2016</small>
 </address>
 </body>
 </html>

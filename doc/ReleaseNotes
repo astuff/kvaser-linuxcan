@@ -3,7 +3,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.12  
+Release notes for linuxcan V5.15  
 ================================================================
 
 Linux device drivers for
@@ -103,6 +103,26 @@ Known problems
      (This is the same as under Windows.)
 
 
+New Features and Fixed Problems in V5.15   (07-MAR-2016)
+===========================================================================
+   * No changes, this is a companion release to the Windows version.
+
+
+New Features and Fixed Problems in V5.14   (01-MAR-2016)
+===========================================================================
+   * A bug regarding maximum number of channels for a kernel module (MAX_CHANNELS)
+     has been fixed for all drivers.
+     
+   * Timestamps are now stored as 64-bit values instead of 32-bit values to
+     match canReadTimer().
+
+
+New Features and Fixed Problems in V5.13   (15-DEC-2015)
+===========================================================================
+   * Updated pciefd driver to work without DMA (option USE_DMA in
+     pciefd_config.h). Note, however, that this is an unupported (and
+     consequently untested) feature that may break in the future.
+
 New Features and Fixed Problems in V5.12   (21-SEP-2015)
 ===========================================================================
    * Sampling points of default CAN bitrates are now 75% instead of 62.5%.
@@ -113,7 +133,7 @@ New Features and Fixed Problems in V5.12   (21-SEP-2015)
 
    * Improved support for CAN-FD for PCIEcan 4xHS.
 
-   * Kvaser device drivers now all use a common driver (kv_common) that is
+   * Kvaser device drivers now all use a common driver (kvcommon) that is
      loaded seprarately.
 
    * Updated register names and definitions in PCIEcan driver to comply with

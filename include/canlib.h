@@ -167,7 +167,8 @@ typedef struct canNotifyData {
 # define canOPEN_ACCEPT_LARGE_DLC       0x0200  // DLC can be greater than 8
 
 /**
- * The channel will use the CAN FD protocol.
+ * The channel will use the CAN FD protocol, ISO compliant. This also means that messages with
+ * \ref canFDMSG_xxx flags can now be used.
  *
  * This define is used in \ref canOpenChannel().
  */
@@ -175,6 +176,14 @@ typedef struct canNotifyData {
 
 /**
  * The channel will use the CAN FD NON-ISO protocol.
+ * Use this if you want to configure the can controller to be able to communicate with
+ * a can controller designed prior to the release of the CAN FD ISO specification.
+ *
+ * Non ISO mode implies:
+ * \li The stuff bit counter will not be included in the frame format.
+ * \li Initial value for CRC17 and CRC21 will be zero.
+ *
+ * This also means that messages with \ref canFDMSG_xxx flags can now be used.
  *
  * This define is used in \ref canOpenChannel().
  */
@@ -245,6 +254,7 @@ typedef struct canNotifyData {
  * \ingroup CAN
  * \anchor BAUD_xxx
  * \anchor canBITRATE_xxx
+ * \anchor canFD_BITRATE_xxx
  * \name canBITRATE_xxx
  *
  * Common bus speeds. Used in \ref canSetBusParams() and \ref canSetBusParamsC200().
@@ -278,14 +288,26 @@ typedef struct canNotifyData {
 #define canBITRATE_10K       (-9)
 
 // CAN FD Bit Rates
-/** Used in \ref canSetBusParamsFd(). Indicates a bitrate of  0.5 Mbit/s and sampling point at 80%. */
+/** Used in \ref canSetBusParams() and \ref canSetBusParamsFd() when using the
+    CAN FD protocol. Indicates a bitrate of 0.5 Mbit/s and sampling point at
+    80%. */
 #define canFD_BITRATE_500K_80P     (-1000)
-/** Used in \ref canSetBusParamsFd(). Indicates a bitrate of  1.0 Mbit/s and sampling point at 80%. */
+/** Used in \ref canSetBusParams() and \ref canSetBusParamsFd() when using the
+    CAN FD protocol. Indicates a bitrate of 1.0 Mbit/s and sampling point at
+    80%. */
 #define canFD_BITRATE_1M_80P       (-1001)
-/** Used in \ref canSetBusParamsFd(). Indicates a bitrate of  2.0 Mbit/s and sampling point at 80%. */
+/** Used in \ref canSetBusParams() and \ref canSetBusParamsFd() when using the
+    CAN FD protocol. Indicates a bitrate of 2.0 Mbit/s and sampling point at
+    80%. */
 #define canFD_BITRATE_2M_80P       (-1002)
-/** Used in \ref canSetBusParamsFd(). Indicates a bitrate of 10.0 Mbit/s and sampling point at 75%. */
-#define canFD_BITRATE_10M_75P      (-1010)
+/** Used in \ref canSetBusParams() and \ref canSetBusParamsFd() when using the
+    CAN FD protocol. Indicates a bitrate of 4.0 Mbit/s and sampling point at
+    80%. */
+#define canFD_BITRATE_4M_80P       (-1003)
+/** Used in \ref canSetBusParams() and \ref canSetBusParamsFd() when using the
+    CAN FD protocol. Indicates a bitrate of 8.0 Mbit/s and sampling point at
+    60%. */
+#define canFD_BITRATE_8M_60P       (-1004)
 
 /** The \ref BAUD_xxx names are deprecated, use \ref canBITRATE_1M instead. */
 #define BAUD_1M              (-1)
@@ -425,11 +447,12 @@ canStatus CANLIBAPI canBusOff (const CanHandle hnd);
  * \source_delphi   <b>function canSetBusParams(handle: canHandle; freq: Longint; tseg1, tseg2, sjw, noSamp, syncmode: Cardinal): canStatus;     </b>
  * \source_end
  *
- * This function sets the bus timing parameters for the specified CAN controller.
+ * This function sets the nominal bus timing parameters for the specified CAN
+ * controller.
  *
  * The library provides default values for \a tseg1, \a tseg2, \a sjw and \a
- * noSamp when \a freq is specified to one of the
- * pre-defined constants, \ref canBITRATE_xxx.
+ * noSamp when \a freq is specified to one of the pre-defined constants,
+ * \ref canBITRATE_xxx for classic CAN and \ref canFD_BITRATE_xxx for CAN FD.
  *
  * If \a freq is any other value, no default values are supplied by the
  * library.
@@ -444,12 +467,13 @@ canStatus CANLIBAPI canBusOff (const CanHandle hnd);
  *
  * \param[in]  hnd       An open handle to a CAN controller.
  * \param[in]  freq      Bit rate (measured in bits per second); or one of the
- *                       predefined constants \ref canBITRATE_xxx, which are described below.
+ *                       predefined constants (\ref canBITRATE_xxx for classic
+ *                       CAN and \ref canFD_BITRATE_xxx for CAN FD).
  * \param[in]  tseg1     Time segment 1, that is, the number of quanta from (but not
  *                       including) the Sync Segment to the sampling point.
  * \param[in]  tseg2     Time segment 2, that is, the number of quanta from the sampling
  *                       point to the end of the bit.
- * \param[in]  sjw       The Synchronization Jump Width; can be 1,2,3, or 4.
+ * \param[in]  sjw       The Synchronization Jump Width.
  * \param[in]  noSamp    The number of sampling points; can be 1 or 3.
  * \param[in]  syncmode  Unsupported and ignored.
  *
@@ -477,24 +501,25 @@ canStatus CANLIBAPI canSetBusParams (const CanHandle hnd,
  * \source_delphi   <b>function canSetBusParamsFd(hnd: canHandle; freq_brs: Longint; tseg1_brs, tseg2_brs, sjw_brs): canStatus;</b>
  * \source_end
  *
- * This function sets the bus timing parameters for the specified
- * CAN FD controller.
+ * This function sets the data phase bus timing parameters for the specified
+ * CAN controller.
  *
- * The library provides default values for \a tseg1_brs, \a tseg2_brs,
- * \a sjw_brs and \a freq_brs is specified to one of the pre-defined
- * constants, \ref canBITRATE_xxx.
+ * The library provides default values for \a tseg1_brs, \a tseg2_brs and
+ * \a sjw_brs when \a freq_brs is specified to one of the pre-defined
+ * constants, \ref canFD_BITRATE_xxx.
  *
  * If \a freq_brs is any other value, no default values are supplied
  * by the library.
  *
  * \param[in]  hnd        An open handle to a CAN controller.
- * \param[in]  freq_brs   Bit rate (measured in bits per second); or one of the
- *                        predefined constants \ref canBITRATE_xxx, which are described below.
+ * \param[in]  freq_brs   CAN FD data bit rate (measured in bits per second); or
+ *                        one of the predefined constants \ref
+ *                        canFD_BITRATE_xxx.
  * \param[in]  tseg1_brs  Time segment 1, that is, the number of quanta from (but not
  *                        including) the Sync Segment to the sampling point.
  * \param[in]  tseg2_brs  Time segment 2, that is, the number of quanta from the sampling
  *                        point to the end of the bit.
- * \param[in]  sjw_brs    The Synchronization Jump Width; can be 1,2,3, or 4.
+ * \param[in]  sjw_brs    The Synchronization Jump Width.
  *
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
@@ -514,7 +539,7 @@ canStatus CANLIBAPI canSetBusParamsFd(const CanHandle hnd,
  * \source_delphi   <b>function canGetBusParams(handle: canHandle; var freq: Longint; var tseg1, tseg2, sjw, noSamp, syncmode: Cardinal): canStatus;     </b>
  * \source_end
  *
- * This function retrieves the current bus parameters for the specified
+ * This function retrieves the current nominal bus parameters for the specified
  * channel.
  *
  * The anatomy of a CAN bit is discussed in detail at Kvaser's
@@ -526,9 +551,9 @@ canStatus CANLIBAPI canSetBusParamsFd(const CanHandle hnd,
  *                       including) the Sync Segment to the sampling point.
  * \param[out] tseg2     Time segment 2, that is, the number of quanta from the sampling
  *                       point to the end of the bit.
- * \param[out] sjw       The Synchronization Jump Width; can be 1,2,3, or 4.
+ * \param[out] sjw       The Synchronization Jump Width.
  * \param[out] noSamp    The number of sampling points; can be 1 or 3.
- * \param[out] syncmode  Unsupported, always read as zero.
+ * \param[out] syncmode  Unsupported, always read as one.
  *
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
@@ -554,7 +579,7 @@ canStatus CANLIBAPI canGetBusParams (const CanHandle hnd,
  * \source_delphi   <b>function canGetBusParamsFd(hnd: canHandle; var freq_brs: Longint; var tseg1_brs, tseg2_brs, sjw_brs): canStatus;</b>
  * \source_end
  *
- * This function retrieves the current bus parameters for the specified
+ * This function retrieves the current data bus parameters for the specified
  * CAN FD channel.
  *
  * \param[in]  hnd         An open handle to a CAN FD controller.
@@ -563,7 +588,7 @@ canStatus CANLIBAPI canGetBusParams (const CanHandle hnd,
  *                         including) the Sync Segment to the sampling point.
  * \param[out] tseg2_brs   Time segment 2, that is, the number of quanta from the sampling
  *                         point to the end of the bit.
- * \param[out] sjw_brs     The Synchronization Jump Width; can be 1,2,3, or 4.
+ * \param[out] sjw_brs     The Synchronization Jump Width.
  *
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
@@ -772,7 +797,9 @@ canStatus CANLIBAPI canReadErrorCounters (const CanHandle hnd,
  * \param[in]  hnd       A handle to an open CAN circuit.
  * \param[in]  id        The identifier of the CAN message to send.
  * \param[in]  msg       A pointer to the message data, or \c NULL.
- * \param[in]  dlc       The length of the message. Can be at most 8.
+ * \param[in]  dlc       The length of the message in bytes.<br>
+                         For Classic CAN dlc can be at most 8, unless \ref canOPEN_ACCEPT_LARGE_DLC is used.<br>
+                         For CAN FD dlc can be one of the following 0-8, 12, 16, 20, 24, 32, 48, 64.
  * \param[in]  flag      A combination of message flags, \ref canMSG_xxx.
  *                       Use this parameter to send extended (29-bit) frames
  *                       and/or remote frames. Use \ref canMSG_EXT and/or
@@ -1032,7 +1059,7 @@ canStatus CANLIBAPI canGetRawHandle (const CanHandle hnd, void *pvFd);
  *                       that is, the number of quanta from the sampling point to
  *                       the end of the bit.
  * \param[in]  sjw       A pointer to a buffer which receives the Synchronization
- *                       Jump Width; can be 1,2,3, or 4.
+ *                       Jump Width.
  * \param[in]  nosamp    A pointer to a buffer which receives the number of
  *                       sampling points; can be 1 or 3.
  * \param[in]  syncMode  Unsupported, always read as zero.
@@ -1670,6 +1697,9 @@ canStatus CANLIBAPI canGetChannelData (int channel,
  *  opened as CAN FD.  */
 
 #define canCHANNEL_IS_CANFD             0x0004
+
+//#define canCHANNEL_IS_CANFD_NON_ISO          0x0008 Reserved for when needed
+
  /** @} */
 
 
@@ -1720,7 +1750,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canHWTYPE_PCIE_V2            76  ///< Kvaser PCIEcan 4xHS and variants
 #define canHWTYPE_MEMORATOR_PRO2     78  ///< Kvaser Memorator Pro 5xHS and variants
 #define canHWTYPE_LEAF2              80  ///< Kvaser Leaf Pro HS v2 and variants
-#define canHWTYPE_MEMORATOR_LIGHT2   82  ///< Kvaser Memorator Light (2nd generation)
+#define canHWTYPE_MEMORATOR_V2       82  ///< Kvaser Memorator (2nd generation)
 
 
 /** @} */
@@ -1742,8 +1772,9 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canCHANNEL_CAP_VIRTUAL           0x00010000L ///< Virtual CAN channel
 #define canCHANNEL_CAP_SIMULATED         0x00020000L ///< Simulated CAN channel
 #define canCHANNEL_CAP_REMOTE            0x00040000L ///< Remote CAN channel (e.g. BlackBird).
-#define canCHANNEL_CAP_CAN_FD            0x00080000L ///< CAN-FD channel
-#define canCHANNEL_CAP_CAN_FD_NONISO     0x00100000L ///< Supports Non-ISO CAN-FD channel
+#define canCHANNEL_CAP_CAN_FD            0x00080000L ///< CAN-FD ISO compliant channel
+#define canCHANNEL_CAP_CAN_FD_NONISO     0x00100000L ///< CAN-FD NON-ISO compliant channel
+#define canCHANNEL_CAP_SILENT_MODE       0x00200000L ///< Channel supports Silent mode
 
 /** @} */
 
@@ -2114,6 +2145,23 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    */
 # define canIOCTL_SET_LOCAL_TXECHO                32
 
+
+
+  /**
+   * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
+   * functions argument.
+   *
+   * Obtain the time reference list for MagiSync devices.
+   *
+   * \a buf points to an array of pairs of 64-bit ints, one of which
+   * will contain the reference number and the other one the timestamp
+   * in nanoseconds.
+   *
+   * \note This function is subject to change in future releases and is
+   * not supported by Kvaser.
+   */
+#  define canIOCTL_GET_TREF_LIST                   39
+
 #endif
  /** @} */
 
@@ -2270,8 +2318,9 @@ canStatus CANLIBAPI canObjBufFree (const CanHandle hnd, int idx);
  *                  defined.
  * \param[in] id    The CAN identifier of the message.
  * \param[in] msg   Points to the contents of the message.
- * \param[in] dlc   The length of the message. Must be at least 0 and at most 8
- *                  bytes.
+ * \param[in] dlc   The length of the message in bytes.<br>
+                    For Classic CAN dlc can be at most 8, unless \ref canOPEN_ACCEPT_LARGE_DLC is used.<br>
+                    For CAN FD dlc can be one of the following 0-8, 12, 16, 20, 24, 32, 48, 64.
  * \param[in] flags Message flags; a combination of the \ref canMSG_xxx flags.
  *
  * \return \ref canOK (zero) if success
@@ -2527,7 +2576,9 @@ canStatus CANLIBAPI canResetBus (const CanHandle hnd);
  * \param[in]  hnd       A handle to an open CAN circuit.
  * \param[in]  id        The identifier of the CAN message to send.
  * \param[in]  msg       A pointer to the message data, or \c NULL.
- * \param[in]  dlc       The length of the message. Can be at most 8.
+ * \param[in]  dlc       The length of the message in bytes.<br>
+                         For Classic CAN dlc can be at most 8, unless \ref canOPEN_ACCEPT_LARGE_DLC is used.<br>
+                         For CAN FD dlc can be one of the following 0-8, 12, 16, 20, 24, 32, 48, 64.
  * \param[in]  flag      A combination of message flags, \ref canMSG_xxx.
  *                       Use this parameter to send extended (29-bit) frames
  *                       and/or remote frames. Use \ref canMSG_EXT and/or
@@ -2600,8 +2651,181 @@ canStatus CANLIBAPI canFlushReceiveQueue (const CanHandle hnd);
 canStatus CANLIBAPI canFlushTransmitQueue (const CanHandle hnd);
 
 
+/** Used for time domain handling. */
+typedef void *kvTimeDomain;
+
 /** Contains status codes according to \ref canSTAT_xxx. */
 typedef canStatus kvStatus;
+
+/**
+ * \ingroup TimeDomainHandling
+ *
+ * Used for time domain handling.
+ */
+typedef struct kvTimeDomainData_s {
+  int nMagiSyncGroups;        ///< number of MagiSync&tm; groups
+  int nMagiSyncedMembers;     ///< number of MagiSync&tm; members
+  int nNonMagiSyncCards;      ///< number of non MagiSync&tm; interfaces
+  int nNonMagiSyncedMembers;  ///< number of non MagiSync&tm; members
+} kvTimeDomainData;
+
+/**
+ * \ingroup TimeDomainHandling
+ *
+ * \source_cs       <b>static Canlib.canStatus kvTimeDomainCreate(out object domain);</b>
+ *
+ * \source_delphi   <b>function kvTimeDomainCreate(var domain: kvTimeDomain): kvStatus;     </b>
+ * \source_end
+ *
+ * This routine creates an empty time domain.
+ *
+ * The variable is set by this function and then used in later calls to
+ * other functions using a \ref kvTimeDomain.
+ *
+ * Time domains created by \ref kvTimeDomainCreate() can be destroyed with a
+ * call to \ref kvTimeDomainDelete().
+ *
+ * \note A time domain is a set of channels with a common time base.
+ *
+ * \param[in] domain  A pointer to a caller allocated, opaque variable of type
+ *                    \ref kvTimeDomain that holds data to identify a particlar
+ *                    time domain.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvTimeDomainDelete()
+ */
+kvStatus CANLIBAPI kvTimeDomainCreate (kvTimeDomain *domain);
+
+/**
+ * \ingroup TimeDomainHandling
+ *
+ * \source_cs       <b>static Canlib.canStatus kvTimeDomainDelete(object domain);</b>
+ *
+ * \source_delphi   <b>function kvTimeDomainDelete(domain: kvTimeDomain): kvStatus;     </b>
+ * \source_end
+ *
+ * This is a cleanup routine that deletes all members of a domain and then
+ * deletes the domain itself.
+ *
+ * \note A time domain is a set of channels with a common time base.
+ *
+ * \param[in] domain  An opaque variable set by \ref kvTimeDomainCreate() that
+ *                    identifies the domain to be deleted.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvTimeDomainCreate()
+ */
+kvStatus CANLIBAPI kvTimeDomainDelete (kvTimeDomain domain);
+
+/**
+ * \ingroup TimeDomainHandling
+ *
+ * \source_cs       <b>static Canlib.canStatus kvTimeDomainResetTime(object domain);</b>
+ *
+ * \source_delphi   <b>function kvTimeDomainResetTime(domain: kvTimeDomain): kvStatus;     </b>
+ * \source_end
+ *
+ * This routine resets the time on all members of a time domain.
+ *
+ * After a call to this routine timestamps from all channels with MagiSync&tm;
+ * running have no offset at all any longer. The same applies for channels that
+ * reside on the same physical interface.
+ *
+ * \note A time domain is a set of channels with a common time base.
+ *
+ * \param[in] domain  An opaque variable set by \ref kvTimeDomainCreate() that
+ *                    identifies the domain to reset the time on.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvTimeDomainCreate()
+ */
+kvStatus CANLIBAPI kvTimeDomainResetTime (kvTimeDomain domain);
+
+/**
+ * \ingroup TimeDomainHandling
+ *
+ * \source_cs       <b>static Canlib.canStatus kvTimeDomainGetData(object domain, Canlib.kvTimeDomainData data);</b>
+ *
+ * \source_delphi   <b>function kvTimeDomainGetData(domain: kvTimeDomain; var data: kvTimeDomainData; bufsiz: Cardinal): kvStatus;     </b>
+ * \source_end
+ *
+ * This routine collects some data on a time domain.
+ *
+ * \note A time domain is a set of channels with a common time base.
+ *
+ * \param[in]  domain  An opaque variable set by \ref kvTimeDomainCreate() that
+ *                     identifies the domain to add a handle to.
+ * \param[out] data    A pointer to a \ref kvTimeDomainData that is to be filled by
+ *                     the function.
+ * \param[in]  bufsiz  The size in bytes of the \ref kvTimeDomainData struct.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvTimeDomainCreate()
+ */
+kvStatus CANLIBAPI kvTimeDomainGetData (kvTimeDomain domain,
+                                        kvTimeDomainData *data,
+                                        size_t bufsiz);
+
+/**
+ * \ingroup TimeDomainHandling
+ *
+ * \source_cs       <b>static Canlib.canStatus kvTimeDomainAddHandle(object domain, int handle);</b>
+ *
+ * \source_delphi   <b>function kvTimeDomainAddHandle(domain: kvTimeDomain; handle: canHandle): kvStatus;     </b>
+ * \source_end
+ *
+ * This routine adds an open channel handle to a domain.
+ *
+ * \note A time domain is a set of channels with a common time base.
+ *
+ * \param[in] domain  An opaque variable set by \ref kvTimeDomainCreate()
+ *                    that identifies the domain to add a handle to.
+ * \param[in] hnd     A handle to an open channel.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvTimeDomainCreate(), \ref kvTimeDomainRemoveHandle()
+ */
+kvStatus CANLIBAPI kvTimeDomainAddHandle(kvTimeDomain domain,
+                                         const CanHandle hnd);
+
+/**
+ * \ingroup TimeDomainHandling
+ *
+ * \source_cs       <b>static Canlib.canStatus kvTimeDomainRemoveHandle(object domain, int handle);</b>
+ *
+ * \source_delphi   <b>function kvTimeDomainRemoveHandle(domain: kvTimeDomain; handle: canHandle): kvStatus;     </b>
+ * \source_end
+ *
+ * This routine removes an open channel handle from a domain.
+ *
+ * \note A time domain is a set of channels with a common time base.
+ *
+ * \param[in] domain  An opaque variable set by \ref kvTimeDomainCreate()
+ *                    that identifies the domain to remove a handle from.
+ * \param[in] hnd     A handle to an open channel.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref kvTimeDomainCreate(), \ref kvTimeDomainAddHandle()
+ */
+kvStatus CANLIBAPI kvTimeDomainRemoveHandle (kvTimeDomain domain,
+                                             const CanHandle hnd);
 
 /**
  * \name kvCallback_t

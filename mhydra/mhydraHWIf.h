@@ -51,17 +51,13 @@
 **/
 
 //
-// Linux/WinCE Mhydra driver
+// Linux Mhydra driver
 //
 
 #ifndef _MHYDRA_HW_IF_H_
 #define _MHYDRA_HW_IF_H_
 
 
-#if WIN32
-#include "vcanevt.h"
-#include "VCanOSif.h"
-#endif
 
 #include "osif_kernel.h"
 #include "hydra_host_cmds.h"
@@ -73,7 +69,8 @@
 
 #define DEVICE_NAME_STRING                    "mhydra"
 // Maximum number of channels for a device of this type.
-#define HYDRA_MAX_CHANNELS                          16
+#define HYDRA_MAX_CARD_CHANNELS                      5
+#define HYDRA_MAX_DRIVER_CHANNELS                  128
 
 #define KV_MHYDRA_MAIN_RCV_BUF_SIZE                 16
 #define KV_MHYDRA_TX_CMD_BUF_SIZE                   16
@@ -104,7 +101,7 @@ typedef struct MhydraChanData
   OS_IF_LOCK   outTxLock;
 
 
-  unsigned int           timestamp_correction_value;
+  unsigned long          timestamp_correction_value;
 
   OBJECT_BUFFER          *objbufs;
 
@@ -118,7 +115,7 @@ typedef struct MhydraChanData
 typedef struct MhydraCardData {
 
   // Map channel (0,1,2,...) to HE (6-bit number meaningful only to fw)
-  unsigned char   channel2he[HYDRA_MAX_CHANNELS];
+  unsigned char   channel2he[HYDRA_MAX_CARD_CHANNELS];
   unsigned char   he2channel[MAX_HE_COUNT];
 
   unsigned int     max_outstanding_tx;
@@ -169,8 +166,8 @@ typedef struct MhydraCardData {
 
   // General data (from Windows version)
   // Time stamping timer frequency in MHz
-  unsigned int  hires_timer_fq;
-  unsigned int  time_offset_valid;
+  unsigned long  hires_timer_fq;
+  unsigned long  time_offset_valid;
 
 } MhydraCardData;
 

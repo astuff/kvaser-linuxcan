@@ -302,7 +302,7 @@ static int pciCanProbe (VCanCardData *vCd)
     }
 
     chan = 0;
-    for (i = 0; i < MAX_CHANNELS; i++) {
+    for (i = 0; i < MAX_CARD_CHANNELS; i++) {
         VCanChanData *vChd = vCd->chanData[i];
 
         if (vChd != NULL) {
@@ -1723,9 +1723,9 @@ static int DEVINIT pciCanInitOne (struct pci_dev *dev,
 {
     // Helper struct for allocation
     typedef struct {
-        VCanChanData *dataPtrArray[MAX_CHANNELS];
-        VCanChanData vChd[MAX_CHANNELS];
-        PciCan2ChanData hChd[MAX_CHANNELS];
+        VCanChanData *dataPtrArray[MAX_CARD_CHANNELS];
+        VCanChanData vChd[MAX_CARD_CHANNELS];
+        PciCan2ChanData hChd[MAX_CARD_CHANNELS];
     } ChanHelperStruct;
 
     ChanHelperStruct *chs;
@@ -1753,7 +1753,7 @@ static int DEVINIT pciCanInitOne (struct pci_dev *dev,
     memset(chs, 0, sizeof(ChanHelperStruct));
 
     // Init array and hwChanData
-    for (chNr = 0; chNr < MAX_CHANNELS; chNr++){
+    for (chNr = 0; chNr < MAX_CARD_CHANNELS; chNr++){
         chs->dataPtrArray[chNr]    = &chs->vChd[chNr];
         chs->vChd[chNr].hwChanData = &chs->hChd[chNr];
         chs->vChd[chNr].minorNr    = -1;   // No preset minor number
@@ -1892,7 +1892,7 @@ static void DEVEXIT pciCanRemoveOne (struct pci_dev *dev)
   }
   os_if_spin_unlock(&driverData.canCardsLock);
 
-  for(i = 0; i < MAX_CHANNELS; i++) {
+  for(i = 0; i < MAX_CARD_CHANNELS; i++) {
     VCanChanData *vChd     = vCard->chanData[i];
     PciCan2ChanData *hChd = vChd->hwChanData;
     if (hChd->objbufs) {
@@ -2278,7 +2278,7 @@ static int pciCanObjbufExists (VCanChanData *chd, int bufType, int bufNo)
 INIT int init_module (void)
 {
   driverData.hwIf = &hwIf;
-  return vCanInit (&driverData, MAX_CHANNELS);
+  return vCanInit (&driverData, MAX_DRIVER_CHANNELS);
 }
 
 EXIT void cleanup_module (void)

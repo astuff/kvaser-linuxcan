@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
-<title>Kvaser Linux CANLIB: Support</title>
+<title>Kvaser Linux CANLIB: kvTimeDomainData_s Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/search.js"></script>
@@ -72,9 +72,9 @@ function toggleVisibility(linkObj) {
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li class="current"><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="modules.html"><span>Modules</span></a></li>
-      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li><a href="examples.html"><span>Examples</span></a></li>
       <li id="searchli">
@@ -95,6 +95,13 @@ function toggleVisibility(linkObj) {
       </li>
     </ul>
   </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
+      <li><a href="classes.html"><span>Data&#160;Structure&#160;Index</span></a></li>
+      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
+    </ul>
+  </div>
 </div>
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -106,22 +113,94 @@ function toggleVisibility(linkObj) {
   </div>
 </div>
 <script type="text/javascript">
-  initNavTree('page_user_guide_support.html','');
+  initNavTree('structkv_time_domain_data__s.html','');
 </script>
 <div id="doc-content">
 <div class="header">
+  <div class="summary">
+<a href="#pub-attribs">Data Fields</a>  </div>
   <div class="headertitle">
-<h1>Support </h1>  </div>
+<h1>kvTimeDomainData_s Struct Reference</h1>  </div>
 </div>
 <div class="contents">
-<div class="textblock"><p>You are invited to visit our support web pages at <a href="http://www.kvaser.com/support/.">http://www.kvaser.com/support/.</a> If you don't find what you are looking for, you can obtain support on a time-available basis by sending an e-mail to <a href="mailto:support@kvaser.com">support@kvaser.com</a>.</p>
-<p>Software updates, bug fixes, and so on will be made available on our web site, <a href="http://www.kvaser.com.">http://www.kvaser.com.</a></p>
-<p>Bug reports, suggestions for improvments, complaints, and similar things are much appreciated and can be sent by e-mail to <a href="mailto:support@kvaser.com">support@kvaser.com</a>. </p>
-</div></div>
+<!-- doxytag: class="kvTimeDomainData_s" -->
+<p><code>#include &lt;canlib.h&gt;</code></p>
+<table class="memberdecls">
+<tr><td colspan="2"><h2><a name="pub-attribs"></a>
+Data Fields</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkv_time_domain_data__s.html#ab8dca255d18320cb7bd22b0448d78fb7">nMagiSyncGroups</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkv_time_domain_data__s.html#aadd2929832bd903c78ddf59c21feea05">nMagiSyncedMembers</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkv_time_domain_data__s.html#af00948e6feb807b210c69fd5945e7068">nNonMagiSyncCards</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkv_time_domain_data__s.html#a9cc0826be3a3477969cc862737e0f334">nNonMagiSyncedMembers</a></td></tr>
+</table>
+<hr/><a name="_details"></a><h2>Detailed Description</h2>
+<div class="textblock"><p>Used for time domain handling. </p>
+</div><hr/><h2>Field Documentation</h2>
+<a class="anchor" id="aadd2929832bd903c78ddf59c21feea05"></a><!-- doxytag: member="kvTimeDomainData_s::nMagiSyncedMembers" ref="aadd2929832bd903c78ddf59c21feea05" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="structkv_time_domain_data__s.html#aadd2929832bd903c78ddf59c21feea05">nMagiSyncedMembers</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>number of MagiSync&trade; members </p>
+
+</div>
+</div>
+<a class="anchor" id="ab8dca255d18320cb7bd22b0448d78fb7"></a><!-- doxytag: member="kvTimeDomainData_s::nMagiSyncGroups" ref="ab8dca255d18320cb7bd22b0448d78fb7" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="structkv_time_domain_data__s.html#ab8dca255d18320cb7bd22b0448d78fb7">nMagiSyncGroups</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>number of MagiSync&trade; groups </p>
+
+</div>
+</div>
+<a class="anchor" id="af00948e6feb807b210c69fd5945e7068"></a><!-- doxytag: member="kvTimeDomainData_s::nNonMagiSyncCards" ref="af00948e6feb807b210c69fd5945e7068" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="structkv_time_domain_data__s.html#af00948e6feb807b210c69fd5945e7068">nNonMagiSyncCards</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>number of non MagiSync&trade; interfaces </p>
+
+</div>
+</div>
+<a class="anchor" id="a9cc0826be3a3477969cc862737e0f334"></a><!-- doxytag: member="kvTimeDomainData_s::nNonMagiSyncedMembers" ref="a9cc0826be3a3477969cc862737e0f334" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="structkv_time_domain_data__s.html#a9cc0826be3a3477969cc862737e0f334">nNonMagiSyncedMembers</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>number of non MagiSync&trade; members </p>
+
+</div>
+</div>
+</div>
 </div>
   <div id="nav-path" class="navpath">
     <ul>
-      <li class="navelem"><a class="el" href="page_user_guide.html">User's Guide</a>      </li>
+      <li class="navelem"><a class="el" href="structkv_time_domain_data__s.html">kvTimeDomainData_s</a>      </li>
 <!--- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"

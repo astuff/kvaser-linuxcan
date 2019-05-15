@@ -91,6 +91,7 @@
 #include "queue.h"
 #include "VCanOsIf.h"
 #include "debug.h"
+#include "softsync.h"
 
 
    MODULE_LICENSE("Dual BSD/GPL");
@@ -149,8 +150,8 @@ int vCanTime (VCanCardData *vCard, unsigned long *time)
   tv.tv_usec -= vCard->driverData->startTime.tv_usec;
   tv.tv_sec  -= vCard->driverData->startTime.tv_sec;
 
-  *time = tv.tv_usec / (long)vCard->usPerTick +
-          (1000000 / vCard->usPerTick) * tv.tv_sec;
+  *time = (unsigned long)tv.tv_usec / (unsigned long)vCard->usPerTick +
+          (1000000ul / (unsigned long)vCard->usPerTick) * (unsigned long)tv.tv_sec;
 
   return VCAN_STAT_OK;
 }
@@ -988,7 +989,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
       break;
     //------------------------------------------------------------------
     case VCAN_IOC_READ_TIMER:
-      ArgPtrOut(sizeof(int));
+      ArgPtrOut(sizeof(unsigned long));
       {
         unsigned long time;
         vStat = hwIf->getTime(chd->vCard, &time);
@@ -1516,7 +1517,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
       }
       break;
 
-      
+
   case KCAN_IOCTL_CANFD:
     {
       KCAN_IOCTL_CANFD_T fd_data;
@@ -1577,6 +1578,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
       sizeof(KCAN_IOCTL_CANFD_T), -EFAULT);
     }
     break;
+
 
 
     default:
@@ -1834,7 +1836,7 @@ void vCanCleanup (VCanDriverData *driverData)
   if (driverData->cdev.dev > 0) {
     DEBUGPRINT(2, ("unregister chrdev_region (%s) major=%d count=%d\n",
                    driverData->deviceName, MAJOR(driverData->cdev.dev),
-		   driverData->cdev.count));
+                   driverData->cdev.count));
     cdev_del(&driverData->cdev);
     unregister_chrdev_region(driverData->cdev.dev, driverData->cdev.count);
   }
@@ -1844,3 +1846,12 @@ void vCanCleanup (VCanDriverData *driverData)
 }
 EXPORT_SYMBOL(vCanCleanup);
 //======================================================================
+
+INIT int init_module (void)
+{
+  return 0;
+}
+
+EXIT void cleanup_module (void)
+{
+}

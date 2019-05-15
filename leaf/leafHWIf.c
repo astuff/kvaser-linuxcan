@@ -51,13 +51,14 @@
 **/
 
 //
-// Linux/WinCE Leaf driver
+// Linux Leaf driver
 //
 
 #  include <linux/version.h>
 #  include <linux/usb.h>
 #  include <linux/types.h>
 #  include <linux/seq_file.h>
+#  include <linux/math64.h>
 
 
 // Non system headers
@@ -169,7 +170,7 @@ static VCanHWInterface hwIf = {
   .objbufSetFlags    = leaf_objbuf_set_flags,
   .objbufSetPeriod   = leaf_objbuf_set_period,
   .objbufSetMsgCount = leaf_objbuf_set_msg_count,
-  .objbufSendBurst   = leaf_objbuf_send_burst
+  .objbufSendBurst   = leaf_objbuf_send_burst,
 };
 
 
@@ -182,28 +183,22 @@ static VCanHWInterface hwIf = {
 #define MAX_PACKET_OUT      3072        // To device
 #define MAX_PACKET_IN       3072        // From device
 
+#define TS_AS_UINT64(X, DEV) \
+  div_u64(((X) & 0x0000ffffffffffffUL) * 1000, (DEV)->hires_timer_fq)
+
+#define TIMESTAMP_AS_UINT64(X, DEV) \
+  TS_AS_UINT64(*(uint64_t *)(X), (DEV))
+
+
 //===========================================================================
-static unsigned long timestamp_in_10us(unsigned short *tics,
-                                       unsigned int hires_timer_fq)
+static unsigned long timestamp_in_10us(VCanCardData *vCard,
+                                       unsigned short *tics)
 {
-  unsigned long  ulTemp;
-  unsigned short resTime[3];
-  unsigned int   uiDivisor = 10 * hires_timer_fq;
+  LeafCardData *dev = (LeafCardData *)vCard->hwCardData;
+  uint64_t timestamp = TIMESTAMP_AS_UINT64(tics, dev);
 
-  resTime[0] = tics[2] / uiDivisor;
-  ulTemp     = (tics[2] % uiDivisor) << 16;
-
-  if (resTime[0] > 0) {
-    // The timer overflows - Ignore this
-    DEBUGPRINT(6, (TXT(">>>>>>>>>> Timer overflow\n")));
-  }
-
-  resTime[1] = (unsigned short)((ulTemp + tics[1]) / uiDivisor);
-  ulTemp     = ((ulTemp + tics[1]) % uiDivisor) << 16;
-
-  resTime[2] = (unsigned short)((ulTemp + tics[0]) / uiDivisor);
-
-  return (unsigned long)((resTime[1] << 16) + resTime[2]);
+  
+  return div_u64(timestamp + 4999, 10000) - vCard->timestamp_offset;
 }
 
 #define NUMBER_OF_BITS_FROM_ACK_TO_VALID_MSG    8
@@ -246,7 +241,7 @@ static int    leaf_fill_usb_buffer(VCanCardData *vCard,
 static void   leaf_translate_can_msg(VCanChanData *vChan,
                                      filoCmd *filo_msg, CAN_MSG *can_msg);
 
-static void   leaf_get_card_info(VCanCardData *vCard);
+static void   leaf_get_card_info_dummy(VCanCardData *vCard);
 //----------------------------------------------------------------------
 
 
@@ -475,9 +470,6 @@ static int leaf_rx_thread (void *context)
           count += cmd->head.cmdLen;
         }
 
-#if WIN32
-        BREAK(0x2000, "rx_thread2");
-#endif
         leaf_handle_command(cmd, vCard);
         usbErrorCounter = 0;
       }
@@ -777,8 +769,7 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
 
         e.tag               = V_RECEIVE_MSG;
         e.transId           = 0;
-        e.timeStamp = timestamp_in_10us(cmd->rxCanMessage.time,
-                                      dev->hires_timer_fq) +
+        e.timeStamp = timestamp_in_10us(vCard, cmd->rxCanMessage.time) +
                                       ((LeafChanData *)vChan->hwChanData)->
                                       timestamp_correction_value;
 
@@ -819,7 +810,7 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
         memcpy(e.tagData.msg.data, &cmd->rxCanMessage.rawMessage[6], 8);
 
         DEBUGPRINT(6, (TXT (" - vCanDispatchEvent id: %d (ch:%d), ")
-                       TXT2("time %d, corr %d\n"),
+                       TXT2("time %lu, corr %lu\n"),
                        e.tagData.msg.id, vChan->channel, e.timeStamp,
                        ((LeafChanData *)vChan->hwChanData)->timestamp_correction_value));
         vCanDispatchEvent(vChan, &e);
@@ -845,7 +836,7 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
           (NUMBER_OF_BITS_FROM_ACK_TO_VALID_MSG * 16000ul) / dev->freq /
           dev->hires_timer_fq;
         DEBUGPRINT(6, (TXT ("CMD_GET_BUSPARAMS_RESP: ")
-                       TXT2("timestamp_correction_value = %d\n"),
+                       TXT2("timestamp_correction_value = %lu\n"),
                        vChan->timestamp_correction_value));
       }
       break;
@@ -902,8 +893,7 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
         //  wake_up(&hCd->waitResponse);
 
         e.tag       = V_CHIP_STATE;
-        e.timeStamp = timestamp_in_10us(cmd->chipStateEvent.time,
-                                        dev->hires_timer_fq);
+        e.timeStamp = timestamp_in_10us(vCard, cmd->chipStateEvent.time);
         e.transId   = 0;
         e.tagData.chipState.busStatus      = (unsigned char)vChd->chipState.state;
         e.tagData.chipState.txErrorCounter = (unsigned char)vChd->chipState.txerr;
@@ -1003,7 +993,7 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
           SWOPTION_32_MHZ_CLK) {
         dev->hires_timer_fq = 32;
       }
-      DEBUGPRINT(6, (TXT("[hires timer running at %u MHz]\n"),
+      DEBUGPRINT(6, (TXT("[hires timer running at %lu MHz]\n"),
                      dev->hires_timer_fq));
 
       if (cmd->getSoftwareInfoResp.swOptions & SWOPTION_BETA) {
@@ -1076,8 +1066,7 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
         if (((LeafChanData *)vChan->hwChanData)->current_tx_message[transId - 1].flags & VCAN_MSG_FLAG_TXRQ) {
           VCAN_EVENT *e = (VCAN_EVENT *)&((LeafChanData *)vChan->hwChanData)->current_tx_message[transId - 1];
           e->tag = V_RECEIVE_MSG;
-          e->timeStamp = timestamp_in_10us(cmd->txRequest.time,
-                                           dev->hires_timer_fq);
+          e->timeStamp = timestamp_in_10us(vCard, cmd->txRequest.time);
           e->tagData.msg.flags &= ~VCAN_MSG_FLAG_TXACK;  // qqq TXACK/RQ???
           vCanDispatchEvent(vChan, e);
         }
@@ -1118,7 +1107,7 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
         if (((LeafChanData *)vChan->hwChanData)->current_tx_message[transId - 1].flags & VCAN_MSG_FLAG_TXACK) {
           VCAN_EVENT *e = (VCAN_EVENT *)&((LeafChanData *)vChan->hwChanData)->current_tx_message[transId - 1];
           e->tag = V_RECEIVE_MSG;
-          e->timeStamp = timestamp_in_10us(cmd->txAck.time, dev->hires_timer_fq);
+          e->timeStamp = timestamp_in_10us(vCard, cmd->txAck.time);
 
           if (dev->time_offset_valid && dev->freq >= 100000) {
             e->timeStamp -= cmd->txAck.timeOffset * (1000ul / dev->freq);
@@ -1249,9 +1238,7 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
 
       e.tag = V_CHIP_STATE;
 
-      e.timeStamp = timestamp_in_10us(cmd->canErrorEvent.time,
-                                      dev->hires_timer_fq);
-
+      e.timeStamp = timestamp_in_10us(vCard, cmd->canErrorEvent.time);
       e.transId = 0;
       e.tagData.chipState.busStatus      = vChd->chipState.state;
       e.tagData.chipState.txErrorCounter = vChd->chipState.txerr;
@@ -1261,9 +1248,7 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
       if (errorCounterChanged) {
         e.tag               = V_RECEIVE_MSG;
         e.transId           = 0;
-        e.timeStamp = timestamp_in_10us(cmd->canErrorEvent.time,
-                                        dev->hires_timer_fq);
-
+        e.timeStamp = timestamp_in_10us(vCard, cmd->canErrorEvent.time);
         e.tagData.msg.id    = 0;
         e.tagData.msg.flags = VCAN_MSG_FLAG_ERROR_FRAME;
 
@@ -1299,9 +1284,7 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
 
         e.tag               = V_RECEIVE_MSG;
         e.transId           = 0;
-        e.timeStamp         = timestamp_in_10us(cmd->logMessage.time,
-                                                dev->hires_timer_fq);
-
+        e.timeStamp         = timestamp_in_10us(vCard, cmd->logMessage.time);
         if (dev->time_offset_valid && dev->freq >= 100000) {
           e.timeStamp -= cmd->logMessage.timeOffset * (1000ul / dev->freq);
         }
@@ -1436,9 +1419,6 @@ static void leaf_send (OS_IF_TASK_QUEUE_HANDLE *work)
   // Wait for a previous write to finish up; we don't use a timeout
   // and so a nonresponsive device can delay us indefinitely. qqq
   os_if_down_sema(&dev->write_finished);
-#if WIN32
-  complete_write(dev);
-#endif
 
   if (!dev->present) {
     // The device was unplugged before the file was released
@@ -1754,9 +1734,6 @@ static int leaf_transmit (VCanCardData *vCard /*, void *cmd*/)
   if (retval) {
     DEBUGPRINT(1, (TXT("%s - failed submitting write urb, error %d"),
                    __FUNCTION__, retval));
-#if WIN32
-    dev->write_urb->status = (USB_ERROR)dev->write_urb->transfer_handle;
-#endif
     retval = VCAN_STAT_FAIL;
   }
   else {
@@ -1772,7 +1749,7 @@ static int leaf_transmit (VCanCardData *vCard /*, void *cmd*/)
 //============================================================================
 // _get_card_info
 //
-static void leaf_get_card_info (VCanCardData* vCard)
+static void leaf_get_card_info_dummy (VCanCardData* vCard)
 {
   LeafCardData *dev = (LeafCardData *)vCard->hwCardData;
   cmdGetCardInfoReq     card_cmd;
@@ -2274,7 +2251,7 @@ static int leaf_plugin (struct usb_interface *interface,
   dev->vCard = vCard;
 
   // Set the number on the channels
-  for (i = 0; i < MAX_CHANNELS; i++) {
+  for (i = 0; i < MAX_CARD_CHANNELS; i++) {
     VCanChanData   *vChd = vCard->chanData[i];
     vChd->channel  = i;
   }
@@ -2287,7 +2264,7 @@ static int leaf_plugin (struct usb_interface *interface,
   DEBUGPRINT(2, (TXT("------------------------------\n")));
   DEBUGPRINT(2, (TXT("Leaf device %d now attached\n"),
                  driverData.noOfDevices));
-  for (i = 0; i < MAX_CHANNELS; i++) {
+  for (i = 0; i < MAX_CARD_CHANNELS; i++) {
     DEBUGPRINT(2, (TXT("With minor number %d \n"), vCard->chanData[i]->minorNr));
   }
   DEBUGPRINT(2, (TXT("using driver built %s\n"), TXT2(__TIME__)));
@@ -2324,7 +2301,7 @@ static void leaf_start (VCanCardData *vCard)
   queue_init(&dev->txCmdQueue, KV_LEAF_TX_CMD_BUF_SIZE);
 
   // Set spinlocks for the outstanding tx
-  for (i = 0; i < MAX_CHANNELS; i++) {
+  for (i = 0; i < MAX_CARD_CHANNELS; i++) {
     VCanChanData  *vChd     = vCard->chanData[i];
     LeafChanData  *leafChan = vChd->hwChanData;
     os_if_spin_lock_init(&leafChan->outTxLock);
@@ -2339,7 +2316,7 @@ static void leaf_start (VCanCardData *vCard)
   rx_thread = os_if_kernel_thread(leaf_rx_thread, vCard);
 
   // Gather some card info
-  leaf_get_card_info(vCard);
+  leaf_get_card_info_dummy(vCard);
   
   if (vCard) {
     DEBUGPRINT(2, (TXT("vCard chnr: %d\n"), vCard->nrChannels));
@@ -2350,6 +2327,7 @@ static void leaf_start (VCanCardData *vCard)
 
   vCard->driverData = &driverData;
   vCanInitData(vCard);
+
 } // _start
 
 
@@ -2361,9 +2339,9 @@ static int leaf_allocate (VCanCardData **in_vCard)
 {
   // Helper struct for allocation
   typedef struct {
-    VCanChanData  *dataPtrArray[MAX_CHANNELS];
-    VCanChanData  vChd[MAX_CHANNELS];
-    LeafChanData  hChd[MAX_CHANNELS];
+    VCanChanData  *dataPtrArray[MAX_CARD_CHANNELS];
+    VCanChanData  vChd[MAX_CARD_CHANNELS];
+    LeafChanData  hChd[MAX_CARD_CHANNELS];
   } ChanHelperStruct;
 
   int              chNr;
@@ -2393,24 +2371,9 @@ static int leaf_allocate (VCanCardData **in_vCard)
   }
   memset(chs, 0, sizeof(ChanHelperStruct));
 
-#if WIN32
-  {
-    LeafCardData *dev = vCard->hwCardData;
-
-    dev->read_urb = os_if_kernel_malloc(sizeof(*dev->read_urb) +
-                                        sizeof(*dev->write_urb));
-    if (!dev->read_urb) {
-      DEBUGPRINT(1, (TXT("Could not allocate read/write_urb")));
-      os_if_kernel_free(chs);
-      goto chan_alloc_err;
-    }
-    memset(dev->read_urb, 0, sizeof(*dev->read_urb) + sizeof(*dev->write_urb));
-    dev->write_urb = dev->read_urb + 1;
-  }
-#endif
 
   // Init array and hwChanData
-  for (chNr = 0; chNr < MAX_CHANNELS; chNr++) {
+  for (chNr = 0; chNr < MAX_CARD_CHANNELS; chNr++) {
     chs->dataPtrArray[chNr]    = &chs->vChd[chNr];
     chs->vChd[chNr].hwChanData = &chs->hChd[chNr];
     chs->vChd[chNr].minorNr    = -1;   // No preset minor number
@@ -2497,7 +2460,7 @@ static void leaf_deallocate (VCanCardData *vCard)
 
   os_if_spin_unlock(&driverData.canCardsLock);
 
-  for(i = 0; i < MAX_CHANNELS; i++) {
+  for(i = 0; i < MAX_CARD_CHANNELS; i++) {
     VCanChanData *vChd     = vCard->chanData[i];
     LeafChanData *leafChan = vChd->hwChanData;
     if (leafChan->objbufs) {
@@ -2547,6 +2510,7 @@ static void leaf_remove (struct usb_interface *interface)
   vCard = usb_get_intfdata(interface);
   usb_set_intfdata(interface, NULL);
 
+
   dev = vCard->hwCardData;
 
   // Prevent device read, write and ioctl
@@ -2554,7 +2518,7 @@ static void leaf_remove (struct usb_interface *interface)
   // work even though the device is no longer present.
   dev->present = 0;
 
-  for (i = 0; i < MAX_CHANNELS; i++) {
+  for (i = 0; i < MAX_CARD_CHANNELS; i++) {
     vChan = vCard->chanData[i];
     DEBUGPRINT(3, (TXT("Waiting for all closed on minor %d\n"), vChan->minorNr));
     while (atomic_read(&vChan->fileOpenCount) > 0) {
@@ -2572,12 +2536,9 @@ static void leaf_remove (struct usb_interface *interface)
   USB_KILL_URB(dev->write_urb);
   DEBUGPRINT(6, (TXT("Unlinking urb\n")));
   os_if_down_sema(&dev->write_finished);
-#if WIN32
-  complete_write(dev);
-#endif
 
   // Remove spin locks
-  for (i = 0; i < MAX_CHANNELS; i++) {
+  for (i = 0; i < MAX_CARD_CHANNELS; i++) {
     VCanChanData   *vChd     = vCard->chanData[i];
     LeafChanData   *leafChan = vChd->hwChanData;
     os_if_spin_lock_remove(&leafChan->outTxLock);
@@ -2730,11 +2691,6 @@ static int leaf_set_silent (VCanChanData *vChan, int silent)
 //
 static int leaf_set_trans_type (VCanChanData *vChan, int linemode, int resnet)
 {
-#if WIN32
-  UNREFERENCED_PARAMETER(vChan);
-  UNREFERENCED_PARAMETER(linemode);
-  UNREFERENCED_PARAMETER(resnet);
-#endif
   // qqq Not implemented
   DEBUGPRINT(3, (TXT("leaf: _set_trans_type is NOT implemented!\n")));
 
@@ -3033,7 +2989,7 @@ static int leaf_proc_read (struct seq_file* m, void* v)
   seq_puts(m,"minor numbers");
   while (NULL != cardData) {
     for (channel = 0; channel < cardData->nrChannels; channel++) {
-    	seq_printf(m," %d", cardData->chanData[channel]->minorNr);
+        seq_printf(m," %d", cardData->chanData[channel]->minorNr);
     }
     cardData = cardData->next;
   }
@@ -3092,7 +3048,6 @@ static int leaf_outstanding_sync (VCanChanData *vChan)
   filoCmd cmd;
   filoCmd reply;
   int ret;
-  LeafCardData  *dev = (LeafCardData *)vCard->hwCardData;
 
   DEBUGPRINT(3, (TXT("leaf: _get_time\n")));
 
@@ -3105,7 +3060,7 @@ static int leaf_outstanding_sync (VCanChanData *vChan)
   ret = leaf_send_and_wait_reply(vCard, (filoCmd *)&cmd, &reply,
                                  CMD_READ_CLOCK_RESP, 0);
   if (ret == VCAN_STAT_OK) {
-    *time = timestamp_in_10us(reply.readClockResp.time, dev->hires_timer_fq);
+    *time = timestamp_in_10us(vCard, reply.readClockResp.time);
   }
 
   return ret;
@@ -3543,10 +3498,13 @@ static int leaf_objbuf_send_burst (VCanChanData *chd, int bufType, int bufNo,
   return (ret != VCAN_STAT_OK) ? VCAN_STAT_NO_MEMORY : VCAN_STAT_OK;
 }
 
+
+
+
 INIT int init_module (void)
 {
   driverData.hwIf = &hwIf;
-  return vCanInit (&driverData, MAX_CHANNELS);
+  return vCanInit (&driverData, MAX_DRIVER_CHANNELS);
 }
 
 EXIT void cleanup_module (void)

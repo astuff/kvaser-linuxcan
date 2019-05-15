@@ -51,17 +51,13 @@
 **/
 
 //
-// Linux/WinCE USBcanII driver
+// Linux USBcanII driver
 //
 
 #ifndef _USBCAN_HW_IF_H_
 #define _USBCAN_HW_IF_H_
 
 
-#if WIN32
-#include "vcanevt.h"
-#include "VCanOSif.h"
-#endif
 
 #include "osif_kernel.h"
 #include "helios_cmds.h"
@@ -72,7 +68,8 @@
 /*****************************************************************************/
 
 #define DEVICE_NAME_STRING              "usbcanII"
-#define MAX_CHANNELS                             2
+#define MAX_CARD_CHANNELS                        2
+#define MAX_DRIVER_CHANNELS                    128 
 #define KV_USBCAN_MAIN_RCV_BUF_SIZE             16
 #define KV_USBCAN_TX_CMD_BUF_SIZE               16
 #define USBCAN_CMD_RESP_WAIT_TIME             1000

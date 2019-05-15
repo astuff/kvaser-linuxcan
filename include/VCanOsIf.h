@@ -73,6 +73,8 @@
 #include "osif_kernel.h"
 #include "queue.h"
 
+#include "softsync.h"
+
 
 /*****************************************************************************/
 /*  Defines                                                                  */
@@ -178,7 +180,7 @@ typedef struct VCanChanData
     unsigned int             overrun;
     CanChipState             chipState;
     unsigned int             errorCount;
-    uint32_t                 errorTime;
+    unsigned long            errorTime;
     unsigned char            rxErrorCounter;
     unsigned char            txErrorCounter;
     unsigned char            canFdMode;
@@ -252,6 +254,8 @@ typedef struct VCanCardData
     VCanDriverData         *driverData;
 
     OS_IF_SEMAPHORE         open;
+
+    unsigned long           timestamp_offset;
 
     struct VCanCardData    *next;
 } VCanCardData;
@@ -334,9 +338,6 @@ typedef struct VCanHWInterface {
                                  int count);
     int (*objbufSendBurst)      (VCanChanData *chd, int bufType, int bufNo,
                                  int burstLen);
-
-    int (*llAccess)             (VCanChanData*, void **);
-
 } VCanHWInterface;
 
 

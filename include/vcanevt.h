@@ -104,7 +104,8 @@ typedef unsigned char VeventTag;
 #define VCAN_MSG_FLAG_TX_START      0x80  /* Transmit Message stored into Controller  */
 #define VCAN_MSG_FLAG_TXRQ          0x80  /* Transmit Message stored into Controller  */
 
-#define VCAN_MSG_FLAG_EDL           0x100  /* Extended Data Length (CAN FD) */
+#define VCAN_MSG_FLAG_EDL           0x100  /* Obsolete, use VCAN_MSG_FLAG_FDF instead */
+#define VCAN_MSG_FLAG_FDF           0x100  /* Extended Data Length (CAN FD) */
 #define VCAN_MSG_FLAG_BRS           0x200  /* Bit Rate Switch (CAN FD)  */
 #define VCAN_MSG_FLAG_ESI           0x400  /* Error Status Indication (CAN FD)  */
 
@@ -208,12 +209,12 @@ struct s_vcan_event {
          unsigned char chanIndex;       // 1
          unsigned char transId;         // 1
          unsigned char unused_1;        // 1 internal use only !!!!
-         uint32_t      timeStamp;            // 4
+         unsigned long timeStamp;       // 4 or 8
          union s_vcan_tag_data
                        tagData;         // 14 Bytes (_VMessage)
        };
                                         // --------
-                                        // 22 Bytes
+                                        // 22 or 26 Bytes
 
 typedef struct s_vcan_event VCAN_EVENT, Vevent, *PVevent;
 
@@ -223,7 +224,7 @@ typedef struct s_can_msg {
   unsigned char      channel_index;
   unsigned char      user_data;
   unsigned char      unused_1;
-  uint32_t           timestamp;
+  unsigned long      timestamp;
   uint32_t           id;
   unsigned short int flags;
   unsigned char      length;

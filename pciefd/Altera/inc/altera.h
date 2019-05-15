@@ -17,14 +17,6 @@
 
 #include "HAL/inc/pciefd.h"
 
-#if LOOPBACK_VERSION == 2
-#include "can_loopback_regs.h"
-#elif LOOPBACK_VERSION == 4
-#include "can_loopback_v4_regs.h"
-#else
-#error "LOOPBACK_VERSION not defined"
-#endif
-
 #include "sysid.h"
 
 #include "pll_regs.h"

@@ -309,20 +309,20 @@ function toggleVisibility(linkObj) {
 <div class="fragment"><pre class="fragment"><span class="preprocessor">    #define NUMBER_OF_CHANNELS 3</span>
 <span class="preprocessor"></span>    <span class="keywordtype">int</span> h[NUMBER_OF_CHANNELS];
     <span class="keywordtype">int</span> stat, i;
-    kvTimeDomain tDomain;
-    kvTimeDomainData tData;
+    <a class="code" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a> tDomain;
+    <a class="code" href="structkv_time_domain_data__s.html">kvTimeDomainData</a> tData;
     
     ... 
     
     <span class="comment">// Create a time domain for my handles.</span>
-    stat = kvTimeDomainCreate(&amp;tDomain);
+    stat = <a class="code" href="canlib_8h.html#aef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate</a>(&amp;tDomain);
     <span class="keywordflow">if</span> (stat &lt; 0) {
         printf(<span class="stringliteral">&quot;Failed, status == %d\n&quot;</span>, stat);
     }
     
     <span class="comment">// Add the handles to the domain.</span>
     <span class="keywordflow">for</span> (i = 0; i &lt; NUMBER_OF_CHANNELS; i++) {
-      stat = kvTimeDomainAddHandle(tDomain, h[i]);
+      stat = <a class="code" href="canlib_8h.html#a73890ef75367c8536235bcc5a6370b26">kvTimeDomainAddHandle</a>(tDomain, h[i]);
       <span class="keywordflow">if</span> (stat &lt; 0) {
           printf(<span class="stringliteral">&quot;Failed to add handle %u to tDomain, &quot;</span>, i);
           printf(<span class="stringliteral">&quot;status == %d\n&quot;</span>, stat);
@@ -330,28 +330,28 @@ function toggleVisibility(linkObj) {
     }
     
     <span class="comment">// Request some data from the domain and try to interpret it.</span>
-    stat = kvTimeDomainGetData(tDomain, &amp;tData; <span class="keyword">sizeof</span>(tData));
+    stat = <a class="code" href="canlib_8h.html#afab02cbe0c7fd8cfa65382d492d724b9">kvTimeDomainGetData</a>(tDomain, &amp;tData; <span class="keyword">sizeof</span>(tData));
     <span class="keywordflow">if</span> (stat &lt; 0) {
         printf(<span class="stringliteral">&quot;Failed, status == %d\n&quot;</span>, stat);
     }
     
-    <span class="keywordflow">if</span> (tData.nMagiSyncGroups &gt; 1) {
+    <span class="keywordflow">if</span> (tData.<a class="code" href="structkv_time_domain_data__s.html#ab8dca255d18320cb7bd22b0448d78fb7" title="number of MagiSync&amp;tm; groups">nMagiSyncGroups</a> &gt; 1) {
       printf(<span class="stringliteral">&quot;Consider connecting the Kvaser MagiSync&amp;tm; enabled &quot;</span>);
       printf(<span class="stringliteral">&quot;interfaces through the same USB root hub!&quot;</span>);
     }
     
-    <span class="keywordflow">if</span> (tData.nMagiSyncGroups == 1) {
+    <span class="keywordflow">if</span> (tData.<a class="code" href="structkv_time_domain_data__s.html#ab8dca255d18320cb7bd22b0448d78fb7" title="number of MagiSync&amp;tm; groups">nMagiSyncGroups</a> == 1) {
       printf(<span class="stringliteral">&quot;All my Kvaser MagiSync&amp;tm; enabled interfaces are &quot;</span>);
       printf(<span class="stringliteral">&quot;connected through the same USB root hub and hence &quot;</span>);
       printf(<span class="stringliteral">&quot;perfectly synchronized!&quot;</span>);
     }
     
-    <span class="keywordflow">if</span> (tData.nMagiSyncedMembers == NUMBER_OF_CHANNELS) {
+    <span class="keywordflow">if</span> (tData.<a class="code" href="structkv_time_domain_data__s.html#aadd2929832bd903c78ddf59c21feea05" title="number of MagiSync&amp;tm; members">nMagiSyncedMembers</a> == NUMBER_OF_CHANNELS) {
       printf(<span class="stringliteral">&quot;All handles have the Kvaser MagiSync&amp;tm; feature enabled!&quot;</span>);
     }
     
     <span class="comment">// Reset the time on all handles in tDomain.</span>
-    stat = kvTimeDomainResetTime(tDomain);
+    stat = <a class="code" href="canlib_8h.html#af1857d6195e783c082b44a6e6cf9f745">kvTimeDomainResetTime</a>(tDomain);
     <span class="keywordflow">if</span> (stat &lt; 0) {
       printf(<span class="stringliteral">&quot;Failed, status == %d\n&quot;</span>, stat);
     }
@@ -359,7 +359,7 @@ function toggleVisibility(linkObj) {
     ... 
     
     <span class="comment">// Final cleanup</span>
-    stat = kvTimeDomainDelete(tDomain);
+    stat = <a class="code" href="canlib_8h.html#af42198d9685ffc7094fc4cd276ab1976">kvTimeDomainDelete</a>(tDomain);
     <span class="keywordflow">if</span> (stat &lt; 0) {
       printf(<span class="stringliteral">&quot;Failed, status == %d\n&quot;</span>, stat);
     }
@@ -555,7 +555,7 @@ function toggleVisibility(linkObj) {
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.12) - Generated on Mon Sep 21 2015</small>
+<small>Kvaser Linux CANLIB (canlib 5.15) - Generated on Mon Mar 7 2016</small>
 </address>
 </body>
 </html>

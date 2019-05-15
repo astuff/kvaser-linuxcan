@@ -322,22 +322,12 @@ int readFIFO(VCanCardData *vCard, pciefd_packet_t *packet)
   }
 
   // Ack or txrq packet
-  else if (isAckPacket(packet)) {
+  else if( isAckPacket(packet)       ||
+           isTxrqPacket(packet)      ||
+           isEFlushAckPacket(packet) ||
+           isEFrameAckPacket(packet)) {
     mode_str = "ack packet";
     if (noEOP(hCard->canRxBuffer,"Ack")) {
-      IORD_RXBUF_FIFO_LAST(hCard->canRxBuffer);
-      return -1;
-    }
-
-    if (readTimestamp(hCard->canRxBuffer, packet, EXPECT_EOP)) {
-      IORD_RXBUF_FIFO_LAST(hCard->canRxBuffer);
-      return -1;
-    }
-  }
-  else if (isTxrqPacket(packet)) {
-    mode_str = "txrq packet";
-    if (noEOP(hCard->canRxBuffer,"Txrq")) {
-
       IORD_RXBUF_FIFO_LAST(hCard->canRxBuffer);
       return -1;
     }

@@ -51,7 +51,7 @@
 **/
 
 //
-// Linux/WinCE USBcanII driver
+// Linux USBcanII driver
 //
 
 #  include <linux/version.h>
@@ -414,9 +414,6 @@ static int usbcan_rx_thread (void *context)
           count += cmd->head.cmdLen;
         }
 
-#if WIN32
-        BREAK(0x2000, "rx_thread2");
-#endif
         usbcan_handle_command(cmd, vCard);
         usbErrorCounter = 0;
       }
@@ -513,7 +510,7 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
 
         memcpy(e.tagData.msg.data, &cmd->rxCanMessage.rawMessage[6], 8);
 
-        DEBUGPRINT(6, (TXT(" - vCanDispatchEvent id: %d (ch:%d), time %d\n"),
+        DEBUGPRINT(6, (TXT(" - vCanDispatchEvent id: %d (ch:%d), time %lu\n"),
                        e.tagData.msg.id, vChan->channel, e.timeStamp));
         vCanDispatchEvent(vChan, &e);
       }
@@ -1005,9 +1002,6 @@ static void usbcan_send (OS_IF_TASK_QUEUE_HANDLE *work)
   // Wait for a previous write to finish up; we don't use a timeout
   // and so a nonresponsive device can delay us indefinitely. qqq
   os_if_down_sema(&dev->write_finished);
-#if WIN32
-  complete_write(dev);
-#endif
 
   if (!dev->present) {
     // The device was unplugged before the file was released
@@ -1329,9 +1323,6 @@ static int usbcan_transmit (VCanCardData *vCard /*, void *cmd*/)
   if (retval) {
     DEBUGPRINT(1, (TXT("%s - failed submitting write urb, error %d"),
                    __FUNCTION__, retval));
-#if WIN32
-    dev->write_urb->status = (USB_ERROR)dev->write_urb->transfer_handle;
-#endif
     retval = -1; // qqq, VCAN_STAT_FAIL ???
   }
   else {
@@ -1598,6 +1589,13 @@ static int DEVINIT usbcan_plugin (struct usb_interface *interface,
 
   DEBUGPRINT(3, (TXT("usbcan: _plugin\n")));
 
+  // Maximum number of channels for this driver reached
+  if (driverData.noOfDevices + MAX_CARD_CHANNELS > MAX_DRIVER_CHANNELS) {
+    DEBUGPRINT(1, (TXT("usbcan: _plugin: Max number of devices reached (%d) for this driver (%s)\n"),
+		   driverData.noOfDevices, driverData.deviceName));
+    return -ENODEV;
+  }
+
   // See if the device offered us matches what we can accept
   // Add here for more devices
   if ((udev->descriptor.idVendor != KVASER_VENDOR_ID) ||
@@ -1738,11 +1736,10 @@ static int DEVINIT usbcan_plugin (struct usb_interface *interface,
   dev->vCard = vCard;
 
   // Set the number on the channels
-  for (i = 0; i < MAX_CHANNELS; i++) {
+  for (i = 0; i < MAX_CARD_CHANNELS; i++) {
     VCanChanData   *vChd = vCard->chanData[i];
     vChd->channel  = i;
   }
-
 
   // Start up vital stuff
   usbcan_start(vCard);
@@ -1751,7 +1748,7 @@ static int DEVINIT usbcan_plugin (struct usb_interface *interface,
   DEBUGPRINT(2, (TXT("------------------------------\n")));
   DEBUGPRINT(2, (TXT("USBcanII device %d now attached\n"),
                  driverData.noOfDevices));
-  for (i = 0; i < MAX_CHANNELS; i++) {
+  for (i = 0; i < MAX_CARD_CHANNELS; i++) {
     DEBUGPRINT(2, (TXT("With minor number %d \n"), vCard->chanData[i]->minorNr));
   }
   DEBUGPRINT(2, (TXT("using driver built %s\n"), TXT2(__TIME__)));
@@ -1791,7 +1788,7 @@ static void DEVINIT usbcan_start (VCanCardData *vCard)
   os_if_spin_lock_init(&dev->timeHi_lock);
 
   // Set spinlocks for the outstanding tx
-  for (i = 0; i < MAX_CHANNELS; i++) {
+  for (i = 0; i < MAX_CARD_CHANNELS; i++) {
     VCanChanData    *vChd    = vCard->chanData[i];
     UsbcanChanData  *usbChan = vChd->hwChanData;
     os_if_spin_lock_init(&usbChan->outTxLock);
@@ -1821,9 +1818,9 @@ static int DEVINIT usbcan_allocate (VCanCardData **in_vCard)
 {
   // Helper struct for allocation
   typedef struct {
-    VCanChanData    *dataPtrArray[MAX_CHANNELS];
-    VCanChanData    vChd[MAX_CHANNELS];
-    UsbcanChanData  hChd[MAX_CHANNELS];
+    VCanChanData    *dataPtrArray[MAX_CARD_CHANNELS];
+    VCanChanData    vChd[MAX_CARD_CHANNELS];
+    UsbcanChanData  hChd[MAX_CARD_CHANNELS];
   } ChanHelperStruct;
 
   int              chNr;
@@ -1853,24 +1850,9 @@ static int DEVINIT usbcan_allocate (VCanCardData **in_vCard)
   }
   memset(chs, 0, sizeof(ChanHelperStruct));
 
-#if WIN32
-  {
-    UsbcanCardData *dev = vCard->hwCardData;
-
-    dev->read_urb = os_if_kernel_malloc(sizeof(*dev->read_urb) +
-                                        sizeof(*dev->write_urb));
-    if (!dev->read_urb) {
-      DEBUGPRINT(1, (TXT("Could not allocate read/write_urb")));
-      os_if_kernel_free(chs);
-      goto chan_alloc_err;
-    }
-    memset(dev->read_urb, 0, sizeof(*dev->read_urb) + sizeof(*dev->write_urb));
-    dev->write_urb = dev->read_urb + 1;
-  }
-#endif
 
   // Init array and hwChanData
-  for (chNr = 0; chNr < MAX_CHANNELS; chNr++) {
+  for (chNr = 0; chNr < MAX_CARD_CHANNELS; chNr++) {
     chs->dataPtrArray[chNr]    = &chs->vChd[chNr];
     chs->vChd[chNr].hwChanData = &chs->hChd[chNr];
     chs->vChd[chNr].minorNr    = -1;   // No preset minor number
@@ -1959,7 +1941,7 @@ static void DEVEXIT usbcan_deallocate (VCanCardData *vCard)
 
   os_if_spin_unlock(&driverData.canCardsLock);
 
-  for(i = 0; i < MAX_CHANNELS; i++) {
+  for(i = 0; i < MAX_CARD_CHANNELS; i++) {
     VCanChanData *vChd      = vCard->chanData[i];
     UsbcanChanData *usbChan = vChd->hwChanData;
     if (usbChan->objbufs) {
@@ -2016,7 +1998,7 @@ static void DEVEXIT usbcan_remove (struct usb_interface *interface)
   // work even though the device is no longer present.
   dev->present = 0;
 
-  for (i = 0; i < MAX_CHANNELS; i++) {
+  for (i = 0; i < MAX_CARD_CHANNELS; i++) {
     vChan = vCard->chanData[i];
     DEBUGPRINT(3, (TXT("Waiting for all closed on minor %d\n"), vChan->minorNr));
     while (atomic_read(&vChan->fileOpenCount) > 0) {
@@ -2035,12 +2017,9 @@ static void DEVEXIT usbcan_remove (struct usb_interface *interface)
   USB_KILL_URB(dev->write_urb);
   DEBUGPRINT(6, (TXT("Unlinking urb\n")));
   os_if_down_sema(&dev->write_finished);
-#if WIN32
-  complete_write(dev);
-#endif
 
   // Remove spin locks
-  for (i = 0; i < MAX_CHANNELS; i++) {
+  for (i = 0; i < MAX_CARD_CHANNELS; i++) {
     VCanChanData   *vChd    = vCard->chanData[i];
     UsbcanChanData *usbChan = vChd->hwChanData;
     os_if_spin_lock_remove(&usbChan->outTxLock);
@@ -2180,11 +2159,6 @@ static int usbcan_set_silent (VCanChanData *vChan, int silent)
 //
 static int usbcan_set_trans_type (VCanChanData *vChan, int linemode, int resnet)
 {
-#if WIN32
-  UNREFERENCED_PARAMETER(vChan);
-  UNREFERENCED_PARAMETER(linemode);
-  UNREFERENCED_PARAMETER(resnet);
-#endif
   // qqq Not implemented
   DEBUGPRINT(3, (TXT("usbcan: _set_trans_type is NOT implemented!\n")));
 
@@ -2909,7 +2883,7 @@ static int usbcan_objbuf_exists (VCanChanData *chd, int bufType, int bufNo)
 INIT int init_module (void)
 {
   driverData.hwIf = &hwIf;
-  return vCanInit (&driverData, MAX_CHANNELS);
+  return vCanInit (&driverData, MAX_DRIVER_CHANNELS);
 }
 
 EXIT void cleanup_module (void)

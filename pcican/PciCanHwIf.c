@@ -430,14 +430,14 @@ static int DEVINIT pciCanProbe (VCanCardData *vCd)
 
     ds_shutdown(&(hCd->cardEeprom));
 
-    for (i = 0; i < MAX_CHANNELS; i++) {
+    for (i = 0; i < MAX_CARD_CHANNELS; i++) {
         VCanChanData   *vChd = vCd->chanData[i];
         PciCanChanData *hChd = vChd->hwChanData;
 
         if (vChd->chipType == CAN_CHIP_TYPE_UNKNOWN) {
             // This does not work, if the card is probed the second time
             // (e.g. after wakeup from sleep mode), and there are less
-            // than MAX_CHANNELS available.
+            // than MAX_CARD_CHANNELS available.
 
             // Each controller has PCICAN_BYTES_PER_CIRCUIT bytes.
             // This is "hardcoded" on the PCB and in the Xilinx.
@@ -1780,9 +1780,9 @@ static int DEVINIT pciCanInitOne (struct pci_dev *dev, const struct pci_device_i
 {
     // Helper struct for allocation
     typedef struct {
-        VCanChanData *dataPtrArray[MAX_CHANNELS];
-        VCanChanData vChd[MAX_CHANNELS];
-        PciCanChanData hChd[MAX_CHANNELS];
+        VCanChanData *dataPtrArray[MAX_CARD_CHANNELS];
+        VCanChanData vChd[MAX_CARD_CHANNELS];
+        PciCanChanData hChd[MAX_CARD_CHANNELS];
     } ChanHelperStruct;
 
     ChanHelperStruct *chs;
@@ -1810,7 +1810,7 @@ static int DEVINIT pciCanInitOne (struct pci_dev *dev, const struct pci_device_i
     memset(chs, 0, sizeof(ChanHelperStruct));
 
     // Init array and hwChanData
-    for (chNr = 0; chNr < MAX_CHANNELS; chNr++){
+    for (chNr = 0; chNr < MAX_CARD_CHANNELS; chNr++){
         chs->dataPtrArray[chNr]    = &chs->vChd[chNr];
         chs->vChd[chNr].hwChanData = &chs->hChd[chNr];
         chs->vChd[chNr].minorNr    = -1;   // No preset minor number
@@ -1990,7 +1990,7 @@ static int EXIT pciCanCloseAllDevices (void)
 INIT int init_module (void)
 {
   driverData.hwIf = &hwIf;
-  return vCanInit (&driverData, MAX_CHANNELS);
+  return vCanInit (&driverData, MAX_DRIVER_CHANNELS);
 }
 
 EXIT void cleanup_module (void)

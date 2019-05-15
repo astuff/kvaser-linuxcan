@@ -85,7 +85,9 @@
 
 #define KCAN_IOCTL_OBJBUF_SET_MSG_COUNT         CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 34, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
+
 #define KCAN_IOCTL_CANFD                        CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 69, METHOD_BUFFERED, FILE_ANY_ACCESS)
+
 
 #define KCAN_CARDFLAG_FIRMWARE_BETA       0x01  // Firmware is beta
 #define KCAN_CARDFLAG_FIRMWARE_RC         0x02  // Firmware is release candidate
@@ -100,6 +102,8 @@
 #if defined(DEVHND_DRIVER_IS_BETA)
 CompilerAssert(KCAN_DRVFLAG_BETA == DEVHND_DRIVER_IS_BETA);
 #endif
+
+
 
 
 #define CAN_CANFD_SUCCESS          0
@@ -119,7 +123,6 @@ typedef struct {
   int status; // CAN_CANFD_MATCHING, CAN_CANFD_MISMATCH
   unsigned int unused[8];
 } KCAN_IOCTL_CANFD_T;
-
 
 #endif /* KCANIO_H */
 

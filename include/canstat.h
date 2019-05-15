@@ -356,6 +356,8 @@ typedef enum {
  * \ref canMSG_RTR, \ref canMSG_STD, \ref canMSG_EXT, \ref canMSG_WAKEUP and
  * \ref canMSG_ERROR_FRAME are meaningful also for transmitted messages.
  *
+ * Note that \ref canMSG_RTR cannot be set for CAN FD messages.
+ *
  * @{
  */
 #define canMSG_MASK             0x00ff      ///< Used to mask the non-info bits
@@ -388,11 +390,21 @@ typedef enum {
 #define canMSG_TXRQ             0x0080      ///< Message is a TX REQUEST (msg is transfered to the chip)
 #define canMSG_DELAY_MSG        0x0100      ///< Message is NOT sent on the bus. The transmission of messages are delayed. The dlc specifies the delay in milliseconds (1..1000).  
 
-// qqq add documentation
+/**
+ * \name canFDMSG_xxx
+ * \anchor canFDMSG_xxx
+ *
+ * Flags used in the CAN FD protocol. Set \ref canOPEN_CAN_FD in \ref
+ * canOpenChannel() to enable the CAN FD protocol.
+ *
+ * @{
+ */
 #define canFDMSG_MASK            0xff0000
-#define canFDMSG_EDL             0x010000    ///< Message is an FD message (CAN FD)
+#define canFDMSG_EDL             0x010000    ///< Obsolete, use \ref canFDMSG_FDF instead
+#define canFDMSG_FDF             0x010000    ///< Message is an FD message (CAN FD)
 #define canFDMSG_BRS             0x020000    ///< Message is sent/received with bit rate switch (CAN FD)
 #define canFDMSG_ESI             0x040000    ///< Sender of the message is in error passive mode (CAN FD)
+/** @} */
 
 /** @} */
 

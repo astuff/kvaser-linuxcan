@@ -67,8 +67,8 @@
 //#define TRY_RT_QUEUE
 
 #define DEVICE_NAME_STRING "pcican"
-#define MAX_CHANNELS 4
-#define PCICAN_MAX_DEV 16
+#define MAX_CARD_CHANNELS 2
+#define MAX_DRIVER_CHANNELS 128
 #define PCICAN_VENDOR  0x10e8
 #define PCICAN_ID 0x8406
 #define KVASER_VENDOR 0x1a07    // KVASER

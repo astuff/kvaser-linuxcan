@@ -52,6 +52,7 @@
 
 /*  Kvaser Linux Canlib VCan layer functions */
 
+#include <stdint.h>
 #include "vcan_ioctl.h"
 #include "kcan_ioctl.h"
 #include "canIfData.h"
@@ -285,7 +286,7 @@ static unsigned int bytesToDlcFD(unsigned int bytes)
 
 int DlcOk (struct HandleData *h, unsigned int dlc, unsigned int flags)
 {
-  if (flags & canFDMSG_EDL) {
+  if (flags & canFDMSG_FDF) {
     return (((dlc >= 0) && (dlc <= 8)) ||
             ((dlc == 12) || (dlc == 16) ||
              (dlc == 20) || (dlc == 24) ||
@@ -700,8 +701,8 @@ static canStatus vCanReadInternal (HandleData *hData, long *id,
         flags = canMSG_STD;
       }
 
-      if (msg.tagData.msg.flags & VCAN_MSG_FLAG_EDL)
-        flags |= canFDMSG_EDL;
+      if (msg.tagData.msg.flags & VCAN_MSG_FLAG_FDF)
+        flags |= canFDMSG_FDF;
       if (msg.tagData.msg.flags & VCAN_MSG_FLAG_BRS)
         flags |= canFDMSG_BRS;
       if (msg.tagData.msg.flags & VCAN_MSG_FLAG_ESI)
@@ -721,7 +722,7 @@ static canStatus vCanReadInternal (HandleData *hData, long *id,
       if (msgPtr != NULL) {
         int count = msg.tagData.msg.dlc;
 
-        if (flags & canFDMSG_EDL) {
+        if (flags & canFDMSG_FDF) {
           count = dlcToBytesFD(count);
         } 
         else if (count > 8) {
@@ -939,7 +940,7 @@ static canStatus vCanWriteInternal(HandleData *hData, long id, void *msgPtr,
     return canERR_PARAM;
   }
 
-  if (flag & canFDMSG_BRS && !(flag & canFDMSG_EDL))
+  if (flag & canFDMSG_BRS && !(flag & canFDMSG_FDF))
   {
     // BRS is only allowed in CAN FD
     return canERR_PARAM;
@@ -949,16 +950,16 @@ static canStatus vCanWriteInternal(HandleData *hData, long id, void *msgPtr,
     return canERR_PARAM;
   }
 
-  if (flag & canFDMSG_EDL) {
+  if (flag & canFDMSG_FDF) {
     if (hData->fdMode) {
-      msgFlags |= VCAN_MSG_FLAG_EDL;
+      msgFlags |= VCAN_MSG_FLAG_FDF;
     }
     else {
       return canERR_PARAM;
     }
   }
 
-  if (flag & canFDMSG_EDL) {
+  if (flag & canFDMSG_FDF) {
     dlcFD = bytesToDlcFD(dlc);
     nbytes = dlcToBytesFD(dlcFD);
   }
@@ -981,7 +982,7 @@ static canStatus vCanWriteInternal(HandleData *hData, long id, void *msgPtr,
   if (flag & canMSG_ERROR_FRAME) msg.flags |= VCAN_MSG_FLAG_ERROR_FRAME;
   if (flag & canMSG_RTR)         msg.flags |= VCAN_MSG_FLAG_REMOTE_FRAME;
 
-  if (flag & canFDMSG_EDL)       msg.flags |= VCAN_MSG_FLAG_EDL;
+  if (flag & canFDMSG_FDF)       msg.flags |= VCAN_MSG_FLAG_FDF;
 
   if (flag & canFDMSG_BRS)       msg.flags |= VCAN_MSG_FLAG_BRS;
 
@@ -1552,6 +1553,7 @@ static canStatus kCanObjbufDisable (HandleData *hData, int idx)
 
   return canOK;
 }
+
 
 
 CANOps vCanOps = {

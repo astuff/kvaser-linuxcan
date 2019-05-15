@@ -109,7 +109,7 @@
 #define HWTYPE_PCIECANFD      HWTYPE_PCIE_V2
 #define HWTYPE_MEMORATOR_PRO2 78
 #define HWTYPE_LEAF2              80  ///< Kvaser Leaf Pro HS (2nd generation)
-#define HWTYPE_MEMORATOR_LIGHT2   82  ///< Kvaser Memorator Light (2nd generation)
+#define HWTYPE_MEMORATOR_V2   82  ///< Kvaser Memorator (2nd generation)
 
 
 /* Transceiver types */

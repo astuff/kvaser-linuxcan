@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**                Copyright 2015 by Kvaser AB, MÃ¶lndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -51,13 +51,18 @@
 **/
 
 /*
-** DO NOT EDIT - THIS FILE IS GENERATED AUTOMATICALLY.
-*/
-#ifndef CANLIB_VERSION_H
-#define CANLIB_VERSION_H
+ * Kvaser Linux Canlib
+ * Examine MagiSync time domains
+ */
 
-#define CANLIB_MAJOR_VERSION (8 - 3)
-#define CANLIB_MINOR_VERSION 15
+#include <canlib.h>
+#include <stdio.h>
 
 
-#endif
+#define NUMBER_OF_CHANNELS 5
+    
+int main (int argc, char *argv[])
+{
+
+  return 0;
+}

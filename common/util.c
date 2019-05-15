@@ -166,13 +166,15 @@ EXPORT_SYMBOL(packed_EAN_to_BCD_with_csum);
 ** The CRCs this code generates agree with the vendor-supplied Verilog models
 ** of several of the popular FDDI "MAC" chips.
 */
+
 #define CRC32_POLY    0x04c11db7L     /* AUTODIN II, Ethernet, & FDDI */
+
+static unsigned int crc32_table[256];
 
 unsigned int calculateCRC32(void *buf, unsigned int bufsiz)
 {
   unsigned char *p;
   unsigned int crc;
-  unsigned int crc32_table[256];
   int i, j;
 
   for (i = 0; i < 256; ++i) {

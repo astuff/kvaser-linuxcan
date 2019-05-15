@@ -70,8 +70,8 @@
 // Use this to set alternate implementation.
 
 #define DEVICE_NAME_STRING "pciefd"
-#define MAX_CHANNELS  4
-#define KVASER_VENDOR 0x1a07 // KVASER
+#define MAX_CARD_CHANNELS     4
+#define MAX_DRIVER_CHANNELS 128
 #define PCIEFD_FPGA_MAJOR_VER 2
 
 #define MAX_ERROR_COUNT       64 //128
@@ -91,7 +91,6 @@
 
 // Memory map (All base addresses are byte adresses)
 #define PCIE_HARD_IP_BASE     0x0000
-#define CAN_LOOPBACK_BASE     (0xf000 + MM_BRIDGE_OFFSET)
 #define SYSID_BASE            (0xf020 + MM_BRIDGE_OFFSET)
 #if USE_ADJUSTABLE_PLL
 #define PLL_BASE              (0xf040 + MM_BRIDGE_OFFSET)
@@ -122,13 +121,6 @@
 #define IORD_SSWITCH_BUS_ANALYZER IORD_SSWITCH_OUTPUT0
 #define IOWR_SSWITCH_PATTERN_GEN  IOWR_SSWITCH_OUTPUT1
 #define IORD_SSWITCH_PATTERN_GEN  IORD_SSWITCH_OUTPUT1
-
-// Loopback
-#define LOOPBACK_N_CHANNELS_INT (4)
-#define LOOPBACK_N_CHANNELS_EXT (2)
-#define LOOPBACK_N_CHANNELS     (LOOPBACK_N_CHANNELS_INT+LOOPBACK_N_CHANNELS_EXT)
-#define LOOPBACK_BUS_ANALYZER    2
-#define LOOPBACK_PATTERN_GEN     3
 
 #define CAN_CONTROLLER_SPAN (CAN_CONTROLLER_1_BASE-CAN_CONTROLLER_0_BASE)
 
@@ -277,7 +269,6 @@ typedef struct PciCanCardData {
   void __iomem       *canControllerBase;
   void __iomem       *timestampBase;
   void __iomem       *serialFlashBase;
-  void __iomem       *canLoopbackBase;
   void __iomem       *sysidBase;
 #if USE_ADJUSTABLE_PLL
   void __iomem       *pllBase;

@@ -54,6 +54,7 @@
 
 #include "canlib.h"
 
+#include "canIfData.h"
 #include "canlib_data.h"
 
 #include "osif_user.h"
@@ -125,6 +126,23 @@ struct dev_descr {
    char * descr_string;
    unsigned int ean[2];
 };
+
+
+#define CRITICAL_SECTION int
+typedef struct list_entry_s {
+  struct list_entry_s *Flink;
+  struct list_entry_s *Blink;
+} LIST_ENTRY;
+
+#define CONTAINING_RECORD(A, T, F) ((T *)((char *)(A) - (long)&(((T *)0)->F)))
+
+
+#define FALSE 0
+#define TRUE 1
+
+
+
+static int Initialized = FALSE;
 
 // This has to be modified if we add/remove drivers.
 static const char *dev_name[] = {"lapcan",   "pcican",   "pcicanII",
@@ -205,7 +223,11 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser Leaf Pro HS v2",                             {0x30008434, 0x00073301}},
           {"Kvaser USBcan Pro 2xHS v2",                         {0x30007529, 0x00073301}},
           {"Kvaser Memorator 2xHS v2",                          {0x30008212, 0x00073301}},
-          {"Kvaser Memorator Pro 2xHS v2",                      {0x30008199, 0x00073301}}
+          {"Kvaser Memorator Pro 2xHS v2",                      {0x30008199, 0x00073301}},
+          {"Kvaser PCIEcan 2xHS v2",                            {0x30008618, 0x00073301}},
+          {"Kvaser PCIEcan HS v2",                              {0x30008663, 0x00073301}},
+          {"Kvaser USBcan Pro 2xHS v2 CB",                      {0x30008779, 0x00073301}},
+          {"Kvaser Leaf Light HS v2 M12",                       {0x30008816, 0x00073301}}
 };
 
 //******************************************************
@@ -315,16 +337,17 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags)
   hData->readIsBlock      = 1;
   hData->writeIsBlock     = 1;
   hData->isExtended       = flags & canOPEN_REQUIRE_EXTENDED;
-  if (flags & canOPEN_CAN_FD_NONISO) 
+  if (flags & canOPEN_CAN_FD_NONISO)
     hData->fdMode = OPEN_AS_CANFD_NONISO;
   else if (flags & canOPEN_CAN_FD)
     hData->fdMode = OPEN_AS_CANFD_ISO;
-  else 
+  else
     hData->fdMode = OPEN_AS_CAN;
   hData->acceptLargeDlc   = ((flags & canOPEN_ACCEPT_LARGE_DLC) != 0);
   hData->wantExclusive    = flags & canOPEN_EXCLUSIVE;
   hData->acceptVirtual    = flags & canOPEN_ACCEPT_VIRTUAL;
   hData->notifyFd         = OS_IF_INVALID_HANDLE;
+  hData->valid            = TRUE;
 
   status = getDevParams(channel,
                         hData->deviceName,
@@ -511,7 +534,7 @@ canSetBusParamsFd (const CanHandle hnd, long freq_brs, unsigned int tseg1_brs,
     return canERR_INVHANDLE;
   }
 
-  if ((OPEN_AS_CANFD_ISO != hData->fdMode) && (OPEN_AS_CANFD_NONISO != hData->fdMode)) 
+  if ((OPEN_AS_CANFD_ISO != hData->fdMode) && (OPEN_AS_CANFD_NONISO != hData->fdMode))
     return canERR_INVHANDLE;
 
   ret = hData->canOps->getBusParams(hData, &freq, &tseg1, &tseg2, &sjw, &noSamp,
@@ -894,41 +917,41 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
                                       unsigned int *const syncMode)
 {
   switch (*freq) {
-  case canFD_BITRATE_10M_75P:
-    *freq     = 10000000L;
-    *tseg1    = 2;
-    *tseg2    = 1;
-    *sjw      = 1;
-    *nosamp   = 1;
-    *syncMode = 0;
-    break;
+
+  case canFD_BITRATE_8M_60P:
+      *freq     = 8000000L;
+      *tseg1    = 2;
+      *tseg2    = 2;
+      *sjw      = 1;
+      break;
+
+  case canFD_BITRATE_4M_80P:
+      *freq     = 4000000L;
+      *tseg1    = 7;
+      *tseg2    = 2;
+      *sjw      = 2;
+      break;
 
   case canFD_BITRATE_2M_80P:
-    *freq     = 2000000L;
-    *tseg1    = 15;
-    *tseg2    = 4;
-    *sjw      = 4;
-    *nosamp   = 1;
-    *syncMode = 0;
-    break;
+      *freq     = 2000000L;
+      *tseg1    = 15;
+      *tseg2    = 4;
+      *sjw      = 4;
+      break;
 
   case canFD_BITRATE_1M_80P:
-    *freq     = 1000000L;
-    *tseg1    = 31;
-    *tseg2    = 8;
-    *sjw      = 8;
-    *nosamp   = 1;
-    *syncMode = 0;
-    break;
+      *freq     = 1000000L;
+      *tseg1    = 31;
+      *tseg2    = 8;
+      *sjw      = 8;
+      break;
 
   case canFD_BITRATE_500K_80P:
-    *freq     = 500000L;
-    *tseg1    = 63;
-    *tseg2    = 16;
-    *sjw      = 16;
-    *nosamp   = 1;
-    *syncMode = 0;
-    break;
+      *freq     = 500000L;
+      *tseg1    = 63;
+      *tseg2    = 16;
+      *sjw      = 16;
+      break;
 
   case BAUD_1M:
     *freq     = 1000000L;
@@ -1402,6 +1425,7 @@ canFlushTransmitQueue (const CanHandle hnd)
 
 
 
+
 //******************************************************
 // Set notification callback
 //******************************************************
@@ -1481,5 +1505,7 @@ kvStatus CANLIBAPI kvSetNotifyCallback(const CanHandle hnd,
 //******************************************************
 void CANLIBAPI canInitializeLibrary (void)
 {
+
+  Initialized = TRUE;
   return;
 }

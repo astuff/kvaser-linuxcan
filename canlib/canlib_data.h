@@ -112,6 +112,7 @@ typedef struct HandleData
   unsigned int       syncDlc;
   unsigned int       syncFlag;
   unsigned long      syncTime;
+  int                valid;
 } HandleData;
 
 

@@ -76,8 +76,8 @@
 
 #define DEVICE_NAME_STRING "pcicanII"
 
-#define MAX_CHANNELS 2
-#define PCICAN_MAX_DEV 16
+#define MAX_CARD_CHANNELS 2
+#define MAX_DRIVER_CHANNELS 128
 
 #define PCICAN2_VENDOR 0x10e8  // AMCC.
 #define PCICAN2_ID 0x8407      // Allocated to Kvaser by AMCC

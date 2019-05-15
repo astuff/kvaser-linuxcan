@@ -63,6 +63,7 @@ OBJS =\
 	listChannels\
 	readTimerTest\
 	simplewrite\
+	timedomains\
 	writeloop\
 
 ifeq ($(KV_DEBUG_ON),1)

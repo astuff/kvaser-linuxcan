@@ -136,18 +136,16 @@ MODULE_AUTHOR("KVASER");
 MODULE_DESCRIPTION("PCIe CAN module.");
 
 #define PCIEFD_VENDOR (0x1a07)
-#define PCIEFD_ID     (0x000d)
+#define PCIEFD_4HS_ID     (0x000d)
+#define PCIEFD_2HS_ID     (0x000e)
+#define PCIEFD_HS_ID      (0x000f)
 
 #define MAX_NB_PARAMETERS 256
 #define PARAM_MAGIC       0xCAFEF00D
 
 #define PARAM_SYSTEM_VERSION 1
 
-// Disable loopback by default
-int loopback = 0;
-
-MODULE_PARM_DESC(loopback, "PCIe CAN Loopback");
-module_param(loopback, int, 0644);
+#define CANFD_MAX_PRESCALER_VALUE   2U
 
 //======================================================================
 // HW function pointers
@@ -204,7 +202,19 @@ static void DEVEXIT pciCanRemoveOne(struct pci_dev *dev);
 static struct pci_device_id id_table[] DEVINITDATA = {
   {
     .vendor    = PCIEFD_VENDOR,
-    .device    = PCIEFD_ID,
+    .device    = PCIEFD_4HS_ID,
+    .subvendor = PCI_ANY_ID,
+    .subdevice = PCI_ANY_ID
+  },
+  {
+    .vendor    = PCIEFD_VENDOR,
+    .device    = PCIEFD_2HS_ID,
+    .subvendor = PCI_ANY_ID,
+    .subdevice = PCI_ANY_ID
+  },
+  {
+    .vendor    = PCIEFD_VENDOR,
+    .device    = PCIEFD_HS_ID,
     .subvendor = PCI_ANY_ID,
     .subdevice = PCI_ANY_ID
   },
@@ -1134,8 +1144,8 @@ static int DEVINIT getCardInfo(VCanCardData *vCard)
 
         os_if_kernel_free(param_image);
 
+	return VCAN_STAT_OK;
       }
-      return VCAN_STAT_OK;
     }
 
   return VCAN_STAT_NO_DEVICE;
@@ -1188,8 +1198,8 @@ static int DEVINIT pciCanProbe (VCanCardData *vCard)
     VCAN_CHANNEL_CAP_CANFD                |
     VCAN_CHANNEL_CAP_CANFD_NONISO;
 
-  if(vCard->nrChannels > MAX_CHANNELS) {
-    vCard->nrChannels = MAX_CHANNELS;
+  if(vCard->nrChannels > MAX_CARD_CHANNELS) {
+    vCard->nrChannels = MAX_CARD_CHANNELS;
   }
 
   printCardInfo(vCard);
@@ -1216,12 +1226,6 @@ static int DEVINIT pciCanProbe (VCanCardData *vCard)
     hCard->useDma = 0;
   }
 #endif
-
-  if (loopback) {
-    INITPRINT("    * Loopback Enabled\n");
-  } else {
-    INITPRINT("    * Loopback Disabled\n");
-  }
 
   INITPRINT( "    * Max read buffer support %u\n", fifoPacketCountRxMax(hCard->canRxBuffer));
 
@@ -1340,6 +1344,9 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
 
   quantaPerCycle = tseg1 + tseg2 + 1;
 
+  DEBUGPRINT(2, "Set CAN/Arbitration params: bitrate:%lu, tseg1:%u, tseg2:%u, sjw:%u\n",
+	     freq, tseg1, tseg2, sjw);
+
   if (quantaPerCycle == 0 || freq == 0) {
     DEBUGPRINT(1,"Error: Bad parameter\n");
     return VCAN_STAT_BAD_PARAMETER;
@@ -1354,6 +1361,14 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
 
   brp = brp >> 3;
 
+  if (brp   < 1 || brp   > 8192 || // 13-bits 1 + 0..8191
+      sjw   < 1 || sjw   >   16 || // 4-bits  1 + 0..15
+      tseg1 < 1 || tseg1 >  512 || // 9-bits  1 + 0..511
+      tseg2 < 1 || tseg2 >   32) { // 5-bits  1 + 0..31
+    DEBUGPRINT(1,"Error: Other checks can/arbitration phase brp:%lu sjw:%u tseg1:%u tseg2:%u\n",brp,sjw,tseg1,tseg2);
+    return VCAN_STAT_BAD_PARAMETER;
+  }
+  
   btrn = PCIEFD_BTR_SEG2(tseg2-1) | PCIEFD_BTR_SEG1(tseg1-1) | PCIEFD_BTR_SJW(sjw-1) | PCIEFD_BTR_BRP(brp-1);
 
   bus_load_prescaler = calcBusloadPrescaler(quantaPerCycle, brp);
@@ -1367,6 +1382,9 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
 
       quantaPerCycle = tseg1 + tseg2 + 1;
 
+      DEBUGPRINT(2, "Set CAN FD Data phase params: bitrate:%lu, tseg1:%u, tseg2:%u, sjw:%u\n",
+		 freq, tseg1, tseg2, sjw);
+      
       if (quantaPerCycle == 0 || freq == 0) {
         DEBUGPRINT(1,"Error: Bad parameter\n");
         return VCAN_STAT_BAD_PARAMETER;
@@ -1379,11 +1397,16 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
       brp = (unsigned long)tmp;
 
       brp = brp >> 13;
+      if (brp > CANFD_MAX_PRESCALER_VALUE) {
+        DEBUGPRINT(1,"[%s, %d] Error: prescaler (%lu) out of limits (>%u)\n", __FILE__, __LINE__, brp, 
+                   CANFD_MAX_PRESCALER_VALUE);
+        return VCAN_STAT_BAD_PARAMETER;
+      }
 
-      if (brp   < 1 || brp   > 8192 || // 13-bits 0..8191 (0 will not work)
-          sjw   < 1 || sjw   >  8   || // 3-bits  0..7
-          tseg1 < 1 || tseg1 > 512  || // 9-bits  0..511
-          tseg2 < 1 || tseg2 > 32) {    // 5-bits  0..31
+      if (brp   < 1 || brp   > 8192 || // 13-bits 1 + 0..8191
+          sjw   < 1 || sjw   >   16 || // 4-bits  1 + 0..15
+          tseg1 < 1 || tseg1 >  512 || // 9-bits  1 + 0..511
+          tseg2 < 1 || tseg2 >   32) { // 5-bits  1 + 0..31
         DEBUGPRINT(1,"Error: Other checks can fd data phase brp:%lu sjw:%u tseg1:%u tseg2:%u\n",brp,sjw,tseg1,tseg2);
         return VCAN_STAT_BAD_PARAMETER;
       }
@@ -2415,7 +2438,7 @@ static void receivedPacketHandler (VCanCardData *vCard)
 
       if( isFlexibleDataRateFormat(packet) )
         {
-          flags |= VCAN_MSG_FLAG_EDL;
+          flags |= VCAN_MSG_FLAG_FDF;
           DEBUGPRINT(4,"Received CAN FD frame\n");
 
           if( isAlternateBitRate(packet) ){
@@ -2896,7 +2919,7 @@ static int pciCanTransmitMessage (VCanChanData *vChd, CAN_MSG *m)
     IOWR_PCIEFD_CONTROL(hChd->canControllerBase, PCIEFD_CONTROL_ERROR_FRAME | transId);
   }
   else {
-    if (flags & VCAN_MSG_FLAG_EDL) { // CAN FD Format (Extended Data Length)
+    if (flags & VCAN_MSG_FLAG_FDF) { // CAN FD Format (Extended Data Length)
 
         DEBUGPRINT(4,"Send CAN FD Frame\n");
 
@@ -3123,57 +3146,6 @@ static int DEVINIT pciCanInitHW (VCanCardData *vCard)
     return VCAN_STAT_FAIL;
   }
 
-
-#if LOOPBACK_VERSION == 4
-  {
-    int int_ch;
-
-    if (loopback)
-      {
-        for(int_ch=0;int_ch<LOOPBACK_N_CHANNELS;int_ch++)
-          {
-            DEBUGPRINT(3,"Loopback: Connect ch:%u to internal bus 0\n",int_ch);
-            // Connect all buses to internal bus 0
-            IOWR_LOOPBACK_CTRL(hCard->canLoopbackBase, int_ch,
-                               LOOPBACK_CTRL_TX_ENABLE(0) | LOOPBACK_CTRL_RX_ENABLE(0));
-          }
-      }
-    else
-      {
-        for(int_ch=0;int_ch<LOOPBACK_N_CHANNELS_INT;int_ch++)
-          {
-            DEBUGPRINT(3,"Connect internal ch:%u to internal bus %u (value:%x)\n",int_ch, int_ch,
-                       LOOPBACK_CTRL_TX_ENABLE((1<<int_ch)) | LOOPBACK_CTRL_RX_ENABLE((1<<int_ch)));
-
-            // Connect internal signals
-            IOWR_LOOPBACK_CTRL(hCard->canLoopbackBase, int_ch,
-                               LOOPBACK_CTRL_TX_ENABLE((1<<int_ch)) | LOOPBACK_CTRL_RX_ENABLE((1<<int_ch)));
-          }
-
-        for(int_ch=0;int_ch<LOOPBACK_N_CHANNELS_EXT;int_ch++)
-          {
-            DEBUGPRINT(3,"Connect external ch:%u to internal bus %u (value:%x)\n",int_ch, int_ch,
-                       LOOPBACK_CTRL_TX_ENABLE((1<<int_ch)) | LOOPBACK_CTRL_RX_ENABLE((1<<int_ch)));
-
-            // Connect external signals
-            IOWR_LOOPBACK_CTRL(hCard->canLoopbackBase, int_ch+LOOPBACK_N_CHANNELS_INT,
-                               LOOPBACK_CTRL_TX_ENABLE((1<<int_ch)) | LOOPBACK_CTRL_RX_ENABLE((1<<int_ch)));
-          }
-      }
-  }
-#elseif LOOPBACK_VERSION == 2
-  // Controls loopback during test
-  if (loopback){
-    IOWR_CAN_LOOPBACK_CTRL(hCard->canLoopbackBase, 3);
-  }else{
-    IOWR_CAN_LOOPBACK_CTRL(hCard->canLoopbackBase, CAN_LOOPBACK_CTRL_NO_LOOPBACK);
-  }
-#endif
-
-  // Controls loopback during test
-
-  // Controls loopback during test
-
   for (chNr = 0; chNr < vCard->nrChannels; chNr++){
     VCanChanData   *vChd = vCard->chanData[chNr];
     PciCanChanData *hChd = vChd->hwChanData;
@@ -3311,7 +3283,6 @@ static int DEVINIT readPCIAddresses (struct pci_dev *dev, VCanCardData *vCard)
 
   hCard->timestampBase             = OFFSET_FROM_BASE(hCard->pcieBar0Base, TIMESTAMP_BASE);
   hCard->serialFlashBase           = OFFSET_FROM_BASE(hCard->pcieBar0Base, SERIALFLASH_BASE);
-  hCard->canLoopbackBase           = OFFSET_FROM_BASE(hCard->pcieBar0Base, CAN_LOOPBACK_BASE);
   hCard->sysidBase                 = OFFSET_FROM_BASE(hCard->pcieBar0Base, SYSID_BASE);
 #if USE_ADJUSTABLE_PLL
   hCard->pllBase                   = OFFSET_FROM_BASE(hCard->pcieBar0Base, PLL_BASE);
@@ -3492,9 +3463,9 @@ static int DEVINIT pciCanInitOne (struct pci_dev *dev, const struct pci_device_i
 {
   // Helper struct for allocation
   typedef struct {
-    VCanChanData *dataPtrArray[MAX_CHANNELS];
-    VCanChanData vChd[MAX_CHANNELS];
-    PciCanChanData hChd[MAX_CHANNELS];
+    VCanChanData *dataPtrArray[MAX_CARD_CHANNELS];
+    VCanChanData vChd[MAX_CARD_CHANNELS];
+    PciCanChanData hChd[MAX_CARD_CHANNELS];
   } ChanHelperStruct;
 
   ChanHelperStruct *chs;
@@ -3503,7 +3474,7 @@ static int DEVINIT pciCanInitOne (struct pci_dev *dev, const struct pci_device_i
   int chNr;
   VCanCardData *vCard;
 
-  DEBUGPRINT(3, "pciCanInitOne - max channels:%u\n", MAX_CHANNELS);
+  DEBUGPRINT(3, "pciCanInitOne - max channels:%u\n", MAX_CARD_CHANNELS);
 
   // Allocate data area for this card
   vCard = os_if_kernel_malloc(sizeof(VCanCardData) + sizeof(PciCanCardData));
@@ -3526,7 +3497,7 @@ static int DEVINIT pciCanInitOne (struct pci_dev *dev, const struct pci_device_i
   memset(chs, 0, sizeof(ChanHelperStruct));
 
   // Init array and hwChanData
-  for (chNr = 0; chNr < MAX_CHANNELS; chNr++){
+  for (chNr = 0; chNr < MAX_CARD_CHANNELS; chNr++){
     chs->dataPtrArray[chNr]    = &chs->vChd[chNr];
     chs->vChd[chNr].hwChanData = &chs->hChd[chNr];
     chs->vChd[chNr].minorNr    = -1;   // No preset minor number
@@ -3581,6 +3552,17 @@ static int DEVINIT pciCanInitOne (struct pci_dev *dev, const struct pci_device_i
   for (chNr = 0; chNr < vCard->nrChannels; chNr++){
     VCanChanData *vChd = vCard->chanData[chNr];
     pciCanActivateTransceiver(vChd, vChd->lineMode);
+
+    // Initialize with valid bus params (0.5 Mbit/s and 2.0 Mbit/s). Values are copied from
+    // canTranslateBaud() in 'canlib.c'. If bus parameters are not initialized here it is not possible
+    // to set CAN baud rate before CAN FD baudrate due to the prescaler check for CAN FD.
+    {
+      VCanBusParams busParams =
+        {.freq     = 500*1000,    .tseg1     = 5U,  .tseg2     = 2U, .sjw     = 1U, .samp3  = 1U,
+         .freq_brs = 2*1000*1000, .tseg1_brs = 15U, .tseg2_brs = 4U, .sjw_brs = 4U, };
+
+      pciCanSetBusParams(vChd, &busParams);
+    }
   }
 
 #if USE_DMA
@@ -3800,7 +3782,7 @@ static int EXIT pciCanCloseAllDevices (void)
 INIT int init_module (void)
 {
   driverData.hwIf = &hwIf;
-  return vCanInit (&driverData, MAX_CHANNELS);
+  return vCanInit (&driverData, MAX_DRIVER_CHANNELS);
 }
 
 EXIT void cleanup_module (void)

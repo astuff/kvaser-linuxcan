@@ -70,6 +70,11 @@ Compilation:
     "make"
     "sudo ./installscript.sh"
 
+  Note: All device drivers use the kvcommon driver. If you want to build and
+  install only particular device drivers, you will first need to build and
+  install the kvcommon driver from the linuxcan/common directory using the
+  method above.
+
 * To build with debug printouts:
 
     "make KV_DEBUG_ON=1"

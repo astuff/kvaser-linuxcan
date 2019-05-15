@@ -132,6 +132,7 @@ function toggleVisibility(linkObj) {
 Data Structures</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcan_notify_data.html">canNotifyData</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcan_user_io_port_data.html">canUserIoPortData</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkv_time_domain_data__s.html">kvTimeDomainData_s</a></td></tr>
 <tr><td colspan="2"><h2><a name="define-members"></a>
 Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a679396227d380d9c074b2b5f55c9f448">CANLIB_DECLARE_ALL</a></td></tr>
@@ -169,7 +170,7 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a10baf4894bfd556862bd475c7970c56c">canDRIVER_SELFRECEPTION</a>&#160;&#160;&#160;8</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a2b395831191936ba483e8c779166e906">canDRIVER_OFF</a>&#160;&#160;&#160;0</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canBITRATE_xxx</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="BAUD_xxx"></a> <a class="anchor" id="canBITRATE_xxx"></a></p>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="BAUD_xxx"></a> <a class="anchor" id="canBITRATE_xxx"></a> <a class="anchor" id="canFD_BITRATE_xxx"></a></p>
 <p>Common bus speeds. Used in <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#ga1a3ba0ef73eee6b97e886730ac696935">canSetBusParamsC200()</a>. The values are translated in canlib, <a class="el" href="group___c_a_n.html#gaf38b95fce4930347d9986887ec046e13">canTranslateBaud()</a>.</p>
 <dl class="note"><dt><b>Note:</b></dt><dd>The <a class="el" href="canlib_8h.html#BAUD_xxx">BAUD_xxx</a> names are only retained for compability.</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="page_user_guide_misc_bitrate.html">Bit Rate Constants</a> </dd></dl>
@@ -186,7 +187,8 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a71dec626b7de7ddd18daf93e535902f4">canFD_BITRATE_500K_80P</a>&#160;&#160;&#160;(-1000)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a3a93c64ba76ebe3c5e525d4dfa4ade8d">canFD_BITRATE_1M_80P</a>&#160;&#160;&#160;(-1001)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a9f21214c84dbb6f5f37eb27520ecc162">canFD_BITRATE_2M_80P</a>&#160;&#160;&#160;(-1002)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a452ffc16340e65993ccc7fce8bfc97ac">canFD_BITRATE_10M_75P</a>&#160;&#160;&#160;(-1010)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aa643e5939f0d4d5fff21747e55c76153">canFD_BITRATE_4M_80P</a>&#160;&#160;&#160;(-1003)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ac1d8bd40554b1433f00e4f1bca3f7a8e">canFD_BITRATE_8M_60P</a>&#160;&#160;&#160;(-1004)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#af0a3340ea8fe8c3be9881bf03bddc23e">BAUD_1M</a>&#160;&#160;&#160;(-1)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ac9067c488b198464dc4e635eec21bf6c">BAUD_500K</a>&#160;&#160;&#160;(-2)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#acd040c85b166e139294ed5d3295d525c">BAUD_250K</a>&#160;&#160;&#160;(-3)</td></tr>
@@ -270,7 +272,7 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aa6b9a1812ed1b470705cb38cfd732699">canHWTYPE_PCIE_V2</a>&#160;&#160;&#160;76</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aa14a2e33eee7ea02ebe4a9c5935d30ad">canHWTYPE_MEMORATOR_PRO2</a>&#160;&#160;&#160;78</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a128f359cf954d6f637d0ae5bc368f797">canHWTYPE_LEAF2</a>&#160;&#160;&#160;80</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a08994bafe83ba1e84c4f136f68d7f1b4">canHWTYPE_MEMORATOR_LIGHT2</a>&#160;&#160;&#160;82</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ab1a088fbcafdc68bba2feaad07f40b0c">canHWTYPE_MEMORATOR_V2</a>&#160;&#160;&#160;82</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canCHANNEL_CAP_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canCHANNEL_CAP_xxx"></a></p>
 <p>Channel capabilities. </p>
@@ -288,6 +290,7 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a7748990724fd22b9be3cd02265358755">canCHANNEL_CAP_REMOTE</a>&#160;&#160;&#160;0x00040000L</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#af46aa24f177eabf4355d89a00fc0ffe4">canCHANNEL_CAP_CAN_FD</a>&#160;&#160;&#160;0x00080000L</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a45e356713bd5b6f87d15966045a19f1c">canCHANNEL_CAP_CAN_FD_NONISO</a>&#160;&#160;&#160;0x00100000L</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#af685c865f8ee78b5a2e5285bb57bd335">canCHANNEL_CAP_SILENT_MODE</a>&#160;&#160;&#160;0x00200000L</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canDRIVER_CAP_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canDRIVER_CAP_xxx"></a></p>
 <p>Driver (transceiver) capabilities. </p>
@@ -327,6 +330,7 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a32745af38a05331b9e0733b4cee76787">canIOCTL_SET_BUSON_TIME_AUTO_RESET</a>&#160;&#160;&#160;30</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aa0cb9f16a282ce0a3d3085cd9bf01e4e">canIOCTL_GET_TXACK</a>&#160;&#160;&#160;31</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a86f7ce6c809f30983b69ead49d793689">canIOCTL_SET_LOCAL_TXECHO</a>&#160;&#160;&#160;32</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ab0ddf53fda70a4f7a76a2d16ea2fd9c4">canIOCTL_GET_TREF_LIST</a>&#160;&#160;&#160;39</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canOBJBUF_TYPE_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canOBJBUF_TYPE_xxx"></a></p>
 <p>Used in <a class="el" href="group___object_buffers.html#gaa189a35c78004d037eed4bd0c2bfa3ee">canObjBufAllocate()</a>. </p>
@@ -347,7 +351,9 @@ Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canHandle</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canHandle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structcan_notify_data.html">canNotifyData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga58db5be8859c14cd8a0c0f6963c64f26">canNotifyData</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ae48ec9ea9912fa48869b4151ce422f57">kvStatus</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structkv_time_domain_data__s.html">kvTimeDomainData_s</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ae1de7dc5611333ad82c8e2bb586135ab">kvTimeDomainData</a></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1">canInitializeLibrary</a> (void)</td></tr>
@@ -394,6 +400,12 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga47d03bfcc31e290284e65211b61f15f3">canWriteWait</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, long id, void *msg, unsigned int dlc, unsigned int flag, unsigned long timeout)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga7abcf8f512da6ab568850b9faa0bc28b">canFlushReceiveQueue</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga52a17bb8012bf025d127b4d29e5f3aa8">canFlushTransmitQueue</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate</a> (<a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a> *domain)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#af42198d9685ffc7094fc4cd276ab1976">kvTimeDomainDelete</a> (<a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a> domain)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#af1857d6195e783c082b44a6e6cf9f745">kvTimeDomainResetTime</a> (<a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a> domain)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#afab02cbe0c7fd8cfa65382d492d724b9">kvTimeDomainGetData</a> (<a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a> domain, <a class="el" href="structkv_time_domain_data__s.html">kvTimeDomainData</a> *data, size_t bufsiz)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a73890ef75367c8536235bcc5a6370b26">kvTimeDomainAddHandle</a> (<a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a> domain, const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ad9f730b78a8755e4ec915f75d47e2c79">kvTimeDomainRemoveHandle</a> (<a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a> domain, const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd)</td></tr>
 <tr><td colspan="2"><h2><a name="member-group"></a>
 kvCallback_t</h2></td></tr>
 <tr><td colspan="2"><a class="anchor" id="amgrp13d863aad4ed03e6513fadf2e2376200"></a> <a class="anchor" id="kvCallback_t"></a> <a class="el" href="group___general.html#kvCallback_t">kvCallback_t</a> is used by the function <a class="el" href="group___general.html#ga99976c5b8e2c534b27bf9ec2e715d8d3">kvSetNotifyCallback()</a>The callback function is called with the following arguments: </p>
@@ -778,7 +790,7 @@ DESCRIPTION</h2>
 </div>
 <div class="memdoc">
 
-<p>CAN-FD channel. </p>
+<p>CAN-FD ISO compliant channel. </p>
 
 </div>
 </div>
@@ -793,7 +805,7 @@ DESCRIPTION</h2>
 </div>
 <div class="memdoc">
 
-<p>Supports Non-ISO CAN-FD channel. </p>
+<p>CAN-FD NON-ISO compliant channel. </p>
 
 </div>
 </div>
@@ -869,6 +881,21 @@ DESCRIPTION</h2>
 <div class="memdoc">
 
 <p>Remote CAN channel (e.g. BlackBird). </p>
+
+</div>
+</div>
+<a class="anchor" id="af685c865f8ee78b5a2e5285bb57bd335"></a><!-- doxytag: member="canlib.h::canCHANNEL_CAP_SILENT_MODE" ref="af685c865f8ee78b5a2e5285bb57bd335" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canCHANNEL_CAP_SILENT_MODE&#160;&#160;&#160;0x00200000L</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Channel supports Silent mode. </p>
 
 </div>
 </div>
@@ -1508,20 +1535,6 @@ DESCRIPTION</h2>
 
 </div>
 </div>
-<a class="anchor" id="a452ffc16340e65993ccc7fce8bfc97ac"></a><!-- doxytag: member="canlib.h::canFD_BITRATE_10M_75P" ref="a452ffc16340e65993ccc7fce8bfc97ac" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define canFD_BITRATE_10M_75P&#160;&#160;&#160;(-1010)</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Used in <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a>. Indicates a bitrate of 10.0 Mbit/s and sampling point at 75%. </p>
-
-</div>
-</div>
 <a class="anchor" id="a3a93c64ba76ebe3c5e525d4dfa4ade8d"></a><!-- doxytag: member="canlib.h::canFD_BITRATE_1M_80P" ref="a3a93c64ba76ebe3c5e525d4dfa4ade8d" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -1532,7 +1545,7 @@ DESCRIPTION</h2>
       </table>
 </div>
 <div class="memdoc">
-<p>Used in <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a>. Indicates a bitrate of 1.0 Mbit/s and sampling point at 80%. </p>
+<p>Used in <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a> when using the CAN FD protocol. Indicates a bitrate of 1.0 Mbit/s and sampling point at 80%. </p>
 
 </div>
 </div>
@@ -1546,7 +1559,21 @@ DESCRIPTION</h2>
       </table>
 </div>
 <div class="memdoc">
-<p>Used in <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a>. Indicates a bitrate of 2.0 Mbit/s and sampling point at 80%. </p>
+<p>Used in <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a> when using the CAN FD protocol. Indicates a bitrate of 2.0 Mbit/s and sampling point at 80%. </p>
+
+</div>
+</div>
+<a class="anchor" id="aa643e5939f0d4d5fff21747e55c76153"></a><!-- doxytag: member="canlib.h::canFD_BITRATE_4M_80P" ref="aa643e5939f0d4d5fff21747e55c76153" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canFD_BITRATE_4M_80P&#160;&#160;&#160;(-1003)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Used in <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a> when using the CAN FD protocol. Indicates a bitrate of 4.0 Mbit/s and sampling point at 80%. </p>
 
 </div>
 </div>
@@ -1560,7 +1587,21 @@ DESCRIPTION</h2>
       </table>
 </div>
 <div class="memdoc">
-<p>Used in <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a>. Indicates a bitrate of 0.5 Mbit/s and sampling point at 80%. </p>
+<p>Used in <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a> when using the CAN FD protocol. Indicates a bitrate of 0.5 Mbit/s and sampling point at 80%. </p>
+
+</div>
+</div>
+<a class="anchor" id="ac1d8bd40554b1433f00e4f1bca3f7a8e"></a><!-- doxytag: member="canlib.h::canFD_BITRATE_8M_60P" ref="ac1d8bd40554b1433f00e4f1bca3f7a8e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canFD_BITRATE_8M_60P&#160;&#160;&#160;(-1004)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Used in <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a> when using the CAN FD protocol. Indicates a bitrate of 8.0 Mbit/s and sampling point at 60%. </p>
 
 </div>
 </div>
@@ -1857,21 +1898,6 @@ DESCRIPTION</h2>
 
 </div>
 </div>
-<a class="anchor" id="a08994bafe83ba1e84c4f136f68d7f1b4"></a><!-- doxytag: member="canlib.h::canHWTYPE_MEMORATOR_LIGHT2" ref="a08994bafe83ba1e84c4f136f68d7f1b4" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define canHWTYPE_MEMORATOR_LIGHT2&#160;&#160;&#160;82</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Kvaser Memorator Light (2nd generation) </p>
-
-</div>
-</div>
 <a class="anchor" id="a0f817b0adc81d42c73445e0c26f37151"></a><!-- doxytag: member="canlib.h::canHWTYPE_MEMORATOR_PRO" ref="a0f817b0adc81d42c73445e0c26f37151" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -1899,6 +1925,21 @@ DESCRIPTION</h2>
 <div class="memdoc">
 
 <p>Kvaser Memorator Pro 5xHS and variants. </p>
+
+</div>
+</div>
+<a class="anchor" id="ab1a088fbcafdc68bba2feaad07f40b0c"></a><!-- doxytag: member="canlib.h::canHWTYPE_MEMORATOR_V2" ref="ab1a088fbcafdc68bba2feaad07f40b0c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canHWTYPE_MEMORATOR_V2&#160;&#160;&#160;82</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Kvaser Memorator (2nd generation) </p>
 
 </div>
 </div>
@@ -2310,6 +2351,23 @@ You must not set, reset, nor close this handle. Waiting on it is the only suppor
 <div class="memdoc">
 <p>This define is used in <a class="el" href="group___general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> mentioned below refers to this functions argument.</p>
 <p><em>buf</em> points to a <code>DWORD</code> which contains the desired time-stamp clock resolution in microseconds. Note that the accuracy of the clock isn't affected. The default value is 1000 microseconds, i.e. one millisecond. </p>
+
+</div>
+</div>
+<a class="anchor" id="ab0ddf53fda70a4f7a76a2d16ea2fd9c4"></a><!-- doxytag: member="canlib.h::canIOCTL_GET_TREF_LIST" ref="ab0ddf53fda70a4f7a76a2d16ea2fd9c4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canIOCTL_GET_TREF_LIST&#160;&#160;&#160;39</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This define is used in <a class="el" href="group___general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> mentioned below refers to this functions argument.</p>
+<p>Obtain the time reference list for MagiSync devices.</p>
+<p><em>buf</em> points to an array of pairs of 64-bit ints, one of which will contain the reference number and the other one the timestamp in nanoseconds.</p>
+<dl class="note"><dt><b>Note:</b></dt><dd>This function is subject to change in future releases and is not supported by Kvaser. </dd></dl>
 
 </div>
 </div>
@@ -2740,7 +2798,7 @@ You can't use this function code when the channel is on bus. </dd></dl>
       </table>
 </div>
 <div class="memdoc">
-<p>The channel will use the CAN FD protocol.</p>
+<p>The channel will use the CAN FD protocol, ISO compliant. This also means that messages with <a class="el" href="canstat_8h.html#canFDMSG_xxx">canFDMSG_xxx</a> flags can now be used.</p>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>. </p>
 
 </div>
@@ -2755,7 +2813,13 @@ You can't use this function code when the channel is on bus. </dd></dl>
       </table>
 </div>
 <div class="memdoc">
-<p>The channel will use the CAN FD NON-ISO protocol.</p>
+<p>The channel will use the CAN FD NON-ISO protocol. Use this if you want to configure the can controller to be able to communicate with a can controller designed prior to the release of the CAN FD ISO specification.</p>
+<p>Non ISO mode implies: </p>
+<ul>
+<li>The stuff bit counter will not be included in the frame format. </li>
+<li>Initial value for CRC17 and CRC21 will be zero.</li>
+</ul>
+<p>This also means that messages with <a class="el" href="canstat_8h.html#canFDMSG_xxx">canFDMSG_xxx</a> flags can now be used.</p>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>. </p>
 
 </div>
@@ -2984,6 +3048,262 @@ You can't use this function code when the channel is on bus. </dd></dl>
 
 </div>
 </div>
+<a class="anchor" id="a48bb105cf654887225e6c1eadb144314"></a><!-- doxytag: member="canlib.h::kvTimeDomain" ref="a48bb105cf654887225e6c1eadb144314" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void* <a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Used for time domain handling. </p>
+
+</div>
+</div>
+<a class="anchor" id="ae1de7dc5611333ad82c8e2bb586135ab"></a><!-- doxytag: member="canlib.h::kvTimeDomainData" ref="ae1de7dc5611333ad82c8e2bb586135ab" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structkv_time_domain_data__s.html">kvTimeDomainData_s</a>  <a class="el" href="structkv_time_domain_data__s.html">kvTimeDomainData</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>Used for time domain handling. </p>
+
+</div>
+</div>
+<hr/><h2>Function Documentation</h2>
+<a class="anchor" id="a73890ef75367c8536235bcc5a6370b26"></a><!-- doxytag: member="canlib.h::kvTimeDomainAddHandle" ref="a73890ef75367c8536235bcc5a6370b26" args="(kvTimeDomain domain, const CanHandle hnd)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a> kvTimeDomainAddHandle </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a>&#160;</td>
+          <td class="paramname"><em>domain</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a>&#160;</td>
+          <td class="paramname"><em>hnd</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This routine adds an open channel handle to a domain.</p>
+<dl class="note"><dt><b>Note:</b></dt><dd>A time domain is a set of channels with a common time base.</dd></dl>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">domain</td><td>An opaque variable set by <a class="el" href="canlib_8h.html#aef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate()</a> that identifies the domain to add a handle to. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>A handle to an open channel.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="page_code_snippets_examples.html">Code Examples</a> </dd>
+<dd>
+<a class="el" href="canlib_8h.html#aef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate()</a>, <a class="el" href="canlib_8h.html#ad9f730b78a8755e4ec915f75d47e2c79">kvTimeDomainRemoveHandle()</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aef2b34a7cd8ab01fc140aabe3a5f5539"></a><!-- doxytag: member="canlib.h::kvTimeDomainCreate" ref="aef2b34a7cd8ab01fc140aabe3a5f5539" args="(kvTimeDomain *domain)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a> kvTimeDomainCreate </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a> *&#160;</td>
+          <td class="paramname"><em>domain</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This routine creates an empty time domain.</p>
+<p>The variable is set by this function and then used in later calls to other functions using a <a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a>.</p>
+<p>Time domains created by <a class="el" href="canlib_8h.html#aef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate()</a> can be destroyed with a call to <a class="el" href="canlib_8h.html#af42198d9685ffc7094fc4cd276ab1976">kvTimeDomainDelete()</a>.</p>
+<dl class="note"><dt><b>Note:</b></dt><dd>A time domain is a set of channels with a common time base.</dd></dl>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">domain</td><td>A pointer to a caller allocated, opaque variable of type <a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a> that holds data to identify a particlar time domain.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="page_code_snippets_examples.html">Code Examples</a> </dd>
+<dd>
+<a class="el" href="canlib_8h.html#af42198d9685ffc7094fc4cd276ab1976">kvTimeDomainDelete()</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="af42198d9685ffc7094fc4cd276ab1976"></a><!-- doxytag: member="canlib.h::kvTimeDomainDelete" ref="af42198d9685ffc7094fc4cd276ab1976" args="(kvTimeDomain domain)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a> kvTimeDomainDelete </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a>&#160;</td>
+          <td class="paramname"><em>domain</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This is a cleanup routine that deletes all members of a domain and then deletes the domain itself.</p>
+<dl class="note"><dt><b>Note:</b></dt><dd>A time domain is a set of channels with a common time base.</dd></dl>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">domain</td><td>An opaque variable set by <a class="el" href="canlib_8h.html#aef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate()</a> that identifies the domain to be deleted.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="page_code_snippets_examples.html">Code Examples</a> </dd>
+<dd>
+<a class="el" href="canlib_8h.html#aef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate()</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="afab02cbe0c7fd8cfa65382d492d724b9"></a><!-- doxytag: member="canlib.h::kvTimeDomainGetData" ref="afab02cbe0c7fd8cfa65382d492d724b9" args="(kvTimeDomain domain, kvTimeDomainData *data, size_t bufsiz)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a> kvTimeDomainGetData </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a>&#160;</td>
+          <td class="paramname"><em>domain</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structkv_time_domain_data__s.html">kvTimeDomainData</a> *&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>bufsiz</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This routine collects some data on a time domain.</p>
+<dl class="note"><dt><b>Note:</b></dt><dd>A time domain is a set of channels with a common time base.</dd></dl>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">domain</td><td>An opaque variable set by <a class="el" href="canlib_8h.html#aef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate()</a> that identifies the domain to add a handle to. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">data</td><td>A pointer to a <a class="el" href="canlib_8h.html#ae1de7dc5611333ad82c8e2bb586135ab">kvTimeDomainData</a> that is to be filled by the function. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">bufsiz</td><td>The size in bytes of the <a class="el" href="canlib_8h.html#ae1de7dc5611333ad82c8e2bb586135ab">kvTimeDomainData</a> struct.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="page_code_snippets_examples.html">Code Examples</a> </dd>
+<dd>
+<a class="el" href="canlib_8h.html#aef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate()</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ad9f730b78a8755e4ec915f75d47e2c79"></a><!-- doxytag: member="canlib.h::kvTimeDomainRemoveHandle" ref="ad9f730b78a8755e4ec915f75d47e2c79" args="(kvTimeDomain domain, const CanHandle hnd)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a> kvTimeDomainRemoveHandle </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a>&#160;</td>
+          <td class="paramname"><em>domain</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a>&#160;</td>
+          <td class="paramname"><em>hnd</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This routine removes an open channel handle from a domain.</p>
+<dl class="note"><dt><b>Note:</b></dt><dd>A time domain is a set of channels with a common time base.</dd></dl>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">domain</td><td>An opaque variable set by <a class="el" href="canlib_8h.html#aef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate()</a> that identifies the domain to remove a handle from. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>A handle to an open channel.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="canlib_8h.html#aef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate()</a>, <a class="el" href="canlib_8h.html#a73890ef75367c8536235bcc5a6370b26">kvTimeDomainAddHandle()</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="af1857d6195e783c082b44a6e6cf9f745"></a><!-- doxytag: member="canlib.h::kvTimeDomainResetTime" ref="af1857d6195e783c082b44a6e6cf9f745" args="(kvTimeDomain domain)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a> kvTimeDomainResetTime </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="canlib_8h.html#a48bb105cf654887225e6c1eadb144314">kvTimeDomain</a>&#160;</td>
+          <td class="paramname"><em>domain</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This routine resets the time on all members of a time domain.</p>
+<p>After a call to this routine timestamps from all channels with MagiSync&trade; running have no offset at all any longer. The same applies for channels that reside on the same physical interface.</p>
+<dl class="note"><dt><b>Note:</b></dt><dd>A time domain is a set of channels with a common time base.</dd></dl>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">domain</td><td>An opaque variable set by <a class="el" href="canlib_8h.html#aef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate()</a> that identifies the domain to reset the time on.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="page_code_snippets_examples.html">Code Examples</a> </dd>
+<dd>
+<a class="el" href="canlib_8h.html#aef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate()</a> </dd></dl>
+
+</div>
+</div>
 </div>
 </div>
   <div id="nav-path" class="navpath">
@@ -3005,7 +3325,7 @@ You can't use this function code when the channel is on bus. </dd></dl>
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.12) - Generated on Mon Sep 21 2015</small>
+<small>Kvaser Linux CANLIB (canlib 5.15) - Generated on Mon Mar 7 2016</small>
 </address>
 </body>
 </html>

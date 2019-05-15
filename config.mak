@@ -60,7 +60,7 @@ KV_KERNEL_SRC_DIR:=$(KERNEL_SOURCE_DIR)
 
 #---------------------------------------------------------------------------
 # export these flags to compilation
-KV_XTRA_COMMON_FLAGS           = -DLINUX=1 -D_LINUX=1 $(foreach INC,$(INCLUDES),-I$(INC)) -Werror
+KV_XTRA_COMMON_FLAGS = -DLINUX=1 -D_LINUX=1 $(foreach INC,$(INCLUDES),-I$(INC)) -Werror -Wno-date-time
 
 export KV_XTRA_CFLAGS       = $(KV_XTRA_COMMON_FLAGS) $(KV_NDEBUGFLAGS) -DWIN32=0
 export KV_XTRA_CFLAGS_DEBUG = $(KV_XTRA_COMMON_FLAGS) $(KV_DEBUGFLAGS)  -DWIN32=0
