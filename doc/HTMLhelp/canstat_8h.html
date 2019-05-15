@@ -514,7 +514,17 @@ Enumerations</h2></td></tr>
 <br />
 &#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7afc999ab39dd6545165d8bfd44bf900ec">canERR_BUFFER_TOO_SMALL</a> = -43, 
 <br />
-&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a7fdb374ab194f07a46dfddd2c57fee5e">canERR__RESERVED</a> = -44
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a6675d7df5e1d243cfe2e315afe5cb573">canERR_IO_WRONG_PIN_TYPE</a> = -44, 
+<br />
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a6c6da6c9e7a89ab174763dc62b4541df">canERR_IO_NOT_CONFIRMED</a> = -45, 
+<br />
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a5f7b2b164921928f3bede7ca56273132">canERR_IO_CONFIG_CHANGED</a> = -46, 
+<br />
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a3a5d08cbc5d0e7b2942118e2174c335b">canERR_IO_PENDING</a> = -47, 
+<br />
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a084500747262b1b59587180359b6cfe1">canERR_IO_NO_VALID_CONFIG</a> = -48, 
+<br />
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a7fdb374ab194f07a46dfddd2c57fee5e">canERR__RESERVED</a> = -49
 <br />
  }</td></tr>
 <tr class="separator:a52b5e5c71832b0bd3c6a5b1fd48583e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -2293,6 +2303,16 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="a52b5e5c71832b0bd3c6a5b1fd48583e7afc999ab39dd6545165d8bfd44bf900ec"></a>canERR_BUFFER_TOO_SMALL&#160;</td><td class="fielddoc"><p><b>The buffer provided was not large enough to contain the requested data.</b>; </p>
 </td></tr>
+<tr><td class="fieldname"><a id="a52b5e5c71832b0bd3c6a5b1fd48583e7a6675d7df5e1d243cfe2e315afe5cb573"></a>canERR_IO_WRONG_PIN_TYPE&#160;</td><td class="fielddoc"><p><b>The I/O pin doesn't exist or the I/O pin type doesn't match the called function, e.g. trying to use input pins as outputs or use digital pins as analog pins. </b>; </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a52b5e5c71832b0bd3c6a5b1fd48583e7a6c6da6c9e7a89ab174763dc62b4541df"></a>canERR_IO_NOT_CONFIRMED&#160;</td><td class="fielddoc"><p><b>The I/O pin configuration is not confirmed. Use <a class="el" href="group__kv__io.html#gaa50d734d29488bea72f5d3808835d7d9">kvIoConfirmConfig()</a> to confirm the configuration.</b>; </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a52b5e5c71832b0bd3c6a5b1fd48583e7a5f7b2b164921928f3bede7ca56273132"></a>canERR_IO_CONFIG_CHANGED&#160;</td><td class="fielddoc"><p><b>The I/O pin configuration has changed after last call to kvIoConfirmConfig. Use <a class="el" href="group__kv__io.html#gaa50d734d29488bea72f5d3808835d7d9">kvIoConfirmConfig()</a> to confirm the new configuration. </b>; </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a52b5e5c71832b0bd3c6a5b1fd48583e7a3a5d08cbc5d0e7b2942118e2174c335b"></a>canERR_IO_PENDING&#160;</td><td class="fielddoc"><p><b>The previous I/O pin value has not yet changed the output and is still pending. This happens when e.g. <a class="el" href="group__kv__io.html#ga38a215ebc548b0d201fe805c5a8b3797">kvIoPinSetAnalog()</a> is called twice on the same pin within a short time. </b>; </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a52b5e5c71832b0bd3c6a5b1fd48583e7a084500747262b1b59587180359b6cfe1"></a>canERR_IO_NO_VALID_CONFIG&#160;</td><td class="fielddoc"><p><b>There is no valid I/O pin configuration. </b> </p>
+</td></tr>
 <tr><td class="fieldname"><a id="a52b5e5c71832b0bd3c6a5b1fd48583e7a7fdb374ab194f07a46dfddd2c57fee5e"></a>canERR__RESERVED&#160;</td><td class="fielddoc"><p>Reserved. </p>
 </td></tr>
 </table>
@@ -2306,7 +2326,7 @@ Enumerations</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="canstat_8h.html">canstat.h</a></li>
-    <li class="footer"> (canlib 5.25) Sun Sep 16 2018</li>
+    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
   </ul>
 </div>
 </body>

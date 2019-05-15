@@ -859,6 +859,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>The <a class="el" href="group__t_script.html#ga14d0df6bf3a9eec3e17bef266b3d9ef9">kvScriptLoadFile()</a> function loads a compiled script file (.txe) stored on the host (PC) into a script slot on the device.</p>
+<dl class="section note"><dt>Note</dt><dd>The canHandle is used to determine what channel is set as the default channel for the loaded script. If your canHandle was opened via a device's second channel, the default channel number will be set to 1 (the numbering of channel on the card starts from 0).</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel. </td></tr>
@@ -1227,7 +1228,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.25) Sun Sep 16 2018</li>
+    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
   </ul>
 </div>
 </body>

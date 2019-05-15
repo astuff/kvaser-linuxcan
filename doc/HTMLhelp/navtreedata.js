@@ -3,7 +3,8 @@ var NAVTREE =
   [ "Welcome to Kvaser Linux Drivers and SDK!", "index.html", [
     [ "CAN bus API (CANlib)", "page_canlib.html", "page_canlib" ],
     [ "LIN bus API (LINlib)", "page_linlib.html", [
-      [ "Using the LIN Bus", "page_linlib.html#section_user_guide_lin_intro", null ]
+      [ "Using the LIN Bus", "page_linlib.html#section_user_guide_lin_intro", null ],
+      [ "LIN Frame Identifiers", "page_linlib.html#section_user_guide_lin_frame_identifiers", null ]
     ] ],
     [ "Database API (kvaDbLib)", "page_kvadblib.html", [
       [ "Description", "page_kvadblib.html#section_user_guide_kvadblib_1", null ],
@@ -45,12 +46,13 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"canlib_8h.html#adec0c195a0b1fcf7b39e6af76165a226",
-"group___c_a_n.html#gaf1786cfbfd542b18b9c599d278837bd9",
-"group__kvadb__database.html#gabe66bb4a8311ee7503e117ec392378b3",
-"group__kvlc__converter.html#gaa674bba6c26b0146d416051b4d048d7c",
-"kva_db_lib_8h.html#a097f44c9d7fcb1cd04d12ff5d0f2a133a6956ea5776610bb31bdf93053001564f",
-"kvmlib_8h.html#aa8c0374618b33785ccb02f74bcfebc46"
+"canlib_8h.html#ac3d4a8c7f3ae2bbae10a6421ec2837f8",
+"group___c_a_n.html#ga99c7c99cc71580f8099a1407f4f9ea1a",
+"group__kvadb__attributes.html#gab05bb9b7e8f31ccdd09e4898abc31ae9",
+"group__kvaxml__parsing.html#ga06ee7a0fe3cdb23b616fe55dc93121a6",
+"group__lin__status__codes.html#gga7a5ecfd2846ddd76cd49fb4edec7fc14af6bbcd0379c7fd0ff41393f0346b0222",
+"kvmlib_8h.html#a375ca6024f9ecd609ba5cbb590babf24",
+"structkv_time_domain_data__s.html#af00948e6feb807b210c69fd5945e7068"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

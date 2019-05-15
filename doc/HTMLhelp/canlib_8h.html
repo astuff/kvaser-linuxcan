@@ -448,6 +448,9 @@ Macros</h2></td></tr>
 <tr class="memitem:a053c71698b7c28ccda9338875a74bfef"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a053c71698b7c28ccda9338875a74bfef">canHWTYPE_CANLINHYBRID</a>&#160;&#160;&#160;84</td></tr>
 <tr class="memdesc:a053c71698b7c28ccda9338875a74bfef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kvaser Hybrid CAN/LIN.  <a href="#a053c71698b7c28ccda9338875a74bfef">More...</a><br /></td></tr>
 <tr class="separator:a053c71698b7c28ccda9338875a74bfef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f227b989d37c23ae0a641bb1cdad209"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a2f227b989d37c23ae0a641bb1cdad209">canHWTYPE_DINRAIL</a>&#160;&#160;&#160;86</td></tr>
+<tr class="memdesc:a2f227b989d37c23ae0a641bb1cdad209"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kvaser DIN Rail SE400S and variants.  <a href="#a2f227b989d37c23ae0a641bb1cdad209">More...</a><br /></td></tr>
+<tr class="separator:a2f227b989d37c23ae0a641bb1cdad209"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canCHANNEL_CAP_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canCHANNEL_CAP_xxx"></a> Channel capabilities. </p>
 </div></td></tr>
@@ -505,6 +508,12 @@ Macros</h2></td></tr>
 <tr class="memitem:a1c3c68d592ead785f1bbb5de757ee7a0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a1c3c68d592ead785f1bbb5de757ee7a0">canCHANNEL_CAP_SCRIPT</a>&#160;&#160;&#160;0x02000000L</td></tr>
 <tr class="memdesc:a1c3c68d592ead785f1bbb5de757ee7a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Channel has script capabilities.  <a href="#a1c3c68d592ead785f1bbb5de757ee7a0">More...</a><br /></td></tr>
 <tr class="separator:a1c3c68d592ead785f1bbb5de757ee7a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5db0cb246c1e9c485f6863ceed9bb39a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a5db0cb246c1e9c485f6863ceed9bb39a">canCHANNEL_CAP_LIN_HYBRID</a>&#160;&#160;&#160;0x04000000L</td></tr>
+<tr class="memdesc:a5db0cb246c1e9c485f6863ceed9bb39a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Channel has LIN capabilities.  <a href="#a5db0cb246c1e9c485f6863ceed9bb39a">More...</a><br /></td></tr>
+<tr class="separator:a5db0cb246c1e9c485f6863ceed9bb39a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a116f1a9d0623257d2b1865669054d0b7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a116f1a9d0623257d2b1865669054d0b7">canCHANNEL_CAP_IO_API</a>&#160;&#160;&#160;0x08000000L</td></tr>
+<tr class="memdesc:a116f1a9d0623257d2b1865669054d0b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Channel has IO API capabilities.  <a href="#a116f1a9d0623257d2b1865669054d0b7">More...</a><br /></td></tr>
+<tr class="separator:a116f1a9d0623257d2b1865669054d0b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0651695dbca39a7c1ed81c96079551ad"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a0651695dbca39a7c1ed81c96079551ad">canCHANNEL_CAP_DIAGNOSTICS</a>&#160;&#160;&#160;0x10000000L</td></tr>
 <tr class="memdesc:a0651695dbca39a7c1ed81c96079551ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Channel has diagnostic capabilities.  <a href="#a0651695dbca39a7c1ed81c96079551ad">More...</a><br /></td></tr>
 <tr class="separator:a0651695dbca39a7c1ed81c96079551ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -807,6 +816,72 @@ Macros</h2></td></tr>
 <tr class="separator:a9e91da25cc455ebc488786b3b5aa0fa5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a039bc2bb8b14cc0554ee736c58a2c204"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a039bc2bb8b14cc0554ee736c58a2c204">kvDEVICE_MODE_LOGGER</a>&#160;&#160;&#160;0x01</td></tr>
 <tr class="separator:a039bc2bb8b14cc0554ee736c58a2c204"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">kvIO_INFO_GET_xxx</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="kvIO_INFO_GET_xxx"></a></p>
+<p>These defines are used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a>. The value range for each property is specified in the manufacturer's user manual. </p>
+</div></td></tr>
+<tr class="memitem:a1098328030dee156b74c349493782cdb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a1098328030dee156b74c349493782cdb">kvIO_INFO_GET_MODULE_TYPE</a>&#160;&#160;&#160;1</td></tr>
+<tr class="separator:a1098328030dee156b74c349493782cdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa35b3f04d717c654cec0a4f0468ebf84"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aa35b3f04d717c654cec0a4f0468ebf84">kvIO_INFO_GET_DIRECTION</a>&#160;&#160;&#160;2</td></tr>
+<tr class="separator:aa35b3f04d717c654cec0a4f0468ebf84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca429207da12ba1659499a6793ce18b4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aca429207da12ba1659499a6793ce18b4">kvIO_INFO_GET_PIN_TYPE</a>&#160;&#160;&#160;4</td></tr>
+<tr class="separator:aca429207da12ba1659499a6793ce18b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac32b2fe0d62c2ca63c4a15994d65f725"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ac32b2fe0d62c2ca63c4a15994d65f725">kvIO_INFO_GET_NUMBER_OF_BITS</a>&#160;&#160;&#160;5</td></tr>
+<tr class="separator:ac32b2fe0d62c2ca63c4a15994d65f725"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4208430dc0a552a3a66d2103bde6c02"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aa4208430dc0a552a3a66d2103bde6c02">kvIO_INFO_GET_RANGE_MIN</a>&#160;&#160;&#160;6</td></tr>
+<tr class="separator:aa4208430dc0a552a3a66d2103bde6c02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ef294dd72816343f9bab9dc9c9dab39"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a3ef294dd72816343f9bab9dc9c9dab39">kvIO_INFO_GET_RANGE_MAX</a>&#160;&#160;&#160;7</td></tr>
+<tr class="separator:a3ef294dd72816343f9bab9dc9c9dab39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1132596e7b709d07e3e500d79ecc27c9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a1132596e7b709d07e3e500d79ecc27c9">kvIO_INFO_GET_DI_LOW_HIGH_FILTER</a>&#160;&#160;&#160;8</td></tr>
+<tr class="separator:a1132596e7b709d07e3e500d79ecc27c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3d4a8c7f3ae2bbae10a6421ec2837f8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ac3d4a8c7f3ae2bbae10a6421ec2837f8">kvIO_INFO_GET_DI_HIGH_LOW_FILTER</a>&#160;&#160;&#160;9</td></tr>
+<tr class="separator:ac3d4a8c7f3ae2bbae10a6421ec2837f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8bc23793eb734cc2c70fd57f5150cb5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ab8bc23793eb734cc2c70fd57f5150cb5">kvIO_INFO_GET_AI_LP_FILTER_ORDER</a>&#160;&#160;&#160;10</td></tr>
+<tr class="separator:ab8bc23793eb734cc2c70fd57f5150cb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3446e6e4785a80e6181d8460d7bf966"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ad3446e6e4785a80e6181d8460d7bf966">kvIO_INFO_GET_AI_HYSTERESIS</a>&#160;&#160;&#160;11</td></tr>
+<tr class="separator:ad3446e6e4785a80e6181d8460d7bf966"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a615221bf13f09e226d9f2fc0a2bdf0ce"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a615221bf13f09e226d9f2fc0a2bdf0ce">kvIO_INFO_GET_MODULE_NUMBER</a>&#160;&#160;&#160;14</td></tr>
+<tr class="separator:a615221bf13f09e226d9f2fc0a2bdf0ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">kvIO_INFO_SET_xxx</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="kvIO_INFO_SET_xxx"></a></p>
+<p>These defines are used in <a class="el" href="group__kv__io.html#ga88dda296acccff6acbc979a94b961188">kvIoPinSetInfo()</a>. The value range for each property is specified in the manufacturer's user manual. </p>
+</div></td></tr>
+<tr class="memitem:afa7572ee9ed7b364ed70002d3101dfdd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#afa7572ee9ed7b364ed70002d3101dfdd">kvIO_INFO_SET_DI_LOW_HIGH_FILTER</a>&#160;&#160;&#160;8</td></tr>
+<tr class="separator:afa7572ee9ed7b364ed70002d3101dfdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13fe255e44c25ff63a4bb2271d816606"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a13fe255e44c25ff63a4bb2271d816606">kvIO_INFO_SET_DI_HIGH_LOW_FILTER</a>&#160;&#160;&#160;9</td></tr>
+<tr class="separator:a13fe255e44c25ff63a4bb2271d816606"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8dd482621b791755305bcbe70b4caaa"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#af8dd482621b791755305bcbe70b4caaa">kvIO_INFO_SET_AI_LP_FILTER_ORDER</a>&#160;&#160;&#160;10</td></tr>
+<tr class="separator:af8dd482621b791755305bcbe70b4caaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d5515549989d5f70a258f159aa8fef0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a0d5515549989d5f70a258f159aa8fef0">kvIO_INFO_SET_AI_HYSTERESIS</a>&#160;&#160;&#160;11</td></tr>
+<tr class="separator:a0d5515549989d5f70a258f159aa8fef0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">kvIO_MODULE_TYPE_xxx</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="kvIO_MODULE_TYPE_xxx"></a></p>
+<p>These defines are used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a>. </p>
+</div></td></tr>
+<tr class="memitem:aa7236356b4f86163b32e6f3b1f2a81e0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aa7236356b4f86163b32e6f3b1f2a81e0">kvIO_MODULE_TYPE_DIGITAL</a>&#160;&#160;&#160;1</td></tr>
+<tr class="separator:aa7236356b4f86163b32e6f3b1f2a81e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7a0f43fd1cf00fd220e21f3e6e3f4c9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#af7a0f43fd1cf00fd220e21f3e6e3f4c9">kvIO_MODULE_TYPE_ANALOG</a>&#160;&#160;&#160;2</td></tr>
+<tr class="separator:af7a0f43fd1cf00fd220e21f3e6e3f4c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16ff8dcf16321da24929f0fb68a204f5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a16ff8dcf16321da24929f0fb68a204f5">kvIO_MODULE_TYPE_RELAY</a>&#160;&#160;&#160;3</td></tr>
+<tr class="separator:a16ff8dcf16321da24929f0fb68a204f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">kvIO_PIN_TYPE_xxx</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="kvIO_PIN_TYPE_xxx"></a></p>
+<p>These defines are used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a>. </p>
+</div></td></tr>
+<tr class="memitem:a6c6338d248a8b47f09b4d53041b9f167"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a6c6338d248a8b47f09b4d53041b9f167">kvIO_PIN_TYPE_DIGITAL</a>&#160;&#160;&#160;1</td></tr>
+<tr class="separator:a6c6338d248a8b47f09b4d53041b9f167"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a757a9a7296413cb3187b78775553317d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a757a9a7296413cb3187b78775553317d">kvIO_PIN_TYPE_ANALOG</a>&#160;&#160;&#160;2</td></tr>
+<tr class="separator:a757a9a7296413cb3187b78775553317d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb5238d0a6c1de0fb683de27a9ee8a9c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#abb5238d0a6c1de0fb683de27a9ee8a9c">kvIO_PIN_TYPE_RELAY</a>&#160;&#160;&#160;3</td></tr>
+<tr class="separator:abb5238d0a6c1de0fb683de27a9ee8a9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">kvIO_PIN_DIRECTION_xxx</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="kvIO_PIN_DIRECTION_xxx"></a></p>
+<p>These defines are used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a>. </p>
+</div></td></tr>
+<tr class="memitem:a9e269996cbfabef79b05627e60bfb0f4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a9e269996cbfabef79b05627e60bfb0f4">kvIO_PIN_DIRECTION_IN</a>&#160;&#160;&#160;4</td></tr>
+<tr class="separator:a9e269996cbfabef79b05627e60bfb0f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32aebdbba25ff32662f8112e222af0a4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a32aebdbba25ff32662f8112e222af0a4">kvIO_PIN_DIRECTION_OUT</a>&#160;&#160;&#160;8</td></tr>
+<tr class="separator:a32aebdbba25ff32662f8112e222af0a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -1017,6 +1092,30 @@ Functions</h2></td></tr>
 <tr class="separator:ga0671078a6184ab2b73287946a49763f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gafa060c0f78d459498d1f6236e2d0b5ae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__general.html#gafa060c0f78d459498d1f6236e2d0b5ae">kvReadTimer64</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, uint64_t *time)</td></tr>
 <tr class="separator:gafa060c0f78d459498d1f6236e2d0b5ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0194114ea5bfcbf770d938b613ba87e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kv__io.html#ga0194114ea5bfcbf770d938b613ba87e6">kvIoGetNumberOfPins</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int *pinCount)</td></tr>
+<tr class="separator:ga0194114ea5bfcbf770d938b613ba87e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa50d734d29488bea72f5d3808835d7d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kv__io.html#gaa50d734d29488bea72f5d3808835d7d9">kvIoConfirmConfig</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd)</td></tr>
+<tr class="separator:gaa50d734d29488bea72f5d3808835d7d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga851cb68946bf38686a065fccf11d6b42"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int pin, int item, void *buffer, const unsigned int bufsize)</td></tr>
+<tr class="separator:ga851cb68946bf38686a065fccf11d6b42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga88dda296acccff6acbc979a94b961188"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kv__io.html#ga88dda296acccff6acbc979a94b961188">kvIoPinSetInfo</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int pin, int item, const void *buffer, const unsigned int bufsize)</td></tr>
+<tr class="separator:ga88dda296acccff6acbc979a94b961188"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad5a1f760ce49861c5970764024a732c7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kv__io.html#gad5a1f760ce49861c5970764024a732c7">kvIoPinSetDigital</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int pin, unsigned int value)</td></tr>
+<tr class="separator:gad5a1f760ce49861c5970764024a732c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa5699336bbf78ddbe430dee8658ca7b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kv__io.html#gaa5699336bbf78ddbe430dee8658ca7b3">kvIoPinGetDigital</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int pin, unsigned int *value)</td></tr>
+<tr class="separator:gaa5699336bbf78ddbe430dee8658ca7b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaaa8b56dd310525951aea002efa0d55ef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kv__io.html#gaaa8b56dd310525951aea002efa0d55ef">kvIoPinGetOutputDigital</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int pin, unsigned int *value)</td></tr>
+<tr class="separator:gaaa8b56dd310525951aea002efa0d55ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabb4bfa9d8f76d64065e03a9c95b7dace"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kv__io.html#gabb4bfa9d8f76d64065e03a9c95b7dace">kvIoPinSetRelay</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int pin, unsigned int value)</td></tr>
+<tr class="separator:gabb4bfa9d8f76d64065e03a9c95b7dace"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga26aaef6002a588a2ee56bdfc89a703df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kv__io.html#ga26aaef6002a588a2ee56bdfc89a703df">kvIoPinGetOutputRelay</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int pin, unsigned int *value)</td></tr>
+<tr class="separator:ga26aaef6002a588a2ee56bdfc89a703df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga38a215ebc548b0d201fe805c5a8b3797"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kv__io.html#ga38a215ebc548b0d201fe805c5a8b3797">kvIoPinSetAnalog</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int pin, float value)</td></tr>
+<tr class="separator:ga38a215ebc548b0d201fe805c5a8b3797"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga209b5932e8abf5e085c778d0dcac78ab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kv__io.html#ga209b5932e8abf5e085c778d0dcac78ab">kvIoPinGetAnalog</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int pin, float *value)</td></tr>
+<tr class="separator:ga209b5932e8abf5e085c778d0dcac78ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga78dd0cebc929d0c0d2b801943c6b0ddc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kv__io.html#ga78dd0cebc929d0c0d2b801943c6b0ddc">kvIoPinGetOutputAnalog</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int pin, float *value)</td></tr>
+<tr class="separator:ga78dd0cebc929d0c0d2b801943c6b0ddc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Definitions for the CANlib API. </p>
@@ -1402,6 +1501,38 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Can send CAN overload frame. </p>
+
+</div>
+</div>
+<a id="a116f1a9d0623257d2b1865669054d0b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a116f1a9d0623257d2b1865669054d0b7">&#9670;&nbsp;</a></span>canCHANNEL_CAP_IO_API</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canCHANNEL_CAP_IO_API&#160;&#160;&#160;0x08000000L</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Channel has IO API capabilities. </p>
+
+</div>
+</div>
+<a id="a5db0cb246c1e9c485f6863ceed9bb39a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5db0cb246c1e9c485f6863ceed9bb39a">&#9670;&nbsp;</a></span>canCHANNEL_CAP_LIN_HYBRID</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canCHANNEL_CAP_LIN_HYBRID&#160;&#160;&#160;0x04000000L</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Channel has LIN capabilities. </p>
 
 </div>
 </div>
@@ -2857,6 +2988,22 @@ Not implemented in linux. </dd></dl>
 </div><div class="memdoc">
 
 <p>CANpari (obsolete). </p>
+
+</div>
+</div>
+<a id="a2f227b989d37c23ae0a641bb1cdad209"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f227b989d37c23ae0a641bb1cdad209">&#9670;&nbsp;</a></span>canHWTYPE_DINRAIL</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canHWTYPE_DINRAIL&#160;&#160;&#160;86</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Kvaser DIN Rail SE400S and variants. </p>
 
 </div>
 </div>
@@ -4813,6 +4960,376 @@ reporting" by calling <a class="el" href="group__can__general.html#gaeaa24db97af
 
 </div>
 </div>
+<a id="ad3446e6e4785a80e6181d8460d7bf966"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3446e6e4785a80e6181d8460d7bf966">&#9670;&nbsp;</a></span>kvIO_INFO_GET_AI_HYSTERESIS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_GET_AI_HYSTERESIS&#160;&#160;&#160;11</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a>.</p>
+<p>A float that contains the hysteresis in volt for an analog input pin, i.e. the amount the input have to change before the sampled value is updated.</p>
+<dl class="section note"><dt>Note</dt><dd>This is only used for analog input pins. </dd></dl>
+
+</div>
+</div>
+<a id="ab8bc23793eb734cc2c70fd57f5150cb5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8bc23793eb734cc2c70fd57f5150cb5">&#9670;&nbsp;</a></span>kvIO_INFO_GET_AI_LP_FILTER_ORDER</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_GET_AI_LP_FILTER_ORDER&#160;&#160;&#160;10</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a>.</p>
+<p>An unsigned 32-bit integer that contains the low-pass filter order for an analog input pin.</p>
+<dl class="section note"><dt>Note</dt><dd>This is only used for analog input pins. </dd></dl>
+
+</div>
+</div>
+<a id="ac3d4a8c7f3ae2bbae10a6421ec2837f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3d4a8c7f3ae2bbae10a6421ec2837f8">&#9670;&nbsp;</a></span>kvIO_INFO_GET_DI_HIGH_LOW_FILTER</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_GET_DI_HIGH_LOW_FILTER&#160;&#160;&#160;9</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a>.</p>
+<p>An unsigned 32-bit integer that contains the filter time in micro seconds when a digital input pin goes from HIGH to LOW.</p>
+<dl class="section note"><dt>Note</dt><dd>This is only used for digital input pins. </dd></dl>
+
+</div>
+</div>
+<a id="a1132596e7b709d07e3e500d79ecc27c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1132596e7b709d07e3e500d79ecc27c9">&#9670;&nbsp;</a></span>kvIO_INFO_GET_DI_LOW_HIGH_FILTER</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_GET_DI_LOW_HIGH_FILTER&#160;&#160;&#160;8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a>.</p>
+<p>An unsigned 32-bit integer that contains the filter time in micro seconds when a digital input pin goes from LOW to HIGH.</p>
+<dl class="section note"><dt>Note</dt><dd>This is only used for digital input pins. </dd></dl>
+
+</div>
+</div>
+<a id="aa35b3f04d717c654cec0a4f0468ebf84"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa35b3f04d717c654cec0a4f0468ebf84">&#9670;&nbsp;</a></span>kvIO_INFO_GET_DIRECTION</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_GET_DIRECTION&#160;&#160;&#160;2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a>.</p>
+<p>An unsigned 32-bit integer, see <a class="el" href="canlib_8h.html#kvIO_PIN_DIRECTION_xxx">kvIO_PIN_DIRECTION_xxx</a>. Read-only. </p>
+
+</div>
+</div>
+<a id="a615221bf13f09e226d9f2fc0a2bdf0ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a615221bf13f09e226d9f2fc0a2bdf0ce">&#9670;&nbsp;</a></span>kvIO_INFO_GET_MODULE_NUMBER</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_GET_MODULE_NUMBER&#160;&#160;&#160;14</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a> to get the module number.</p>
+<p>An unsigned 32-bit integer that contains the module number the pin belongs to. The number starts from 0. Read-only. </p>
+
+</div>
+</div>
+<a id="a1098328030dee156b74c349493782cdb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1098328030dee156b74c349493782cdb">&#9670;&nbsp;</a></span>kvIO_INFO_GET_MODULE_TYPE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_GET_MODULE_TYPE&#160;&#160;&#160;1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a>.</p>
+<p>An unsigned 32-bit integer, see <a class="el" href="canlib_8h.html#kvIO_MODULE_TYPE_xxx">kvIO_MODULE_TYPE_xxx</a>. Read-only. </p>
+
+</div>
+</div>
+<a id="ac32b2fe0d62c2ca63c4a15994d65f725"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac32b2fe0d62c2ca63c4a15994d65f725">&#9670;&nbsp;</a></span>kvIO_INFO_GET_NUMBER_OF_BITS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_GET_NUMBER_OF_BITS&#160;&#160;&#160;5</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a>.</p>
+<p>An unsigned 32-bit integer that contains the resolution in number of bits. Read-only. </p>
+
+</div>
+</div>
+<a id="aca429207da12ba1659499a6793ce18b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca429207da12ba1659499a6793ce18b4">&#9670;&nbsp;</a></span>kvIO_INFO_GET_PIN_TYPE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_GET_PIN_TYPE&#160;&#160;&#160;4</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a>.</p>
+<p>An unsigned 32-bit integer, see <a class="el" href="canlib_8h.html#kvIO_PIN_TYPE_xxx">kvIO_PIN_TYPE_xxx</a>. Read-only. </p>
+
+</div>
+</div>
+<a id="a3ef294dd72816343f9bab9dc9c9dab39"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ef294dd72816343f9bab9dc9c9dab39">&#9670;&nbsp;</a></span>kvIO_INFO_GET_RANGE_MAX</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_GET_RANGE_MAX&#160;&#160;&#160;7</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a>.</p>
+<p>A float that contains the upper range limit in volts. Read-only.</p>
+<dl class="section note"><dt>Note</dt><dd>This is not applicable for relay pins. </dd></dl>
+
+</div>
+</div>
+<a id="aa4208430dc0a552a3a66d2103bde6c02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4208430dc0a552a3a66d2103bde6c02">&#9670;&nbsp;</a></span>kvIO_INFO_GET_RANGE_MIN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_GET_RANGE_MIN&#160;&#160;&#160;6</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga851cb68946bf38686a065fccf11d6b42">kvIoPinGetInfo()</a>.</p>
+<p>A float that contains the lower range limit in volts. Read-only.</p>
+<dl class="section note"><dt>Note</dt><dd>This is not applicable for relay pins. </dd></dl>
+
+</div>
+</div>
+<a id="a0d5515549989d5f70a258f159aa8fef0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d5515549989d5f70a258f159aa8fef0">&#9670;&nbsp;</a></span>kvIO_INFO_SET_AI_HYSTERESIS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_SET_AI_HYSTERESIS&#160;&#160;&#160;11</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga88dda296acccff6acbc979a94b961188">kvIoPinSetInfo()</a>.</p>
+<p>A float that contains the hysteresis in volt for an analog input pin, i.e. the amount the input have to change before the sampled value is updated.</p>
+<dl class="section note"><dt>Note</dt><dd>This is only used for analog input pins. </dd></dl>
+
+</div>
+</div>
+<a id="af8dd482621b791755305bcbe70b4caaa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8dd482621b791755305bcbe70b4caaa">&#9670;&nbsp;</a></span>kvIO_INFO_SET_AI_LP_FILTER_ORDER</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_SET_AI_LP_FILTER_ORDER&#160;&#160;&#160;10</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga88dda296acccff6acbc979a94b961188">kvIoPinSetInfo()</a>.</p>
+<p>An unsigned 32-bit integer that contains the low-pass filter order for an analog input pin.</p>
+<dl class="section note"><dt>Note</dt><dd>This is only used for analog input pins. </dd></dl>
+
+</div>
+</div>
+<a id="a13fe255e44c25ff63a4bb2271d816606"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13fe255e44c25ff63a4bb2271d816606">&#9670;&nbsp;</a></span>kvIO_INFO_SET_DI_HIGH_LOW_FILTER</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_SET_DI_HIGH_LOW_FILTER&#160;&#160;&#160;9</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga88dda296acccff6acbc979a94b961188">kvIoPinSetInfo()</a>.</p>
+<p>An unsigned 32-bit integer that contains the filter time in micro seconds when a digital input pin goes from HIGH to LOW.</p>
+<dl class="section note"><dt>Note</dt><dd>This is only used for digital input pins. </dd></dl>
+
+</div>
+</div>
+<a id="afa7572ee9ed7b364ed70002d3101dfdd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa7572ee9ed7b364ed70002d3101dfdd">&#9670;&nbsp;</a></span>kvIO_INFO_SET_DI_LOW_HIGH_FILTER</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_INFO_SET_DI_LOW_HIGH_FILTER&#160;&#160;&#160;8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__kv__io.html#ga88dda296acccff6acbc979a94b961188">kvIoPinSetInfo()</a>.</p>
+<p>An unsigned 32-bit integer that contains the filter time in micro seconds when a digital input pin goes from LOW to HIGH.</p>
+<dl class="section note"><dt>Note</dt><dd>This is only used for digital input pins. </dd></dl>
+
+</div>
+</div>
+<a id="af7a0f43fd1cf00fd220e21f3e6e3f4c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7a0f43fd1cf00fd220e21f3e6e3f4c9">&#9670;&nbsp;</a></span>kvIO_MODULE_TYPE_ANALOG</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_MODULE_TYPE_ANALOG&#160;&#160;&#160;2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Kvaser Add-on module with analog inputs and analog outputs </p>
+
+</div>
+</div>
+<a id="aa7236356b4f86163b32e6f3b1f2a81e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7236356b4f86163b32e6f3b1f2a81e0">&#9670;&nbsp;</a></span>kvIO_MODULE_TYPE_DIGITAL</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_MODULE_TYPE_DIGITAL&#160;&#160;&#160;1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Kvaser Add-on module with digital inputs and digital outputs </p>
+
+</div>
+</div>
+<a id="a16ff8dcf16321da24929f0fb68a204f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a16ff8dcf16321da24929f0fb68a204f5">&#9670;&nbsp;</a></span>kvIO_MODULE_TYPE_RELAY</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_MODULE_TYPE_RELAY&#160;&#160;&#160;3</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Kvaser Add-on module with relays and digital inputs </p>
+
+</div>
+</div>
+<a id="a9e269996cbfabef79b05627e60bfb0f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e269996cbfabef79b05627e60bfb0f4">&#9670;&nbsp;</a></span>kvIO_PIN_DIRECTION_IN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_PIN_DIRECTION_IN&#160;&#160;&#160;4</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Input </p>
+
+</div>
+</div>
+<a id="a32aebdbba25ff32662f8112e222af0a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a32aebdbba25ff32662f8112e222af0a4">&#9670;&nbsp;</a></span>kvIO_PIN_DIRECTION_OUT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_PIN_DIRECTION_OUT&#160;&#160;&#160;8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Output </p>
+
+</div>
+</div>
+<a id="a757a9a7296413cb3187b78775553317d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a757a9a7296413cb3187b78775553317d">&#9670;&nbsp;</a></span>kvIO_PIN_TYPE_ANALOG</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_PIN_TYPE_ANALOG&#160;&#160;&#160;2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Analog </p>
+
+</div>
+</div>
+<a id="a6c6338d248a8b47f09b4d53041b9f167"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c6338d248a8b47f09b4d53041b9f167">&#9670;&nbsp;</a></span>kvIO_PIN_TYPE_DIGITAL</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_PIN_TYPE_DIGITAL&#160;&#160;&#160;1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Digital </p>
+
+</div>
+</div>
+<a id="abb5238d0a6c1de0fb683de27a9ee8a9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb5238d0a6c1de0fb683de27a9ee8a9c">&#9670;&nbsp;</a></span>kvIO_PIN_TYPE_RELAY</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvIO_PIN_TYPE_RELAY&#160;&#160;&#160;3</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Relay </p>
+
+</div>
+</div>
 <a id="a904471b2f2e1417f37415a0caec61914"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a904471b2f2e1417f37415a0caec61914">&#9670;&nbsp;</a></span>kvLED_ACTION_ALL_LEDS_OFF</h2>
 
@@ -5553,7 +6070,7 @@ reporting" by calling <a class="el" href="group__can__general.html#gaeaa24db97af
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="canlib_8h.html">canlib.h</a></li>
-    <li class="footer"> (canlib 5.25) Sun Sep 16 2018</li>
+    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
   </ul>
 </div>
 </body>

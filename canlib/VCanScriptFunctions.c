@@ -64,6 +64,7 @@
 /* Kvaser Linux Canlib VCan layer functions used in Scripts */
 
 #include <errno.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/ioctl.h>
 

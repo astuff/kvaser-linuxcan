@@ -131,6 +131,7 @@ var kva_db_lib_8h =
     [ "kvaDbGetMsgAttributeByName", "group__kvadb__attributes.html#ga8dc2f474a745af37d128a7cca676fa4d", null ],
     [ "kvaDbGetMsgById", "group__kvadb__messages.html#ga732d691ed8ead650e4a49d18c8f7ffa2", null ],
     [ "kvaDbGetMsgByName", "group__kvadb__messages.html#ga9685fdb33257ac28e4cd989cfe8ca154", null ],
+    [ "kvaDbGetMsgByPGN", "group__kvadb__messages.html#gab45031c6ed2eed71515f2badd586d4b4", null ],
     [ "kvaDbGetMsgComment", "group__kvadb__messages.html#gace75dd206cd50883de777ed1d8051e1b", null ],
     [ "kvaDbGetMsgDlc", "group__kvadb__messages.html#gaad8505adb65a9f91a646951136456404", null ],
     [ "kvaDbGetMsgFlags", "group__kvadb__messages.html#ga894f00aefc3b13615917a7db64d3c1e6", null ],

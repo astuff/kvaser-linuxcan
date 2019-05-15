@@ -108,7 +108,7 @@ static uint32_t capabilities_table[][2] = {
   {VCAN_CHANNEL_CAP_EXTENDED_CAN,        canCHANNEL_CAP_EXTENDED_CAN},
   {VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION, canCHANNEL_CAP_BUS_STATISTICS},
   {VCAN_CHANNEL_CAP_ERROR_COUNTERS,      canCHANNEL_CAP_ERROR_COUNTERS},
-  {VCAN_CHANNEL_CAP_CAN_DIAGNOSTICS,     canCHANNEL_CAP_CAN_DIAGNOSTICS},
+  {VCAN_CHANNEL_CAP_CAN_DIAGNOSTICS,     canCHANNEL_CAP_RESERVED_2},
   {VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES,   canCHANNEL_CAP_GENERATE_ERROR},
   {VCAN_CHANNEL_CAP_TXREQUEST,           canCHANNEL_CAP_TXREQUEST},
   {VCAN_CHANNEL_CAP_TXACKNOWLEDGE,       canCHANNEL_CAP_TXACKNOWLEDGE},
@@ -123,6 +123,7 @@ static uint32_t capabilities_table[][2] = {
   {VCAN_CHANNEL_CAP_HAS_REMOTE,          canCHANNEL_CAP_REMOTE_ACCESS},
   {VCAN_CHANNEL_CAP_HAS_SCRIPT,          canCHANNEL_CAP_SCRIPT},
   {VCAN_CHANNEL_CAP_LIN_HYBRID,          canCHANNEL_CAP_LIN_HYBRID},
+  {VCAN_CHANNEL_CAP_HAS_IO_API,          canCHANNEL_CAP_IO_API},
   {VCAN_CHANNEL_CAP_DIAGNOSTICS,         canCHANNEL_CAP_DIAGNOSTICS}
 };
 
@@ -1585,173 +1586,220 @@ static canStatus vCanRequestChipStatus (HandleData *hData)
 static canStatus vCanGetChannelData (char *deviceName, int item,
                                      void *buffer, size_t bufsize)
 {
-  int fd;
-  int err = 1;
+  int fd = -1;
+  int err = canOK;
+
+  /* If, at the end, err is not canOK, return that err.  Otherwise, if
+     errno is not 0, return a canlib error for that code.  On any
+     error condition, we break out of the switch and land in the
+     common clean-up code which tends to file descriptors and error
+     reporting.  There is a nested switch that require using goto.
+
+     If a system call -- e.g. ioctl -- fails, it will return -1 and
+     set errno to an error code.  Ensure errno set to zero here. */
+
+  errno = 0;
 
   fd = open(deviceName, O_RDONLY);
-  if (fd == canINVALID_HANDLE) {
+  if (fd == -1) {
     DEBUGPRINT((TXT("Unable to open %s\n"), deviceName));
-    return canERR_NOTFOUND;
-  }
+    err = canERR_NOTFOUND;
+  } else {
 
-  switch (item) {
-  case canCHANNELDATA_CARD_NUMBER:
-    err = ioctl(fd, VCAN_IOC_GET_CARD_NUMBER, buffer);
-    break;
-
-  case canCHANNELDATA_TRANS_TYPE:
-    err = ioctl(fd, VCAN_IOC_GET_TRANSCEIVER_INFO, buffer);
-    break;
-
-  case canCHANNELDATA_CARD_SERIAL_NO:
-    if (bufsize < 8){
-      close(fd);
-      return canERR_PARAM;
-    }
-    err = ioctl(fd, VCAN_IOC_GET_SERIAL, buffer);
-    break;
-
-  case canCHANNELDATA_CARD_UPC_NO:
-    err = ioctl(fd, VCAN_IOC_GET_EAN, buffer);
-    break;
-
-  case canCHANNELDATA_DRIVER_NAME:
-    err = ioctl(fd, VCAN_IOC_GET_DRIVER_NAME, buffer);
-    break;
-
-  case canCHANNELDATA_CARD_FIRMWARE_REV:
-    err = ioctl(fd, VCAN_IOC_GET_FIRMWARE_REV, buffer);
-    break;
-
-  case canCHANNELDATA_CARD_HARDWARE_REV:
-    err = ioctl(fd, VCAN_IOC_GET_HARDWARE_REV, buffer);
-    break;
-
-  case canCHANNELDATA_CHANNEL_CAP:
-    err = ioctl(fd, VCAN_IOC_GET_CHAN_CAP, buffer);
-    if (!err) {
-      *(uint32_t *)buffer = get_capabilities (*(uint32_t *)buffer);
-    }
-    break;
-
-  case canCHANNELDATA_CHANNEL_CAP_MASK:
-    err = ioctl(fd, VCAN_IOC_GET_CHAN_CAP_MASK, buffer);
-    if (!err) {
-      *(uint32_t *)buffer = get_capabilities (*(uint32_t *)buffer);
-    }
-    break;
-
-  case canCHANNELDATA_CHANNEL_FLAGS:
-    err = ioctl(fd, VCAN_IOC_GET_CHANNEL_INFO, buffer);
-    if (!err) {
-      *(uint32_t *)buffer =  convert_channel_info_flags(*(uint32_t *)buffer);
-    }
-    break;
-
-  case canCHANNELDATA_CARD_TYPE:
-    err = ioctl(fd, VCAN_IOC_GET_CARD_TYPE, buffer);
-    break;
-
-  case canCHANNELDATA_MAX_BITRATE:
-    err = ioctl(fd, VCAN_IOC_GET_MAX_BITRATE, buffer);
-    break;
-
-  case canCHANNELDATA_CUST_CHANNEL_NAME:
-    {
-      KCAN_IOCTL_GET_CUST_CHANNEL_NAME_T custChannelName;
-      unsigned int maxCopySize;
-
-      if (bufsize == 0) {
-        close(fd);
-        return canERR_PARAM;
+    switch (item) {
+    case canCHANNELDATA_CARD_NUMBER:
+      if (bufsize < 4) {
+        err = canERR_PARAM;
+        break;
       }
+      ioctl(fd, VCAN_IOC_GET_CARD_NUMBER, buffer);
+      break;
 
-      memset(buffer, 0, bufsize);
-      maxCopySize = bufsize - 1; // Assure null termination.
-      if (maxCopySize == 0) {
-        close(fd);
-        return canOK;
+    case canCHANNELDATA_TRANS_TYPE:
+      if (bufsize < 4) {
+        err = canERR_PARAM;
+        break;
       }
+      ioctl(fd, VCAN_IOC_GET_TRANSCEIVER_INFO, buffer);
+      break;
 
-      if (maxCopySize > sizeof(custChannelName.data)) {
-        maxCopySize = sizeof(custChannelName.data);
+    case canCHANNELDATA_CARD_SERIAL_NO:
+      if (bufsize < 8) {
+        err = canERR_PARAM;
+        break;
       }
+      ioctl(fd, VCAN_IOC_GET_SERIAL, buffer);
+      break;
 
-      memset(&custChannelName, 0, sizeof(custChannelName));
-      err = ioctl(fd, KCAN_IOCTL_GET_CUST_CHANNEL_NAME, &custChannelName);
-      if (!err) {
-        memcpy(buffer, custChannelName.data, maxCopySize);
+    case canCHANNELDATA_CARD_UPC_NO:
+      if (bufsize < 8) {
+        err = canERR_PARAM;
+        break;
       }
-      else {
-        close(fd);
-        return canERR_NOT_IMPLEMENTED;
-      }
-    }
-    break;
+      ioctl(fd, VCAN_IOC_GET_EAN, buffer);
+      break;
 
-  case canCHANNELDATA_DRIVER_FILE_VERSION:
-    {
-      VCAN_IOCTL_CARD_INFO ci;
-      unsigned short *p = (unsigned short *)buffer;
-
-      if (bufsize < 8){
-        close(fd);
-        return canERR_PARAM;
+    case canCHANNELDATA_DRIVER_NAME:
+      if (bufsize < MAX_IOCTL_DRIVER_NAME + 1) {
+        err = canERR_PARAM;
+        break;
       }
-      err = ioctl(fd, VCAN_IOCTL_GET_CARD_INFO, &ci);
-      if (!err) {
-        *p++ = 0;
-        *p++ = ci.driver_version_build;
-        *p++ = ci.driver_version_minor;
-        *p++ = ci.driver_version_major;
+      ioctl(fd, VCAN_IOC_GET_DRIVER_NAME, buffer);
+      break;
+
+    case canCHANNELDATA_CARD_FIRMWARE_REV:
+      if (bufsize < 8) {
+        err = canERR_PARAM;
+        break;
+      }
+      ioctl(fd, VCAN_IOC_GET_FIRMWARE_REV, buffer);
+      break;
+
+    case canCHANNELDATA_CARD_HARDWARE_REV:
+      if (bufsize < 8) {
+        err = canERR_PARAM;
+        break;
+      }
+      ioctl(fd, VCAN_IOC_GET_HARDWARE_REV, buffer);
+      break;
+
+    case canCHANNELDATA_CHANNEL_CAP:
+      if (bufsize < 4) {
+        err = canERR_PARAM;
+        break;
+      }
+      if (ioctl(fd, VCAN_IOC_GET_CHAN_CAP, buffer) != -1) {
+        *(uint32_t *)buffer = get_capabilities (*(uint32_t *)buffer);
       }
       break;
-    }
 
-  case canCHANNELDATA_DRIVER_PRODUCT_VERSION:
-    {
-      VCAN_IOCTL_CARD_INFO ci;
-      unsigned short *p = (unsigned short *)buffer;
-
-      if (bufsize < 8){
-        close(fd);
-        return canERR_PARAM;
+    case canCHANNELDATA_CHANNEL_CAP_MASK:
+      if (bufsize < 4) {
+        err = canERR_PARAM;
+        break;
       }
-      err = ioctl(fd, VCAN_IOCTL_GET_CARD_INFO, &ci);
-      if (!err) {
-        *p++ = 0;
-        *p++ = 0; // (unsigned short) ci.driver_version_minor_letter;
-        *p++ = (unsigned short) ci.product_version_minor;
-        *p++ = (unsigned short) ci.product_version_major;
+      if (ioctl(fd, VCAN_IOC_GET_CHAN_CAP_MASK, buffer) != -1) {
+        *(uint32_t *)buffer = get_capabilities (*(uint32_t *)buffer);
       }
       break;
-    }
 
-  case canCHANNELDATA_IS_REMOTE:
-    // No remote devices for Linux so far
-    {
-      if (bufsize < 4 /*"32-bit unsigned int"*/|| !buffer) {
-        close(fd);
-        return canERR_PARAM;
+    case canCHANNELDATA_CHANNEL_FLAGS:
+      if (bufsize < 4) {
+        err = canERR_PARAM;
+        break;
       }
-      *(uint32_t*)buffer = 0;
-    }
-    break;
+      if (ioctl(fd, VCAN_IOC_GET_CHANNEL_INFO, buffer) != -1) {
+        *(uint32_t *)buffer =  convert_channel_info_flags(*(uint32_t *)buffer);
+      }
+      break;
 
-  case canCHANNELDATA_FEATURE_EAN:
-  case canCHANNELDATA_HW_STATUS:
-  case canCHANNELDATA_LOGGER_TYPE:
-  case canCHANNELDATA_REMOTE_TYPE:
-    {
-      KCAN_IOCTL_MISC_INFO miscInfo;
-      if (bufsize < 4 /*"32-bit unsigned int"*/|| !buffer) {
-        close(fd);
-        return canERR_PARAM;
+    case canCHANNELDATA_CARD_TYPE:
+      if (bufsize < 4) {
+        err = canERR_PARAM;
+        break;
+      }
+      ioctl(fd, VCAN_IOC_GET_CARD_TYPE, buffer);
+      break;
+
+    case canCHANNELDATA_MAX_BITRATE:
+      if (bufsize < 4) {
+        err = canERR_PARAM;
+        break;
+      }
+      ioctl(fd, VCAN_IOC_GET_MAX_BITRATE, buffer);
+      break;
+
+    case canCHANNELDATA_CUST_CHANNEL_NAME:
+      {
+        KCAN_IOCTL_GET_CUST_CHANNEL_NAME_T custChannelName;
+        unsigned int maxCopySize;
+
+        if (bufsize == 0) {
+          err = canERR_PARAM;
+          break;
+        }
+
+        memset(buffer, 0, bufsize);
+        maxCopySize = bufsize - 1; // Assure null termination.
+        if (maxCopySize == 0) {
+          break;
+        }
+
+        if (maxCopySize > sizeof(custChannelName.data)) {
+          maxCopySize = sizeof(custChannelName.data);
+        }
+
+        memset(&custChannelName, 0, sizeof(custChannelName));
+        if (ioctl(fd, KCAN_IOCTL_GET_CUST_CHANNEL_NAME, &custChannelName) != -1) {
+          memcpy(buffer, custChannelName.data, maxCopySize);
+        }
+        else {
+          err = canERR_NOT_IMPLEMENTED;
+        }
+      }
+      break;
+
+    case canCHANNELDATA_DRIVER_FILE_VERSION:
+      {
+        VCAN_IOCTL_CARD_INFO ci;
+        unsigned short *p = (unsigned short *)buffer;
+
+        if (bufsize < 8){
+          err = canERR_PARAM;
+          break;
+        }
+        if (ioctl(fd, VCAN_IOCTL_GET_CARD_INFO, &ci) != -1) {
+          *p++ = 0;
+          *p++ = ci.driver_version_build;
+          *p++ = ci.driver_version_minor;
+          *p++ = ci.driver_version_major;
+        }
+        break;
       }
 
-      memset(&miscInfo, 0, sizeof(miscInfo));
+    case canCHANNELDATA_DRIVER_PRODUCT_VERSION:
+      {
+        VCAN_IOCTL_CARD_INFO ci;
+        unsigned short *p = (unsigned short *)buffer;
 
-      switch (item) {
+        if (bufsize < 8){
+          err = canERR_PARAM;
+          break;
+        }
+        if (ioctl(fd, VCAN_IOCTL_GET_CARD_INFO, &ci) != -1) {
+          *p++ = 0;
+          *p++ = 0; // (unsigned short) ci.driver_version_minor_letter;
+          *p++ = (unsigned short) ci.product_version_minor;
+          *p++ = (unsigned short) ci.product_version_major;
+        }
+        break;
+      }
+
+    case canCHANNELDATA_IS_REMOTE:
+      // No remote devices for Linux so far
+      {
+        if (bufsize < 4 /*"32-bit unsigned int"*/|| !buffer) {
+          err = canERR_PARAM;
+          break;
+        }
+        *(uint32_t*)buffer = 0;
+      }
+      break;
+
+    case canCHANNELDATA_FEATURE_EAN:
+    case canCHANNELDATA_HW_STATUS:
+    case canCHANNELDATA_LOGGER_TYPE:
+    case canCHANNELDATA_REMOTE_TYPE:
+      {
+        KCAN_IOCTL_MISC_INFO miscInfo;
+        if (bufsize < 4 /*"32-bit unsigned int"*/|| !buffer) {
+          err = canERR_PARAM;
+          break;
+        }
+
+        memset(&miscInfo, 0, sizeof(miscInfo));
+
+        switch (item) {
         case canCHANNELDATA_FEATURE_EAN:
           miscInfo.subcmd = KCAN_IOCTL_MISC_INFO_SUBCMD_FEATURE_EAN;
           break;
@@ -1766,25 +1814,24 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
           miscInfo.subcmd = KCAN_IOCTL_MISC_INFO_SUBCMD_CHANNEL_REMOTE_INFO;
           break;
         default:
-          close(fd);
-          return canERR_PARAM;
-      }
+          err = canERR_PARAM;
+          goto end;
+        }
 
-      err = ioctl(fd, KCAN_IOCTL_GET_CARD_INFO_MISC, &miscInfo);
-      if (!err) {
-        if (miscInfo.retcode == KCAN_IOCTL_MISC_INFO_RETCODE_SUCCESS){
-          switch (item) {
+        if (ioctl(fd, KCAN_IOCTL_GET_CARD_INFO_MISC, &miscInfo) != -1) {
+          if (miscInfo.retcode == KCAN_IOCTL_MISC_INFO_RETCODE_SUCCESS){
+            switch (item) {
             case canCHANNELDATA_FEATURE_EAN:
               if (bufsize < sizeof(miscSubCmdFeatureEan)) {
-                close(fd);
-                return canERR_PARAM;
+                err = canERR_PARAM;
+                break;
               }
               memcpy(buffer, &miscInfo.payload.featureEan, sizeof(miscSubCmdFeatureEan));
               break;
             case canCHANNELDATA_HW_STATUS:
               if (bufsize < sizeof(sizeof(miscSubCmdHwStatus))) {
-                close(fd);
-                return canERR_PARAM;
+                err = canERR_PARAM;
+                break;
               }
               memcpy(buffer, &miscInfo.payload.hwStatus, sizeof(miscSubCmdHwStatus));
               break;
@@ -1795,30 +1842,35 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
               *(uint32_t *)buffer = miscInfo.payload.remoteInfo.remoteType;
               break;
             default:
-              close(fd);
-              return canERR_PARAM;
+              err = canERR_PARAM;
+            }
+          }
+          else {
+	    err = canERR_NOT_IMPLEMENTED;
           }
         }
-        else {
-          close(fd);
-          return canERR_NOT_IMPLEMENTED;
-        }
-
       }
-    }
-    break;
+      break;
 
-  default:
-    close(fd);
-    return canERR_PARAM;
+    default:
+      err = canERR_PARAM;
+      break;
+    }
   }
 
-  close(fd);
+ end:
+  if (fd != -1) {
+    close(fd);
+  }
 
-  if (err) {
-    if (!(item == canCHANNELDATA_CUST_CHANNEL_NAME && err == ENOSYS)) {
+  if (err != canOK) {
+    if (!(item == canCHANNELDATA_CUST_CHANNEL_NAME && errno == ENOSYS)) {
       DEBUGPRINT((TXT("Error on ioctl %d: %d / %d\n"), item, err, errno));
     }
+    return err;
+  }
+
+  if (errno != 0) {
     return errnoToCanStatus(errno);
   }
 

@@ -576,7 +576,8 @@ If the call fails, the return value is a negative integer indicating an error co
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="group__lin__status__codes.html#gga7a5ecfd2846ddd76cd49fb4edec7fc14a548e5df5738051c1e7ab0a3dcb8aa7b1">linOK</a> (zero) if success </dd>
 <dd>
-<a class="el" href="group__lin__status__codes.html#linERR_xxx">linERR_xxx</a> (negative) if failure </dd></dl>
+<a class="el" href="group__lin__status__codes.html#linERR_xxx">linERR_xxx</a> (negative) if failure</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_linlib.html#section_user_guide_lin_frame_identifiers">LIN Frame Identifiers</a> </dd></dl>
 
 </div>
 </div>
@@ -663,7 +664,7 @@ Supported bit rates are 1000 - 20000 bits per second.</dd></dl>
 <p>To return to normal mode, either restart the LIN interface (by going off bus and on the bus again) or call the function with delay and <em>cFlags</em> set to zero.</p>
 <dl class="section note"><dt>Note</dt><dd>The handle shall be on-bus. </dd>
 <dd>
-It is supported in firmware version 2.4.1 and later.</dd></dl>
+Not supported by all devices.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>A handle to an open LIN channel. </td></tr>
@@ -733,7 +734,9 @@ For LIN 2.0 compliance, you must specify both <a class="el" href="linlib_8h.html
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="group__lin__status__codes.html#gga7a5ecfd2846ddd76cd49fb4edec7fc14a548e5df5738051c1e7ab0a3dcb8aa7b1">linOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="group__lin__status__codes.html#linERR_xxx">linERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group___l_i_n.html#ga1c89e03300af644cee54861f92ae567e">linSetupIllegalMessage()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group___l_i_n.html#ga1c89e03300af644cee54861f92ae567e">linSetupIllegalMessage()</a> </dd>
+<dd>
+<a class="el" href="page_linlib.html#section_user_guide_lin_frame_identifiers">LIN Frame Identifiers</a> </dd></dl>
 
 </div>
 </div>
@@ -788,7 +791,9 @@ For LIN 2.0 compliance, you must specify both <a class="el" href="linlib_8h.html
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="group__lin__status__codes.html#gga7a5ecfd2846ddd76cd49fb4edec7fc14a548e5df5738051c1e7ab0a3dcb8aa7b1">linOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="group__lin__status__codes.html#linERR_xxx">linERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group___l_i_n.html#ga905647480dd89a7225e4b8ae0d82cb92">linClearMessage()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group___l_i_n.html#ga905647480dd89a7225e4b8ae0d82cb92">linClearMessage()</a> </dd>
+<dd>
+<a class="el" href="page_linlib.html#section_user_guide_lin_frame_identifiers">LIN Frame Identifiers</a> </dd></dl>
 
 </div>
 </div>
@@ -843,7 +848,9 @@ For LIN 2.0 compliance, you must specify both <a class="el" href="linlib_8h.html
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="group__lin__status__codes.html#gga7a5ecfd2846ddd76cd49fb4edec7fc14a548e5df5738051c1e7ab0a3dcb8aa7b1">linOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="group__lin__status__codes.html#linERR_xxx">linERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group___l_i_n.html#ga1bd437b46f5923f05905c43cd4a1617a">linWriteSync()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group___l_i_n.html#ga1bd437b46f5923f05905c43cd4a1617a">linWriteSync()</a> </dd>
+<dd>
+<a class="el" href="page_linlib.html#section_user_guide_lin_frame_identifiers">LIN Frame Identifiers</a> </dd></dl>
 
 </div>
 </div>
@@ -926,6 +933,9 @@ For LIN 2.0 compliance, you must specify both <a class="el" href="linlib_8h.html
 </div><div class="memdoc">
 <p>Write a wakeup frame.</p>
 <p>If count is zero, one single wakeup frame is transmitted. If count &gt; 1, several wakeup frames are transmitted spaced with 'interval' bittimes. The LIN interface will interrupt the sequence when a LIN message or another command is received. The stream of wakeups will be recived as incoming messages with the LIN_RX flag bit set.</p>
+<dl class="section note"><dt>Note</dt><dd>Maximum value of count is 255 (0xFF). </dd>
+<dd>
+Maximum value of interval is either 255 (0xFF) or 65535 (0xFFFF) depending on device.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>A handle to an open LIN channel. </td></tr>
@@ -946,7 +956,7 @@ For LIN 2.0 compliance, you must specify both <a class="el" href="linlib_8h.html
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.25) Sun Sep 16 2018</li>
+    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
   </ul>
 </div>
 </body>

@@ -104,7 +104,7 @@
  * I/O functions use a pin number to access each pin on connected I/O modules. Pin enumeration is product dependent.
  *
  * It is required to verify the configuration before it is possible to use any kvIoPinSetXxx()/kvIoPinGetXxx() function.
- * The module configuration can be examined with kvIoGetNumberOfPins() and kvIoGetPinInfo(). If the configuration is as expected, a call to kvIoConfirmConfig() will confirm the configuration. Removing or adding I/O modules will change the configuration and the pins are re-enumerated. It is always required to confirm the new configuration after a configuration change.
+ * The module configuration can be examined with kvIoGetNumberOfPins() and kvIoPinGetInfo(). If the configuration is as expected, a call to kvIoConfirmConfig() will confirm the configuration. Removing or adding I/O modules will change the configuration and the pins are re-enumerated. It is always required to confirm the new configuration after a configuration change.
  *
  * \ingroup grp_canlib
  */
@@ -2205,6 +2205,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canHWTYPE_LEAF2              80  ///< Kvaser Leaf Pro HS v2 and variants
 #define canHWTYPE_MEMORATOR_V2       82  ///< Kvaser Memorator (2nd generation)
 #define canHWTYPE_CANLINHYBRID       84  ///< Kvaser Hybrid CAN/LIN
+#define canHWTYPE_DINRAIL            86  ///< Kvaser DIN Rail SE400S and variants
 
 
 /** @} */
@@ -4537,6 +4538,11 @@ kvStatus CANLIBAPI kvScriptLoadFileOnDevice (const CanHandle hnd,
  * The \ref kvScriptLoadFile() function loads a compiled script file (.txe) stored
  * on the host (PC) into a script slot on the device.
  *
+ * \note The canHandle is used to determine what channel is set as the default
+ * channel for the loaded script. If your canHandle was opened via a device's
+ * second channel, the default channel number will be set to 1 (the numbering
+ * of channel on the card starts from 0).
+ *
  * \param[in] hnd           An open handle to a CAN channel.
  * \param[in] slotNo        The slot where to load the script.
  * \param[in] filePathOnPC  The script file name; a pointer to a \c NULL
@@ -5037,6 +5043,426 @@ kvStatus CANLIBAPI kvReadTimer (const CanHandle hnd, unsigned int *time);
  */
 kvStatus CANLIBAPI kvReadTimer64 (const CanHandle hnd, uint64_t *time);
 
+/**
+ * \ingroup kv_io
+ * \anchor kvIO_INFO_GET_xxx
+ * \name kvIO_INFO_GET_xxx
+ *
+ * These defines are used in \ref kvIoPinGetInfo().
+ * The value range for each property is specified in the manufacturer's user manual.
+ *
+ *  @{
+ */
+  /**
+   * This define is used in \ref kvIoPinGetInfo().
+   *
+   * An unsigned 32-bit integer, see \ref kvIO_MODULE_TYPE_xxx. 
+   * Read-only.
+   */
+#define kvIO_INFO_GET_MODULE_TYPE                1
+  /**
+   * This define is used in \ref kvIoPinGetInfo().
+   *
+   * An unsigned 32-bit integer, see \ref kvIO_PIN_DIRECTION_xxx. 
+   * Read-only.
+   */
+#define kvIO_INFO_GET_DIRECTION                     2
+  /**
+   * This define is used in \ref kvIoPinGetInfo().
+   *
+   * An unsigned 32-bit integer, see \ref kvIO_PIN_TYPE_xxx. 
+   * Read-only.
+   */
+#define kvIO_INFO_GET_PIN_TYPE                      4
+  /**
+   * This define is used in \ref kvIoPinGetInfo().
+   *
+   * An unsigned 32-bit integer that contains the resolution 
+   * in number of bits. Read-only.
+   */
+#define kvIO_INFO_GET_NUMBER_OF_BITS                5
+  /**
+   * This define is used in \ref kvIoPinGetInfo().
+   *
+   * A float that contains the lower range limit
+   * in volts. Read-only.
+   *
+   * \note This is not applicable for relay pins.
+   */
+#define kvIO_INFO_GET_RANGE_MIN                     6
+  /**
+   * This define is used in \ref kvIoPinGetInfo().
+   *
+   * A float that contains the upper range limit
+   * in volts. Read-only.
+   *
+   * \note This is not applicable for relay pins.
+   */
+#define kvIO_INFO_GET_RANGE_MAX                     7
+  /**
+   * This define is used in \ref kvIoPinGetInfo().
+   *
+   * An unsigned 32-bit integer that contains the filter time in micro
+   * seconds when a digital input pin goes from LOW to HIGH.
+   *
+   * \note This is only used for digital input pins. 
+   */
+#define kvIO_INFO_GET_DI_LOW_HIGH_FILTER            8
+  /**
+   * This define is used in \ref kvIoPinGetInfo().
+   *
+   * An unsigned 32-bit integer that contains the filter time in micro
+   * seconds when a digital input pin goes from HIGH to LOW.
+   *
+   * \note This is only used for digital input pins. 
+   */
+#define kvIO_INFO_GET_DI_HIGH_LOW_FILTER            9
+  /**
+   * This define is used in \ref kvIoPinGetInfo().
+   *
+   * An unsigned 32-bit integer that contains the low-pass filter
+   * order for an analog input pin.
+   *
+   * \note This is only used for analog input pins. 
+   */
+#define kvIO_INFO_GET_AI_LP_FILTER_ORDER           10
+  /**
+   * This define is used in \ref kvIoPinGetInfo().
+   *
+   * A float that contains the hysteresis in volt for an
+   * analog input pin, i.e. the amount the input have to change
+   * before the sampled value is updated.
+   *
+   * \note This is only used for analog input pins. 
+   */
+#define kvIO_INFO_GET_AI_HYSTERESIS                11
+  /**
+   * This define is used in \ref kvIoPinGetInfo() to get the module number.
+   *
+   * An unsigned 32-bit integer that contains the module number
+   * the pin belongs to. The number starts from 0. Read-only.
+   */
+#define kvIO_INFO_GET_MODULE_NUMBER             14
+ /** @} */
+
+
+/**
+ * \ingroup kv_io
+ * \anchor kvIO_INFO_SET_xxx
+ * \name kvIO_INFO_SET_xxx
+ *
+ * These defines are used in \ref kvIoPinSetInfo().
+ * The value range for each property is specified in the manufacturer's user manual.
+ *
+ *  @{
+ */
+  /**
+   * This define is used in \ref kvIoPinSetInfo().
+   *
+   * An unsigned 32-bit integer that contains the filter time in micro
+   * seconds when a digital input pin goes from LOW to HIGH.
+   *
+   * \note This is only used for digital input pins. 
+   */
+#define kvIO_INFO_SET_DI_LOW_HIGH_FILTER            8
+  /**
+   * This define is used in \ref kvIoPinSetInfo().
+   *
+   * An unsigned 32-bit integer that contains the filter time in micro
+   * seconds when a digital input pin goes from HIGH to LOW.
+   *
+   * \note This is only used for digital input pins. 
+   */
+#define kvIO_INFO_SET_DI_HIGH_LOW_FILTER            9
+  /**
+   * This define is used in \ref kvIoPinSetInfo().
+   *
+   * An unsigned 32-bit integer that contains the low-pass filter
+   * order for an analog input pin.
+   *
+   * \note This is only used for analog input pins. 
+   */
+#define kvIO_INFO_SET_AI_LP_FILTER_ORDER           10
+  /**
+   * This define is used in \ref kvIoPinSetInfo().
+   *
+   * A float that contains the hysteresis in volt for an
+   * analog input pin, i.e. the amount the input have to change
+   * before the sampled value is updated.
+   *
+   * \note This is only used for analog input pins. 
+   */
+#define kvIO_INFO_SET_AI_HYSTERESIS                11
+ /** @} */
+
+
+
+
+/**
+ * \ingroup kv_io
+ * \anchor kvIO_MODULE_TYPE_xxx
+ * \name kvIO_MODULE_TYPE_xxx
+ *
+ * These defines are used in \ref kvIoPinGetInfo().
+ *
+ *  @{
+ */
+   /**
+   * Kvaser Add-on module with digital inputs and digital outputs
+   */
+#define kvIO_MODULE_TYPE_DIGITAL        1
+  /**
+   * Kvaser Add-on module with analog inputs and analog outputs
+   *
+   */
+#define kvIO_MODULE_TYPE_ANALOG         2
+  /**
+   * Kvaser Add-on module with relays and digital inputs
+   *
+   */
+#define kvIO_MODULE_TYPE_RELAY          3
+ /** @} */
+
+
+/**
+ * \ingroup kv_io
+ * \anchor kvIO_PIN_TYPE_xxx
+ * \name kvIO_PIN_TYPE_xxx
+ *
+ * These defines are used in \ref kvIoPinGetInfo().
+ *
+ *  @{
+ */
+   /**
+   * Digital
+   */
+#define kvIO_PIN_TYPE_DIGITAL           1
+  /**
+   * Analog
+   *
+   */
+#define kvIO_PIN_TYPE_ANALOG            2
+  /**
+   * Relay
+   *
+   */
+#define kvIO_PIN_TYPE_RELAY             3
+ /** @} */
+
+
+/**
+ * \ingroup kv_io
+ * \anchor kvIO_PIN_DIRECTION_xxx
+ * \name kvIO_PIN_DIRECTION_xxx
+ *
+ * These defines are used in \ref kvIoPinGetInfo().
+ *
+ *  @{
+ */
+  /**
+   * Input
+   */
+#define kvIO_PIN_DIRECTION_IN           4
+  /**
+   * Output
+   *
+   */
+#define kvIO_PIN_DIRECTION_OUT          8
+ /** @} */
+
+/**
+ * \ingroup kv_io
+ *
+ * Get the number of I/O pins available from a device.
+ *
+ * \param[in]  hnd   An open handle to a CAN channel.
+ * \param[out] pinCount  A pointer to an int which receives the number of pins.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref kvIoPinGetInfo(), \ref kv_io
+ * \note Preliminary API that may change.
+ * \note Not implemented in Linux.
+ */
+canStatus CANLIBAPI kvIoGetNumberOfPins (const CanHandle hnd, unsigned int *pinCount);
+
+/**
+ * \ingroup kv_io
+ *
+ * This function is used to confirm configuration. It is required to call this function, before it is possible to use any kvIoPinSetXxx()/kvIoPinGetXxx() function. After a configuration change, module removal or insertion, it is required to confirm the new configuration.
+ *
+ * \param[in]  hnd   An open handle to a CAN channel.
+ *
+ * \sa \ref kv_io
+ * \note Preliminary API that may change.
+ * \note Not implemented in Linux.
+ */
+canStatus CANLIBAPI kvIoConfirmConfig (const CanHandle hnd);
+
+/**
+ * \ingroup kv_io
+ *
+ * This function is used to retrieve I/O pin properties.
+ *
+ * \param[in]  hnd        An open handle to a CAN channel.
+ * \param[in]  pin        The pin number, see \ref kvIoGetNumberOfPins.
+ * \param[in]  item       Type of item to retrieve \ref kvIO_INFO_GET_xxx.
+ * \param[out] buffer     The address of a buffer which is to receive the data.
+ * \param[in]  bufsize    The size of the buffer, matching the size of selected \ref kvIO_INFO_GET_xxx item.
+ *
+ * \sa \ref kvIoPinSetInfo(), \ref kv_io
+ * \note Preliminary API that may change.
+ * \note Not implemented in Linux.
+ */
+canStatus CANLIBAPI kvIoPinGetInfo (const CanHandle hnd, unsigned int pin, int item, void *buffer, const unsigned int bufsize);
+
+/**
+ * \ingroup kv_io
+ *
+ * This function is used to set I/O pin properties, for items that can be changed.
+ *
+ * \param[in]  hnd        An open handle to a CAN channel.
+ * \param[in]  pin        The pin number, see \ref kvIoGetNumberOfPins.
+ * \param[in]  item       Type of item to set, see \ref kvIO_INFO_SET_xxx.
+ * \param[in]  buffer     The address of a buffer contains the data to set.
+ * \param[in]  bufsize    The size of the buffer, matching the size of selected \ref kvIO_INFO_SET_xxx item.
+ *
+ * \sa \ref kvIoPinGetInfo()
+ * \note Preliminary API that may change.
+ * \note Not implemented in Linux.
+ */
+canStatus CANLIBAPI kvIoPinSetInfo (const CanHandle hnd, unsigned int pin, int item, const void *buffer, const unsigned int bufsize);
+
+/**
+ * \ingroup kv_io
+ *
+ * This function is used to set a digital output I/O pin. If \a value is zero,
+ * the pin is set LOW. For any non-zero \a value, the pin is set HIGH.
+ *
+ * \param[in]  hnd   An open handle to a CAN channel.
+ * \param[in]  pin   The pin number, see \ref kvIoGetNumberOfPins.
+ * \param[in]  value An unsigned int which sets a value of the pin.
+ *
+ * \note Preliminary API that may change.
+ * \note Not implemented in Linux.
+ */
+canStatus CANLIBAPI kvIoPinSetDigital (const CanHandle hnd, unsigned int pin, unsigned int value);
+
+/**
+ * \ingroup kv_io
+ *
+ * This function is used to retrieve the value of the specified digital input I/O pin.
+ * If the pin is LOW, the integer pointed to by \a value is assigned zero.
+ * If the pin is HIGH, the integer pointed to by \a value is assigned a '1'.
+ *
+ * \param[in]  hnd   An open handle to a CAN channel.
+ * \param[in]  pin   The pin number, see \ref kvIoGetNumberOfPins.
+ * \param[out] value A pointer to an unsigned int which receives the value of the pin.
+ *
+ * \sa \ref kvIoPinSetDigital()
+ * \note Preliminary API that may change.
+ * \note Not implemented in Linux.
+ */
+canStatus CANLIBAPI kvIoPinGetDigital (const CanHandle hnd, unsigned int pin, unsigned int *value);
+
+/**
+ * \ingroup kv_io
+ *
+ * This function is used to get the latest set value of a digital output I/O pin.
+ * If the latest value written to the pin is LOW, the integer pointed to by \a value is assigned zero.
+ * If it is HIGH, the integer pointed to by \a value is assigned a '1'. 
+ * This function only returns values as they are presented in memory and the actual value on the output pin may therefore differ. 
+ *
+ * \param[in]  hnd   An open handle to a CAN channel.
+ * \param[in]  pin   The pin number, see \ref kvIoGetNumberOfPins.
+ * \param[out] value A pointer to an unsigned int which receives the latest set value of the pin.
+ *
+ * \sa \ref kvIoPinSetDigital()
+ * \note The actual value on the output pin may differ. 
+ * \note Preliminary API that may change.
+ * \note Not implemented in Linux.
+ */
+canStatus CANLIBAPI kvIoPinGetOutputDigital (const CanHandle hnd, unsigned int pin, unsigned int *value);
+
+/**
+ * \ingroup kv_io
+ *
+ * This function is used to control a relay of the specified I/O pin.
+ * If \a value is zero, the relay is set to OFF. For any non-zero \a value,
+ * the relay is set to ON.
+ *
+ * \param[in]  hnd   An open handle to a CAN channel.
+ * \param[in]  pin   The pin number, see \ref kvIoGetNumberOfPins.
+ * \param[in]  value An unsigned int which sets a value of the pin.
+ * \note Preliminary API that may change.
+ * \note Not implemented in Linux.
+ */
+canStatus CANLIBAPI kvIoPinSetRelay (const CanHandle hnd, unsigned int pin, unsigned int value);
+
+/**
+ * \ingroup kv_io
+ *
+ * This function is used to get the latest set value of a relay I/O pin.
+ * If \a value is zero, the relay has been set to OFF. For any non-zero \a value,
+ * the relay has been set to ON. 
+ * This function returns values as they are presented in memory and the actual state on the relay pin may differ. 
+ *
+ * \param[in]  hnd   An open handle to a CAN channel.
+ * \param[in]  pin   The pin number, see \ref kvIoGetNumberOfPins.
+ * \param[in]  value A pointer to an unsigned int which receives the latest set value of the pin.
+ *
+ * \note Preliminary API that may change.
+ * \note Not implemented in Linux.
+ */
+canStatus CANLIBAPI kvIoPinGetOutputRelay (const CanHandle hnd, unsigned int pin, unsigned int *value);
+
+/**
+ * \ingroup kv_io
+ *
+ * This function is used to set the voltage level of the specified analog I/O pin.
+ *
+ * \param[in]  hnd   An open handle to a CAN channel.
+ * \param[in]  pin   The pin number, see \ref kvIoGetNumberOfPins.
+ * \param[in]  value A float which sets a voltage of the pin.
+ *
+ * \sa \ref kvIoPinGetAnalog()
+ * \note Preliminary API that may change.
+ * \note Not implemented in Linux.
+ */
+canStatus CANLIBAPI kvIoPinSetAnalog (const CanHandle hnd, unsigned int pin, float value);
+
+/**
+ * \ingroup kv_io
+ *
+ * This function is used to retrieve the voltage level of the specified analog I/O pin.
+ *
+ * \param[in]  hnd   An open handle to a CAN channel.
+ * \param[in]  pin   The pin number, see \ref kvIoGetNumberOfPins.
+ * \param[out] value A pointer to a float which receives the voltage of the pin.
+ *
+ * \sa \ref kvIoPinSetAnalog()
+ * \note Preliminary API that may change.
+ * \note Not implemented in Linux.
+ */
+canStatus CANLIBAPI kvIoPinGetAnalog (const CanHandle hnd, unsigned int pin, float* value);
+
+/**
+ * \ingroup kv_io
+ *
+ * This function is used to get the latest set voltage level of an analog I/O pin.
+ * This function only returns values as they are presented in memory and the actual value on the output pin may therefore differ. 
+ *
+ * \param[in]  hnd   An open handle to a CAN channel.
+ * \param[in]  pin   The pin number, see \ref kvIoGetNumberOfPins.
+ * \param[out] value A pointer to a float which receives the latest set voltage level of the pin.
+ *
+ * \sa \ref kvIoPinSetAnalog()
+ * \note The actual voltage level on the output pin may differ. 
+ * \note Preliminary API that may change.
+ * \note Not implemented in Linux.
+ */
+canStatus CANLIBAPI kvIoPinGetOutputAnalog (const CanHandle hnd, unsigned int pin, float* value);
 
 #ifdef __cplusplus
 }

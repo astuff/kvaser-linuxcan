@@ -134,6 +134,12 @@ static int debug_level = PCICAN_DEBUG;
 #   define DEBUGPRINT(n, args...) if ((n) == 1) printk("<" #n ">" args)
 #endif
 
+// First page: Memory layout(1), EAN(5) and serial number(4)
+#define FIRST_PAGE_DATA_SIZE (1+5+4)
+
+// Piggyback: EAN(5), serial number(4), piggy type(1), opto type(1)
+#define PIGGYBACK_DATA_SIZE (5+4+1+1)
+
 //======================================================================
 // HW function pointers
 //======================================================================
@@ -402,19 +408,19 @@ static int pciCanProbe (VCanCardData *vCd)
 
         memset(buf, 0, sizeof(buf));
 
-        ds_read_rom_64bit(&(hCd->cardEeprom), 0, buf);
+        ds_read_rom_byte_repeat(&(hCd->cardEeprom), buf);
 
         if (*buf == DS2431_CODE) {
             //
             // This is a 2431 memory, so the date is in the second page...
             //
             ds_read_memory(DS2431_CODE,
-                           &(hCd->cardEeprom), 0x20, buf, sizeof(buf));
-            mfgDate = *(unsigned short *)&buf[5];
+                           &(hCd->cardEeprom), 0x25, buf, sizeof(unsigned short));
+            mfgDate = *(unsigned short *)&buf[0];
 
-            // ...and the rest of the data in the first page.
+            // ...and memory layout, EAN and serial number in the first page.
             ds_read_memory(DS2431_CODE,
-                           &(hCd->cardEeprom), 0, buf, sizeof(buf));
+                           &(hCd->cardEeprom), 0, buf, FIRST_PAGE_DATA_SIZE);
             memcpy(&boardSerialNumber, &buf[6], sizeof(boardSerialNumber));
             if (boardSerialNumber != 0xffffffff) {
                 vCd->serialNumber = boardSerialNumber;
@@ -425,7 +431,7 @@ static int pciCanProbe (VCanCardData *vCd)
             //
 
             ds_read_memory(DS2430_CODE,
-                           &(hCd->cardEeprom), 0, buf, sizeof(buf));
+                           &(hCd->cardEeprom), 0, buf, FIRST_PAGE_DATA_SIZE);
             memcpy(&boardSerialNumber, &buf[6], sizeof(boardSerialNumber));
 
             if (boardSerialNumber != 0xffffffff) {
@@ -460,15 +466,14 @@ static int pciCanProbe (VCanCardData *vCd)
             packed_EAN_to_BCD_with_csum(&buf[1], vCd->ean);
         }
         {
-            unsigned int sum = 0, n;
+            unsigned int n;
             char hex[3 * 32 + 1];
 
             DEBUGPRINT(1, "EEPROM Board: ");
-            for (n = 0; n < 32; ++n) {
+            for (n = 0; n < FIRST_PAGE_DATA_SIZE; ++n) {
                 sprintf(&hex[n * 3], "%02x ", buf[n]);
-                sum += buf [n];
             }
-            DEBUGPRINT(1, "%s, sum=%02x\n", hex, sum);
+            DEBUGPRINT(1, "%s\n", hex);
 
             DEBUGPRINT(1, "serial number = 0x%04x (%u)\n",
                        vCd->serialNumber, vCd->serialNumber);
@@ -565,10 +570,10 @@ static int pciCanProbe (VCanCardData *vCd)
             unsigned char buf[32];
 
             memset(buf, 0, sizeof(buf));
-            ds_read_rom_64bit(&hChd->chanEeprom, 0, buf);
+            ds_read_rom_byte_repeat(&hChd->chanEeprom, buf);
 
             // *buf is DS2431_CODE or something else
-            ds_read_memory(*buf, &hChd->chanEeprom, 0, buf, sizeof(buf));
+            ds_read_memory(*buf, &hChd->chanEeprom, 0, buf, PIGGYBACK_DATA_SIZE);
 
             if ((buf[9] == VCAN_TRANSCEIVER_TYPE_SWC)       ||
                 (buf[9] == VCAN_TRANSCEIVER_TYPE_DNOPTO)    ||

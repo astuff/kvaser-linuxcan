@@ -88,14 +88,14 @@ typedef struct s_softsync_match_list {
 
 typedef struct s_softsync_master SOFTSYNC_MASTER;
 
-typedef struct s_softsync_master {
+struct s_softsync_master {
   SOFTSYNC_DATA            *master;
   SOFTSYNC_MASTER          *next;
   SOFTSYNC_MASTER          *prev;
-}  SOFTSYNC_MASTER;
+};
 
 
-typedef struct s_softsync_data {
+struct s_softsync_data {
 
   int                      id;
 
@@ -124,8 +124,7 @@ typedef struct s_softsync_data {
   SOFTSYNC_DATA            *prev;
 
   SOFTSYNC_MASTER          *masterData;
-
-} SOFTSYNC_DATA;
+};
 
 uint64_t softSyncLoc2Glob (CARD_INFO *ci, uint64_t stamp);
 uint64_t softSyncGlob2Loc (CARD_INFO *ci, uint64_t stamp);

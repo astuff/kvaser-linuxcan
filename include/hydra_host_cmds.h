@@ -1860,12 +1860,13 @@ typedef struct {
 #define IO_PIN_INFO_NUMBER_OF_BITS                5
 #define IO_PIN_INFO_RANGE_MIN                     6
 #define IO_PIN_INFO_RANGE_MAX                     7
-#define IO_PIN_INFO_DIGITAL_OFF_TO_ON_DELAY       8
-#define IO_PIN_INFO_DIGITAL_ON_TO_OFF_DELAY       9
+#define IO_PIN_INFO_DIGITAL_LOW_HIGH_FILTER       8
+#define IO_PIN_INFO_DIGITAL_HIGH_LOW_FILTER       9
 #define IO_PIN_INFO_ANALOG_LOWPASS_FILTER_ORDER  10
 #define IO_PIN_INFO_ANALOG_HYSTERESIS            11
 #define IO_PIN_INFO_ANALOG_VALUE_ABOVE           12
 #define IO_PIN_INFO_ANALOG_VALUE_BELOW           13
+#define IO_PIN_INFO_MODULE_NUMBER                14
 
 #define IO_PIN_TYPE_UNKNOWN                       0
 #define IO_PIN_TYPE_DIGITAL                       1
@@ -1875,6 +1876,11 @@ typedef struct {
 #define IO_PIN_DIRECTION_UNKNOWN                  0
 #define IO_PIN_DIRECTION_IN                       4
 #define IO_PIN_DIRECTION_OUT                      8
+
+#define IO_MODULE_TYPE_UNKNOWN                    0
+#define IO_MODULE_TYPE_DIGITAL                    1
+#define IO_MODULE_TYPE_ANALOG                     2
+#define IO_MODULE_TYPE_RELAY                      3
 
 #define IO_EVENT_UNKNOWN                          0
 #define IO_EVENT_CONFIG_CHANGED                   2
@@ -1896,6 +1902,11 @@ typedef struct {
 #define IO_API_ERROR_TOO_MANY_EVENTS             -9
 #define IO_API_ERROR_COMMUNICATION              -10
 #define IO_API_ERROR_CONFIG_NOT_CONFIRMED       -11
+#define IO_API_ERROR_RX_CRC                     -12
+#define IO_API_ERROR_HW_NOT_READY               -13
+#define IO_API_ERROR_RX_TIMEOUT                 -14
+#define IO_API_ERROR_INDEX_TOO_HIGH             -15
+#define IO_API_ERROR_VALUE_OUT_OF_RANGE         -16
 
 typedef struct {
   uint8_t subCmdNo;

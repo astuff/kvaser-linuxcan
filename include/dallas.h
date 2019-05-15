@@ -116,7 +116,8 @@ typedef enum {
           dsError_BusStuckLow,        // 6
           dsError_NotProgrammed,      // 7
           dsError_ApplicationLocked,  // 8
-          dsError_CRCError            // 9
+          dsError_CRCError,           // 9
+          dsError_NoMemory            // 10
         } dsStatus;
 
 /*****************************************************************************/
@@ -128,7 +129,9 @@ dsStatus ds_reset (DALLAS_CONTEXT *dc);
 
 int ds_check_for_presence (DALLAS_CONTEXT *dc);
 
-dsStatus ds_read_rom_64bit (DALLAS_CONTEXT *dc, int port, unsigned char *data);
+dsStatus ds_read_rom_64bit (DALLAS_CONTEXT *dc, unsigned char *data);
+
+dsStatus ds_read_rom_byte_repeat (DALLAS_CONTEXT *dc, unsigned char *byte);
 
 dsStatus ds_read_string (DALLAS_CONTEXT *dc,
                          unsigned int command,

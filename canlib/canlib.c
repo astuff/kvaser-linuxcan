@@ -140,7 +140,11 @@ static const char *errorStrings[] = {
   "Script version mismatch",         // canERR_SCRIPT_WRONG_VERSION
   "Script container version mismatch",  // canERR_SCRIPT_TXE_CONTAINER_VERSION
   "Script container format error",   // canERR_SCRIPT_TXE_CONTAINER_FORMAT
-  "Buffer provided too small to hold data",  // canERR_BUFFER_TOO_SMALL
+  "Buffer provided too small to hold data",           // canERR_BUFFER_TOO_SMALL
+  "I/O pin doesn't exist or I/O pin type mismatch",   // canERR_IO_WRONG_PIN_TYPE
+  "I/O pin configuration is not confirmed",           // canERR_IO_NOT_CONFIRMED,
+  "Configuration changed after last call to kvIoConfirmConfig",  // canERR_IO_CONFIG_CHANGED
+  "The previous I/O pin value has not yet changed the output and is still pending", //canERR_IO_PENDING
 };
 
 struct dev_descr {
@@ -2834,4 +2838,175 @@ static canStatus check_bitrate (const CanHandle hnd, unsigned int bitrate)
     }
   }
   return canOK;
+}
+
+//******************************************************
+// IoAPI - not implemented in linux
+//******************************************************
+canStatus CANLIBAPI kvIoConfirmConfig  (const int hnd)
+{
+  (void) hnd;
+
+  return canERR_NOT_IMPLEMENTED;
+}
+
+//******************************************************
+// IoAPI - not implemented in linux
+//******************************************************
+canStatus CANLIBAPI kvIoGetNumberOfPins   (const int hnd, unsigned int *pinCount)
+{
+  (void) hnd;
+  (void) pinCount;
+
+  return canERR_NOT_IMPLEMENTED;
+}
+
+//******************************************************
+// IoAPI - not implemented in linux
+//******************************************************
+canStatus CANLIBAPI kvIoPinGetInfo    (const int hnd,
+                                       unsigned int pin,
+                                       int item,
+                                       void *buffer,
+                                       const unsigned int bufsize)
+{
+  (void) hnd;
+  (void) pin;
+  (void) item;
+  (void) buffer;
+  (void) bufsize;
+
+  return canERR_NOT_IMPLEMENTED;
+}
+
+//******************************************************
+// IoAPI - not implemented in linux
+//******************************************************
+canStatus CANLIBAPI kvIoPinGetAnalog (const int  hnd,  
+                                      unsigned int pin,  
+                                      float *  value)
+{
+  (void) hnd;
+  (void) pin;
+  (void) value;
+
+  return canERR_NOT_IMPLEMENTED;
+} 
+
+//******************************************************
+// IoAPI - not implemented in linux
+//******************************************************
+canStatus CANLIBAPI kvIoPinGetOutputAnalog (const int  hnd,  
+                                      unsigned int pin,  
+                                      float *  value)
+{
+  (void) hnd;
+  (void) pin;
+  (void) value;
+
+  return canERR_NOT_IMPLEMENTED;
+} 
+
+//******************************************************
+// IoAPI - not implemented in linux
+//******************************************************
+canStatus CANLIBAPI kvIoPinGetDigital (const int  hnd,  
+                                      unsigned int pin,  
+                                      unsigned int * value)
+{
+  (void) hnd;
+  (void) pin;
+  (void) value;
+
+  return canERR_NOT_IMPLEMENTED;
+} 
+
+//******************************************************
+// IoAPI - not implemented in linux
+//******************************************************
+canStatus CANLIBAPI kvIoPinGetOutputDigital (const int  hnd,  
+                                      unsigned int pin,  
+                                      unsigned int * value)
+{
+  (void) hnd;
+  (void) pin;
+  (void) value;
+
+  return canERR_NOT_IMPLEMENTED;
+} 
+
+
+//******************************************************
+// IoAPI - not implemented in linux
+//******************************************************
+canStatus CANLIBAPI kvIoPinSetAnalog (const int  hnd,  
+                                      unsigned int pin,  
+                                      float value)
+{
+  (void) hnd;
+  (void) pin;
+  (void) value;
+
+  return canERR_NOT_IMPLEMENTED;
+} 
+
+
+//******************************************************
+// IoAPI - not implemented in linux
+//******************************************************
+canStatus CANLIBAPI kvIoPinSetDigital (const int  hnd,  
+                                       unsigned int pin,  
+                                       unsigned int value)
+{
+  (void) hnd;
+  (void) pin;
+  (void) value;
+
+  return canERR_NOT_IMPLEMENTED;
+} 
+
+//******************************************************
+// IoAPI - not implemented in linux
+//******************************************************
+canStatus CANLIBAPI kvIoPinSetRelay (const int  hnd,  
+                                     unsigned int pin,  
+                                     unsigned int value)
+{
+  (void) hnd;
+  (void) pin;
+  (void) value;
+
+  return canERR_NOT_IMPLEMENTED;
+} 
+
+//******************************************************
+// IoAPI - not implemented in linux
+//******************************************************
+canStatus CANLIBAPI kvIoPinGetOutputRelay (const int  hnd,  
+                                     unsigned int pin,  
+                                     unsigned int *value)
+{
+  (void) hnd;
+  (void) pin;
+  (void) value;
+
+  return canERR_NOT_IMPLEMENTED;
+} 
+
+//******************************************************
+// IoAPI - not implemented in linux
+//******************************************************
+canStatus CANLIBAPI kvIoPinSetInfo (const int  hnd,  
+                                    unsigned int pin,  
+                                    int  item,  
+                                    const void *  buffer,  
+                                    const unsigned int  bufsize)  
+{
+  (void) hnd;
+  (void) pin;
+  (void) item;
+  (void) buffer;
+  (void) bufsize;
+
+  return canERR_NOT_IMPLEMENTED;
 }

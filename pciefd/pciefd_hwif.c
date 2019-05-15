@@ -87,6 +87,10 @@
 #include <asm/io.h>
 #include <linux/seq_file.h>
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 29))
+#error Linux kernel version 2.6.29 or later required for kvpciefd!
+#endif /* KERNEL_VERSION < 2.6.29 */
+
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)
 #   include <asm/system.h>
 #endif /* KERNEL_VERSION < 3.4.0 */
@@ -1246,7 +1250,8 @@ static int pciCanProbe (VCanCardData *vCard)
                         VCAN_CHANNEL_CAP_TXREQUEST            |
                         VCAN_CHANNEL_CAP_TXACKNOWLEDGE        |
                         VCAN_CHANNEL_CAP_CANFD                |
-                        VCAN_CHANNEL_CAP_CANFD_NONISO,
+                        VCAN_CHANNEL_CAP_CANFD_NONISO         |
+                        VCAN_CHANNEL_CAP_SILENTMODE,
                         0xFFFFFFFF,
                         0xFFFFFFFF,
                         MAX_CARD_CHANNELS);
@@ -2994,11 +2999,6 @@ static int pciCanTransmitMessage (VCanChanData *vChd, CAN_MSG *m)
 
   transId = atomic_read(&vChd->transId);
 
-  if (transId == 0) {
-    DEBUGPRINT(1,"--- transId must not be zero\n");
-    return VCAN_STAT_NO_RESOURCES;
-  }
-
   if (hChd->current_tx_message[transId - 1].user_data) {
     DEBUGPRINT(2, "Transid is already in use: %x %d   %x %d CH:%u\n\n",
                hChd->current_tx_message[transId - 1].id,
@@ -3450,51 +3450,39 @@ static void pciCanSend (void *void_chanData)
 
   wait_for_completion(&devChan->busOnCompletion);
 
-  if (!chd->isOnBus) {
-    DEBUGPRINT(4, "Attempt to send when not on bus\n");
-    complete(&devChan->busOnCompletion);
-
-    return;
-  }
-
-  if (chd->minorNr < 0) {  // Channel not initialized?
-    DEBUGPRINT(1, "Attempt to send on unitialized channel\n");
-    complete(&devChan->busOnCompletion);
-    return;
-  }
-
-  if (!pciCanTxAvailable(chd)) {
-    DEBUGPRINT(4, "Maximum number of messages outstanding reached\n");
-    complete(&devChan->busOnCompletion);
-    return;
-  }
-
-  // Send Messages
-  queuePos = queue_front(&chd->txChanQueue);
-  if (queuePos >= 0) {
-    if (pciCanTransmitMessage(chd, &chd->txChanBuffer[queuePos]) ==
-        VCAN_STAT_OK) {
-      queue_pop(&chd->txChanQueue);
-      queue_wakeup_on_space(&chd->txChanQueue);
-
-    } else {
-      DEBUGPRINT(1, "Message send failed\n");
-      queue_release(&chd->txChanQueue);
-
-      // Need to retry work!
-#if !defined(TRY_RT_QUEUE)
-      schedule_work(&devChan->txTaskQ);
-#else
-      queue_work(devChan->txTaskQ, &devChan->txWork);
-#endif
+  while (1) {
+    if (!chd->isOnBus) {
+      DEBUGPRINT(4, "Attempt to send when not on bus\n");
+      break;
     }
-  } else {
-    queue_release(&chd->txChanQueue);
+    
+    if (chd->minorNr < 0) {  // Channel not initialized?
+      DEBUGPRINT(1, "Attempt to send on unitialized channel\n");
+      break;
+    }
+    
+    if (!pciCanTxAvailable(chd)) {
+      DEBUGPRINT(4, "Maximum number of messages outstanding reached\n");
+      break;
+    }
+    
+    // Send Messages
+    queuePos = queue_front(&chd->txChanQueue);
+    if (queuePos >= 0) {
+      if (pciCanTransmitMessage(chd, &chd->txChanBuffer[queuePos]) == VCAN_STAT_OK) {
+        queue_pop(&chd->txChanQueue);
+        queue_wakeup_on_space(&chd->txChanQueue);
+      } else {
+        queue_release(&chd->txChanQueue);
+        break;
+      }
+    } else {
+      queue_release(&chd->txChanQueue);
+      break;
+    }
   }
 
   complete(&devChan->busOnCompletion);
-
-  return;
 }
 
 //======================================================================

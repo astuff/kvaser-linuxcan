@@ -223,12 +223,16 @@ typedef struct {
   /**
    * Time in microseconds of the falling edges in the
    * synch byte relative the falling edge of the start bit.
+   *
+   * \note Not supported by all devices.
    */
   unsigned long synchEdgeTime[4];
 
   /**
    * Start time in microseconds of each data byte. In case of 8-byte messages,
    * the crc time isn't included (but can be deduced from frameLength).
+   *
+   * \note Not supported by all devices.
    */
    unsigned long byteTime[8];
 } LinMessageInfo;
@@ -564,6 +568,7 @@ unsigned long LINLIBAPI linReadTimer(LinHandle h);
  * \return \ref linERR_xxx (negative) if failure
  *
  * \sa \ref linWriteSync()
+ * \sa \ref section_user_guide_lin_frame_identifiers
  */
 LinStatus LINLIBAPI linWriteMessage(LinHandle h, unsigned int id, const void *msg,
                                     unsigned int dlc);
@@ -580,6 +585,8 @@ LinStatus LINLIBAPI linWriteMessage(LinHandle h, unsigned int id, const void *ms
  *
  * \return \ref linOK (zero) if success
  * \return \ref linERR_xxx (negative) if failure
+ *
+ * \sa \ref section_user_guide_lin_frame_identifiers
  */
 LinStatus LINLIBAPI linRequestMessage(LinHandle h, unsigned int id);
 
@@ -663,6 +670,7 @@ LinStatus LINLIBAPI linReadMessageWait(LinHandle h, unsigned int *id, void *msg,
  * \return \ref linERR_xxx (negative) if failure
  *
  * \sa \ref linClearMessage()
+ * \sa \ref section_user_guide_lin_frame_identifiers
  */
 LinStatus LINLIBAPI linUpdateMessage(LinHandle h, unsigned int id, const void *msg,
                                      unsigned int dlc);
@@ -678,8 +686,8 @@ LinStatus LINLIBAPI linUpdateMessage(LinHandle h, unsigned int id, const void *m
  * and on the bus again) or call the function with delay and \a cFlags set to zero.
  *
  * \note The handle shall be on-bus.
- * \note It is supported in firmware version 2.4.1 and later.
- *
+ * \note Not supported by all devices.
+  *
  * \param[in] h        A handle to an open LIN channel.
  * \param[in] id       The identifier of the LIN message.
  * \param[in] cFlags   One or more of the \ref LIN_MSG_DISTURB_xxx flags.
@@ -757,6 +765,7 @@ LinStatus LINLIBAPI linSetupIllegalMessage(LinHandle h, unsigned int id,
  * \return \ref linERR_xxx (negative) if failure
  *
  * \sa \ref linSetupIllegalMessage()
+ * \sa \ref section_user_guide_lin_frame_identifiers
  */
 LinStatus LINLIBAPI linSetupLIN(LinHandle h, unsigned int lFlags, unsigned int bps);
 
@@ -792,6 +801,9 @@ LinStatus LINLIBAPI linSetupLIN(LinHandle h, unsigned int lFlags, unsigned int b
  * The LIN interface will interrupt the sequence when a LIN message or another
  * command is received. The stream of wakeups will be recived as incoming
  * messages with the LIN_RX flag bit set.
+ *
+ * \note Maximum value of count is 255 (0xFF).
+ * \note Maximum value of interval is either 255 (0xFF) or 65535 (0xFFFF) depending on device.
  *
  * \param[in] h        A handle to an open LIN channel.
  * \param[in] count    The number of wakeup frames to send.
@@ -898,6 +910,20 @@ LinStatus LINLIBAPI linGetCanHandle(LinHandle h, unsigned int *canHandle);
 *
 *   in your programs, and link with linlib.dll (which, in turn, uses canlib32.dll).\n
 *   On Linux, the files are called liblinlib.so and libcanlib.so respectively.
+*
+* \section section_user_guide_lin_frame_identifiers LIN Frame Identifiers
+*
+*   LIN frame identifiers range from ID 0x00 to 0x3F.
+*   IDs 0x3E and 0x3F are reserved for future use.
+*
+*   IDs 0x3C and 0x3D are used for diagnostics frames and behave somewhat
+*   differently compared to the regular frames.\n
+*   0x3C is called the master request frame and 0x3D is called the slave
+*   response frame.\n
+*   Diagnostic frames should contain eight bytes of data and use the classic
+*   checksum (even if \ref LIN_ENHANCED_CHECKSUM is specified).\n
+*   0x3D is single shot and its slave message buffer is automatically cleared upon
+*   reception of a 0x3C or 0x3D.
 *
 **/
 

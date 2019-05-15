@@ -64,6 +64,7 @@
 /* Kvaser Linux Canlib VCan layer functions used in Memorators */
 
 #include <errno.h>
+#include <stdio.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include "kcanio_memorator.h"
@@ -167,6 +168,16 @@ static canStatus memoResultToCanStatus(KCANY_MEMO_INFO *info)
   }
   return ret;
 }
+
+#if (__GLIBC__ <= 2)
+#if (__GLIBC_MINOR__ < 10)
+static size_t strnlen(const char *s, size_t maxlen)
+{
+  (void) maxlen;
+  return strlen(s);
+}
+#endif
+#endif /* GLIBC < 2.10 */
 
 /***************************************************************************/
 static int is_filename_invalid(char *filename)

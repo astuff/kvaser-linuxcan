@@ -283,8 +283,39 @@ typedef enum {
    */
     canERR_BUFFER_TOO_SMALL = -43,
 
-  // The last entry - a dummy so we know where NOT to place a comma.
-    canERR__RESERVED       = -44    ///< Reserved
+  /**
+   * <b>The I/O pin doesn't exist or the I/O pin type doesn't match the called
+   function, e.g. trying to use input pins as outputs or use digital pins as analog pins. </b>;
+   */
+    canERR_IO_WRONG_PIN_TYPE = -44,
+
+  /**
+   * <b>The I/O pin configuration is not confirmed. Use kvIoConfirmConfig()
+   to confirm the configuration.</b>;
+   */
+    canERR_IO_NOT_CONFIRMED = -45,
+
+  /**
+   * <b>The I/O pin configuration has changed after last call to kvIoConfirmConfig. Use kvIoConfirmConfig()
+   to confirm the new configuration. </b>;
+   */
+    canERR_IO_CONFIG_CHANGED = -46,
+
+  /**
+   * <b>The previous I/O pin value has not yet changed the output and is still pending.
+   This happens when e.g. kvIoPinSetAnalog() is called twice on the same pin
+   within a short time. </b>;
+   */
+    canERR_IO_PENDING = -47,
+
+    /**
+   * <b>There is no valid I/O pin configuration. 
+   * </b>
+   */
+    canERR_IO_NO_VALID_CONFIG = -48,
+
+    // The last entry - a dummy so we know where NOT to place a comma.
+    canERR__RESERVED       = -49    ///< Reserved
 } canStatus;
 /** @} */
 

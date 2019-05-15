@@ -66,7 +66,8 @@ UDEVCTRL=`which udevcontrol`
 UDEVADM=`which udevadm`
 
 GCC_MAJ_VERSION_GTEQ_4 := $(shell expr `gcc -dumpversion | cut -f1 -d.` \>= 4)
-GCC_MIN_VERSION_GTEQ_8 := $(shell expr `gcc -dumpversion | cut -f2 -d.` \>= 8)
+GCC_MAJ_VERSION_GTEQ_5 := $(shell expr `gcc -dumpversion | cut -f1 -d.` \>= 5)
+GCC_MIN_VERSION_GTEQ_9 := $(shell expr `gcc -dumpversion | cut -f2 -d.` \>= 9)
 
 # alter lines below to change default debug level
 ifndef KV_VCANOSIF_DEBUG_LEVEL
@@ -123,21 +124,18 @@ KV_KERNEL_SRC_DIR := $(KDIR)
 
 #---------------------------------------------------------------------------
 # export these flags to compilation
-KV_XTRA_COMMON_FLAGS = -DLINUX=1 $(foreach INC,$(INCLUDES),-I$(INC)) -Werror -Wno-date-time -Wall \
-                       -Wclobbered -Wempty-body -Wignored-qualifiers -Wmissing-parameter-type \
-                       -Wold-style-declaration -Woverride-init -Wtype-limits \
-                       -Wuninitialized
+KV_XTRA_COMMON_FLAGS = -DLINUX=1 $(foreach INC,$(INCLUDES),-I$(INC)) -Werror -Wall
 
-# gcc 4.6 does not allow initializing a struct field with '{ 0 }'
-# gcc 4.7.2 is reporting false positive warnings
+# GCC 4.9 is the first version with Wdate-time
+ifeq ($(GCC_MAJ_VERSION_GTEQ_5),1)
+  KV_XTRA_COMMON_FLAGS += -Wno-date-time
+else
 ifeq ($(GCC_MAJ_VERSION_GTEQ_4),1)
-ifeq ($(GCC_MIN_VERSION_GTEQ_8),1)
-  KV_XTRA_COMMON_FLAGS += -Wmissing-field-initializers
-ifeq ($(ARCH),arm) # On ARM, ignore missing field initializers in <kv_module_name>.mod.c
-  CFLAGS_$(KV_MODULE_NAME).mod.o += -Wno-missing-field-initializers
-endif
-endif
-endif
+ifeq ($(GCC_MIN_VERSION_GTEQ_9),1)
+  KV_XTRA_COMMON_FLAGS += -Wno-date-time
+endif # GCC_MIN >= 9
+endif # GCC_MAJ >= 4
+endif # GCC_MAJ >= 5
 
 export KV_XTRA_CFLAGS       = $(KV_XTRA_COMMON_FLAGS) $(KV_NDEBUGFLAGS) -DWIN32=0
 export KV_XTRA_CFLAGS_DEBUG = $(KV_XTRA_COMMON_FLAGS) $(KV_DEBUGFLAGS)  -DWIN32=0
@@ -191,7 +189,7 @@ clean:
 	@echo "Cleaning $(KV_MODULE_NAME)" $(IS_DEBUG)
 	rm -f $(foreach suffix, o mod.o ko mod.c, $(KV_MODULE_NAME).$(suffix))                \
 	      $(foreach suffix, o.cmd mod.o.cmd ko.cmd, .$(KV_MODULE_NAME).$(suffix))         \
-	      modules.order Module.symvers new_modules.conf                                   \
+	      modules.order Module.symvers new_modules.conf .cache.mk                         \
 	      $(SRCS:%.c=%.o)                                                                 \
 	      $(join $(dir $(SRCS)),$(addprefix .,$(notdir $(patsubst %.c,%.o.cmd,$(SRCS))))) \
 	      $(join $(dir $(SRCS)),$(addprefix .,$(notdir $(patsubst %.c,%.o.d,$(SRCS)))))

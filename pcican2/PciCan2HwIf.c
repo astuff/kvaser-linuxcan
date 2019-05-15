@@ -1555,45 +1555,37 @@ static void pciCanSend (struct work_struct *work)
 #endif
     int queuePos;
 
-    if (!chd->isOnBus) {
+    while (1) {
+      if (!chd->isOnBus) {
         DEBUGPRINT(2, "Attempt to send when not on bus\n");
-        return;
-    }
-
-    if (chd->minorNr < 0) {  // Channel not initialized?
+        break;
+      }
+      
+      if (chd->minorNr < 0) {  // Channel not initialized?
         DEBUGPRINT(2, "Attempt to send on unitialized channel\n");
-        return;
-    }
-
-    if (!pciCanTxAvailable(chd)) {
+        break;
+      }
+      
+      if (!pciCanTxAvailable(chd)) {
         DEBUGPRINT(2, "Maximum number of messages outstanding reached\n");
-        return;
-    }
-
-    // Send Messages
-    queuePos = queue_front(&chd->txChanQueue);
-    if (queuePos >= 0) {
-        if (pciCanTransmitMessage(chd, &chd->txChanBuffer[queuePos]) ==
-              VCAN_STAT_OK) {
-            DEBUGPRINT(2, "Message sent\n");
-            queue_pop(&chd->txChanQueue);
-            queue_wakeup_on_space(&chd->txChanQueue);
+        break;
+      }
+      
+      // Send Messages
+      queuePos = queue_front(&chd->txChanQueue);
+      if (queuePos >= 0) {
+        if (pciCanTransmitMessage(chd, &chd->txChanBuffer[queuePos]) == VCAN_STAT_OK) {
+          queue_pop(&chd->txChanQueue);
+          queue_wakeup_on_space(&chd->txChanQueue);
         } else {
-            DEBUGPRINT(2, "Message send failed\n");
-            queue_release(&chd->txChanQueue);
-            // Need to retry work!
-#if !defined(TRY_RT_QUEUE)
-            schedule_work(&devChan->txTaskQ);
-#else
-            queue_work(devChan->txTaskQ, &devChan->txWork);
-#endif
+          queue_release(&chd->txChanQueue);
+          break;
         }
-    } else {
-        DEBUGPRINT(2, "Nothing in queue\n");
+      } else {
         queue_release(&chd->txChanQueue);
+        break;
+      }
     }
-
-    return;
 }
 #endif
 

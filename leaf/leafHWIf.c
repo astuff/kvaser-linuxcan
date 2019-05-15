@@ -2398,6 +2398,15 @@ static int leaf_start (VCanCardData *vCard)
 
     r = leaf_capabilities (vCard, VCAN_CHANNEL_CAP_SYNC_TX_FLUSH);
     if (r != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_SYNC_TX_FLUSH\n")));
+
+    r = leaf_capabilities (vCard, VCAN_CHANNEL_CAP_HAS_LOGGER);
+    if (r != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_HAS_LOGGER\n")));
+
+    r = leaf_capabilities (vCard, VCAN_CHANNEL_CAP_HAS_REMOTE);
+    if (r != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_HAS_REMOTE\n")));
+
+    r = leaf_capabilities (vCard, VCAN_CHANNEL_CAP_HAS_SCRIPT);
+    if (r != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_HAS_SCRIPT\n")));
   }
 
   set_capability_value (vCard,
@@ -3691,6 +3700,18 @@ static int leaf_capabilities (VCanCardData *vCard, uint32_t vcan_cmd) {
     case CAP_SUB_CMD_SYNC_TX_FLUSH:
       value = reply.capabilitiesResp.syncTxFlushCap.value;
       mask  = reply.capabilitiesResp.syncTxFlushCap.mask;
+      break;
+    case CAP_SUB_CMD_HAS_LOGGER:
+      value = reply.capabilitiesResp.loggerCap.value;
+      mask  = reply.capabilitiesResp.loggerCap.mask;
+      break;
+    case CAP_SUB_CMD_HAS_REMOTE:
+      value = reply.capabilitiesResp.remoteCap.value;
+      mask  = reply.capabilitiesResp.remoteCap.mask;
+      break;
+    case CAP_SUB_CMD_HAS_SCRIPT:
+      value = reply.capabilitiesResp.scriptCap.value;
+      mask  = reply.capabilitiesResp.scriptCap.mask;
       break;
     default: return VCAN_STAT_BAD_PARAMETER; break;
   }

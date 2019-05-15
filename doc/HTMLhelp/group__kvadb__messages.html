@@ -94,6 +94,8 @@ Functions</h2></td></tr>
 <tr class="separator:ga0146dd4ddf2c39bfdc3b93c29fe85b32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga732d691ed8ead650e4a49d18c8f7ffa2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#ga732d691ed8ead650e4a49d18c8f7ffa2">kvaDbGetMsgById</a> (<a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a> dh, unsigned int id, <a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *mh)</td></tr>
 <tr class="separator:ga732d691ed8ead650e4a49d18c8f7ffa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab45031c6ed2eed71515f2badd586d4b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#gab45031c6ed2eed71515f2badd586d4b4">kvaDbGetMsgByPGN</a> (<a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a> dh, unsigned int id, <a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *mh)</td></tr>
+<tr class="separator:gab45031c6ed2eed71515f2badd586d4b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9685fdb33257ac28e4cd989cfe8ca154"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#ga9685fdb33257ac28e4cd989cfe8ca154">kvaDbGetMsgByName</a> (<a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a> dh, const char *msg_name, <a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *mh)</td></tr>
 <tr class="separator:ga9685fdb33257ac28e4cd989cfe8ca154"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga194badc7e10d889df38a0f4eb763b5e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#ga194badc7e10d889df38a0f4eb763b5e6">kvaDbGetMsgName</a> (<a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> mh, char *buf, size_t buflen)</td></tr>
@@ -406,6 +408,53 @@ Functions</h2></td></tr>
 </dl>
 </div>
 </div>
+<a id="gab45031c6ed2eed71515f2badd586d4b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab45031c6ed2eed71515f2badd586d4b4">&#9670;&nbsp;</a></span>kvaDbGetMsgByPGN()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a> kvaDbGetMsgByPGN </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a>&#160;</td>
+          <td class="paramname"><em>dh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *&#160;</td>
+          <td class="paramname"><em>mh</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get a handle to a message with a specific PGN-identifier. If the message is marked as J1939, check if the PGN-part is equal.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">dh</td><td>A database handle </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>The selected message identifier </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">mh</td><td>A message handle</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57ad8a19899af8c1e42208a67afb572b2fc">kvaDbOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="kva_db_lib_8h.html#kvaDbErr_xxx">kvaDbErr_xxx</a> (negative) if failure</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvadb__messages.html#ga9685fdb33257ac28e4cd989cfe8ca154">kvaDbGetMsgByName()</a> </dd></dl>
+
+</div>
+</div>
 <a id="gace75dd206cd50883de777ed1d8051e1b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gace75dd206cd50883de777ed1d8051e1b">&#9670;&nbsp;</a></span>kvaDbGetMsgComment()</h2>
 
@@ -437,7 +486,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the message comment.</p>
+<p>Get the comment for a message as a null-terminated string. A truncated string will be returned if <em>buf</em> is too small and status will be kvaDbOK.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">mh</td><td>A message handle </td></tr>
@@ -693,7 +742,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the message name.</p>
+<p>Get the name of a message as a null-terminated string. A truncated string will be returned if <em>buf</em> is too small and status will be kvaDbOK.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">mh</td><td>A message handle </td></tr>
@@ -741,7 +790,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the qualified message name, which is the database name and the message name separated by a dot.</p>
+<p>Get the qualified message name, which is the database name and the message name separated by a dot, as a null-terminated string. An empty string will be returned if <em>buf</em> is too small and status will be kvaDbOK.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">mh</td><td>A message handle </td></tr>
@@ -1183,7 +1232,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.25) Sun Sep 16 2018</li>
+    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
   </ul>
 </div>
 </body>

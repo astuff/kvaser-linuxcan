@@ -93,9 +93,28 @@ reverse=$(if $(1),$(call reverse,$(wordlist 2,$(words $(1)),$(1)))) $(firstword 
 
 #---------------------------------------------------------------------------
 # RULES
-.PHONY: canlib linlib common leaf mhydra pcican pcican2 usbcanII virtualcan pciefd install uninstall clean check load
+.PHONY: print_versions canlib linlib common leaf mhydra pcican pcican2 usbcanII virtualcan pciefd install uninstall clean check load
 
-all:  $(SUBDIRS)
+all: print_versions $(SUBDIRS)
+	@echo
+	@echo Done building linuxcan
+	@echo
+
+KDIR ?= /lib/modules/`uname -r`/build
+print_versions:
+	@echo 'Building linuxcan v'`sed -n 's/^version=//g; s/_/./g; s/\([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).\(beta\)\?/\1 \2/p' moduleinfo.txt`
+	@echo '  User    : '$(USER)
+	@echo '  System  : '`uname -a`
+	@echo '  CC      : '$(CC)
+	@echo '  CC ver. : '`$(CC) -dumpversion`
+	@echo '  KDIR    : '$(KDIR)
+	@if lsusb -d 0bfd: > /dev/null ; then \
+		echo '*****************************************************'; \
+		echo 'WARNING: Found connected Kvaser USB device(s)!'; \
+		echo '         Unplug them before installing the drivers.'; \
+		echo '*****************************************************'; \
+	fi
+	@echo
 
 canlib:
 	$(MAKE) -C canlib examples

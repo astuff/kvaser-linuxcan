@@ -82,6 +82,7 @@ $(document).ready(function(){initNavTree('page_linlib.html','');});
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#section_user_guide_lin_intro">Using the LIN Bus</a></li>
+<li class="level1"><a href="#section_user_guide_lin_frame_identifiers">LIN Frame Identifiers</a></li>
 </ul>
 </div>
 <div class="textblock"><h1><a class="anchor" id="section_user_guide_lin_intro"></a>
@@ -89,14 +90,21 @@ Using the LIN Bus</h1>
 <p>Using the LIN bus requires special hardware, e.g. Kvaser Leaf Professional LIN, Kvaser Hybrid 2xCAN/LIN or Kvaser Hybrid Pro 2xCAN/LIN.</p>
 <p>The CAN API calls are not directly suitable for the LIN bus. Instead, a new API is provided that enables you to use the LIN bus as easily as you use the CAN bus. The function calls in the LIN API all have names starting with lin, e.g <a class="el" href="group___l_i_n.html#gaca2d874c870f16c11a4e8e158817d8bf">linReadMessage()</a>.</p>
 <p>You will need to </p><div class="fragment"><div class="line"><span class="preprocessor">#include linlib.h</span></div></div><!-- fragment --><p>in your programs, and link with linlib.dll (which, in turn, uses canlib32.dll).<br />
- On Linux, the files are called liblinlib.so and libcanlib.so respectively. </p>
+ On Linux, the files are called liblinlib.so and libcanlib.so respectively.</p>
+<h1><a class="anchor" id="section_user_guide_lin_frame_identifiers"></a>
+LIN Frame Identifiers</h1>
+<p>LIN frame identifiers range from ID 0x00 to 0x3F. IDs 0x3E and 0x3F are reserved for future use.</p>
+<p>IDs 0x3C and 0x3D are used for diagnostics frames and behave somewhat differently compared to the regular frames.<br />
+ 0x3C is called the master request frame and 0x3D is called the slave response frame.<br />
+ Diagnostic frames should contain eight bytes of data and use the classic checksum (even if <a class="el" href="linlib_8h.html#a937225a25c3c24efabf7c8438ccecd09">LIN_ENHANCED_CHECKSUM</a> is specified).<br />
+ 0x3D is single shot and its slave message buffer is automatically cleared upon reception of a 0x3C or 0x3D. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.25) Sun Sep 16 2018</li>
+    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
   </ul>
 </div>
 </body>

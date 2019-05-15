@@ -2949,11 +2949,6 @@ static int mhydra_start (VCanCardData *vCard)
       DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_SINGLE_SHOT\n")));
     }
 
-    stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_LIN_HYBRID);
-    if (stat != VCAN_STAT_OK) {
-      DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_LIN_HYBRID\n")));
-    }
-
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_HAS_LOGGER);
     if (stat != VCAN_STAT_OK) {
       DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_HAS_LOGGER\n")));
@@ -2969,15 +2964,21 @@ static int mhydra_start (VCanCardData *vCard)
       DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_HAS_SCRIPT\n")));
     }
 
+    stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_LIN_HYBRID);
+    if (stat != VCAN_STAT_OK) {
+      DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_LIN_HYBRID\n")));
+    }
+
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_HAS_IO_API);
     if (stat != VCAN_STAT_OK) {
       DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_HAS_IO_API\n")));
     }
 
-    stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_DIAGNOSTICS);
-    if (stat != VCAN_STAT_OK) {
-      DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_DIAGNOSTICS\n")));
-    }
+    //  KDI capability removed until further notice. see case fb#23327
+    //  stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_DIAGNOSTICS);
+    //  if (stat != VCAN_STAT_OK) {
+    //    DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_DIAGNOSTICS\n")));
+    //  }
   }
 
   set_capability_value (vCard,
@@ -4628,8 +4629,8 @@ static int mhydra_capabilities (VCanCardData *vCard, uint32_t vcan_cmd) {
         mask  = reply.capabilitiesResp.linHybridCap.mask;
         break;
       case CAP_SUB_CMD_HAS_LOGGER:
-        value = reply.capabilitiesResp.remoteCap.value;
-        mask  = reply.capabilitiesResp.remoteCap.mask;
+        value = reply.capabilitiesResp.loggerCap.value;
+        mask  = reply.capabilitiesResp.loggerCap.mask;
         break;
       case CAP_SUB_CMD_HAS_REMOTE:
         value = reply.capabilitiesResp.remoteCap.value;

@@ -382,7 +382,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the string and integer from an enumeration value.</p>
+<p>Get the enumeration value and name. The name is returned as a null-terminated string. If <em>buf</em> is to small, the name will be truncated and status will be kvaDbOK.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">eh</td><td>An enumeration value handle </td></tr>
@@ -482,14 +482,14 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the string and integer from the first enumeration value for a signal.</p>
+<p>Get the enumeration value and name for the first enumeration value for a signal. The name is returned as a null-terminated string. If <em>buf</em> is to small, the name will be truncated and status will be kvaDbOK.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sh</td><td>A signal handle. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">eh</td><td>An enumeration value handle </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">val</td><td>The enumeration value </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">buf</td><td>The buffer that will hold the enumeration name </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">buflen</td><td>The length of the buffer</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">eh</td><td>An enumeration value handle. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">val</td><td>The enumeration value. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">buf</td><td>The buffer that will hold the enumeration name. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">buflen</td><td>The length of the buffer.</td></tr>
   </table>
   </dd>
 </dl>
@@ -623,14 +623,14 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the string and integer from the next enumeration value for a signal. Should be called after <a class="el" href="group__kvadb__signals.html#ga47e441735aa826b3ef3186cfdbc3e772">kvaDbGetFirstEnumValuePair()</a>.</p>
+<p>Get the enumeration value and name for the next enumeration value for a signal. The name is returned as a null-terminated string. If <em>buf</em> is to small, the name will be truncated and status will be kvaDbOK. Should be called after <a class="el" href="group__kvadb__signals.html#ga47e441735aa826b3ef3186cfdbc3e772">kvaDbGetFirstEnumValuePair()</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sh</td><td>A signal handle. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">eh</td><td>An enumeration value handle </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">val</td><td>The enumeration value </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">buf</td><td>The buffer that will hold the enumeration name </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">buflen</td><td>The length of the buffer</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">eh</td><td>An enumeration value handle. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">val</td><td>The enumeration value. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">buf</td><td>The buffer that will hold the enumeration name. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">buflen</td><td>The length of the buffer.</td></tr>
   </table>
   </dd>
 </dl>
@@ -760,7 +760,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the signal comment.</p>
+<p>Get the comment for a signal as a null-terminated string. A truncated string will be returned if <em>buf</em> is too small and status will be kvaDbOK.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sh</td><td>A signal handle </td></tr>
@@ -929,12 +929,12 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the signal name.</p>
+<p>Get the name of a signal as a null-terminated string. A truncated string will be returned if <em>buf</em> is too small and status will be kvaDbOK.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">sh</td><td>A signal handle </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">buf</td><td>The signal name </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">buflen</td><td>The length of the buffer that will hold the signal name</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">sh</td><td>A signal handle. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">buf</td><td>The signal name. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">buflen</td><td>The length of the buffer that will hold the signal name.</td></tr>
   </table>
   </dd>
 </dl>
@@ -1018,7 +1018,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the qualified signal name. which is the database, message ans signal names separated by dots.</p>
+<p>Get the qualified signal name, which is the database, message and signal names separated by dots, as a null-terminated string. An empty string will be returned if <em>buf</em> is too small and status will be kvaDbOK.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sh</td><td>A signal handle </td></tr>
@@ -1107,7 +1107,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the signal unit.</p>
+<p>Get the signal unit as a null-terminated string. A truncated string will be returned if <em>buf</em> is too small and status will be kvaDbOK.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sh</td><td>A signal handle </td></tr>
@@ -2161,7 +2161,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.25) Sun Sep 16 2018</li>
+    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
   </ul>
 </div>
 </body>

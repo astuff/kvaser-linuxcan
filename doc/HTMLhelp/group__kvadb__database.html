@@ -281,10 +281,10 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>This function gets an existing database's name.</p>
+<p>Get the name of a database as a null-terminated string. A truncated string will be returned if <em>buf</em> is too small and status will be kvaDbOK.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">dh</td><td>A database handle </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dh</td><td>A database handle. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">buf</td><td>Buffer to receive database name. The database name is used to create qualified names for messages and signals. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">buflen</td><td>Buffer size in bytes.</td></tr>
   </table>
@@ -328,10 +328,10 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>This function converts error code to its written description</p>
+<p>Get the written description for an error code as a null-terminated string. If <em>buf</em> is too small, kvaDbErr_Param will be returned.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">error</td><td>The error code to convert. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">error</td><td>The error code. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">buf</td><td>Buffer to receive error text. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">buflen</td><td>Buffer size in bytes.</td></tr>
   </table>
@@ -746,7 +746,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.25) Sun Sep 16 2018</li>
+    <li class="footer"> (canlib 5.26) Mon Nov 26 2018</li>
   </ul>
 </div>
 </body>

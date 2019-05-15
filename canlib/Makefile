@@ -74,6 +74,12 @@ CFLAGS  += -Wall -Werror -Wextra -DCANLIB_NAME_STRING=\"$(LIBRARY)\" -O2 -fomit-
 CFLAGS  += $(ccflags-y)
 CFLAGS  += -I. -I../include
 
+# GCC 4.6 and below does not allow initializing of struct with '{ 0 }'
+GCC_VERSION_LTEQ_4_6 := $(shell expr `gcc -dumpversion | cut -f1-2 -d'.'` \<= 4.6)
+ifeq ($(GCC_VERSION_LTEQ_4_6),1)
+CFLAGS += -Wno-missing-field-initializers
+endif
+
 # Flags for  reentrant, position independent code
 LIBCFLAGS = $(CFLAGS) -D_REENTRANT -fPIC
 LDFLAGS = -lc -pthread

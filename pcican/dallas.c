@@ -71,9 +71,11 @@
 
 #include <linux/delay.h>
 #include <linux/types.h>
+#include <linux/slab.h>
 #include <asm/io.h>
 #include "dallas.h"
 #include "util.h"
+#include "debug.h"
 
 /*****************************************************************************/
 
@@ -83,6 +85,17 @@
 #define T_RELEASE        45
 
 /*****************************************************************************/
+#ifdef PCICAN_DEBUG
+static int debug_level = PCICAN_DEBUG;
+    MODULE_PARM_DESC(debug_level, "PCIcan debug level");
+    module_param(debug_level, int, 0644);
+#   define DEBUGPRINT(n, args...) if (debug_level>=(n)) printk("<" #n ">" args)
+#else
+#   define DEBUGPRINT(n, args...) if ((n) == 1) printk("<" #n ">" args)
+#endif
+
+
+
 // new
 static spinlock_t dallas_lock;
 static int dallas_lock_initialized = 0;
@@ -398,10 +411,39 @@ static dsStatus ds2431_read_memory (DALLAS_CONTEXT *dc,
 } /* ds2431_read_memory */
 
 
-typedef struct {
-  unsigned int crc;
-  unsigned int count;
-} bufdata_t;
+static void count_bits_in_data(const unsigned char *data, size_t bufsiz, unsigned char *bits)
+{
+  unsigned int i, j;
+  for (i=0; i < bufsiz; i++) { 
+    for (j=0; j < 8; j++) {
+      bits[j+i*8] += (data[i] >> j) & 0x01;
+    }
+  }
+}
+
+static unsigned int bits_to_bytes(unsigned char *data, size_t bufsiz,
+                          const unsigned char *bits, unsigned int threshold)
+{
+  unsigned int i, j, bad_bits = 0;
+
+  memset(data, 0, bufsiz);
+  for (i=0; i < bufsiz; i++) { 
+    for (j=0; j < 8; j++) {
+      if (bits[j+i*8] >= threshold) {
+        data[i] |= 1 << j;
+      }
+      if (threshold - 1 <=  bits[j+i*8] && bits[j+i*8] <= threshold + 1) {
+        bad_bits++;
+      }
+    }
+  }
+
+  if (bad_bits) {
+    DEBUGPRINT(1, "Warning: Got %d ambiguous bits. Result may be unreliable.\n", bad_bits);
+  }
+
+  return bad_bits;
+}
 
 
 dsStatus ds_read_memory (unsigned char memory_type,
@@ -410,86 +452,41 @@ dsStatus ds_read_memory (unsigned char memory_type,
                          unsigned char *data,
                          size_t bufsiz)
 {
-  const int repeatCount = 10;    // Should perhaps be user selectable
-  bufdata_t result[repeatCount];
-  int found;
-  unsigned int maxcount, crc, i, j, maxidx;
-  dsStatus stat;
+  const unsigned int repeatCount = 20;
+  const unsigned int retries = 10;
+  unsigned int i, j;
+  dsStatus stat = dsError_None;
+  unsigned char *bits;
+  unsigned int bad_bits;
 
-  memset(result, 0, sizeof(result));
+  bits = kmalloc(bufsiz*8, GFP_KERNEL);
+  if (!bits) return dsError_NoMemory;
 
-  for (i = 0; i < repeatCount; i++) {
-    // Read memory and calculate checksum
-    if (memory_type == DS2431_CODE) {
-      ds2431_read_memory(dc, address, data, bufsiz);
-    } else {
-      ds2430_read_memory(dc, address, data, bufsiz);
-    }
-    crc = calculateCRC32(data, bufsiz);
+  for (i=0; i < retries; i++) {
 
-    // Find same checksum in table, or first unused entry
-    found = 0;
-    for (j = 0; j < repeatCount; j++) {
-      if (result[j].count == 0) {
-        break;
-      } else if (result[j].crc == crc) {
-        found = 1;
-        result[j].count++;
-        break;
+    memset(bits, 0 , bufsiz * 8);
+
+    for (j=0; j<repeatCount; j++) {
+      // Read memory and count bits
+      if (memory_type == DS2431_CODE) {
+        ds2431_read_memory(dc, address, data, bufsiz);
+      } else {
+        ds2430_read_memory(dc, address, data, bufsiz);
       }
+      count_bits_in_data(data, bufsiz, bits);
     }
 
-    if (!found) {
-      // First time this crc was found; store.
-      result[j].crc   = crc;
-      result[j].count = 1;
-    }
-    // If we are repeating, sleep for a millisecond or two.
-    if (repeatCount > 1) {
-      set_current_state(TASK_UNINTERRUPTIBLE);
-      schedule_timeout(msecs_to_jiffies(2));
-    }
-  }
-
-  maxidx = 0;
-  maxcount = 0;
-  for (i = 0; i < repeatCount; i++) {
-    if (result[i].count > maxcount) {
-      maxcount = result[i].count;
-      // DbgPrint("%s dallas[%d].count=%d\n", hwif.hw_name, i, maxcount);
-      maxidx = i;
-    }
-  }
-
-  // Try to get the most common data again
-  for (i = 0; i < repeatCount; i++) {
-    // Read memory and calculate checksum
-    if (memory_type == DS2431_CODE) {
-      ds2431_read_memory(dc, address, data, bufsiz);
-    } else {
-      ds2430_read_memory(dc, address, data, bufsiz);
-    }
-    crc = calculateCRC32(data, bufsiz);
-    if (crc == result[maxidx].crc) {
+    bad_bits = bits_to_bytes(data, bufsiz, bits, repeatCount/2);
+    if (!bad_bits) {
       break;
     }
+
+    // If we are repeating, sleep for a millisecond or two.
+    set_current_state(TASK_UNINTERRUPTIBLE);
+    schedule_timeout(msecs_to_jiffies(2));
   }
 
-  if (i == repeatCount) {
-    // Unable to find selected result again...
-    stat = dsError_NotProgrammed;   // For lack of anything better
-  } else if (repeatCount > 1) {
-    if (maxcount < (repeatCount / 2)) {
-      // Majority readings are < 50%, so fail
-      stat = dsError_NotProgrammed; // Not entirely correct code, but...
-    } else {
-      stat = dsError_None;
-    }
-  } else {
-    // We read the contents just once so we don't know if we failed or not.
-    stat = dsError_None;
-  }
-
+  kfree(bits);
 
   return stat;
 }
@@ -566,7 +563,7 @@ static unsigned char calcCRC8rom (unsigned char *buf)
 
 /* Read data from the ROM (which contains the S/N).
  */
-static dsStatus ds_read_rom_64bit_single (DALLAS_CONTEXT *dc, int port,
+static dsStatus ds_read_rom_64bit_single (DALLAS_CONTEXT *dc,
                                           unsigned char *data)
 {
   int x;
@@ -595,13 +592,13 @@ static dsStatus ds_read_rom_64bit_single (DALLAS_CONTEXT *dc, int port,
 } /* ds_read_rom_64bit_single */
 
 
-dsStatus ds_read_rom_64bit (DALLAS_CONTEXT *dc, int port, unsigned char *data)
+dsStatus ds_read_rom_64bit (DALLAS_CONTEXT *dc, unsigned char *data)
 {
   int maxLoop = 10;
   dsStatus stat = dsError_None;
 
   while (maxLoop--) {
-    stat = ds_read_rom_64bit_single(dc, port, data);
+    stat = ds_read_rom_64bit_single(dc, data);
     if (stat == dsError_None) {
       break;
     }
@@ -609,6 +606,43 @@ dsStatus ds_read_rom_64bit (DALLAS_CONTEXT *dc, int port, unsigned char *data)
 
   return stat;
 } /* ds_read_rom_64bit */
+
+
+dsStatus ds_read_rom_byte_repeat (DALLAS_CONTEXT *dc, unsigned char *byte)
+{
+  unsigned int i, j, repeatCount = 20;
+  unsigned int bad_bits, retries = 10;
+  dsStatus stat = dsError_CRCError;
+  unsigned char bits[8];
+
+  if (!dc->in_mask) return dsError_NoDevice;
+
+  for (j=0; j < retries; j++) {
+    memset(bits, 0, sizeof(bits));
+
+    for (i=0; i<repeatCount; i++) {
+      stat = ds_reset (dc);
+      if (stat != dsError_None) continue;
+      ds_write_byte (dc, READ_ROM);
+      *(byte) = (unsigned char) ds_read_byte (dc);
+      count_bits_in_data(byte, 1, bits);
+    }
+
+    bad_bits = bits_to_bytes(byte, 1, bits, repeatCount/2);
+    if (!bad_bits) {
+      stat = dsError_None;
+      break;
+    } else {
+      stat = dsError_CRCError;
+    }
+  }
+
+  if (*byte != DS2430_CODE && *byte != DS2431_CODE) {
+    DEBUGPRINT(1, "ERROR: ds_read_rom_byte_repeat(), device code = 0x%x\n", *byte);
+    return dsError_WrongDevice;
+  }
+  return stat;
+} /* ds_read_rom_byte_repeat */
 
 
 int ds_verify_area (unsigned char *data, int bufsiz)

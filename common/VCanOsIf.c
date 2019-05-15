@@ -2725,8 +2725,6 @@ unsigned int vCanPoll (struct file *filp, poll_table *wait)
 
   chd = fileNodePtr->chanData;
 
-  full = txQFull(chd);
-
   // Add the channel wait queues to the poll
   poll_wait(filp, queue_space_event(&chd->txChanQueue), wait);
   poll_wait(filp, &fileNodePtr->rcv.rxWaitQ, wait);
@@ -2738,6 +2736,8 @@ unsigned int vCanPoll (struct file *filp, poll_table *wait)
     DEBUGPRINT(4, (TXT("vCanPoll: Channel %d readable\n"), fileNodePtr->chanNr));
   }
   spin_unlock_irqrestore(&fileNodePtr->rcv.rcvLock, rcvLock_irqFlags);
+
+  full = txQFull(chd);
 
   if (!full) {
     // Writable

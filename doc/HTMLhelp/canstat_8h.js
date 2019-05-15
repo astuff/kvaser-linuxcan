@@ -147,6 +147,11 @@ var canstat_8h =
       [ "canERR_SCRIPT_TXE_CONTAINER_VERSION", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7aea19c70918f0993acd55691d28748914", null ],
       [ "canERR_SCRIPT_TXE_CONTAINER_FORMAT", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a58c38bbd185bd93144a10f22f12ca8fd", null ],
       [ "canERR_BUFFER_TOO_SMALL", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7afc999ab39dd6545165d8bfd44bf900ec", null ],
+      [ "canERR_IO_WRONG_PIN_TYPE", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a6675d7df5e1d243cfe2e315afe5cb573", null ],
+      [ "canERR_IO_NOT_CONFIRMED", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a6c6da6c9e7a89ab174763dc62b4541df", null ],
+      [ "canERR_IO_CONFIG_CHANGED", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a5f7b2b164921928f3bede7ca56273132", null ],
+      [ "canERR_IO_PENDING", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a3a5d08cbc5d0e7b2942118e2174c335b", null ],
+      [ "canERR_IO_NO_VALID_CONFIG", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a084500747262b1b59587180359b6cfe1", null ],
       [ "canERR__RESERVED", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a7fdb374ab194f07a46dfddd2c57fee5e", null ]
     ] ]
 ];

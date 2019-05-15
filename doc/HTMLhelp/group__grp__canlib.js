@@ -7,5 +7,5 @@ var group__grp__canlib =
     [ "Time Domain Handling", "group___time_domain_handling.html", "group___time_domain_handling" ],
     [ "Named Parameter Settings", "group___named_parameter_settings.html", null ],
     [ "t-script", "group__t_script.html", "group__t_script" ],
-    [ "I/O Pin Handling", "group__kv__io.html", null ]
+    [ "I/O Pin Handling", "group__kv__io.html", "group__kv__io" ]
 ];

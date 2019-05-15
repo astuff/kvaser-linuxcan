@@ -180,12 +180,12 @@ int main(int argc, char* argv[])
     (void) canGetChannelData(i, canCHANNELDATA_CUST_CHANNEL_NAME,
                              custChanName, sizeof(custChanName));
 
-    printf("ch %2.1d: %-22s\t%x-%05x-%05x-%x, s/n %u, v%u.%u.%u.%u %s (%s v%d.%d.%d)\n",
+    printf("ch %2.1d: %-22s\t%x-%05x-%05x-%x, s/n %u, v%u.%u.%u %s (%s v%d.%d.%d)\n",
            i, name,
            (ean[1] >> 12), ((ean[1] & 0xfff) << 8) | ((ean[0] >> 24) & 0xff),
            (ean[0] >> 4) & 0xfffff, (ean[0] & 0x0f),
            serial[0],
-           fw[1] >> 16, fw[1] & 0xffff, fw[0] >> 16, fw[0] & 0xffff,
+           fw[1] >> 16, fw[1] & 0xffff, fw[0] & 0xffff,
            custChanName,
            driverName, fileVersion[3], fileVersion[2], fileVersion[1]);
   }

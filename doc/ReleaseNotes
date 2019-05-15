@@ -62,7 +62,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.25  
+Release notes for linuxcan V5.26  
 ================================================================
 
 These release notes apply to both CANLIB SDK and the Linux drivers.
@@ -127,17 +127,17 @@ http://www.kvaser.com.
 Version info
 ================================================================
 
-   * Tested under x86_64 SMP Ubuntu 12.04 x32/x64 (3.2.0-29-generic-pae/3.2.0-23-generic).
    * Tested under x86_64 SMP Ubuntu 14.04 x32/x64 (3.13.0-32-generic/3.13.0-32-generic).
    * Tested under x86_64 SMP Ubuntu 16.04 x32/x64 (4.4.0-generic/4.4.0-generic).
-   * Compiled with gcc version 4.6.3, 4.7.3, 4.8.2, 4.8.4, 6.1.1, 6.3.1, 7.1.1 and 7.2.0.
-   * Used glibc version 2.15, 2.17, 2.19, 2.24 and 2.26.
+   * Tested under x86_64 SMP Ubuntu 18.04 x64 (4.15.0-38-generic).
+   * Compiled with gcc version 4.6.3, 4.7.3, 4.8.2, 4.8.4, 6.1.1, 6.3.1, 7.1.1, 7.2.0 and 7.3.0.
+   * Used glibc version 2.15, 2.17, 2.19, 2.24, 2.26 and 2.27.
 
 
 ================================================================
 General information
 ================================================================
-System requirements: Linux 2.6.26 or later.
+System requirements: Linux 2.6.29 or later.
 
 ================================================================
 Known problems
@@ -158,6 +158,31 @@ Known problems
      hardware, the same is not true for auto tx. The latter is only
      available if there is firmware support in the device.
      (This is the same as under Windows.)
+
+
+New Features and Fixed Problems in V5.26   (26-NOV-2018)
+===========================================================================
+* Updated the README and "General infromation" in this document. Since linuxcan
+  version V5.12 the minimum Linux kernel version required is 2.6.28. For pciefd
+  driver 2.6.29 is required.
+
+* Fixed bug with corrupt serial numbers in PCIcan driver.
+
+* Fixed build problems for GCC 8 and old GCC (4.3 and 4.6).
+
+* SDK (canlib)
+  - Fixed a bug where handles became invalid for a short while when
+    connecting 2 or more usb-devices that used the same driver.
+  - listChannels example reports firmware version on same format as in Windows.
+
+* SDK (kvadblib)
+  - Fixed a bug where kvaDbGetFlags() didn't return the KVADB_DATABASE_J1939-flag.
+  - Added function kvaDbGetMsgByPGN().
+  - Clarified null-terminated strings in documentation.
+  
+* SDK (linlib)
+  - Clarified LIN diagnostic frames in documentation.
+  - linWriteWakeup() parameter check updated.
 
 
 New Features and Fixed Problems in V5.25   (16-SEP-2018)

@@ -101,10 +101,11 @@ case "$1" in
       $LOG -t $0 "Module $MODULE added"
       nrchan=`cat /proc/$DEV | grep 'total channels' | cut -d \  -f 3`
       major=`cat /proc/devices | grep "$DEV$" | cut -d \  -f 1`
-      rm -f /dev/$DEV[0-9]*
       for minor in $(seq 0 `expr $nrchan - 1`) ; do
-         $LOG -t $0 "Created /dev/$DEV$minor"
-         mknod /dev/$DEV$minor c $major $minor
+	if [ ! -f /dev/$DEV$minor ]; then 
+          $LOG -t $0 "Created /dev/$DEV$minor"
+          mknod /dev/$DEV$minor c $major $minor
+	fi
       done
       ;;
    stop)

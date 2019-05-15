@@ -1006,7 +1006,7 @@ LinStatus LINLIBAPI linWriteWakeup(LinHandle h,
 
   if (lh->openMode == canOPEN_LIN) {
     if (count) {
-      if (count > 0xffff || interval > 0xffff) {
+      if (count > 0xff || interval > 0xffff) {
         LeaveCriticalSection(&crit);
         return linERR_PARAM;
       }

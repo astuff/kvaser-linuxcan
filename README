@@ -114,7 +114,7 @@
 
 System requirements:
 
-* Linux 2.6 or later
+* Linux 2.6.29 or later
 * Header files and compiler for kernel compilation.
   In Ubuntu 14.04 e.g. this is accomplished by issuing the command:
 
@@ -144,12 +144,16 @@ Compilation:
   To unload and uninstall all drivers:
     "sudo make uninstall"
 
-  To install and load PCI drivers:
+  To install and load, virtual and PCI drivers:
     "sudo make load"
 
-  Note: running "sudo make load" will also cause the PCI drivers to be
-        loaded at boot time. This might be bad if experimenting
-        with the device drivers.
+  Note: running "sudo make load" will also cause the virtual and PCI drivers to
+        be loaded at boot time. This might be bad if experimenting with the
+        device drivers.
+
+  Note: it is never required to manually install or load any modules, create or
+        edit files. This is taken care of the Makefile, in the root of the
+        linuxcan directory.
 
 * To build just a single driver, go to the corresponding subdirectory:
 
@@ -160,6 +164,14 @@ Compilation:
         install only particular device drivers, you will first need to build and
         install the kvcommon driver from the linuxcan/common directory using the
         method above.
+
+* To build and load just a single driver (virtual or PCI), go to the
+  corresponding subdirectory:
+
+    "make"
+    "sudo ./installscript.sh load"
+
+  Note: See the note above, regarding the kvcommon driver.
 
 * To build with debug printouts:
 
@@ -224,7 +236,7 @@ for PCIcan II:
 for Virtualcan:
 
     alias virtualcan kvvirtualcan
-    install virtualcan /usr/sbin/virtualcan.sh start
+    install kvvirtualcan /usr/sbin/virtualcan.sh start
     remove kvvirtualcan /usr/sbin/virtualcan.sh stop
 
 In the same files, the following lines are added to blacklist SocketCAN:
@@ -242,6 +254,12 @@ In the same files, the following lines are added to blacklist SocketCAN:
 /usr/sbin/usbcanII.sh    (start/stop usbcanII driver;    by udev or manually)
 /usr/sbin/leaf.sh        (start/stop leaf driver;        by udev or manually)
 /usr/sbin/mhydra.sh      (start/stop mhydra driver;      by udev or manually)
+
+* Module loading at boot
+----------------------------------
+If the modules are installed with "sudo make load", the virtual and the PCI
+drivers are added to /etc/modules-load.d/kvaser.conf. This will cause the
+modules to be loaded at boot time.
 
 * udev rules
 ----------------------------------
