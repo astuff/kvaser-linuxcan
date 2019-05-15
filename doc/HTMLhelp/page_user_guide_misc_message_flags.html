@@ -144,11 +144,11 @@ function toggleVisibility(linkObj) {
 <tr>
 <td>canMSGERR_SW_OVERRUN</td><td>1024</td><td>Software buffer overrun. </td></tr>
 </table>
-<dl class="note"><dt><b>Note:</b></dt><dd>Other canMSG_xxx and canMSGERR_xxx flags are reserved and must be zero when calling <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>.</dd>
+<dl class="note"><dt><b>Note:</b></dt><dd>Other <a class="el" href="canstat_8h.html#canMSG_xxx">canMSG_xxx</a> and <a class="el" href="canstat_8h.html#canMSGERR_xxx">canMSGERR_xxx</a> flags are reserved and must be zero when calling <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>.</dd>
 <dd>
-Not all hardware platforms can detect the difference between hardware overruns and software overruns, so your application should test for both conditions. You can use the symbol <a class="el" href="canstat_8h.html#adf0d578c7b25ede29a9733da44f08ab3">canMSGERR_OVERRUN</a> for this purpose.</dd>
+Not all hardware platforms can detect the difference between hardware overruns and software overruns, so your application should test for both conditions. You can use the symbol <a class="el" href="canstat_8h.html#adf0d578c7b25ede29a9733da44f08ab3" title="Any overrun condition.">canMSGERR_OVERRUN</a> for this purpose.</dd>
 <dd>
-All canMSG_xxx flags may be combined.</dd>
+All <a class="el" href="canstat_8h.html#canMSG_xxx">canMSG_xxx</a> flags may be combined.</dd>
 <dd>
 The NERR flag is set by the CAN transceiver when certain CAN bus wire faults occur, namely</dd></dl>
 <table class="doxtable">
@@ -196,7 +196,7 @@ The NERR flag is set by the CAN transceiver when certain CAN bus wire faults occ
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.9) - Generated on Tue Mar 17 2015</small>
+<small>Kvaser Linux CANLIB (canlib 5.12) - Generated on Mon Sep 21 2015</small>
 </address>
 </body>
 </html>

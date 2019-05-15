@@ -56,7 +56,14 @@ CC = gcc
 CFLAGS = -Wall -O2  -D_REENTRANT $(XTRA_CFLAGS) -I../../include
 LDFLAGS = -L..
 LDLIBS = -lcanlib -lpthread
-OBJS = busparms readTimerTest canmonitor writeloop cancount simplewrite listChannels
+OBJS =\
+	busparms\
+	cancount\
+	canmonitor\
+	listChannels\
+	readTimerTest\
+	simplewrite\
+	writeloop\
 
 ifeq ($(KV_DEBUG_ON),1)
   KV_XTRA_CFLAGS_DEBUG= -D_DEBUG=1 -DDEBUG=1 

@@ -61,6 +61,8 @@
 #include "osif_user.h"
 
 
+#include "vcanevt.h"
+
 #define N_O_CHANNELS 2
 
 typedef LinkedList HandleList;
@@ -69,6 +71,10 @@ typedef LinkedList HandleList;
 #include <canlib_version.h>
 
 #define LAPCAN_TICKS_PER_MS 125
+
+#define OPEN_AS_CAN          0 
+#define OPEN_AS_CANFD_ISO    1
+#define OPEN_AS_CANFD_NONISO 2
 
 struct CANops;
 
@@ -82,6 +88,8 @@ typedef struct HandleData
   int                channelNr; // Absolute ch nr i.e. it can be >2 for lapcan
   canHandle          handle;
   unsigned char      isExtended;
+  unsigned char      fdMode;
+  unsigned char      acceptLargeDlc;
   unsigned char      wantExclusive;
   unsigned char      acceptVirtual;
   unsigned char      readIsBlock;
@@ -100,7 +108,7 @@ typedef struct HandleData
   struct CANOps      *canOps;
   unsigned char      syncPressent;
   long               syncId;
-  unsigned char      syncMsg[8];
+  unsigned char      syncMsg[MAX_MSG_LEN];
   unsigned int       syncDlc;
   unsigned int       syncFlag;
   unsigned long      syncTime;
@@ -122,11 +130,14 @@ typedef struct CANOps
              OS_IF_SET_NOTIFY_PARAM, unsigned int);
   canStatus (*busOn)(HandleData *);
   canStatus (*busOff)(HandleData *);
-
-  canStatus (*setBusParams)(HandleData *, long, unsigned int, unsigned int,
-                            unsigned int, unsigned int, unsigned int);
-  canStatus (*getBusParams)(HandleData *, long *, unsigned int *, unsigned int *,
-                            unsigned int *, unsigned int *, unsigned int *);
+  canStatus (*setBusParams)(HandleData *hData, long freq, unsigned int tseg1, 
+			    unsigned int tseg2, unsigned int sjw, unsigned int noSamp,
+                            long freq_brs, unsigned int tseg1_brs, unsigned int tseg2_brs, 
+			    unsigned int sjw_brs, unsigned int syncmode);
+  canStatus (*getBusParams)(HandleData *hData, long *freq, unsigned int *tseg1, 
+			    unsigned int *tseg2, unsigned int *sjw, unsigned int *noSamp,
+                            long *freq_brs, unsigned int *tseg1_brs, unsigned int *tseg2_brs,
+                            unsigned int *sjw_brs, unsigned int *syncmode);
   canStatus (*read)(HandleData *, long *, void *, unsigned int *,
                     unsigned int *, unsigned long *);
   canStatus (*readWait)(HandleData *, long *, void *, unsigned int *,
@@ -158,9 +169,7 @@ typedef struct CANOps
   canStatus (*objbufSendBurst)(HandleData *hData, int idx, unsigned int burstLen);
   canStatus (*objbufEnable)(HandleData *hData, int idx);
   canStatus (*objbufDisable)(HandleData *hData, int idx);
-//} HWOps;
 } CANOps;
 
-//typedef struct CanBusTiming
 
 #endif

@@ -232,15 +232,15 @@ function toggleVisibility(linkObj) {
   i = 0;
   <span class="keywordflow">while</span>(!willExit){
     <span class="comment">/* Send some messages */</span>
-    <span class="keywordflow">for</span> (k = 0 ; k &lt; 10000 ; k++) {
-      ret = <a name="a8"></a><a class="code" href="group___c_a_n.html#ga47d03bfcc31e290284e65211b61f15f3">canWriteWait</a>(h, channel + 100, <span class="stringliteral">&quot;Kvaser!&quot;</span>, 8, 0, -1);       
+    <span class="keywordflow">for</span> (k = 0 ; k &lt; 1000 ; k++) {
+      ret = <a name="a8"></a><a class="code" href="group___c_a_n.html#ga47d03bfcc31e290284e65211b61f15f3">canWriteWait</a>(h, channel + 100, <span class="stringliteral">&quot;Kvaser!&quot;</span>, 8, 0<span class="comment">/*|canMSG_EXT*/</span>, -1);       
       <span class="keywordflow">if</span> (ret != <a name="a9"></a><a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> || willExit) {
         <span class="keywordflow">break</span>;
       }
       i++;
     }
     printf(<span class="stringliteral">&quot;Total sent=%d\n&quot;</span>, i);
-    <span class="comment">//sleep(1);</span>
+    sleep(1);
   }
    
   <span class="keywordflow">if</span> (<a name="a10"></a><a class="code" href="group___c_a_n.html#ga304cb3a7bc2874c1f8ad361a911bcd5f">canWriteSync</a>(h, 1000) != <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a>) {
@@ -275,7 +275,7 @@ function toggleVisibility(linkObj) {
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.9) - Generated on Tue Mar 17 2015</small>
+<small>Kvaser Linux CANLIB (canlib 5.12) - Generated on Mon Sep 21 2015</small>
 </address>
 </body>
 </html>

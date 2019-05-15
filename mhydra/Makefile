@@ -53,6 +53,8 @@
 #  ---------------------------------------------------------------------------
 # 
 
+-include $(PWD)/../kveyes.mak
+
 # module name
 KV_MODULE_NAME = mhydra
 
@@ -61,10 +63,6 @@ INCLUDES := $(src)/../include/
 
 # source files
 SRCS :=           mhydraHWIf.c 
-SRCS += ../common/VCanOsIf.c 
-SRCS += ../common/objbuf.c 
-SRCS += ../common/osif_functions_kernel.c
-SRCS += ../common/queue.c
 
 ifneq ($(KERNELRELEASE),)
 	RUNDIR := $(src)

@@ -76,6 +76,8 @@
 // Use a unique set for each driver
 #define USB_LEAF_MINOR_BASE   80
 
+    MODULE_LICENSE("Dual BSD/GPL");
+    MODULE_AUTHOR("KVASER");
     MODULE_DESCRIPTION("Leaf CAN module.");
 
 
@@ -137,7 +139,9 @@ static int leaf_objbuf_set_msg_count(VCanChanData *chd, int bufType, int bufNo,
 static int leaf_objbuf_send_burst(VCanChanData *chd, int bufType, int bufNo,
                                   int burstLen);
 
-VCanHWInterface hwIf = {
+static VCanDriverData driverData;
+
+static VCanHWInterface hwIf = {
   .initAllDevices    = leaf_init_driver,
   .setBusParams      = leaf_set_busparams,
   .getBusParams      = leaf_get_busparams,
@@ -484,7 +488,7 @@ static int leaf_rx_thread (void *context)
 
   DEBUGPRINT(3, (TXT("rx thread Ended - finalised\n")));
 
-  os_if_exit_thread(result);
+  os_if_exit_thread(THIS_MODULE, result);
 
   return result;
 } // _rx_thread
@@ -2344,6 +2348,7 @@ static void leaf_start (VCanCardData *vCard)
     DEBUGPRINT(2, (TXT("vCard is NULL\n")));
   }
 
+  vCard->driverData = &driverData;
   vCanInitData(vCard);
 } // _start
 
@@ -2412,11 +2417,11 @@ static int leaf_allocate (VCanCardData **in_vCard)
   }
   vCard->chanData = chs->dataPtrArray;
 
-  os_if_spin_lock(&canCardsLock);
+  os_if_spin_lock(&driverData.canCardsLock);
   // Insert into list of cards
-  vCard->next = canCards;
-  canCards = vCard;
-  os_if_spin_unlock(&canCardsLock);
+  vCard->next = driverData.canCards;
+  driverData.canCards = vCard;
+  os_if_spin_unlock(&driverData.canCardsLock);
 
   *in_vCard = vCard;
 
@@ -2461,16 +2466,16 @@ static void leaf_deallocate (VCanCardData *vCard)
 #  endif
   usb_free_urb(dev->write_urb);
 
-  os_if_spin_lock(&canCardsLock);
+  os_if_spin_lock(&driverData.canCardsLock);
 
   // qqq Check for open files
-  local_vCard = canCards;
+  local_vCard = driverData.canCards;
 
   // Identify the card to remove in the global list
 
   if (local_vCard == vCard) {
     // The first entry is the one to remove
-    canCards = local_vCard->next;
+    driverData.canCards = local_vCard->next;
   }
   else {
     while (local_vCard) {
@@ -2490,7 +2495,7 @@ static void leaf_deallocate (VCanCardData *vCard)
     }
   }
 
-  os_if_spin_unlock(&canCardsLock);
+  os_if_spin_unlock(&driverData.canCardsLock);
 
   for(i = 0; i < MAX_CHANNELS; i++) {
     VCanChanData *vChd     = vCard->chanData[i];
@@ -3022,7 +3027,7 @@ static int EXIT leaf_close_all (void)
 static int leaf_proc_read (struct seq_file* m, void* v)
 {
   int            channel  = 0;
-  VCanCardData  *cardData = canCards;
+  VCanCardData  *cardData = driverData.canCards;
 
   seq_printf(m,"\ntotal channels %d\n", driverData.noOfDevices);
   seq_puts(m,"minor numbers");
@@ -3536,4 +3541,15 @@ static int leaf_objbuf_send_burst (VCanChanData *chd, int bufType, int bufNo,
   ret = leaf_queue_cmd(vCard, &cmd, LEAF_Q_CMD_WAIT_TIME);
 
   return (ret != VCAN_STAT_OK) ? VCAN_STAT_NO_MEMORY : VCAN_STAT_OK;
+}
+
+INIT int init_module (void)
+{
+  driverData.hwIf = &hwIf;
+  return vCanInit (&driverData, MAX_CHANNELS);
+}
+
+EXIT void cleanup_module (void)
+{
+  vCanCleanup (&driverData);
 }

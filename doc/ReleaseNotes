@@ -3,7 +3,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.9  
+Release notes for linuxcan V5.12  
 ================================================================
 
 Linux device drivers for
@@ -13,14 +13,14 @@ Linux device drivers for
   *  KVASER PCIEcan
   *  KVASER PC104+
   *  KVASER PCI104
-  *  KVASER PCIcan II**
-  *  KVASER PCIcanx II**
+  *  KVASER PCIcan II **
+  *  KVASER PCIcanx II **
   *  KVASER USBcan II
   *  KVASER USBcan II Rugged
   *  KVASER USBcan Professional
   *  KVASER USBcan R
   *  KVASER USBcan Light 2xHS
-  *  KVASER Memorator***
+  *  KVASER Memorator ***
   *  KVASER Memorator Professional ****
   *  KVASER Leaf Professional LIN
   *  KVASER Leaf Professional
@@ -37,18 +37,23 @@ Linux device drivers for
   *  KVASER BlackBird v2 *****
   *  KVASER Memorator Pro 5xHS *****
   *  KVASER USBcan Pro 5xHS *****
+  *  KVASER USBcan Light 4xHS (00831-1)
+  *  KVASER Leaf Pro HS v2 (00843-4)
+  *  KVASER USBcan Pro 2xHS v2 (00752-9)
+  *  KVASER Memorator 2xHS v2 (00821-2) *****
+  *  KVASER Memorator Pro 2xHS v2 (00819-9) *****
 
   **    Recommended firmware > 3.0
-  ***   Only with USBcan II functionality. 
+  ***   Only with USBcan II functionality.
   ****  Only with USBcan Professional functionality.
-  ***** Only with usb CAN communication. 
+  ***** Only with usb CAN communication.
 
 
 ================================================================
 Support
 ================================================================
-If you have any problems you are welcome to contact us. 
-You will find the contact information on the web at 
+If you have any problems you are welcome to contact us.
+You will find the contact information on the web at
 http://www.kvaser.com.
 
 
@@ -57,7 +62,6 @@ Version info
 ================================================================
 
    * Tested under x86_64 SMP Ubuntu 12.04 x32/x64 (3.2.0-29-generic-pae/3.2.0-23-generic).
-   * Tested under x86_64 SMP Ubuntu 13.04 x32/x64 (3.8.0-19-generic/3.8.0-19-generic).
    * Tested under x86_64 SMP Ubuntu 14.04 x32/x64 (3.13.0-32-generic/3.13.0-32-generic).
    * Compiled with gcc version 4.6.3, 4.7.3 and 4.8.2.
    * Used glibc version 2.15, 2.17 and 2.19.
@@ -75,12 +79,9 @@ NOTE! While SMP (and fully preemptible kernel) has seen significant
       and 64 bit kernels is welcome.
       See the FAQ for information on how to disable SMP.
 
-================================================================  
+================================================================
 Known problems
 ================================================================
-   * Firmware bug in Leaf will cause it to start up in silent mode.
-     (Set it to normal mode manually using canSetBusOutputControl().)
-
    * Firmware bug in Leaf will cause it to start up in silent mode.
      (Set it to normal mode manually using canSetBusOutputControl().)
 
@@ -102,21 +103,56 @@ Known problems
      (This is the same as under Windows.)
 
 
+New Features and Fixed Problems in V5.12   (21-SEP-2015)
+===========================================================================
+   * Sampling points of default CAN bitrates are now 75% instead of 62.5%.
+
+   * Added tentative support (USB CAN communication only) for KVASER USBcan
+     Light 4xHS, Leaf Pro HS v2, KVASER USBcan Pro 2xHS v2, KVASER Memorator
+     2xHS v2, Memorator Pro 2xHS v2.
+
+   * Improved support for CAN-FD for PCIEcan 4xHS.
+
+   * Kvaser device drivers now all use a common driver (kv_common) that is
+     loaded seprarately.
+
+   * Updated register names and definitions in PCIEcan driver to comply with
+     the names used in the ISO standard for CAN-FD.
+
+   * Kvaser PCIEcan 4xHS requires firmware 2.0.1 or higher.
+
+New Features and Fixed Problems in V5.11   (21-MAY-2015)
+===========================================================================
+   * Blacklisting SocketCAN kvaser_usb driver when installing leaf and usbcanII
+     drivers.
+
+   * Implemented canOPEN_CAN_FD_NONISO flag to open a channel in non-ISO canFD mode.
+     Added canCHANNEL_CAP_CAN_FD_NONISO capability for devices that can be opened
+     in non-ISO canFD mode.
+
+
+New Features and Fixed Problems in V5.10   (Internal release)
+===========================================================================
+   * Support for Kvaser PCIEcan 4xHS.
+
+   * Tentative support for CAN-FD.
+
+
 New Features and Fixed Problems in V5.9   (17-MAR-2015)
 ===========================================================================
-* Minor changes.
+   * Minor changes.
 
 
 New Features and Fixed Problems in V5.8   (02-FEB-2015)
 ===========================================================================
-   * Support for Kvaser Memorator Pro 5xHS 00778-9 and tentative support 
-     for Kvaser USBcan Pro 5xHS 00779-6. 
+   * Support for Kvaser Memorator Pro 5xHS 00778-9 and tentative support
+     for Kvaser USBcan Pro 5xHS 00779-6.
      Only usb CAN communication supported.
 
 
 New Features and Fixed Problems in V5.7   (28-SEP-2014)
 ===========================================================================
-   * Fixed bug when compiling on arm architecture. 
+   * Fixed bug when compiling on arm architecture.
 
    * Tentative support for Kvaser Eagle 00567-9 and Kvaser BlackBird v2 00671-3.
      Only usb CAN communication supported.
@@ -144,7 +180,7 @@ New Features and Fixed Problems in V5.3   (20-MAR-2014)
    * Support for Kvaser Mini PCI Express 2xHS 00743-7
 
    * Corrected retun value upon timeout in canReadSync.
-   
+
    * Fixed bug when passing NULL pointer arguments to canRead and
      canReadWait.
 
@@ -154,11 +190,11 @@ New Features and Fixed Problems in V5.2   (26-SEP-2013)
    * Changed types in canIfData.h in order to handle 32/64bit
      type differences. This implies that both drivers and
      canlib should be updated together.
-     
+
    * Replaced usage of create_proc_read_entry to
      proc_create_data. Since it is deprecated in kernel 3.10,
-     kernels >= 2.6.26 are now required. 
-     
+     kernels >= 2.6.26 are now required.
+
 
 ================================================================
 Updates in version 5.1
@@ -198,11 +234,11 @@ Updates in version 4.80
    * pcicanII needs firmware 3.0 or later.
    * Added support for canReadSync
    * Resolved bug related to x64 kernels in function vCanTime
-   * Added support for local echo, canIOCTL_SET_LOCAL_TXECHO 
+   * Added support for local echo, canIOCTL_SET_LOCAL_TXECHO
    * Added support for canCHANNELDATA_MFGNAME_ASCII and
      canCHANNELDATA_DEVDESCR_ASCII using canGetChannelData.
 
-   
+
 ================================================================
 Information about version 4.78 ALPHA
 ================================================================
@@ -398,7 +434,7 @@ Updates in version 4.6 BETA
 ================================================================
 Information about version 4.5 BETA
 ================================================================
-Fixed spinlock problem causing problems with newer kernels. 
+Fixed spinlock problem causing problems with newer kernels.
 
 
 ================================================================
@@ -408,7 +444,7 @@ Updates in version 4.5 BETA
    KVASER Leaf Family, KVASER PC104+ and KVASER PCIcanx II.
    For other Kvaser cards use version 4.2 of the driver.
 
-  
+
 ================================================================
 Information about version 4.4 BETA
 ================================================================
@@ -418,8 +454,8 @@ Small changes and solved bugs.
 ================================================================
 Updates in version 4.4 BETA
 ================================================================
-   NOTE! This version of the driver is a BETA release for 
-   KVASER Leaf Family, KVASER PC104+ and KVASER PCIcanx II. 
+   NOTE! This version of the driver is a BETA release for
+   KVASER Leaf Family, KVASER PC104+ and KVASER PCIcanx II.
    For other Kvaser cards use version 4.2 of the driver.
 
 
@@ -427,8 +463,8 @@ Updates in version 4.4 BETA
 Information about version 4.3 BETA
 ================================================================
 Small changes and solved bugs.
-Added support for KVASER Leaf family, KVASER PCIcanx II and 
-KVASER PC104+. KVASER LAPcan and LAPcan II are excluded from this 
+Added support for KVASER Leaf family, KVASER PCIcanx II and
+KVASER PC104+. KVASER LAPcan and LAPcan II are excluded from this
 release.
 KVASER PCIcanx II and KVASER PC104+ uses the KVASER PCIcan II driver.
 KVASER PCIcanx uses KVASER PCIcan driver.
@@ -442,7 +478,7 @@ NOTE! The current driver only supports ONE USBcan II or Leaf device.
 ================================================================
 Updates in version 4.3 BETA
 ================================================================
-   NOTE! This version of the driver is a BETA release for 
+   NOTE! This version of the driver is a BETA release for
    KVASER Leaf Family, KVASER PC104+ and KVASER PCIcanx II.
 
    * Added support for KVASER Leaf family.
@@ -464,10 +500,10 @@ NOTE! The current driver only supports ONE USBcanII device.
 Updates in version 4.2
 ================================================================
    * Added locking for pcicanII queues.
-   * For USBcanII URB_ASYNC_UNLINK is removed from kernel source 
+   * For USBcanII URB_ASYNC_UNLINK is removed from kernel source
      code since kernel version 2.6.14.
 
- 
+
 ================================================================
 Information about version 4.1 BETA
 ================================================================
@@ -478,7 +514,7 @@ NOTE! The current driver only supports ONE USBcanII device.
 NOTE! Not tested on SMP kernels.
 
 No major changes for LAPcan and PCIcan drivers.
-The driver structure is modified and the code rewritten since 
+The driver structure is modified and the code rewritten since
 version 3.0 and 3.1. The functionality is the same as before.
 
 
@@ -494,4 +530,3 @@ Updates in version 4.1 BETA
 Solved problems in 4.01 BETA:
 ================================================================
    * pcmcia_core is not loaded when PCIcan is loaded.
-

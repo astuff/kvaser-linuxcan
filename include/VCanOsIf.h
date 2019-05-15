@@ -137,6 +137,10 @@
 #define VCAN_STAT_SIGNALED          -6    // -ERESTARTSYS
 #define VCAN_STAT_BAD_PARAMETER     -7    // -EINVAL
 
+#define OPEN_AS_CAN           0
+#define OPEN_AS_CANFD_ISO     1
+#define OPEN_AS_CANFD_NONISO  2
+
 /*****************************************************************************/
 /*  Data structures                                                          */
 /*****************************************************************************/
@@ -177,6 +181,8 @@ typedef struct VCanChanData
     uint32_t                 errorTime;
     unsigned char            rxErrorCounter;
     unsigned char            txErrorCounter;
+    unsigned char            canFdMode;
+    unsigned char            driverMode;
 
     /* Transmit buffer */
     CAN_MSG                  txChanBuffer[TX_CHAN_BUF_SIZE];
@@ -206,6 +212,20 @@ typedef struct VCanChanData
 #define DEVHND_CARD_REFUSE_TO_USE_CAN   0x10  // Major problem detected
 #define DEVHND_CARD_AUTO_TX_OBJBUFS     0x20  // Firmware supports periodic transmit object buffers
 
+struct VCanHWInterface;
+struct VCanCardData;
+
+typedef struct VCanDriverData
+{
+    int                     noOfDevices;
+    struct timeval          startTime;
+    char                   *deviceName;
+    struct VCanHWInterface *hwIf;
+    struct VCanCardData    *canCards;
+    OS_IF_LOCK              canCardsLock;
+    struct cdev             cdev;
+} VCanDriverData;
+
 /*  Cards specific data */
 typedef struct VCanCardData
 {
@@ -229,20 +249,12 @@ typedef struct VCanCardData
     unsigned char           cardPresent;
     VCanChanData          **chanData;
     void                   *hwCardData;
+    VCanDriverData         *driverData;
 
     OS_IF_SEMAPHORE         open;
 
     struct VCanCardData    *next;
 } VCanCardData;
-
-
-typedef struct VCanDriverData
-{
-    int                     noOfDevices;
-    int                     majorDevNr;
-    struct timeval          startTime;
-    char                   *deviceName;
-} VCanDriverData;
 
 typedef struct
 {
@@ -322,6 +334,9 @@ typedef struct VCanHWInterface {
                                  int count);
     int (*objbufSendBurst)      (VCanChanData *chd, int bufType, int bufNo,
                                  int burstLen);
+
+    int (*llAccess)             (VCanChanData*, void **);
+
 } VCanHWInterface;
 
 
@@ -341,10 +356,6 @@ typedef struct WaitNode {
 /*  Shared data structures                                                   */
 /*****************************************************************************/
 
-extern VCanDriverData         driverData;
-extern VCanCardData          *canCards;
-extern VCanHWInterface        hwIf;
-extern OS_IF_LOCK             canCardsLock;
 extern struct file_operations fops;
 
 
@@ -362,6 +373,8 @@ int             vCanTime(VCanCardData *vCard, unsigned long *time);
 int             vCanDispatchEvent(VCanChanData *chd, VCAN_EVENT *e);
 int             vCanFlushSendBuffer(VCanChanData *chd);
 unsigned long   getQLen(unsigned long head, unsigned long tail, unsigned long size);
+int             vCanInit(VCanDriverData *, unsigned);
+void            vCanCleanup(VCanDriverData *);
 
 
 #endif /* _VCAN_OS_IF_H_ */

@@ -308,7 +308,10 @@ OS_IF_THREAD os_if_kernel_thread(int (*thread)(void *context), void *context);
 
 //////////////////////////////////////////////////////////////////////
 //
-void os_if_exit_thread(int result);
+void os_if_exit_thread(void *module, int result);
+#ifndef THIS_MODULE
+#define THIS_MODULE 0
+#endif
 
 
   typedef unsigned long AtomicBit;

@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mï¿½lndal, Sweden
+**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -7,7 +7,7 @@
 ** COPYING file for details.
 **
 ** License: BSD-new
-** ===============================================================================
+** ============================================================================
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
 **     * Redistributions of source code must retain the above copyright
@@ -19,20 +19,20 @@
 **       names of its contributors may be used to endorse or promote products
 **       derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
 ** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 ** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 ** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **
 **
 ** License: GPLv2
-** ===============================================================================
+** ============================================================================
 ** This program is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU General Public License
 ** as published by the Free Software Foundation; either version 2
@@ -126,13 +126,13 @@ struct dev_descr {
    unsigned int ean[2];
 };
 
-// NOTE: minipciecan is a temporary name until the product name is decided.
-
-// qqq This has to be modified if we add/remove drivers.
+// This has to be modified if we add/remove drivers.
 static const char *dev_name[] = {"lapcan",   "pcican",   "pcicanII",
-                                 "usbcanII", "leaf",     "kvvirtualcan", "minipciecan", "mhydra" };
+                                 "usbcanII", "leaf",     "kvvirtualcan",
+                                 "mhydra", "pciefd"};
 static const char *off_name[] = {"LAPcan",   "PCIcan",   "PCIcanII",
-                                 "USBcanII", "Leaf",     "VIRTUALcan", "Mini PCIe CAN", "Minihydra"};
+                                 "USBcanII", "Leaf",     "VIRTUALcan",
+                                 "Minihydra", "PCIe CAN"};
 static struct dev_descr dev_descr_list[] = {
           {"Kvaser Unknown",                                    {0x00000000, 0x00000000}},
           {"Kvaser Virtual CAN",                                {0x00000000, 0x00000000}},
@@ -193,12 +193,19 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser USBcan Professional CB",                     {0x30006843, 0x00073301}},
           {"Kvaser Leaf Light v2",                              {0x30006850, 0x00073301}},
           {"Kvaser Mini PCI Express HS",                        {0x30006881, 0x00073301}},
+          {"Kvaser PCIEcan 4xHS",                               {0x30006829, 0x00073301}},
           {"Kvaser Leaf Light HS v2 OEM",                       {0x30007352, 0x00073301}},
           {"Kvaser Ethercan Light HS",                          {0x30007130, 0x00073301}},
           {"Kvaser Mini PCI Express 2xHS",                      {0x30007437, 0x00073301}},
           {"Kvaser USBcan Light 2xHS",                          {0x30007147, 0x00073301}},
+          {"Kvaser PCIEcan 4xHS",                               {0x30006836, 0x00073301}},
           {"Kvaser Memorator Pro 5xHS",                         {0x30007789, 0x00073301}},
           {"Kvaser USBcan Pro 5xHS",                            {0x30007796, 0x00073301}},
+          {"Kvaser USBcan Light 4xHS",                          {0x30008311, 0x00073301}},
+          {"Kvaser Leaf Pro HS v2",                             {0x30008434, 0x00073301}},
+          {"Kvaser USBcan Pro 2xHS v2",                         {0x30007529, 0x00073301}},
+          {"Kvaser Memorator 2xHS v2",                          {0x30008212, 0x00073301}},
+          {"Kvaser Memorator Pro 2xHS v2",                      {0x30008199, 0x00073301}}
 };
 
 //******************************************************
@@ -224,7 +231,7 @@ canStatus getDevParams (int channel, char devName[], int *devChannel,
   int ChannelsOnCard  = 0;
   int err;
   OS_IF_FILE_HANDLE fd;
-  
+
   for(n = 0; n < sizeof(dev_name) / sizeof(*dev_name); n++) {
     CardNo = -1;
     ChannelNoOnCard = 0;
@@ -261,7 +268,7 @@ canStatus getDevParams (int channel, char devName[], int *devChannel,
           *canOps = &vCanOps;
           sprintf(officialName, "KVASER %s channel %d", off_name[n], devCounter);
           *devChannel = ChannelNoOnCard;
-          
+
           return canOK;
         }
       }
@@ -308,6 +315,13 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags)
   hData->readIsBlock      = 1;
   hData->writeIsBlock     = 1;
   hData->isExtended       = flags & canOPEN_REQUIRE_EXTENDED;
+  if (flags & canOPEN_CAN_FD_NONISO) 
+    hData->fdMode = OPEN_AS_CANFD_NONISO;
+  else if (flags & canOPEN_CAN_FD)
+    hData->fdMode = OPEN_AS_CANFD_ISO;
+  else 
+    hData->fdMode = OPEN_AS_CAN;
+  hData->acceptLargeDlc   = ((flags & canOPEN_ACCEPT_LARGE_DLC) != 0);
   hData->wantExclusive    = flags & canOPEN_EXCLUSIVE;
   hData->acceptVirtual    = flags & canOPEN_ACCEPT_VIRTUAL;
   hData->notifyFd         = OS_IF_INVALID_HANDLE;
@@ -454,6 +468,8 @@ canSetBusParams (const CanHandle hnd, long freq, unsigned int tseg1,
 {
   canStatus ret;
   HandleData *hData;
+  long freq_brs;
+  unsigned int tseg1_brs, tseg2_brs, sjw_brs;
 
   hData = findHandle(hnd);
   if (hData == NULL) {
@@ -466,8 +482,54 @@ canSetBusParams (const CanHandle hnd, long freq, unsigned int tseg1,
     }
   }
 
-  return hData->canOps->setBusParams(hData, freq, tseg1, tseg2,
-                                     sjw, noSamp, syncmode);
+  ret = hData->canOps->getBusParams(hData, NULL, NULL, NULL, NULL, NULL,
+                                    &freq_brs, &tseg1_brs, &tseg2_brs,
+                                    &sjw_brs, NULL);
+  if (ret != canOK) {
+    return ret;
+  }
+
+  return hData->canOps->setBusParams(hData, freq, tseg1, tseg2, sjw, noSamp,
+                                     freq_brs, tseg1_brs, tseg2_brs, sjw_brs,
+                                     syncmode);
+}
+
+//******************************************************
+// Set CAN FD bus parameters
+//******************************************************
+canStatus CANLIBAPI
+canSetBusParamsFd (const CanHandle hnd, long freq_brs, unsigned int tseg1_brs,
+                   unsigned int tseg2_brs, unsigned int sjw_brs)
+{
+  canStatus ret;
+  HandleData *hData;
+  long freq;
+  unsigned int tseg1, tseg2, sjw, noSamp, syncmode;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  if ((OPEN_AS_CANFD_ISO != hData->fdMode) && (OPEN_AS_CANFD_NONISO != hData->fdMode)) 
+    return canERR_INVHANDLE;
+
+  ret = hData->canOps->getBusParams(hData, &freq, &tseg1, &tseg2, &sjw, &noSamp,
+                                    NULL, NULL, NULL, NULL, &syncmode);
+  if (ret != canOK) {
+    return ret;
+  }
+
+  if (freq_brs < 0) {
+    ret = canTranslateBaud(&freq_brs, &tseg1_brs, &tseg2_brs, &sjw_brs, &noSamp, &syncmode);
+    if (ret != canOK) {
+      return ret;
+    }
+  }
+
+  return hData->canOps->setBusParams(hData, freq, tseg1, tseg2, sjw, noSamp,
+                                     freq_brs, tseg1_brs, tseg2_brs, sjw_brs,
+                                     syncmode);
 }
 
 canStatus CANLIBAPI
@@ -506,8 +568,29 @@ canGetBusParams (const CanHandle hnd, long *freq, unsigned int *tseg1,
     return canERR_INVHANDLE;
   }
 
-  return hData->canOps->getBusParams(hData, freq, tseg1, tseg2,
-                                     sjw, noSamp, syncmode);
+  return hData->canOps->getBusParams(hData, freq, tseg1, tseg2, sjw, noSamp,
+                                     NULL, NULL, NULL, NULL, syncmode);
+}
+
+
+//******************************************************
+// Get CAN FD bus parameters
+//******************************************************
+canStatus CANLIBAPI
+canGetBusParamsFd (const CanHandle hnd, long *freq, unsigned int *tseg1,
+                   unsigned int *tseg2, unsigned int *sjw)
+{
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  if (!hData->fdMode) return canERR_INVHANDLE;
+
+  return hData->canOps->getBusParams(hData, NULL, NULL, NULL, NULL, NULL,
+                                     freq, tseg1, tseg2, sjw, NULL);
 }
 
 
@@ -811,10 +894,46 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
                                       unsigned int *const syncMode)
 {
   switch (*freq) {
+  case canFD_BITRATE_10M_75P:
+    *freq     = 10000000L;
+    *tseg1    = 2;
+    *tseg2    = 1;
+    *sjw      = 1;
+    *nosamp   = 1;
+    *syncMode = 0;
+    break;
+
+  case canFD_BITRATE_2M_80P:
+    *freq     = 2000000L;
+    *tseg1    = 15;
+    *tseg2    = 4;
+    *sjw      = 4;
+    *nosamp   = 1;
+    *syncMode = 0;
+    break;
+
+  case canFD_BITRATE_1M_80P:
+    *freq     = 1000000L;
+    *tseg1    = 31;
+    *tseg2    = 8;
+    *sjw      = 8;
+    *nosamp   = 1;
+    *syncMode = 0;
+    break;
+
+  case canFD_BITRATE_500K_80P:
+    *freq     = 500000L;
+    *tseg1    = 63;
+    *tseg2    = 16;
+    *sjw      = 16;
+    *nosamp   = 1;
+    *syncMode = 0;
+    break;
+
   case BAUD_1M:
     *freq     = 1000000L;
-    *tseg1    = 4;
-    *tseg2    = 3;
+    *tseg1    = 5;
+    *tseg2    = 2;
     *sjw      = 1;
     *nosamp   = 1;
     *syncMode = 0;
@@ -822,8 +941,8 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
 
   case BAUD_500K:
     *freq     = 500000L;
-    *tseg1    = 4;
-    *tseg2    = 3;
+    *tseg1    = 5;
+    *tseg2    = 2;
     *sjw      = 1;
     *nosamp   = 1;
     *syncMode = 0;
@@ -831,8 +950,8 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
 
   case BAUD_250K:
     *freq     = 250000L;
-    *tseg1    = 4;
-    *tseg2    = 3;
+    *tseg1    = 5;
+    *tseg2    = 2;
     *sjw      = 1;
     *nosamp   = 1;
     *syncMode = 0;
@@ -840,8 +959,8 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
 
   case BAUD_125K:
     *freq     = 125000L;
-    *tseg1    = 10;
-    *tseg2    = 5;
+    *tseg1    = 11;
+    *tseg2    = 4;
     *sjw      = 1;
     *nosamp   = 1;
     *syncMode = 0;
@@ -849,8 +968,8 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
 
   case BAUD_100K:
     *freq     = 100000L;
-    *tseg1    = 10;
-    *tseg2    = 5;
+    *tseg1    = 11;
+    *tseg2    = 4;
     *sjw      = 1;
     *nosamp   = 1;
     *syncMode = 0;
@@ -867,8 +986,8 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
 
   case BAUD_62K:
     *freq     = 62500L;
-    *tseg1    = 10;
-    *tseg2    = 5;
+    *tseg1    = 11;
+    *tseg2    = 4;
     *sjw      = 1;
     *nosamp   = 1;
     *syncMode = 0;
@@ -876,8 +995,8 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
 
   case BAUD_50K:
     *freq     = 50000L;
-    *tseg1    = 10;
-    *tseg2    = 5;
+    *tseg1    = 11;
+    *tseg2    = 4;
     *sjw      = 1;
     *nosamp   = 1;
     *syncMode = 0;
@@ -891,7 +1010,7 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
     *nosamp   = 1;
     *syncMode = 0;
     break;
-    
+
   default:
     return canERR_PARAM;
   }
@@ -935,26 +1054,6 @@ unsigned short CANLIBAPI canGetVersion (void)
 {
   return (CANLIB_MAJOR_VERSION << 8) + CANLIB_MINOR_VERSION;
 }
-
-/*
-unsigned int CANLIBAPI canGetVersionEx (unsigned int itemCode)
-{
-  unsigned int version = 0;
-
-  switch (itemCode) {
-  // build number
-  case 0:
-    //version = BUILD_NUMBER;
-    break;
-
-  default:
-
-    break;
-  }
-
-  return version;
-}
-*/
 
 
 //******************************************************
@@ -1007,7 +1106,9 @@ canGetDescrData (void *buffer, unsigned int ean[], int cap)
   strcpy(buffer, dev_descr_list[0].descr_string);
 
   /* check in device is virtual device */
-  if ((ean[0] == dev_descr_list[1].ean[0]) && (ean[1] == dev_descr_list[1].ean[1]) && (cap & canCHANNEL_CAP_VIRTUAL))
+  if ((ean[0] == dev_descr_list[1].ean[0]) &&
+      (ean[1] == dev_descr_list[1].ean[1]) &&
+      (cap & canCHANNEL_CAP_VIRTUAL))
   {
     strcpy(buffer, dev_descr_list[1].descr_string);
   }
@@ -1044,7 +1145,7 @@ canGetChannelData (int channel, int item, void *buffer, size_t bufsize)
   if (status < 0) {
     return status;
   }
-  
+
   switch(item) {
   case canCHANNELDATA_CHANNEL_NAME:
     strcpy(buffer, hData.deviceOfficialName);
@@ -1057,26 +1158,35 @@ canGetChannelData (int channel, int item, void *buffer, size_t bufsize)
     return canOK;
 
   case canCHANNELDATA_DEVDESCR_ASCII:
-    status = hData.canOps->getChannelData(hData.deviceName, canCHANNELDATA_CARD_UPC_NO, &ean, sizeof(ean));
+    status = hData.canOps->getChannelData(hData.deviceName,
+                                          canCHANNELDATA_CARD_UPC_NO,
+                                          &ean,
+                                          sizeof(ean));
     if (status != canOK)
     {
       return status;
     }
 
-    status = hData.canOps->getChannelData(hData.deviceName, canCHANNELDATA_CHANNEL_CAP, &cap, sizeof(cap));
+    status = hData.canOps->getChannelData(hData.deviceName,
+                                          canCHANNELDATA_CHANNEL_CAP,
+                                          &cap,
+                                          sizeof(cap));
     if (status != canOK)
     {
       return status;
     }
 
-    return canGetDescrData(buffer, ean,cap);
+    return canGetDescrData(buffer, ean, cap);
 
   case canCHANNELDATA_MFGNAME_ASCII:
     strcpy(buffer, "KVASER AB");
     return canOK;
 
   default:
-    return hData.canOps->getChannelData(hData.deviceName, item, buffer, bufsize);
+    return hData.canOps->getChannelData(hData.deviceName,
+                                        item,
+                                        buffer,
+                                        bufsize);
   }
 }
 
@@ -1288,6 +1398,8 @@ canFlushTransmitQueue (const CanHandle hnd)
 
   return hData->canOps->ioCtl(hData, canIOCTL_FLUSH_TX_BUFFER, NULL, 0);
 }
+
+
 
 
 //******************************************************

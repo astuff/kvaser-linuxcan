@@ -14,14 +14,14 @@
  *     * Redistributions in binary form must reproduce the above copyright
  *       notice, this list of conditions and the following disclaimer in the
  *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the <organization> nor the
+ *     * Neither the name of the \<organization\> nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+ * DISCLAIMED. IN NO EVENT SHALL \<COPYRIGHT HOLDER\> BE LIABLE FOR ANY
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
  * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -152,6 +152,33 @@ typedef struct canNotifyData {
  */
 # define canOPEN_ACCEPT_VIRTUAL         0x0020
 
+
+/**
+ * The channel will accept messages with DLC (Data Length Code) greater than
+ * 8. If this flag is not used, a message with DLC > 8 will always be
+ * reported or transmitted as a message with DLC = 8. If the
+ * \ref canOPEN_ACCEPT_LARGE_DLC flag is used, the message will be sent and/or
+ * received with the true DLC, which can be at most 15.
+ *
+ * \note The length of the message is always at most 8.
+ *
+ * This define is used in \ref canOpenChannel().
+ */
+# define canOPEN_ACCEPT_LARGE_DLC       0x0200  // DLC can be greater than 8
+
+/**
+ * The channel will use the CAN FD protocol.
+ *
+ * This define is used in \ref canOpenChannel().
+ */
+# define canOPEN_CAN_FD                 0x0400
+
+/**
+ * The channel will use the CAN FD NON-ISO protocol.
+ *
+ * This define is used in \ref canOpenChannel().
+ */
+# define canOPEN_CAN_FD_NONISO          0x0800
 /** @} */
 
 /**
@@ -230,6 +257,7 @@ typedef struct canNotifyData {
  * @{
  */
 
+
 /** Used in \ref canSetBusParams() and \ref canSetBusParamsC200(). Indicate a bitrate of 1 Mbit/s. */
 #define canBITRATE_1M        (-1)
 /** Used in \ref canSetBusParams() and \ref canSetBusParamsC200(). Indicate a bitrate of 500 kbit/s. */
@@ -248,6 +276,16 @@ typedef struct canNotifyData {
 #define canBITRATE_83K       (-8)
 /** Used in \ref canSetBusParams() and \ref canSetBusParamsC200(). Indicate a bitrate of 10 kbit/s. */
 #define canBITRATE_10K       (-9)
+
+// CAN FD Bit Rates
+/** Used in \ref canSetBusParamsFd(). Indicates a bitrate of  0.5 Mbit/s and sampling point at 80%. */
+#define canFD_BITRATE_500K_80P     (-1000)
+/** Used in \ref canSetBusParamsFd(). Indicates a bitrate of  1.0 Mbit/s and sampling point at 80%. */
+#define canFD_BITRATE_1M_80P       (-1001)
+/** Used in \ref canSetBusParamsFd(). Indicates a bitrate of  2.0 Mbit/s and sampling point at 80%. */
+#define canFD_BITRATE_2M_80P       (-1002)
+/** Used in \ref canSetBusParamsFd(). Indicates a bitrate of 10.0 Mbit/s and sampling point at 75%. */
+#define canFD_BITRATE_10M_75P      (-1010)
 
 /** The \ref BAUD_xxx names are deprecated, use \ref canBITRATE_1M instead. */
 #define BAUD_1M              (-1)
@@ -300,9 +338,6 @@ extern "C" {
  * appropriate \ref canERR_xxx error code will be returned later on when
  * \ref canOpenChannel() (or any other API call that requires initialization) is
  * called.
- *
- * \note This call replaces the \ref canLocateHardware() API call and serves the
- *  same purpose.
  *
  * \sa \ref page_code_snippets_examples
  *
@@ -437,6 +472,43 @@ canStatus CANLIBAPI canSetBusParams (const CanHandle hnd,
 /**
  * \ingroup CAN
  *
+ * \source_cs       <b>static Canlib.canStatus canSetBusParamsFd(int hnd, int freq_brs, int tseg1_brs, int tseg2_brs, int sjw_brs);</b>
+ *
+ * \source_delphi   <b>function canSetBusParamsFd(hnd: canHandle; freq_brs: Longint; tseg1_brs, tseg2_brs, sjw_brs): canStatus;</b>
+ * \source_end
+ *
+ * This function sets the bus timing parameters for the specified
+ * CAN FD controller.
+ *
+ * The library provides default values for \a tseg1_brs, \a tseg2_brs,
+ * \a sjw_brs and \a freq_brs is specified to one of the pre-defined
+ * constants, \ref canBITRATE_xxx.
+ *
+ * If \a freq_brs is any other value, no default values are supplied
+ * by the library.
+ *
+ * \param[in]  hnd        An open handle to a CAN controller.
+ * \param[in]  freq_brs   Bit rate (measured in bits per second); or one of the
+ *                        predefined constants \ref canBITRATE_xxx, which are described below.
+ * \param[in]  tseg1_brs  Time segment 1, that is, the number of quanta from (but not
+ *                        including) the Sync Segment to the sampling point.
+ * \param[in]  tseg2_brs  Time segment 2, that is, the number of quanta from the sampling
+ *                        point to the end of the bit.
+ * \param[in]  sjw_brs    The Synchronization Jump Width; can be 1,2,3, or 4.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ */
+canStatus CANLIBAPI canSetBusParamsFd(const CanHandle hnd,
+                                      long freq_brs,
+                                      unsigned int tseg1_brs,
+                                      unsigned int tseg2_brs,
+                                      unsigned int sjw_brs);
+
+
+/**
+ * \ingroup CAN
+ *
  * \source_cs       <b>static Canlib.canStatus canGetBusParams(int handle, out long freq, out int tseg1, out int tseg2, out int sjw, out int noSamp, out int syncmode);</b>
  *
  * \source_delphi   <b>function canGetBusParams(handle: canHandle; var freq: Longint; var tseg1, tseg2, sjw, noSamp, syncmode: Cardinal): canStatus;     </b>
@@ -473,6 +545,34 @@ canStatus CANLIBAPI canGetBusParams (const CanHandle hnd,
                                      unsigned int *noSamp,
                                      unsigned int *syncmode);
 
+
+/**
+ * \ingroup CAN
+ *
+ * \source_cs       <b>static Canlib.canStatus canGetBusParamsFd(int hnd, out long freq_brs, out int tseg1_brs, out int tseg2_brs, out int sjw_brs);</b>
+ *
+ * \source_delphi   <b>function canGetBusParamsFd(hnd: canHandle; var freq_brs: Longint; var tseg1_brs, tseg2_brs, sjw_brs): canStatus;</b>
+ * \source_end
+ *
+ * This function retrieves the current bus parameters for the specified
+ * CAN FD channel.
+ *
+ * \param[in]  hnd         An open handle to a CAN FD controller.
+ * \param[out] freq_brs    Bit rate (bits per second).
+ * \param[out] tseg1_brs   Time segment 1, that is, the number of quanta from (but not
+ *                         including) the Sync Segment to the sampling point.
+ * \param[out] tseg2_brs   Time segment 2, that is, the number of quanta from the sampling
+ *                         point to the end of the bit.
+ * \param[out] sjw_brs     The Synchronization Jump Width; can be 1,2,3, or 4.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ */
+canStatus CANLIBAPI canGetBusParamsFd(const CanHandle hnd,
+                                      long  *freq_brs,
+                                      unsigned int *tseg1_brs,
+                                      unsigned int *tseg2_brs,
+                                      unsigned int *sjw_brs);
 /**
  * \ingroup CAN
  *
@@ -552,7 +652,7 @@ canStatus CANLIBAPI canGetBusOutputControl (const CanHandle hnd,
  * filtering is done by software. \ref canAccept() behaves in the same way for all
  * boards, however.
  *
- * \ref canSetAcceptanceFilter() and \ref canAccept() both serve the same purpose but the
+ * \win_start \ref canSetAcceptanceFilter() and \win_end \ref canAccept() both serve the same purpose but the
  * former can set the code and mask in just one call.
  *
  * If you want to remove a filter, call \ref canAccept() with the mask set to 0.
@@ -765,8 +865,8 @@ canStatus CANLIBAPI canWriteSync (const CanHandle hnd, unsigned long timeout);
  * \sa \ref page_user_guide_send_recv_reading, \ref
  * page_user_guide_send_recv_mailboxes, \ref page_code_snippets_examples,
  * \ref page_user_guide_time_accuracy_and_resolution
- * \sa \ref canReadSpecific(), \ref canReadSpecificSkip(), \ref canReadSync(),
- *     \ref canReadSyncSpecific(), \ref canReadWait()
+ * \sa \win_start \ref canReadSpecific(), \ref canReadSpecificSkip(),\win_end \ref canReadSync(),
+ *     \win_start \ref canReadSyncSpecific(),\win_end \ref canReadWait()
  *
  */
 canStatus CANLIBAPI canRead (const CanHandle hnd,
@@ -1076,7 +1176,9 @@ canStatus CANLIBAPI canIoCtl (const CanHandle hnd,
  * \return \ref canERR_xxx (negative) if failure
  *
  * \sa \ref page_user_guide_time_accuracy_and_resolution
+ * \win_start
  * \sa \ref kvReadTimer()
+ * \win_end
  */
 canStatus CANLIBAPI canReadTimer (const CanHandle hnd, unsigned long *time);
 
@@ -1118,8 +1220,6 @@ canStatus CANLIBAPI canReadTimer (const CanHandle hnd, unsigned long *time);
  * This behaviour can be changed using \ref canIOCTL_SET_LOCAL_TXECHO.
  *
  * \note The handle returned may be zero which is perfectly valid.
- *
- * \note This call replaces the \ref canOpen() API call and serves the same purpose.
  *
  * \param[in]  channel  The number of the channel. Channel numbering is hardware
  *                      dependent.
@@ -1565,6 +1665,11 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 /** Used with \ref canCHANNELDATA_CHANNEL_FLAGS, indicates that the channel is
     opened. */
 #define canCHANNEL_IS_OPEN              0x0002
+
+/** Used with \ref canCHANNELDATA_CHANNEL_FLAGS, indicates that the channel is
+ *  opened as CAN FD.  */
+
+#define canCHANNEL_IS_CANFD             0x0004
  /** @} */
 
 
@@ -1612,8 +1717,10 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canHWTYPE_ETHERCAN           70  ///< Kvaser Ethercan
 #define canHWTYPE_USBCAN_LIGHT       72  ///< Kvaser USBcan Light
 #define canHWTYPE_USBCAN_PRO2        74  ///< Kvaser USBcan Pro 5xHS and variants
-#define canHWTYPE_PCIE_V2            76  ///< PCIe for now
+#define canHWTYPE_PCIE_V2            76  ///< Kvaser PCIEcan 4xHS and variants
 #define canHWTYPE_MEMORATOR_PRO2     78  ///< Kvaser Memorator Pro 5xHS and variants
+#define canHWTYPE_LEAF2              80  ///< Kvaser Leaf Pro HS v2 and variants
+#define canHWTYPE_MEMORATOR_LIGHT2   82  ///< Kvaser Memorator Light (2nd generation)
 
 
 /** @} */
@@ -1635,6 +1742,8 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canCHANNEL_CAP_VIRTUAL           0x00010000L ///< Virtual CAN channel
 #define canCHANNEL_CAP_SIMULATED         0x00020000L ///< Simulated CAN channel
 #define canCHANNEL_CAP_REMOTE            0x00040000L ///< Remote CAN channel (e.g. BlackBird).
+#define canCHANNEL_CAP_CAN_FD            0x00080000L ///< CAN-FD channel
+#define canCHANNEL_CAP_CAN_FD_NONISO     0x00100000L ///< Supports Non-ISO CAN-FD channel
 
 /** @} */
 
@@ -1811,6 +1920,8 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * \note There is no more information available as to what happened when this
    * call returns. The call may return on an "internal" event in CANLIB and your
    * application must be prepared to handle this (i.e. go to sleep again.)
+   *
+   * \win_start
    * \note If \ref canWaitForEvent() returns with success status (\ref canOK), you must call
    * \ref canRead() repeatedly until it returns \ref canERR_NOMSG, before calling
    * \ref canWaitForEvent() again. This will flush the driver's internal event queues.
@@ -1819,6 +1930,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * \ref canERR_TIMEOUT.
    *
    * \sa \ref canWaitForEvent()
+   * \win_end
    *
    * \note You must not set, reset, nor close this handle.  Waiting on it is
    *       the only supported operation.
@@ -2501,7 +2613,7 @@ typedef canStatus kvStatus;
  * \li context - the context pointer you passed to \ref kvSetNotifyCallback().
  * \li notifyEvent - one of the \ref canNOTIFY_xxx notification codes.
  *
- * \note It is really the \ref canNOTIFY_xxx codes, and not the \ref
+ * \note It is really the \ref canNOTIFY_xxx codes, and not the
  *  \ref canEVENT_xxx codes that the \ref canSetNotify() API is using.
  *
  * \param[in] hnd          An open handle to a CAN channel.
@@ -2556,6 +2668,7 @@ kvStatus CANLIBAPI kvSetNotifyCallback (const CanHandle hnd,
 #ifdef __cplusplus
 }
 #endif
+
 
 
 #endif

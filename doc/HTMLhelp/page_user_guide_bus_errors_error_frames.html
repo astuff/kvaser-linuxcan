@@ -115,7 +115,7 @@ function toggleVisibility(linkObj) {
 </div>
 <div class="contents">
 <div class="textblock"><p>When a CAN controller detects an error, it transmits an error frame. This is a special CAN message that causes all other CAN controllers on the bus to notice that an error has occurred.</p>
-<p>CANLIB will report error frames to the application just like it reports any other CAN message, but the <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a> flag will be set in the flags parameter when e.g. <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> returns.</p>
+<p>CANLIB will report error frames to the application just like it reports any other CAN message, but the <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8" title="Message is an error frame.">canMSG_ERROR_FRAME</a> flag will be set in the flags parameter when e.g. <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> returns.</p>
 <p>When an error frame is received, its identifier, DLC and data bytes will be undefined. You should test if a message is an error frame before checking its identifier, DLC or data bytes.</p>
 <p>In an healthy CAN system, error frames should rarely, if ever, occur. Error frames usually mean there is some type of serious problem in the system, such as a bad connector, a bad cable, bus termination missing or faulty, or another node transmitting at wrong bit rate, and so on. </p>
 </div></div>
@@ -140,7 +140,7 @@ function toggleVisibility(linkObj) {
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.9) - Generated on Tue Mar 17 2015</small>
+<small>Kvaser Linux CANLIB (canlib 5.12) - Generated on Mon Sep 21 2015</small>
 </address>
 </body>
 </html>

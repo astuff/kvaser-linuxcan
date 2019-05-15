@@ -198,7 +198,7 @@ static void objbuf_write_all (OS_IF_TASK_QUEUE_HANDLE *work)
   }
 
   if (done_mask) {
-    hwIf.requestSend(vCard, vChan); // Ok to fail ;-)
+    vChan->vCard->driverData->hwIf->requestSend(vCard, vChan); // Ok to fail ;-)
   }
 
   os_if_up_sema(&fileNodePtr->ioctl_mutex);

@@ -75,6 +75,8 @@
 #define USB_USBCAN_MINOR_BASE   96
 
 
+    MODULE_LICENSE("Dual BSD/GPL");
+    MODULE_AUTHOR("KVASER");
     MODULE_DESCRIPTION("USBcanII CAN module.");
 
 
@@ -132,7 +134,9 @@ static int usbcan_objbuf_set_flags(VCanChanData *chd, int bufType, int bufNo,
 static int usbcan_objbuf_set_period(VCanChanData *chd, int bufType, int bufNo,
                                     int period);
 
-VCanHWInterface hwIf = {
+static VCanDriverData driverData;
+
+static VCanHWInterface hwIf = {
   .initAllDevices    = usbcan_init_driver,
   .setBusParams      = usbcan_set_busparams,
   .getBusParams      = usbcan_get_busparams,
@@ -423,7 +427,7 @@ static int usbcan_rx_thread (void *context)
 
   DEBUGPRINT(3, (TXT("rx thread Ended - finalised\n")));
 
-  os_if_exit_thread(result);
+  os_if_exit_thread(THIS_MODULE, result);
 
   return result;
 } // _rx_thread
@@ -1804,6 +1808,7 @@ static void DEVINIT usbcan_start (VCanCardData *vCard)
   // Gather some card info
   usbcan_get_card_info(vCard);
   DEBUGPRINT(2, (TXT("vcard chnr: %d\n"), vCard->nrChannels));
+  vCard->driverData = &driverData;
   vCanInitData(vCard);
 } // _start
 
@@ -1872,11 +1877,11 @@ static int DEVINIT usbcan_allocate (VCanCardData **in_vCard)
   }
   vCard->chanData = chs->dataPtrArray;
 
-  os_if_spin_lock(&canCardsLock);
+  os_if_spin_lock(&driverData.canCardsLock);
   // Insert into list of cards
-  vCard->next = canCards;
-  canCards = vCard;
-  os_if_spin_unlock(&canCardsLock);
+  vCard->next = driverData.canCards;
+  driverData.canCards = vCard;
+  os_if_spin_unlock(&driverData.canCardsLock);
 
   *in_vCard = vCard;
 
@@ -1923,16 +1928,16 @@ static void DEVEXIT usbcan_deallocate (VCanCardData *vCard)
 #  endif
   usb_free_urb(dev->write_urb);
 
-  os_if_spin_lock(&canCardsLock);
+  os_if_spin_lock(&driverData.canCardsLock);
 
   // qqq Check for open files
-  local_vCard = canCards;
+  local_vCard = driverData.canCards;
 
   // Identify the card to remove in the global list
 
   if (local_vCard == vCard) {
     // The first entry is the one to remove
-    canCards = local_vCard->next;
+    driverData.canCards = local_vCard->next;
   }
   else {
     while (local_vCard) {
@@ -1952,7 +1957,7 @@ static void DEVEXIT usbcan_deallocate (VCanCardData *vCard)
     }
   }
 
-  os_if_spin_unlock(&canCardsLock);
+  os_if_spin_unlock(&driverData.canCardsLock);
 
   for(i = 0; i < MAX_CHANNELS; i++) {
     VCanChanData *vChd      = vCard->chanData[i];
@@ -2468,7 +2473,7 @@ static int EXIT usbcan_close_all (void)
 static int usbcan_proc_read (struct seq_file* m, void* v)
 {
   int            channel  = 0;
-  VCanCardData  *cardData = canCards;
+  VCanCardData  *cardData = driverData.canCards;
 
   seq_printf(m, "\ntotal channels %d\n", driverData.noOfDevices);
   seq_puts(m, "minor numbers");
@@ -2900,3 +2905,14 @@ static int usbcan_objbuf_exists (VCanChanData *chd, int bufType, int bufNo)
 }
 
 
+
+INIT int init_module (void)
+{
+  driverData.hwIf = &hwIf;
+  return vCanInit (&driverData, MAX_CHANNELS);
+}
+
+EXIT void cleanup_module (void)
+{
+  vCanCleanup (&driverData);
+}

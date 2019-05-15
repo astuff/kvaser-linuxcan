@@ -259,13 +259,13 @@ function toggleVisibility(linkObj) {
       ret = <a name="a8"></a><a class="code" href="group___c_a_n.html#gac01f98e282609b5f6aaf2b1eabfb83ec">canReadWait</a>(h, &amp;<span class="keywordtype">id</span>, &amp;msg, &amp;dlc, &amp;flag, &amp;time, -1);
       <span class="keywordflow">switch</span> (ret){
       <span class="keywordflow">case</span> 0:
-        <span class="keywordflow">if</span> (flag &amp; <a name="a9"></a><a class="code" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a>) {
+        <span class="keywordflow">if</span> (flag &amp; <a name="a9"></a><a class="code" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8" title="Message is an error frame.">canMSG_ERROR_FRAME</a>) {
           err++;
         } <span class="keywordflow">else</span> {
-          <span class="keywordflow">if</span> (flag &amp; <a name="a10"></a><a class="code" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>)        std++;
-          <span class="keywordflow">if</span> (flag &amp; <a name="a11"></a><a class="code" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a>)        ext++;
-          <span class="keywordflow">if</span> (flag &amp; <a name="a12"></a><a class="code" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3">canMSG_RTR</a>)        rtr++;
-          <span class="keywordflow">if</span> (flag &amp; <a name="a13"></a><a class="code" href="canstat_8h.html#adf0d578c7b25ede29a9733da44f08ab3">canMSGERR_OVERRUN</a>) over++;
+          <span class="keywordflow">if</span> (flag &amp; <a name="a10"></a><a class="code" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e" title="Message has a standard ID.">canMSG_STD</a>)        std++;
+          <span class="keywordflow">if</span> (flag &amp; <a name="a11"></a><a class="code" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10" title="Message has an extended ID.">canMSG_EXT</a>)        ext++;
+          <span class="keywordflow">if</span> (flag &amp; <a name="a12"></a><a class="code" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3" title="Message is a remote request.">canMSG_RTR</a>)        rtr++;
+          <span class="keywordflow">if</span> (flag &amp; <a name="a13"></a><a class="code" href="canstat_8h.html#adf0d578c7b25ede29a9733da44f08ab3" title="Any overrun condition.">canMSGERR_OVERRUN</a>) over++;
         }
         i++;
         <span class="keywordflow">break</span>;
@@ -310,7 +310,7 @@ function toggleVisibility(linkObj) {
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.9) - Generated on Tue Mar 17 2015</small>
+<small>Kvaser Linux CANLIB (canlib 5.12) - Generated on Mon Sep 21 2015</small>
 </address>
 </body>
 </html>

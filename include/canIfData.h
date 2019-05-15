@@ -78,10 +78,15 @@ typedef struct CanIfStat
 
 typedef struct {
     __s32 freq;
-    __u8 sjw;
-    __u8 tseg1;
-    __u8 tseg2;
-    __u8 samp3;
+    __u32 sjw;
+    __u32 tseg1;
+    __u32 tseg2;
+    __u32 samp3;
+  // After bit rate switch (CAN FD)
+    __s32 freq_brs;
+    __u32 sjw_brs;
+    __u32 tseg1_brs;
+    __u32 tseg2_brs;
 } VCanBusParams;
 
 typedef struct {
@@ -110,8 +115,9 @@ typedef struct {
   __u32 buffer_number;
   __u32 id;
   __u32 dlc;
-  __u8 data[8];
+  __u8 data[128]; // CAN FD/EF
   __u32 flags;
 } KCanObjbufBufferData;
 
 #endif /* _CANIF_DATA_H_ */
+

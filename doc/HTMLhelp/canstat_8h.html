@@ -117,8 +117,7 @@ function toggleVisibility(linkObj) {
 <div id="doc-content">
 <div class="header">
   <div class="summary">
-<a href="#define-members">Defines</a> &#124;
-<a href="#enum-members">Enumerations</a>  </div>
+<a href="#define-members">Defines</a>  </div>
   <div class="headertitle">
 <h1>canstat.h File Reference</h1>  </div>
 </div>
@@ -126,19 +125,37 @@ function toggleVisibility(linkObj) {
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="define-members"></a>
 Defines</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a3b7a3241ee88e905792b2630634a8373">canTRANSCEIVER_RESNET_NA</a>&#160;&#160;&#160;0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a9a3115d766b5936b274c35000a0e72c3">canTRANSCEIVER_RESNET_MASTER</a>&#160;&#160;&#160;1</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a1b7891d8cb1860e15e1bf68b24f84159">canTRANSCEIVER_RESNET_MASTER_STBY</a>&#160;&#160;&#160;2</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#af7b991b312233362855a3aa446502700">canTRANSCEIVER_RESNET_SLAVE</a>&#160;&#160;&#160;3</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Convenience</div></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a8c295379deb70c4c892f0a6dc4c5405e">CANSTATUS_SUCCESS</a>(X)&#160;&#160;&#160;((X) == canOK)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ac6535edaa1eea78208702d87d7d50f3c">CANSTATUS_FAILURE</a>(X)&#160;&#160;&#160;((X) != canOK)</td></tr>
+<tr><td colspan="2"><div class="groupHeader">canEVENT_xxx WM__CANLIB notification codes</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canEVENT_xxx"></a> Appears in the notification <code>WM__CANLIB</code> message. </p>
+</div></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#af5f5917ba5476570815747b960e26ba6">canEVENT_RX</a>&#160;&#160;&#160;32000</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a21669303d34190235f63303deae6b248">canEVENT_TX</a>&#160;&#160;&#160;32001</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a5a6431078d49d8f7cc36c6313db44406">canEVENT_ERROR</a>&#160;&#160;&#160;32002</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a0c59f7bbcb5cceaefe0d1d5915e8b4fc">canEVENT_STATUS</a>&#160;&#160;&#160;32003</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#accbc123f913273ebadcdf894a8748df8">canEVENT_ENVVAR</a>&#160;&#160;&#160;32004</td></tr>
+<tr><td colspan="2"><div class="groupHeader">canNOTIFY_xxx</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canNOTIFY_xxx"></a></p>
+<p>These are notification codes used in calls to <a class="el" href="group___c_a_n.html#gaa5dd0f277c7059169055321fbda87486">canSetNotify()</a> and <a class="el" href="group___general.html#ga99976c5b8e2c534b27bf9ec2e715d8d3">kvSetNotifyCallback()</a>.</p>
+<p>This can be <a class="el" href="canstat_8h.html#aac3167adc3230d49b3a359ed3e9c6422">canNOTIFY_NONE</a> (zero), meaning that no event notification is to occur, or a combination of any of the following constants </p>
+</div></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#aac3167adc3230d49b3a359ed3e9c6422">canNOTIFY_NONE</a>&#160;&#160;&#160;0</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#af0b2b8979177da5f9c875f584f9c7d9c">canNOTIFY_RX</a>&#160;&#160;&#160;0x0001</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a14e966f0b3f498285fb332632df60a88">canNOTIFY_TX</a>&#160;&#160;&#160;0x0002</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a91afcc669b1b8be0ed390aac37e44805">canNOTIFY_ERROR</a>&#160;&#160;&#160;0x0004</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ae04b14c6acacd116cceaf78abc8b02c0">canNOTIFY_STATUS</a>&#160;&#160;&#160;0x0008</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ab69dc959890826b245c422966c4bf627">canNOTIFY_ENVVAR</a>&#160;&#160;&#160;0x0010</td></tr>
+<tr><td colspan="2"><div class="groupHeader">canSTAT_xxx</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canSTAT_xxx"></a></p>
+<p>The following circuit status flags are returned by <a class="el" href="group___c_a_n.html#gaca3da209fe673b3838a50a3abe831855">canReadStatus()</a>. Note that more than one flag might be set at any one time.</p>
+<dl class="note"><dt><b>Note:</b></dt><dd>Usually both <a class="el" href="canstat_8h.html#a7b3f46760938cbc79f0a81f297f1e2b4">canSTAT_HW_OVERRUN</a> and <a class="el" href="canstat_8h.html#a81051d406447b59ebfbf6ed31e1478a1">canSTAT_SW_OVERRUN</a> are set when overrun has occurred. This is because the kernel driver can't see the difference between a software overrun and a hardware overrun. So the code should always test for both types of overrun using the <a class="el" href="canstat_8h.html#a3b1c56fe475153972bf7116a0c1cba53">flag</a>. </dd></dl>
+</div></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a06a51383b823f78d63bbb6e08aa0948b">canSTAT_ERROR_PASSIVE</a>&#160;&#160;&#160;0x00000001</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#aab3d45d8b4e8bfbba45d585fb6195fbf">canSTAT_BUS_OFF</a>&#160;&#160;&#160;0x00000002</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ae6f14de69c7a46b9ab2c5e8e9e6518f2">canSTAT_ERROR_WARNING</a>&#160;&#160;&#160;0x00000004</td></tr>
@@ -151,6 +168,12 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a7b3f46760938cbc79f0a81f297f1e2b4">canSTAT_HW_OVERRUN</a>&#160;&#160;&#160;0x00000200</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a81051d406447b59ebfbf6ed31e1478a1">canSTAT_SW_OVERRUN</a>&#160;&#160;&#160;0x00000400</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a3b1c56fe475153972bf7116a0c1cba53">canSTAT_OVERRUN</a>&#160;&#160;&#160;(canSTAT_HW_OVERRUN | canSTAT_SW_OVERRUN)</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Message information flags, &lt; 0x100</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canMSG_xxx"></a></p>
+<p>The following flags can be returned from <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> et al, or passed to <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>.</p>
+<p>All flags and/or combinations of them are meaningful for received messages.</p>
+<p><a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3">canMSG_RTR</a>, <a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>, <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a>, <a class="el" href="canstat_8h.html#a616183e2ed8ca81976463914e47b35e1">canMSG_WAKEUP</a> and <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a> are meaningful also for transmitted messages. </p>
+</div></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a9ea137b68594f47f0cc3fb112b569b7c">canMSG_MASK</a>&#160;&#160;&#160;0x00ff</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3">canMSG_RTR</a>&#160;&#160;&#160;0x0001</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>&#160;&#160;&#160;0x0002</td></tr>
@@ -160,6 +183,15 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a>&#160;&#160;&#160;0x0020</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a5ef7ad2e558debdbf85921440961efcb">canMSG_TXACK</a>&#160;&#160;&#160;0x0040</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#aa73e5649dc11a61acbf41935bebe97bd">canMSG_TXRQ</a>&#160;&#160;&#160;0x0080</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ace754df19009a6eeff09d866d68a3a27">canMSG_DELAY_MSG</a>&#160;&#160;&#160;0x0100</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a6f1046c663cdef60425ac4f821aa6dcc">canFDMSG_MASK</a>&#160;&#160;&#160;0xff0000</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a162be4f6b66c81fa09dc76c268475216">canFDMSG_EDL</a>&#160;&#160;&#160;0x010000</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a20c4f6ae319558189eb85d10036e9eea">canFDMSG_BRS</a>&#160;&#160;&#160;0x020000</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#aa50c93236b2b28677bcae0f7c1ab3860">canFDMSG_ESI</a>&#160;&#160;&#160;0x040000</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Message error flags, &gt;= 0x0100</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canMSGERR_xxx"></a></p>
+<dl class="note"><dt><b>Note:</b></dt><dd>Not all hardware platforms can detect the difference between hardware overruns and software overruns, so your application should test for both conditions. You can use the symbol <a class="el" href="canstat_8h.html#adf0d578c7b25ede29a9733da44f08ab3">canMSGERR_OVERRUN</a> for this purpose. </dd></dl>
+</div></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a8aeb91d8bc2c63b0ca547052a96b63cf">canMSGERR_MASK</a>&#160;&#160;&#160;0xff00</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ae441634e38d57eb789936f5ac745410b">canMSGERR_HW_OVERRUN</a>&#160;&#160;&#160;0x0200</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a810afd58f22df8c44c729f78d955e006">canMSGERR_SW_OVERRUN</a>&#160;&#160;&#160;0x0400</td></tr>
@@ -171,6 +203,11 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#adf0d578c7b25ede29a9733da44f08ab3">canMSGERR_OVERRUN</a>&#160;&#160;&#160;0x0600</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a1c3c24e5ee42096b25701503daf87b14">canMSGERR_BIT</a>&#160;&#160;&#160;0xC000</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ae853e0ee140775839d8943a44dc27b61">canMSGERR_BUSERR</a>&#160;&#160;&#160;0xF800</td></tr>
+<tr><td colspan="2"><div class="groupHeader">canTRANSCEIVER_LINEMODE_xxx</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canTRANSCEIVER_LINEMODE_xxx"></a></p>
+<p>The following values can be usedto set different driver (i.e. transceiver) modes.</p>
+<p>Not implemented in Linux. </p>
+</div></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a47a59c1a30446c793ae7eb1c5983359f">canTRANSCEIVER_LINEMODE_NA</a>&#160;&#160;&#160;0</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a6386255f58bc6f37fcfe36d3567989a8">canTRANSCEIVER_LINEMODE_SWC_SLEEP</a>&#160;&#160;&#160;4</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a1c3a39e14fb41adab5a83b0babb7fb7e">canTRANSCEIVER_LINEMODE_SWC_NORMAL</a>&#160;&#160;&#160;5</td></tr>
@@ -185,10 +222,11 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#afdda46945266de458aac552ae90e7803">canTRANSCEIVER_LINEMODE_OEM2</a>&#160;&#160;&#160;14</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a7e092b4f203391e0378d7f992f3e65e2">canTRANSCEIVER_LINEMODE_OEM3</a>&#160;&#160;&#160;15</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#af33084e90160fa6d49fa5ef70483eadc">canTRANSCEIVER_LINEMODE_OEM4</a>&#160;&#160;&#160;16</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a3b7a3241ee88e905792b2630634a8373">canTRANSCEIVER_RESNET_NA</a>&#160;&#160;&#160;0</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a9a3115d766b5936b274c35000a0e72c3">canTRANSCEIVER_RESNET_MASTER</a>&#160;&#160;&#160;1</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a1b7891d8cb1860e15e1bf68b24f84159">canTRANSCEIVER_RESNET_MASTER_STBY</a>&#160;&#160;&#160;2</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#af7b991b312233362855a3aa446502700">canTRANSCEIVER_RESNET_SLAVE</a>&#160;&#160;&#160;3</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Transceiver (logical) types</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canTRANSCEIVER_TYPE_xxx"></a></p>
+<p>The following constants can be returned from <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, using the <a class="el" href="canlib_8h.html#a2b20aaf3e8ed0c7932a3e700d31a3dc1">canCHANNELDATA_TRANS_TYPE</a> item code. They identify the bus transceiver type for the channel specified in the call to <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>.</p>
+<dl class="note"><dt><b>Note:</b></dt><dd>They indicate a hardware type, but not necessarily a specific circuit or product. </dd></dl>
+</div></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a6267ab8b3309b90c9811ba396595eb66">canTRANSCEIVER_TYPE_UNKNOWN</a>&#160;&#160;&#160;0</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a23fb1bc76f56fd0caf6bcbce99df72b8">canTRANSCEIVER_TYPE_251</a>&#160;&#160;&#160;1</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#add090da2f3936a0a264d39381ba0c101">canTRANSCEIVER_TYPE_252</a>&#160;&#160;&#160;2</td></tr>
@@ -210,6 +248,7 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a0908dd067656a6e65360f0c0ece3358b">canTRANSCEIVER_TYPE_RS485</a>&#160;&#160;&#160;18</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a355af023621874d0cc3e35094c83d121">canTRANSCEIVER_TYPE_LIN</a>&#160;&#160;&#160;19</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#afea4a10ad40446340456dea0d642aacd">canTRANSCEIVER_TYPE_KONE</a>&#160;&#160;&#160;20</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a6cb324d78ba3426a7b20ba400d8e251b">canTRANSCEIVER_TYPE_CANFD</a>&#160;&#160;&#160;22</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a24636beba2413b67e5b733d52340917d">canTRANSCEIVER_TYPE_LINX_LIN</a>&#160;&#160;&#160;64</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#acb5d029625550dbcbc1163770fdd3cfc">canTRANSCEIVER_TYPE_LINX_J1708</a>&#160;&#160;&#160;66</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a451986925bbb397794b9c8c6a29aed57">canTRANSCEIVER_TYPE_LINX_K</a>&#160;&#160;&#160;68</td></tr>
@@ -217,6 +256,11 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#af5482786e5c5cebba339b0cb9605350d">canTRANSCEIVER_TYPE_LINX_LS</a>&#160;&#160;&#160;72</td></tr>
 <tr><td colspan="2"><h2><a name="enum-members"></a>
 Enumerations</h2></td></tr>
+<tr><td colspan="2"><div class="groupHeader">canERR_xxx</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canERR_xxx"></a></p>
+<p>Generally, a return code greater than or equal to zero means success. A value less than zero means failure.</p>
+<p>You should avoid testing for a specific error code unless it is explicitly stated in the documentation for the API in question that this specific error code is returned. Instead, check if the error code is less than zero. Use <a class="el" href="group___general.html#ga01a7a415c95c579750bcdd95a1d245c4">canGetErrorText()</a> to obtain an error message suitable for a message to the user, or for a line in an error log file. </p>
+</div></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> { <br/>
 &#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> =  0, 
 <br/>
@@ -256,7 +300,7 @@ Enumerations</h2></td></tr>
 <br/>
 &#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a1550d8642f95a383aec4a455802e570d">canERR_DYNAINIT</a> =  -18, 
 <br/>
-&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a47eafc30fda08857029c407e6ce92179">canERR_RESERVED_4</a> =  -19, 
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7ad7a1b581152af36ba78eb3615e1b7aae">canERR_NOT_SUPPORTED</a> =  -19, 
 <br/>
 &#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7adb181526c9b8fe09829d6cc6e9cfb03c">canERR_RESERVED_5</a> =  -20, 
 <br/>
@@ -284,7 +328,23 @@ Enumerations</h2></td></tr>
 <br/>
 &#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a41e892edb8f1b6f9f609599df8e20bdf">canERR_NOT_IMPLEMENTED</a> =  -32, 
 <br/>
-&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a7fdb374ab194f07a46dfddd2c57fee5e">canERR__RESERVED</a> =  -33
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a91aa65bba23c56a50f434981e223ba1f">canERR_DEVICE_FILE</a> =  -33, 
+<br/>
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7aef3aec50d19d01672104eab5c7d3adcd">canERR_HOST_FILE</a> =  -34, 
+<br/>
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a7525507df5d5ced84592aee453f94915">canERR_DISK</a> =  -35, 
+<br/>
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7aab840e7ad015071678918944e940fc49">canERR_CRC</a> =  -36, 
+<br/>
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a1ca846c66dea7cf0fdb157e02eca06ef">canERR_CONFIG</a> =  -37, 
+<br/>
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7afc8651b75676e525058c4289d823a12f">canERR_MEMO_FAIL</a> =  -38, 
+<br/>
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7aacfd2f891be7d88a9b6c8ca65e369b76">canERR_SCRIPT_FAIL</a> =  -39, 
+<br/>
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7ae88fe7d696e1e4411612e083bc45188b">canERR_SCRIPT_WRONG_VERSION</a> =  -40, 
+<br/>
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a7fdb374ab194f07a46dfddd2c57fee5e">canERR__RESERVED</a> =  -41
 <br/>
  }</td></tr>
 </table>
@@ -300,6 +360,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>An envvar changed. </p>
+
 </div>
 </div>
 <a class="anchor" id="a5a6431078d49d8f7cc36c6313db44406"></a><!-- doxytag: member="canstat.h::canEVENT_ERROR" ref="a5a6431078d49d8f7cc36c6313db44406" args="" -->
@@ -312,6 +374,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>when a CAN bus error is reported by the CAN controller </p>
 
 </div>
 </div>
@@ -326,6 +390,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>when the queue of received CAN messages goes from empty to non-empty </p>
+
 </div>
 </div>
 <a class="anchor" id="a0c59f7bbcb5cceaefe0d1d5915e8b4fc"></a><!-- doxytag: member="canstat.h::canEVENT_STATUS" ref="a0c59f7bbcb5cceaefe0d1d5915e8b4fc" args="" -->
@@ -338,6 +404,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>when the CAN controller changes state </p>
 
 </div>
 </div>
@@ -352,6 +420,83 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>when a CAN message has been transmitted </p>
+
+</div>
+</div>
+<a class="anchor" id="a20c4f6ae319558189eb85d10036e9eea"></a><!-- doxytag: member="canstat.h::canFDMSG_BRS" ref="a20c4f6ae319558189eb85d10036e9eea" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canFDMSG_BRS&#160;&#160;&#160;0x020000</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Message is sent/received with bit rate switch (CAN FD) </p>
+
+</div>
+</div>
+<a class="anchor" id="a162be4f6b66c81fa09dc76c268475216"></a><!-- doxytag: member="canstat.h::canFDMSG_EDL" ref="a162be4f6b66c81fa09dc76c268475216" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canFDMSG_EDL&#160;&#160;&#160;0x010000</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Message is an FD message (CAN FD) </p>
+
+</div>
+</div>
+<a class="anchor" id="aa50c93236b2b28677bcae0f7c1ab3860"></a><!-- doxytag: member="canstat.h::canFDMSG_ESI" ref="aa50c93236b2b28677bcae0f7c1ab3860" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canFDMSG_ESI&#160;&#160;&#160;0x040000</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Sender of the message is in error passive mode (CAN FD) </p>
+
+</div>
+</div>
+<a class="anchor" id="a6f1046c663cdef60425ac4f821aa6dcc"></a><!-- doxytag: member="canstat.h::canFDMSG_MASK" ref="a6f1046c663cdef60425ac4f821aa6dcc" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canFDMSG_MASK&#160;&#160;&#160;0xff0000</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Used to mask the non-info bits. </p>
+
+</div>
+</div>
+<a class="anchor" id="ace754df19009a6eeff09d866d68a3a27"></a><!-- doxytag: member="canstat.h::canMSG_DELAY_MSG" ref="ace754df19009a6eeff09d866d68a3a27" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canMSG_DELAY_MSG&#160;&#160;&#160;0x0100</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Message is NOT sent on the bus. The transmission of messages are delayed. The dlc specifies the delay in milliseconds (1..1000). </p>
+
 </div>
 </div>
 <a class="anchor" id="ade1b8ed815a4bc6ada6ec666e48e9cf8"></a><!-- doxytag: member="canstat.h::canMSG_ERROR_FRAME" ref="ade1b8ed815a4bc6ada6ec666e48e9cf8" args="" -->
@@ -364,6 +509,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Message is an error frame. </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a9">cancount.c</a>.</dd>
 </dl>
 </div>
@@ -378,6 +525,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Message has an extended ID. </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a11">cancount.c</a>.</dd>
 </dl>
 </div>
@@ -393,6 +542,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Used to mask the non-info bits. </p>
+
 </div>
 </div>
 <a class="anchor" id="a1f53f2fdeeb263cd2bf5d374e1dd59a2"></a><!-- doxytag: member="canstat.h::canMSG_NERR" ref="a1f53f2fdeeb263cd2bf5d374e1dd59a2" args="" -->
@@ -405,6 +556,20 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+<p>NERR was active during the message</p>
+<p>The NERR flag is set by the CAN transceiver when certain CAN bus wire faults occur, namely: </p>
+<ul>
+<li>CANH wire interrupted </li>
+<li>CANL wire interrupted </li>
+<li>CANH short-circuited to battery </li>
+<li>CANH short-circuited to VCC </li>
+<li>CANL short-circuited to ground </li>
+<li>CANH short-circuited to ground </li>
+<li>CANL short-circuited to battery </li>
+<li>CANL short-circuited to VCC </li>
+<li>CANL and CANH mutually short-circuited</li>
+</ul>
+<p>See the TJA1054 data sheet (available from Philips) for more detailed information. </p>
 
 </div>
 </div>
@@ -418,6 +583,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Message is a remote request. </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a12">cancount.c</a>.</dd>
 </dl>
 </div>
@@ -432,6 +599,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Message has a standard ID. </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a10">cancount.c</a>.</dd>
 </dl>
 </div>
@@ -447,6 +616,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Message is a TX ACK (msg is really sent) </p>
+
 </div>
 </div>
 <a class="anchor" id="aa73e5649dc11a61acbf41935bebe97bd"></a><!-- doxytag: member="canstat.h::canMSG_TXRQ" ref="aa73e5649dc11a61acbf41935bebe97bd" args="" -->
@@ -459,6 +630,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Message is a TX REQUEST (msg is transfered to the chip) </p>
 
 </div>
 </div>
@@ -473,6 +646,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Message to be sent / was received in wakeup mode. </p>
+
 </div>
 </div>
 <a class="anchor" id="a1c3c24e5ee42096b25701503daf87b14"></a><!-- doxytag: member="canstat.h::canMSGERR_BIT" ref="a1c3c24e5ee42096b25701503daf87b14" args="" -->
@@ -485,6 +660,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Any bit error. </p>
 
 </div>
 </div>
@@ -499,6 +676,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Sent dom, read rec. </p>
+
 </div>
 </div>
 <a class="anchor" id="a724bd6fc37424e998331f2ef18999bb8"></a><!-- doxytag: member="canstat.h::canMSGERR_BIT1" ref="a724bd6fc37424e998331f2ef18999bb8" args="" -->
@@ -511,6 +690,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Sent rec, read dom. </p>
 
 </div>
 </div>
@@ -525,6 +706,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Any RX error. </p>
+
 </div>
 </div>
 <a class="anchor" id="a25f501d02aa1982eeae460d9dc505755"></a><!-- doxytag: member="canstat.h::canMSGERR_CRC" ref="a25f501d02aa1982eeae460d9dc505755" args="" -->
@@ -537,6 +720,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>CRC error. </p>
 
 </div>
 </div>
@@ -551,6 +736,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Form error. </p>
+
 </div>
 </div>
 <a class="anchor" id="ae441634e38d57eb789936f5ac745410b"></a><!-- doxytag: member="canstat.h::canMSGERR_HW_OVERRUN" ref="ae441634e38d57eb789936f5ac745410b" args="" -->
@@ -563,6 +750,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>HW buffer overrun. </p>
 
 </div>
 </div>
@@ -577,6 +766,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Used to mask the non-error bits. </p>
+
 </div>
 </div>
 <a class="anchor" id="adf0d578c7b25ede29a9733da44f08ab3"></a><!-- doxytag: member="canstat.h::canMSGERR_OVERRUN" ref="adf0d578c7b25ede29a9733da44f08ab3" args="" -->
@@ -589,6 +780,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Any overrun condition. </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a13">cancount.c</a>.</dd>
 </dl>
 </div>
@@ -604,6 +797,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Stuff error. </p>
+
 </div>
 </div>
 <a class="anchor" id="a810afd58f22df8c44c729f78d955e006"></a><!-- doxytag: member="canstat.h::canMSGERR_SW_OVERRUN" ref="a810afd58f22df8c44c729f78d955e006" args="" -->
@@ -616,6 +811,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>SW buffer overrun. </p>
 
 </div>
 </div>
@@ -630,6 +827,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>An environment variable was changed by a script. </p>
+
 </div>
 </div>
 <a class="anchor" id="a91afcc669b1b8be0ed390aac37e44805"></a><!-- doxytag: member="canstat.h::canNOTIFY_ERROR" ref="a91afcc669b1b8be0ed390aac37e44805" args="" -->
@@ -642,6 +841,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>CAN bus error notification. </p>
 
 </div>
 </div>
@@ -656,6 +857,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Turn notifications off. </p>
+
 </div>
 </div>
 <a class="anchor" id="af0b2b8979177da5f9c875f584f9c7d9c"></a><!-- doxytag: member="canstat.h::canNOTIFY_RX" ref="af0b2b8979177da5f9c875f584f9c7d9c" args="" -->
@@ -668,6 +871,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>CAN message reception notification. </p>
 
 </div>
 </div>
@@ -682,6 +887,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>CAN chip status change. </p>
+
 </div>
 </div>
 <a class="anchor" id="a14e966f0b3f498285fb332632df60a88"></a><!-- doxytag: member="canstat.h::canNOTIFY_TX" ref="a14e966f0b3f498285fb332632df60a88" args="" -->
@@ -694,6 +901,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>CAN message transmission notification. </p>
 
 </div>
 </div>
@@ -708,6 +917,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>The circuit is Off Bus. </p>
+
 </div>
 </div>
 <a class="anchor" id="ab25a3795fe1e47e5011fd02c0fad0fbd"></a><!-- doxytag: member="canstat.h::canSTAT_ERROR_ACTIVE" ref="ab25a3795fe1e47e5011fd02c0fad0fbd" args="" -->
@@ -720,6 +931,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>The circuit is error active. </p>
 
 </div>
 </div>
@@ -734,6 +947,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>The circuit is error passive. </p>
+
 </div>
 </div>
 <a class="anchor" id="ae6f14de69c7a46b9ab2c5e8e9e6518f2"></a><!-- doxytag: member="canstat.h::canSTAT_ERROR_WARNING" ref="ae6f14de69c7a46b9ab2c5e8e9e6518f2" args="" -->
@@ -746,6 +961,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>At least one error counter &gt; 96. </p>
 
 </div>
 </div>
@@ -760,6 +977,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>The has been at least one HW buffer overflow. </p>
+
 </div>
 </div>
 <a class="anchor" id="a3b1c56fe475153972bf7116a0c1cba53"></a><!-- doxytag: member="canstat.h::canSTAT_OVERRUN" ref="a3b1c56fe475153972bf7116a0c1cba53" args="" -->
@@ -772,6 +991,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>For convenience. </p>
 
 </div>
 </div>
@@ -786,6 +1007,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>The circuit is error passive. </p>
+
 </div>
 </div>
 <a class="anchor" id="ac6810fdbadcb2ad166e274cdbfb66bac"></a><!-- doxytag: member="canstat.h::canSTAT_RX_PENDING" ref="ac6810fdbadcb2ad166e274cdbfb66bac" args="" -->
@@ -798,6 +1021,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>There are messages in the receive buffer. </p>
 
 </div>
 </div>
@@ -812,6 +1037,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>There has been at least one RX error of some sort. </p>
+
 </div>
 </div>
 <a class="anchor" id="a81051d406447b59ebfbf6ed31e1478a1"></a><!-- doxytag: member="canstat.h::canSTAT_SW_OVERRUN" ref="a81051d406447b59ebfbf6ed31e1478a1" args="" -->
@@ -824,6 +1051,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>The has been at least one SW buffer overflow. </p>
 
 </div>
 </div>
@@ -838,6 +1067,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>There are messages pending transmission. </p>
+
 </div>
 </div>
 <a class="anchor" id="a99aeadda22fbe4553c1b486e3115625a"></a><!-- doxytag: member="canstat.h::canSTAT_TXERR" ref="a99aeadda22fbe4553c1b486e3115625a" args="" -->
@@ -850,6 +1081,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>There has been at least one TX error. </p>
 
 </div>
 </div>
@@ -898,6 +1131,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Not Affected/Not available. </p>
+
 </div>
 </div>
 <a class="anchor" id="a6855b9a326055bd659720b1a26c82965"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_LINEMODE_NORMAL" ref="a6855b9a326055bd659720b1a26c82965" args="" -->
@@ -910,6 +1145,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Normal mode (the inverse of sleep mode) for those supporting it. </p>
 
 </div>
 </div>
@@ -924,6 +1161,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Reserved for OEM apps. </p>
+
 </div>
 </div>
 <a class="anchor" id="afdda46945266de458aac552ae90e7803"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_LINEMODE_OEM2" ref="afdda46945266de458aac552ae90e7803" args="" -->
@@ -936,6 +1175,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Reserved for OEM apps. </p>
 
 </div>
 </div>
@@ -950,6 +1191,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Reserved for OEM apps. </p>
+
 </div>
 </div>
 <a class="anchor" id="af33084e90160fa6d49fa5ef70483eadc"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_LINEMODE_OEM4" ref="af33084e90160fa6d49fa5ef70483eadc" args="" -->
@@ -962,6 +1205,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Reserved for OEM apps. </p>
 
 </div>
 </div>
@@ -976,6 +1221,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Sleep mode for those supporting it. </p>
+
 </div>
 </div>
 <a class="anchor" id="a1c6558d49d90183fe597f5c01f97c5d3"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_LINEMODE_STDBY" ref="a1c6558d49d90183fe597f5c01f97c5d3" args="" -->
@@ -988,6 +1235,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Standby for those who support it. </p>
 
 </div>
 </div>
@@ -1002,6 +1251,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>SWC High-Speed Mode. </p>
+
 </div>
 </div>
 <a class="anchor" id="a1c3a39e14fb41adab5a83b0babb7fb7e"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_LINEMODE_SWC_NORMAL" ref="a1c3a39e14fb41adab5a83b0babb7fb7e" args="" -->
@@ -1014,6 +1265,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>SWC Normal Mode. </p>
 
 </div>
 </div>
@@ -1028,6 +1281,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>SWC Sleep Mode. </p>
+
 </div>
 </div>
 <a class="anchor" id="a7025d514c6fd18ddd3a65d3641e48a17"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_LINEMODE_SWC_WAKEUP" ref="a7025d514c6fd18ddd3a65d3641e48a17" args="" -->
@@ -1040,6 +1295,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>SWC Wakeup Mode. </p>
 
 </div>
 </div>
@@ -1054,6 +1311,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Truck &amp; Trailer: operating mode single wire using CAN high. </p>
+
 </div>
 </div>
 <a class="anchor" id="a08d64105450168056e5c0345f813496e"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_LINEMODE_TT_CAN_L" ref="a08d64105450168056e5c0345f813496e" args="" -->
@@ -1066,6 +1325,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Truck &amp; Trailer: operating mode single wire using CAN low. </p>
 
 </div>
 </div>
@@ -1105,6 +1366,7 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+<p><a class="anchor" id="canTRANSCEIVER_RESNET_xxx"></a> </p>
 
 </div>
 </div>
@@ -1132,6 +1394,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>TJA1041. </p>
+
 </div>
 </div>
 <a class="anchor" id="aab49e54f03654e4912c2f772c309ddb6"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_TYPE_1041_OPTO" ref="aab49e54f03654e4912c2f772c309ddb6" args="" -->
@@ -1144,6 +1408,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>TJA1041 with optical isolation. </p>
 
 </div>
 </div>
@@ -1158,6 +1424,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>TJA1050. </p>
+
 </div>
 </div>
 <a class="anchor" id="ae7a129e7f35a4bcd229ddf453582db71"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_TYPE_1050_OPTO" ref="ae7a129e7f35a4bcd229ddf453582db71" args="" -->
@@ -1170,6 +1438,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>TJA1050 with optical isolation. </p>
 
 </div>
 </div>
@@ -1184,6 +1454,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>TJA1054 with optical isolation. </p>
+
 </div>
 </div>
 <a class="anchor" id="a23fb1bc76f56fd0caf6bcbce99df72b8"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_TYPE_251" ref="a23fb1bc76f56fd0caf6bcbce99df72b8" args="" -->
@@ -1196,6 +1468,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>82c251 </p>
 
 </div>
 </div>
@@ -1210,6 +1484,23 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>82c252, TJA1053, TJA1054 </p>
+
+</div>
+</div>
+<a class="anchor" id="a6cb324d78ba3426a7b20ba400d8e251b"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_TYPE_CANFD" ref="a6cb324d78ba3426a7b20ba400d8e251b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canTRANSCEIVER_TYPE_CANFD&#160;&#160;&#160;22</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>CAN-FD. </p>
+
 </div>
 </div>
 <a class="anchor" id="a37e062e478f7760179ab28fe801b3eef"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_TYPE_DNOPTO" ref="a37e062e478f7760179ab28fe801b3eef" args="" -->
@@ -1222,6 +1513,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Optoisolated 82C251. </p>
 
 </div>
 </div>
@@ -1236,6 +1529,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Unknown or undefined. </p>
+
 </div>
 </div>
 <a class="anchor" id="a70d6e804588d0785412c1bc8713ace3b"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_TYPE_FIBER" ref="a70d6e804588d0785412c1bc8713ace3b" args="" -->
@@ -1248,6 +1543,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>82c251 with fibre extension </p>
 
 </div>
 </div>
@@ -1262,6 +1559,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>K-line, without CAN. </p>
+
 </div>
 </div>
 <a class="anchor" id="a74a3f653987322fb6bb2cb2cc4085654"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_TYPE_K251" ref="a74a3f653987322fb6bb2cb2cc4085654" args="" -->
@@ -1274,6 +1573,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>K-line + 82c251. </p>
 
 </div>
 </div>
@@ -1288,6 +1589,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>KONE. </p>
+
 </div>
 </div>
 <a class="anchor" id="a355af023621874d0cc3e35094c83d121"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_TYPE_LIN" ref="a355af023621874d0cc3e35094c83d121" args="" -->
@@ -1300,6 +1603,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>LIN. </p>
 
 </div>
 </div>
@@ -1314,6 +1619,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Unknown or undefined. </p>
+
 </div>
 </div>
 <a class="anchor" id="a451986925bbb397794b9c8c6a29aed57"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_TYPE_LINX_K" ref="a451986925bbb397794b9c8c6a29aed57" args="" -->
@@ -1326,6 +1633,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Unknown or undefined. </p>
 
 </div>
 </div>
@@ -1340,6 +1649,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Unknown or undefined. </p>
+
 </div>
 </div>
 <a class="anchor" id="af5482786e5c5cebba339b0cb9605350d"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_TYPE_LINX_LS" ref="af5482786e5c5cebba339b0cb9605350d" args="" -->
@@ -1352,6 +1663,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Unknown or undefined. </p>
 
 </div>
 </div>
@@ -1366,6 +1679,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Unknown or undefined. </p>
+
 </div>
 </div>
 <a class="anchor" id="a0908dd067656a6e65360f0c0ece3358b"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_TYPE_RS485" ref="a0908dd067656a6e65360f0c0ece3358b" args="" -->
@@ -1378,6 +1693,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>RS485 (i.e. J1708) </p>
 
 </div>
 </div>
@@ -1392,6 +1709,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>AU5790. </p>
+
 </div>
 </div>
 <a class="anchor" id="a1f5dbcd6845d860712f6ba75be5934e5"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_TYPE_SWC_OPTO" ref="a1f5dbcd6845d860712f6ba75be5934e5" args="" -->
@@ -1404,6 +1723,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>AU5790 with optical isolation. </p>
 
 </div>
 </div>
@@ -1418,6 +1739,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>AU5790 prototype. </p>
+
 </div>
 </div>
 <a class="anchor" id="a5533cb358c34c3adffe4ab883159d95c"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_TYPE_TT" ref="a5533cb358c34c3adffe4ab883159d95c" args="" -->
@@ -1430,6 +1753,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>B10011S Truck-And-Trailer. </p>
 
 </div>
 </div>
@@ -1444,6 +1769,8 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Unknown or undefined. </p>
+
 </div>
 </div>
 <a class="anchor" id="a9b15607ca98944ee16fbceb057419088"></a><!-- doxytag: member="canstat.h::canTRANSCEIVER_TYPE_W210" ref="a9b15607ca98944ee16fbceb057419088" args="" -->
@@ -1456,6 +1783,8 @@ Enumerations</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Unknown or undefined. </p>
 
 </div>
 </div>
@@ -1472,72 +1801,139 @@ Enumerations</h2></td></tr>
 <div class="memdoc">
 <dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209"></a><!-- doxytag: member="canOK" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209" args="" -->canOK</em>&nbsp;</td><td>
+<p><b>Normal successful completion</b>; The driver is just fine, and really believes it carried out your command to everyone's satisfaction. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7ae22cf05933b31e181f580ee702006f26"></a><!-- doxytag: member="canERR_PARAM" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7ae22cf05933b31e181f580ee702006f26" args="" -->canERR_PARAM</em>&nbsp;</td><td>
+<p><b>Error in one or more parameters</b>; a parameter <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> specified in the call was invalid, out of range, or so. This status code will also be returned when the call is not implemented. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a734089f351bc421c230bf8b6cd9b1e8e"></a><!-- doxytag: member="canERR_NOMSG" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a734089f351bc421c230bf8b6cd9b1e8e" args="" -->canERR_NOMSG</em>&nbsp;</td><td>
+<p><b>There were no messages to read</b>; A function tried to read a message, but there was no message to read. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a55c8bbcb0145b27275508325ece58a1c"></a><!-- doxytag: member="canERR_NOTFOUND" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a55c8bbcb0145b27275508325ece58a1c" args="" -->canERR_NOTFOUND</em>&nbsp;</td><td>
+<p><b>Specified device or channel not found.</b> There is no hardware available that matches the given search criteria. For example, you may have specified <a class="el" href="canlib_8h.html#a161c14f3b9d1e5cff276c6246a651fcd">canOPEN_REQUIRE_EXTENDED</a> but there's no controller capable of extended CAN. You may have specified a channel number that is out of the range for the hardware in question. You may have requested exclusive access to a channel, but the channel is already occupied. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a14ab9724bac244d1fecd7c9f0fc66042"></a><!-- doxytag: member="canERR_NOMEM" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a14ab9724bac244d1fecd7c9f0fc66042" args="" -->canERR_NOMEM</em>&nbsp;</td><td>
+<p><b>Out of memory</b>; A memory allocation failed. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7aaaaf6921b454420a1f47e94c62a58151"></a><!-- doxytag: member="canERR_NOCHANNELS" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7aaaaf6921b454420a1f47e94c62a58151" args="" -->canERR_NOCHANNELS</em>&nbsp;</td><td>
+<p><b>No channels available</b>; There is indeed hardware matching the criteria you specified, but there are no channels available, or the channel you specified is already occupied. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7ab5941909cb18b6047f1d54a9ce495ba2"></a><!-- doxytag: member="canERR_INTERRUPTED" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7ab5941909cb18b6047f1d54a9ce495ba2" args="" -->canERR_INTERRUPTED</em>&nbsp;</td><td>
+<p>Interrupted by signals. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7acd1c4c3a87dd24f0a43753ee4bfe7993"></a><!-- doxytag: member="canERR_TIMEOUT" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7acd1c4c3a87dd24f0a43753ee4bfe7993" args="" -->canERR_TIMEOUT</em>&nbsp;</td><td>
+<p><b>Timeout occurred</b>; A function waited for something to happen (for example, the arrival of a message), but that something didn't happen. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a87887ebf2a17b06d82d83e33acf06df8"></a><!-- doxytag: member="canERR_NOTINITIALIZED" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a87887ebf2a17b06d82d83e33acf06df8" args="" -->canERR_NOTINITIALIZED</em>&nbsp;</td><td>
+<p><b>The library is not initialized</b>; The driver is not initialized. <a class="el" href="group___general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1">canInitializeLibrary()</a> was probably not called? </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7ae4951273642e64740ee34fee6d8afd34"></a><!-- doxytag: member="canERR_NOHANDLES" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7ae4951273642e64740ee34fee6d8afd34" args="" -->canERR_NOHANDLES</em>&nbsp;</td><td>
+<p><b>Out of handles</b>; No handles are available inside canlib32. The application has too many handles open (i.e. has called <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> too many times, or there's a memory leak somewhere.)</p>
+<dl class="note"><dt><b>Note:</b></dt><dd>We are not talking about Windows handles here, it's CANLIB's own internal handles. </dd></dl>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a9335388ba5edd2cedeb61d6febeff505"></a><!-- doxytag: member="canERR_INVHANDLE" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a9335388ba5edd2cedeb61d6febeff505" args="" -->canERR_INVHANDLE</em>&nbsp;</td><td>
+<p><b>Handle is invalid</b>; The CANLIB handle you specified (if the API call includes a handle) is not valid. Ensure you are passing the handle and not, for example, a channel number. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a7a393849fb3da385d57955abd4ced4d1"></a><!-- doxytag: member="canERR_INIFILE" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a7a393849fb3da385d57955abd4ced4d1" args="" -->canERR_INIFILE</em>&nbsp;</td><td>
+<p>Error in the ini-file (16-bit only) </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a33e3bde5886d81b0bdfd17b066950713"></a><!-- doxytag: member="canERR_DRIVER" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a33e3bde5886d81b0bdfd17b066950713" args="" -->canERR_DRIVER</em>&nbsp;</td><td>
+<p><b>Driver type not supported</b>; CAN driver mode is not supported by the present hardware. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7ae895fc4d04df717a1a79c144bd2f358e"></a><!-- doxytag: member="canERR_TXBUFOFL" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7ae895fc4d04df717a1a79c144bd2f358e" args="" -->canERR_TXBUFOFL</em>&nbsp;</td><td>
+<p><b>Transmit buffer overflow</b>; The transmit queue was full, so the message was dropped. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7ad4f76037af5671395511f17f889d9212"></a><!-- doxytag: member="canERR_RESERVED_1" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7ad4f76037af5671395511f17f889d9212" args="" -->canERR_RESERVED_1</em>&nbsp;</td><td>
+<p>Reserved. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a632ad377bdda7890936099a9c48fb1bd"></a><!-- doxytag: member="canERR_HARDWARE" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a632ad377bdda7890936099a9c48fb1bd" args="" -->canERR_HARDWARE</em>&nbsp;</td><td>
+<p><b>A hardware error has occurred</b>; Something probably related to the hardware happened. This could mean that the device does not respond (IRQ or address conflict?), or that the response was invalid or unexpected (faulty card?). </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a591e2da450a16df777e766ec621e3ec7"></a><!-- doxytag: member="canERR_DYNALOAD" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a591e2da450a16df777e766ec621e3ec7" args="" -->canERR_DYNALOAD</em>&nbsp;</td><td>
+<p><b>A driver DLL can't be found or loaded</b>; (One of) the DLL(s) specified in the registry failed to load. This could be a driver installation problem. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7aee571ea29d786d483d1d3ea9f70d6753"></a><!-- doxytag: member="canERR_DYNALIB" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7aee571ea29d786d483d1d3ea9f70d6753" args="" -->canERR_DYNALIB</em>&nbsp;</td><td>
+<p><b>A DLL seems to have wrong version</b>; DLL version mismatch. (One of) the DLL(s) specified in the registry is - probably - too old, or - less likely - too new. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a1550d8642f95a383aec4a455802e570d"></a><!-- doxytag: member="canERR_DYNAINIT" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a1550d8642f95a383aec4a455802e570d" args="" -->canERR_DYNAINIT</em>&nbsp;</td><td>
+<p><b>Error when initializing a DLL</b>; Something failed when a device driver was being initialized. In other words, we can open the driver but it makes a lot of fuss about something we don't understand. </p>
 </td></tr>
-<tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a47eafc30fda08857029c407e6ce92179"></a><!-- doxytag: member="canERR_RESERVED_4" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a47eafc30fda08857029c407e6ce92179" args="" -->canERR_RESERVED_4</em>&nbsp;</td><td>
+<tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7ad7a1b581152af36ba78eb3615e1b7aae"></a><!-- doxytag: member="canERR_NOT_SUPPORTED" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7ad7a1b581152af36ba78eb3615e1b7aae" args="" -->canERR_NOT_SUPPORTED</em>&nbsp;</td><td>
+<p>Operation not supported by hardware or firmware. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7adb181526c9b8fe09829d6cc6e9cfb03c"></a><!-- doxytag: member="canERR_RESERVED_5" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7adb181526c9b8fe09829d6cc6e9cfb03c" args="" -->canERR_RESERVED_5</em>&nbsp;</td><td>
+<p>Reserved. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a10701b0ecf993a676b320cb950cf2efd"></a><!-- doxytag: member="canERR_RESERVED_6" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a10701b0ecf993a676b320cb950cf2efd" args="" -->canERR_RESERVED_6</em>&nbsp;</td><td>
+<p>Reserved. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7ab319f515afc35f7d5ddacbb9abc25b4e"></a><!-- doxytag: member="canERR_RESERVED_2" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7ab319f515afc35f7d5ddacbb9abc25b4e" args="" -->canERR_RESERVED_2</em>&nbsp;</td><td>
+<p>Reserved. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7ae3d0b1b64503691c416f119893f3bf46"></a><!-- doxytag: member="canERR_DRIVERLOAD" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7ae3d0b1b64503691c416f119893f3bf46" args="" -->canERR_DRIVERLOAD</em>&nbsp;</td><td>
+<p><b>Can't find or load kernel driver</b>; A device driver (kernel mode driver for NT, VxD for W95/98) failed to load; or the DLL could not open the device. Privileges? Driver file missing? </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a17b153376eb1a49dcabec9a89ff1d62a"></a><!-- doxytag: member="canERR_DRIVERFAILED" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a17b153376eb1a49dcabec9a89ff1d62a" args="" -->canERR_DRIVERFAILED</em>&nbsp;</td><td>
+<p><b>DeviceIOControl failed</b>; Use Win32 GetLastError() to learn what really happened. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a2e842a7e76976a6f7fba4c7336baccf8"></a><!-- doxytag: member="canERR_NOCONFIGMGR" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a2e842a7e76976a6f7fba4c7336baccf8" args="" -->canERR_NOCONFIGMGR</em>&nbsp;</td><td>
+<p>Can't find req'd config s/w (e.g. CS/SS) </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7af25dd4a47346062a0026edf744ece3d5"></a><!-- doxytag: member="canERR_NOCARD" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7af25dd4a47346062a0026edf744ece3d5" args="" -->canERR_NOCARD</em>&nbsp;</td><td>
+<p>The card was removed or not inserted. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a658588aedc799dbd4f9add6aefdee8b6"></a><!-- doxytag: member="canERR_RESERVED_7" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a658588aedc799dbd4f9add6aefdee8b6" args="" -->canERR_RESERVED_7</em>&nbsp;</td><td>
+<p>Reserved. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a25fbfe8dcdce06f120a8bd2dd6cc807f"></a><!-- doxytag: member="canERR_REGISTRY" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a25fbfe8dcdce06f120a8bd2dd6cc807f" args="" -->canERR_REGISTRY</em>&nbsp;</td><td>
+<p><b>Error (missing data) in the Registry</b>; A registry key is missing, invalid, malformed, has gone for lunch or what not. can_verify.exe might provide some insight. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a66629f2b1fd06dfb55ff1b166f930c8a"></a><!-- doxytag: member="canERR_LICENSE" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a66629f2b1fd06dfb55ff1b166f930c8a" args="" -->canERR_LICENSE</em>&nbsp;</td><td>
+<p>The license is not valid. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7ac269db2ca1aca441a75fe6becb4dc55f"></a><!-- doxytag: member="canERR_INTERNAL" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7ac269db2ca1aca441a75fe6becb4dc55f" args="" -->canERR_INTERNAL</em>&nbsp;</td><td>
+<p><b>Internal error in the driver</b>; Indicates an error condition in the driver or DLL, which couldn't be properly handled. Please contact the friendly support at <a href="mailto:support@kvaser.com">support@kvaser.com</a>. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a7c73c0d025fa4caa0dc0311793db3d9e"></a><!-- doxytag: member="canERR_NO_ACCESS" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a7c73c0d025fa4caa0dc0311793db3d9e" args="" -->canERR_NO_ACCESS</em>&nbsp;</td><td>
+<p><b>Access denied</b>; This means that you tried to set the bit rate on a handle to which you haven't got init access or you tried to open a channel that already is open with init access. See <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> for more information about init access. </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a41e892edb8f1b6f9f609599df8e20bdf"></a><!-- doxytag: member="canERR_NOT_IMPLEMENTED" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a41e892edb8f1b6f9f609599df8e20bdf" args="" -->canERR_NOT_IMPLEMENTED</em>&nbsp;</td><td>
+<p><b>Not implemented</b>; The requested feature or function is not implemented in the device you are trying to use it on. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a91aa65bba23c56a50f434981e223ba1f"></a><!-- doxytag: member="canERR_DEVICE_FILE" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a91aa65bba23c56a50f434981e223ba1f" args="" -->canERR_DEVICE_FILE</em>&nbsp;</td><td>
+<p><b>Device File error</b>; An error has occured when trying to access a file on the device. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7aef3aec50d19d01672104eab5c7d3adcd"></a><!-- doxytag: member="canERR_HOST_FILE" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7aef3aec50d19d01672104eab5c7d3adcd" args="" -->canERR_HOST_FILE</em>&nbsp;</td><td>
+<p><b>Host File error</b>; An error has occured when trying to access a file on the host. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a7525507df5d5ced84592aee453f94915"></a><!-- doxytag: member="canERR_DISK" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a7525507df5d5ced84592aee453f94915" args="" -->canERR_DISK</em>&nbsp;</td><td>
+<p><b>Disk error</b>; A disk error has occurred. Verify that the disk is initialized. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7aab840e7ad015071678918944e940fc49"></a><!-- doxytag: member="canERR_CRC" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7aab840e7ad015071678918944e940fc49" args="" -->canERR_CRC</em>&nbsp;</td><td>
+<p><b>CRC error</b>; The CRC calculation did not match the expected result. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a1ca846c66dea7cf0fdb157e02eca06ef"></a><!-- doxytag: member="canERR_CONFIG" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a1ca846c66dea7cf0fdb157e02eca06ef" args="" -->canERR_CONFIG</em>&nbsp;</td><td>
+<p><b>Configuration Error</b>; The configuration is corrupt. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7afc8651b75676e525058c4289d823a12f"></a><!-- doxytag: member="canERR_MEMO_FAIL" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7afc8651b75676e525058c4289d823a12f" args="" -->canERR_MEMO_FAIL</em>&nbsp;</td><td>
+<p><b>Memo Error</b>; Other configuration error. </p>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7aacfd2f891be7d88a9b6c8ca65e369b76"></a><!-- doxytag: member="canERR_SCRIPT_FAIL" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7aacfd2f891be7d88a9b6c8ca65e369b76" args="" -->canERR_SCRIPT_FAIL</em>&nbsp;</td><td>
+<p><b>Script Fail</b>; A script has failed.</p>
+<dl class="note"><dt><b>Note:</b></dt><dd>This code represents several different failures, for example:<ul>
+<li>Trying to load a corrupt file or not a .txe file</li>
+<li>Trying to start a t script that has not been loaded</li>
+<li>Trying to load a t script compiled with the wrong version of the t compiler</li>
+<li>Trying to unload a t script that has not been stopped</li>
+<li>Trying to use an envvar that does not exist </li>
+</ul>
+</dd></dl>
+</td></tr>
+<tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7ae88fe7d696e1e4411612e083bc45188b"></a><!-- doxytag: member="canERR_SCRIPT_WRONG_VERSION" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7ae88fe7d696e1e4411612e083bc45188b" args="" -->canERR_SCRIPT_WRONG_VERSION</em>&nbsp;</td><td>
+<p><b>The t script version dosen't match the version(s) that the device firmware supports.</b>; </p>
 </td></tr>
 <tr><td valign="top"><em><a class="anchor" id="a52b5e5c71832b0bd3c6a5b1fd48583e7a7fdb374ab194f07a46dfddd2c57fee5e"></a><!-- doxytag: member="canERR__RESERVED" ref="a52b5e5c71832b0bd3c6a5b1fd48583e7a7fdb374ab194f07a46dfddd2c57fee5e" args="" -->canERR__RESERVED</em>&nbsp;</td><td>
+<p>Reserved. </p>
 </td></tr>
 </table>
 </dd>
@@ -1566,7 +1962,7 @@ Enumerations</h2></td></tr>
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.9) - Generated on Tue Mar 17 2015</small>
+<small>Kvaser Linux CANLIB (canlib 5.12) - Generated on Mon Sep 21 2015</small>
 </address>
 </body>
 </html>

@@ -77,6 +77,8 @@
 // Use a unique set for each driver
 #define USB_MHYDRA_MINOR_BASE   80
 
+    MODULE_LICENSE("Dual BSD/GPL");
+    MODULE_AUTHOR("KVASER");
     MODULE_DESCRIPTION("Mhydra CAN module.");
 
 
@@ -138,7 +140,9 @@ static int mhydra_objbuf_set_msg_count(VCanChanData *chd, int bufType, int bufNo
 static int mhydra_objbuf_send_burst(VCanChanData *chd, int bufType, int bufNo,
                                   int burstLen);
 
-VCanHWInterface hwIf = {
+static VCanDriverData driverData;
+
+static VCanHWInterface hwIf = {
   .initAllDevices    = mhydra_init_driver,
   .setBusParams      = mhydra_set_busparams,
   .getBusParams      = mhydra_get_busparams,
@@ -252,12 +256,16 @@ static void   mhydra_get_card_info(VCanCardData *vCard);
 
 //----------------------------------------------------------------------------
 // Supported KVASER hardware
-#define KVASER_VENDOR_ID                    0x0bfd
-#define USB_EAGLE_PRODUCT_ID                  256 // Kvaser Eagle
-#define USB_BLACKBIRD_V2_PRODUCT_ID           258 // Kvaser BlackBird v2
-#define USB_MEMO_PRO_5HS_PRODUCT_ID           260 // Kvaser Memorator Pro 5xHS
-#define USB_USBCAN_PRO_5HS_PRODUCT_ID         261 // Kvaser USBcan Pro 5xHS
-
+#define KVASER_VENDOR_ID                0x0bfd
+#define USB_EAGLE_PRODUCT_ID              256 // Kvaser Eagle
+#define USB_BLACKBIRD_V2_PRODUCT_ID       258 // Kvaser BlackBird v2
+#define USB_MEMO_PRO_5HS_PRODUCT_ID       260 // Kvaser Memorator Pro 5xHS
+#define USB_USBCAN_PRO_5HS_PRODUCT_ID     261 // Kvaser USBcan Pro 5xHS
+#define USB_USBCAN_LIGHT_4HS_PRODUCT_ID   262 // Kvaser USBcan Light 4xHS (00831-1)
+#define USB_LEAF_PRO_HS_V2_PRODUCT_ID     263 // Kvaser Leaf Pro HS v2 (00843-4)
+#define USB_USBCAN_PRO_2HS_V2_PRODUCT_ID  264 // Kvaser USBcan Pro 2xHS v2 (00752-9)
+#define USB_MEMO_2HS_PRODUCT_ID           265 // Kvaser Memorator 2xHS v2 (00821-2)
+#define USB_MEMO_PRO_2HS_V2_PRODUCT_ID    266 // Kvaser Memorator Pro 2xHS v2 (00819-9)
 
 // Table of devices that work with this driver
 static struct usb_device_id mhydra_table [] = {
@@ -265,6 +273,11 @@ static struct usb_device_id mhydra_table [] = {
   { USB_DEVICE(KVASER_VENDOR_ID, USB_BLACKBIRD_V2_PRODUCT_ID) },
   { USB_DEVICE(KVASER_VENDOR_ID, USB_MEMO_PRO_5HS_PRODUCT_ID) },
   { USB_DEVICE(KVASER_VENDOR_ID, USB_USBCAN_PRO_5HS_PRODUCT_ID) },
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_USBCAN_LIGHT_4HS_PRODUCT_ID)},
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_LEAF_PRO_HS_V2_PRODUCT_ID)},
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_USBCAN_PRO_2HS_V2_PRODUCT_ID)},
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_MEMO_2HS_PRODUCT_ID)},
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_MEMO_PRO_2HS_V2_PRODUCT_ID)},
   { }  // Terminating entry
 };
 
@@ -443,7 +456,7 @@ static int mhydra_rx_thread (void *context)
 
   DEBUGPRINT(3, (TXT("rx thread Ended - finalised\n")));
 
-  os_if_exit_thread(result);
+  os_if_exit_thread(THIS_MODULE, result);
 
   return result;
 } // _rx_thread
@@ -1930,7 +1943,12 @@ static int mhydra_plugin (struct usb_interface *interface,
        (udev->descriptor.idProduct != USB_EAGLE_PRODUCT_ID) &&
        (udev->descriptor.idProduct != USB_BLACKBIRD_V2_PRODUCT_ID) &&
        (udev->descriptor.idProduct != USB_MEMO_PRO_5HS_PRODUCT_ID) &&
-       (udev->descriptor.idProduct != USB_USBCAN_PRO_5HS_PRODUCT_ID)
+       (udev->descriptor.idProduct != USB_USBCAN_PRO_5HS_PRODUCT_ID) &&
+       (udev->descriptor.idProduct != USB_USBCAN_LIGHT_4HS_PRODUCT_ID) &&
+       (udev->descriptor.idProduct != USB_LEAF_PRO_HS_V2_PRODUCT_ID) &&
+       (udev->descriptor.idProduct != USB_USBCAN_PRO_2HS_V2_PRODUCT_ID) &&
+       (udev->descriptor.idProduct != USB_MEMO_2HS_PRODUCT_ID) &&
+       (udev->descriptor.idProduct != USB_MEMO_PRO_2HS_V2_PRODUCT_ID)
       )
      )
   {
@@ -1958,6 +1976,26 @@ static int mhydra_plugin (struct usb_interface *interface,
     case USB_USBCAN_PRO_5HS_PRODUCT_ID:
       DEBUGPRINT(2, (TXT("\nKVASER ")));
       DEBUGPRINT(2, (TXT("USBcan Pro 5xHS plugged in\n")));
+      break;
+    case USB_USBCAN_LIGHT_4HS_PRODUCT_ID:
+      DEBUGPRINT(2, (TXT("\nKVASER ")));
+      DEBUGPRINT(2, (TXT("USBcan Light 4xHS (00831-1) plugged in\n")));
+      break;
+    case USB_LEAF_PRO_HS_V2_PRODUCT_ID:
+      DEBUGPRINT(2, (TXT("\nKVASER ")));
+      DEBUGPRINT(2, (TXT("Leaf Pro HS v2 (00843-4) plugged in\n")));
+      break;
+    case USB_USBCAN_PRO_2HS_V2_PRODUCT_ID:
+      DEBUGPRINT(2, (TXT("\nKVASER ")));
+      DEBUGPRINT(2, (TXT("USBcan Pro 2xHS v2 (00752-9) plugged in\n")));
+      break;
+    case USB_MEMO_2HS_PRODUCT_ID:
+      DEBUGPRINT(2, (TXT("\nKVASER ")));
+      DEBUGPRINT(2, (TXT("Memorator 2xHS v2 (00821-2) plugged in\n")));
+      break;
+    case USB_MEMO_PRO_2HS_V2_PRODUCT_ID:
+      DEBUGPRINT(2, (TXT("\nKVASER ")));
+      DEBUGPRINT(2, (TXT("Memorator Pro 2xHS v2 (00819-9) plugged in\n")));
       break;
 
     default:
@@ -2141,6 +2179,7 @@ static void mhydra_start (VCanCardData *vCard)
     DEBUGPRINT(2, (TXT("vCard is NULL\n")));
   }
 
+  vCard->driverData = &driverData;
   vCanInitData(vCard);
 } // _start
 
@@ -2209,11 +2248,11 @@ static int mhydra_allocate (VCanCardData **in_vCard)
   }
   vCard->chanData = chs->dataPtrArray;
 
-  os_if_spin_lock(&canCardsLock);
+  os_if_spin_lock(&driverData.canCardsLock);
   // Insert into list of cards
-  vCard->next = canCards;
-  canCards = vCard;
-  os_if_spin_unlock(&canCardsLock);
+  vCard->next = driverData.canCards;
+  driverData.canCards = vCard;
+  os_if_spin_unlock(&driverData.canCardsLock);
 
   *in_vCard = vCard;
 
@@ -2258,16 +2297,16 @@ static void mhydra_deallocate (VCanCardData *vCard)
 #  endif
   usb_free_urb(dev->write_urb);
 
-  os_if_spin_lock(&canCardsLock);
+  os_if_spin_lock(&driverData.canCardsLock);
 
   // qqq Check for open files
-  local_vCard = canCards;
+  local_vCard = driverData.canCards;
 
   // Identify the card to remove in the global list
 
   if (local_vCard == vCard) {
     // The first entry is the one to remove
-    canCards = local_vCard->next;
+    driverData.canCards = local_vCard->next;
   }
   else {
     while (local_vCard) {
@@ -2287,7 +2326,7 @@ static void mhydra_deallocate (VCanCardData *vCard)
     }
   }
 
-  os_if_spin_unlock(&canCardsLock);
+  os_if_spin_unlock(&driverData.canCardsLock);
 
   for(i = 0; i < HYDRA_MAX_CHANNELS; i++) {
     VCanChanData *vChd     = vCard->chanData[i];
@@ -2407,6 +2446,7 @@ static int mhydra_set_busparams (VCanChanData *vChan, VCanBusParams *par)
 
 
   DEBUGPRINT(4, (TXT("mhydra: _set_busparam\n")));
+  memset(&cmd, 0, sizeof(cmd));
 
   cmd.cmdNo = CMD_SET_BUSPARAMS_REQ;
   setDST(&cmd, dev->channel2he[vChan->channel]);
@@ -2467,6 +2507,7 @@ static int mhydra_get_busparams (VCanChanData *vChan, VCanBusParams *par)
   MhydraCardData *dev = vChan->vCard->hwCardData;
 
   DEBUGPRINT(3, (TXT("mhydra: _get_busparam\n")));
+  memset(&cmd, 0, sizeof(cmd));
 
   cmd.cmdNo = CMD_GET_BUSPARAMS_REQ;
   setDST(&cmd, dev->channel2he[vChan->channel]);
@@ -2828,7 +2869,7 @@ static int EXIT mhydra_close_all (void)
 static int mhydra_proc_read (struct seq_file* m, void* v)
 {
   int            channel  = 0;
-  VCanCardData  *cardData = canCards;
+  VCanCardData  *cardData = driverData.canCards;
 
   seq_printf(m,"\ntotal channels %d\n", driverData.noOfDevices);
   seq_puts(m,"minor numbers");
@@ -3341,4 +3382,15 @@ static int mhydra_objbuf_send_burst (VCanChanData *chd, int bufType, int bufNo,
   ret = mhydra_queue_cmd(vCard, &cmd, MHYDRA_Q_CMD_WAIT_TIME);
 
   return (ret != VCAN_STAT_OK) ? VCAN_STAT_NO_MEMORY : VCAN_STAT_OK;
+}
+
+INIT int init_module (void)
+{
+  driverData.hwIf = &hwIf;
+  return vCanInit (&driverData, HYDRA_MAX_CHANNELS);
+}
+
+EXIT void cleanup_module (void)
+{
+  vCanCleanup (&driverData);
 }

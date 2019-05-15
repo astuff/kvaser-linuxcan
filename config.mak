@@ -20,7 +20,7 @@ export KV_USBCAN_DEBUG_LEVEL    = 8
 endif
 
 ifndef KV_PCICAN2_DEBUG_LEVEL
-export KV_PCICAN2_DEBUG_LEVEL   = 8
+export KV_PCICAN2_DEBUG_LEVEL  = 8
 endif
 
 ifndef KV_LEAF_DEBUG_LEVEL
@@ -35,8 +35,8 @@ ifndef KV_VIRTUAL_DEBUG_LEVEL
 export KV_VIRTUAL_DEBUG_LEVEL   = 8
 endif
 
-ifndef KV_MINIPCIECAN_DEBUG_LEVEL
-export KV_MINIPCIECAN_DEBUG_LEVEL = 8
+ifndef KV_PCIEFD_DEBUG_LEVEL
+export KV_PCIEFD_DEBUG_LEVEL = 8
 endif
 
 #---------------------------------------------------------------------------
@@ -47,10 +47,10 @@ KV_PCICAN2_ON  += -DPCICAN2_DEBUG=$(KV_PCICAN2_DEBUG_LEVEL)
 KV_LEAF_ON     += -DLEAF_DEBUG=$(KV_LEAF_DEBUG_LEVEL)
 KV_MHYDRA_ON   += -DMHYDRA_DEBUG=$(KV_MHYDRA_DEBUG_LEVEL)
 KV_VIRTUAL_ON  += -DVIRTUAL_DEBUG=$(KV_VIRTUAL_DEBUG_LEVEL)
-KV_MINIPCIECAN_ON += -DMINIPCIECAN_DEBUG=$(KV_MINIPCIECAN_DEBUG_LEVEL)
+KV_PCIEFD_ON   += -DPCIEFD_DEBUG=$(KV_PCIEFD_DEBUG_LEVEL)
 KV_VCANOSIF_ON += -DVCANOSIF_DEBUG=$(KV_VCANOSIF_DEBUG_LEVEL)
 
-KV_DEBUGFLAGS  = -D_DEBUG=1 -DDEBUG=1 $(KV_PCICAN_ON) $(KV_USBCAN_ON) $(KV_PCICAN2_ON) $(KV_LEAF_ON) $(KV_MHYDRA_ON) $(KV_VIRTUAL_ON) $(KV_MINIPCIECAN_ON) $(KV_VCANOSIF_ON)
+KV_DEBUGFLAGS  = -D_DEBUG=1 -DDEBUG=1 $(KV_PCICAN_ON) $(KV_USBCAN_ON) $(KV_PCICAN2_ON) $(KV_LEAF_ON) $(KV_MHYDRA_ON) $(KV_VIRTUAL_ON) $(KV_PCIEFD_ON) $(KV_VCANOSIF_ON)
 KV_NDEBUGFLAGS = -D_DEBUG=0 -DDEBUG=0
 
 #----------------------------------------
@@ -60,7 +60,7 @@ KV_KERNEL_SRC_DIR:=$(KERNEL_SOURCE_DIR)
 
 #---------------------------------------------------------------------------
 # export these flags to compilation
-KV_XTRA_COMMON_FLAGS           = -DLINUX=1 -D_LINUX=1 $(foreach INC,$(INCLUDES),-I$(INC))
+KV_XTRA_COMMON_FLAGS           = -DLINUX=1 -D_LINUX=1 $(foreach INC,$(INCLUDES),-I$(INC)) -Werror
 
 export KV_XTRA_CFLAGS       = $(KV_XTRA_COMMON_FLAGS) $(KV_NDEBUGFLAGS) -DWIN32=0
 export KV_XTRA_CFLAGS_DEBUG = $(KV_XTRA_COMMON_FLAGS) $(KV_DEBUGFLAGS)  -DWIN32=0
@@ -75,16 +75,20 @@ else
   export EXTRA_CFLAGS=$(KV_XTRA_CFLAGS)
 endif
 
+
 #------------------------------------------------------
 obj-m := $(KV_MODULE_NAME).o
-$(KV_MODULE_NAME)-objs := $(OBJS) 
+$(KV_MODULE_NAME)-objs := $(OBJS)
+
+KBUILD_EXTRA_SYMBOLS = $(PWD)/../common/Module.symvers
+
 
 .PHONY: kv_module install clean
 
 kv_module:
 	@echo --------------------------------------------------------------------
 	@echo "building $(KV_MODULE_NAME) $(IS_DEBUG)"
-	@echo "Kernel src:" $(KV_KERNEL_SRC_DIR)  
+	@echo "Kernel src:" $(KV_KERNEL_SRC_DIR)
 	$(MAKE) -C $(KV_KERNEL_SRC_DIR) SUBDIRS=$(PWD) modules
 	@echo --------------------------------------------------------------------
 

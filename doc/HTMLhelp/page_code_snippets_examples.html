@@ -233,11 +233,11 @@ function toggleVisibility(linkObj) {
 <h2>canSetNotify Example</h2>
 <div class="fragment"><pre class="fragment">    canHnd = <a class="code" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel</a>(...);
     ...
-    stat = <a class="code" href="group___c_a_n.html#gaa5dd0f277c7059169055321fbda87486">canSetNotify</a>(canHnd, wndHandle, <a class="code" href="canstat_8h.html#af0b2b8979177da5f9c875f584f9c7d9c">canNOTIFY_RX</a>);
+    stat = <a class="code" href="group___c_a_n.html#gaa5dd0f277c7059169055321fbda87486">canSetNotify</a>(canHnd, wndHandle, <a class="code" href="canstat_8h.html#af0b2b8979177da5f9c875f584f9c7d9c" title="CAN message reception notification.">canNOTIFY_RX</a>);
 </pre></div><p>When a CAN message is received and the receive queue is empty, a <code>WM__CANLIB</code> message will be sent to the window whose handle is wndHandle. The <code>WM__CANLIB</code> message will have</p>
 <div class="fragment"><pre class="fragment">    wParam == canHnd
     HIWORD(lParam) == 0
-    LOWORD(lParam) == <a class="code" href="canstat_8h.html#af5f5917ba5476570815747b960e26ba6">canEVENT_RX</a>
+    LOWORD(lParam) == <a class="code" href="canstat_8h.html#af5f5917ba5476570815747b960e26ba6" title="when the queue of received CAN messages goes from empty to non-empty">canEVENT_RX</a>
 </pre></div><p>In the routine that handles <code>WM__CANLIB</code>, you should call <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> repeatedly, using the handle found in <em>wParam</em>, until it returns <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a734089f351bc421c230bf8b6cd9b1e8e">canERR_NOMSG</a> or some other error code.</p>
 <h2>canGetChannelData Example</h2>
 <p>This code snippet enumerates all CAN channels in the computer and prints the type of the CAN card they're on.</p>
@@ -264,7 +264,7 @@ function toggleVisibility(linkObj) {
 <div class="fragment"><pre class="fragment">    <span class="keywordtype">int</span> handle, stat;
     <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> data[8];
 
-    stat = <a class="code" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite</a>(handle, 1234, data, 8, <a class="code" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a>);
+    stat = <a class="code" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite</a>(handle, 1234, data, 8, <a class="code" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10" title="Message has an extended ID.">canMSG_EXT</a>);
     <span class="keywordflow">if</span> (stat &lt; 0) {
         printf(<span class="stringliteral">&quot;Failed, status == %d\n&quot;</span>, stat);
     }
@@ -555,7 +555,7 @@ function toggleVisibility(linkObj) {
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.9) - Generated on Tue Mar 17 2015</small>
+<small>Kvaser Linux CANLIB (canlib 5.12) - Generated on Mon Sep 21 2015</small>
 </address>
 </body>
 </html>

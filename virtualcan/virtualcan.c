@@ -89,6 +89,8 @@
 #include "vcan_ioctl.h"
 
 
+MODULE_LICENSE("Dual BSD/GPL");
+MODULE_AUTHOR("KVASER");
 MODULE_DESCRIPTION("VirtualCAN CAN module.");
 
 //
@@ -132,7 +134,9 @@ static void virtualRequestSend (VCanCardData *vCard, VCanChanData *vChan);
 static int virtualTransmitMessage (VCanChanData *vChd, CAN_MSG *m);
 
 
-VCanHWInterface hwIf = {
+static VCanDriverData driverData;
+
+static VCanHWInterface hwIf = {
     .initAllDevices     = virtualInitAllDevices,
     .setBusParams       = virtualSetBusParams,
     .getBusParams       = virtualGetBusParams,
@@ -505,6 +509,7 @@ static int virtualTransmitMessage (VCanChanData *vChd, CAN_MSG *m)
 static int virtualInitData (VCanCardData *vCard)
 {
     int chNr;
+    vCard->driverData = &driverData;
     vCanInitData(vCard);
     for (chNr = 0; chNr < vCard->nrChannels; chNr++) {
         virtualChanData *hChd;
@@ -567,10 +572,10 @@ static int virtualInitOne (void)
     virtualInitData(vCard);
 
     // Insert into list of cards
-    os_if_spin_lock(&canCardsLock);
-    vCard->next = canCards;
-    canCards    = vCard;
-    os_if_spin_unlock(&canCardsLock);
+    os_if_spin_lock(&driverData.canCardsLock);
+    vCard->next = driverData.canCards;
+    driverData.canCards    = vCard;
+    os_if_spin_unlock(&driverData.canCardsLock);
 
     return 1;
 
@@ -630,17 +635,28 @@ static int virtualCloseAllDevices (void)
     VCanCardData *vCard;
 
     while (1) {
-        os_if_spin_lock(&canCardsLock);
-        vCard = canCards;
+        os_if_spin_lock(&driverData.canCardsLock);
+        vCard = driverData.canCards;
         if (!vCard) {
-            os_if_spin_unlock(&canCardsLock);
+            os_if_spin_unlock(&driverData.canCardsLock);
             break;
         }
-        canCards = vCard->next;
-        os_if_spin_unlock(&canCardsLock);
+        driverData.canCards = vCard->next;
+        os_if_spin_unlock(&driverData.canCardsLock);
         virtualRemoveOne(vCard);
     }
     DEBUGPRINT(1, "Kvaser Virtual Closed.\n");
 
     return 0;
 } // virtualCloseAllDevices
+
+INIT int init_module (void)
+{
+  driverData.hwIf = &hwIf;
+  return vCanInit (&driverData, MAX_CHANNELS);
+}
+
+EXIT void cleanup_module (void)
+{
+  vCanCleanup (&driverData);
+}

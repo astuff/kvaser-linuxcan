@@ -107,6 +107,7 @@ int os_if_queue_task (OS_IF_TASK_QUEUE_HANDLE *hnd)
 {
   return schedule_work(hnd); // ret nonzero if ok
 }
+EXPORT_SYMBOL(os_if_queue_task);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_queue_task_not_default_queue
@@ -117,6 +118,7 @@ int os_if_queue_task_not_default_queue (OS_IF_WQUEUE *wq,
 {
   return queue_work(wq, hnd); // ret nonzero if ok
 }
+EXPORT_SYMBOL(os_if_queue_task_not_default_queue);
 
 
 
@@ -128,6 +130,7 @@ void os_if_init_waitqueue_head (OS_IF_WAITQUEUE_HEAD *handle)
 {
   init_waitqueue_head(handle);
 }
+EXPORT_SYMBOL(os_if_init_waitqueue_head);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -147,6 +150,7 @@ void os_if_init_named_waitqueue_head (OS_IF_WAITQUEUE_HEAD *handle, char *name)
 void os_if_delete_waitqueue_head (OS_IF_WAITQUEUE_HEAD *handle)
 {
 }
+EXPORT_SYMBOL(os_if_delete_waitqueue_head);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -157,6 +161,7 @@ void os_if_init_waitqueue_entry (OS_IF_WAITQUEUE *wait)
 {
   init_waitqueue_entry(wait, current);
 }
+EXPORT_SYMBOL(os_if_init_waitqueue_entry);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -190,6 +195,7 @@ signed long os_if_wait_for_event_timeout (signed long timeout,
   //                                        msecs_to_jiffies(timeout) + 1);
   return schedule_timeout(msecs_to_jiffies(timeout) + 1);
 }
+EXPORT_SYMBOL(os_if_wait_for_event_timeout);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_schedule_timeout_simple
@@ -199,6 +205,7 @@ signed long os_if_wait_for_event_timeout_simple (signed long timeout)
 {
   return schedule_timeout(msecs_to_jiffies(timeout) + 1);
 }
+EXPORT_SYMBOL(os_if_wait_for_event_timeout_simple);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_schedule
@@ -218,6 +225,7 @@ void os_if_wake_up_interruptible (OS_IF_WAITQUEUE_HEAD *handle)
 {
   wake_up_interruptible(handle);
 }
+EXPORT_SYMBOL(os_if_wake_up_interruptible);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_mark_event
@@ -239,6 +247,7 @@ void os_if_up_sema (OS_IF_SEMAPHORE *var)
   complete(var);
   //os_if_wake_up_interruptible(var);
 }
+EXPORT_SYMBOL(os_if_up_sema);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_down_sema
@@ -249,6 +258,7 @@ void os_if_down_sema (OS_IF_SEMAPHORE *var)
   wait_for_completion(var);
   // interruptible_sleep_on(var);
 }
+EXPORT_SYMBOL(os_if_down_sema);
 
 
 
@@ -261,6 +271,7 @@ void os_if_init_sema (OS_IF_SEMAPHORE *var)
   init_completion(var);
   //os_if_init_waitqueue_head(var);
 }
+EXPORT_SYMBOL(os_if_init_sema);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_delete_sema
@@ -269,6 +280,7 @@ void os_if_init_sema (OS_IF_SEMAPHORE *var)
 void os_if_delete_sema (OS_IF_SEMAPHORE *var)
 {
 }
+EXPORT_SYMBOL(os_if_delete_sema);
 
 
 
@@ -331,6 +343,7 @@ void os_if_spin_lock (OS_IF_LOCK *lock)
 {
   spin_lock(lock);
 }
+EXPORT_SYMBOL(os_if_spin_lock);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_spin_unlock
@@ -340,6 +353,7 @@ void os_if_spin_unlock (OS_IF_LOCK *lock)
 {
   spin_unlock(lock);
 }
+EXPORT_SYMBOL(os_if_spin_unlock);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_spin_lock_remove
@@ -348,6 +362,7 @@ void os_if_spin_unlock (OS_IF_LOCK *lock)
 void os_if_spin_lock_remove (OS_IF_LOCK *lock)
 {
 }
+EXPORT_SYMBOL(os_if_spin_lock_remove);
 
 //////////////////////////////////////////////////////////////////////
 // Interrupts
@@ -399,6 +414,7 @@ void os_if_spin_lock_irqsave (OS_IF_LOCK *lock, unsigned long *flags)
 {
   spin_lock_irqsave(lock, *flags);
 }
+EXPORT_SYMBOL(os_if_spin_lock_irqsave);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_spin_unlock_irqrestore
@@ -408,6 +424,7 @@ void os_if_spin_unlock_irqrestore (OS_IF_LOCK *lock, unsigned long flags)
 {
   spin_unlock_irqrestore(lock, flags);
 }
+EXPORT_SYMBOL(os_if_spin_unlock_irqrestore);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_spin_lock_softirq
@@ -492,6 +509,7 @@ OS_IF_WQUEUE* os_if_declare_task (char *name, OS_IF_TASK_QUEUE_HANDLE *taskQ)
 {
   return create_workqueue(name);
 }
+EXPORT_SYMBOL(os_if_declare_task);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_declare_rt_task
@@ -515,6 +533,7 @@ void os_if_destroy_task (OS_IF_WQUEUE *wQueue)
 {
   destroy_workqueue(wQueue);
 }
+EXPORT_SYMBOL(os_if_destroy_task);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -530,6 +549,7 @@ void os_if_init_task (OS_IF_TASK_QUEUE_HANDLE *taskQ, void *function, void *data
      INIT_WORK(taskQ, function);
 #  endif
 }
+EXPORT_SYMBOL(os_if_init_task);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_set_task_interruptible
@@ -539,6 +559,7 @@ void os_if_set_task_interruptible (void)
 {
   set_current_state(TASK_INTERRUPTIBLE);
 }
+EXPORT_SYMBOL(os_if_set_task_interruptible);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_set_task_uninterruptible
@@ -548,6 +569,7 @@ void os_if_set_task_uninterruptible (void)
 {
   set_current_state(TASK_UNINTERRUPTIBLE);
 }
+EXPORT_SYMBOL(os_if_set_task_uninterruptible);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_set_task_running
@@ -557,6 +579,7 @@ void os_if_set_task_running (void)
 {
   set_current_state(TASK_RUNNING);
 }
+EXPORT_SYMBOL(os_if_set_task_running);
 
 //////////////////////////////////////////////////////////////////////
 // Read and write locks
@@ -571,6 +594,7 @@ void os_if_rwlock_init (rwlock_t *lock)
 {
   rwlock_init(lock);
 }
+EXPORT_SYMBOL(os_if_rwlock_init);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_read_lock_irqsave
@@ -580,6 +604,7 @@ void os_if_read_lock_irqsave (rwlock_t *rw_lock, unsigned long *flags)
 {
   read_lock_irqsave(rw_lock, *flags);
 }
+EXPORT_SYMBOL(os_if_read_lock_irqsave);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_read_unlock_irqrestore
@@ -589,6 +614,7 @@ void os_if_read_unlock_irqrestore (rwlock_t *rw_lock, unsigned long flags)
 {
   read_unlock_irqrestore(rw_lock, flags);
 }
+EXPORT_SYMBOL(os_if_read_unlock_irqrestore);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_write_lock_irqsave
@@ -598,6 +624,7 @@ void os_if_write_lock_irqsave (rwlock_t *rw_lock, unsigned long *flags)
 {
   write_lock_irqsave(rw_lock, *flags);
 }
+EXPORT_SYMBOL(os_if_write_lock_irqsave);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_write_unlock_irqrestore
@@ -607,6 +634,7 @@ void os_if_write_unlock_irqrestore (rwlock_t *rw_lock, unsigned long flags)
 {
   write_unlock_irqrestore(rw_lock, flags);
 }
+EXPORT_SYMBOL(os_if_write_unlock_irqrestore);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_rwlock_remove
@@ -615,6 +643,7 @@ void os_if_write_unlock_irqrestore (rwlock_t *rw_lock, unsigned long flags)
 void os_if_rwlock_remove (rwlock_t *lock)
 {
 }
+EXPORT_SYMBOL(os_if_rwlock_remove);
 
 //////////////////////////////////////////////////////////////////////
 // System signals
@@ -629,6 +658,7 @@ int os_if_signal_pending(void)
 {
   return signal_pending(current);
 }
+EXPORT_SYMBOL(os_if_signal_pending);
 
 
 //////////////////////////////////////////////////////////////////////
@@ -644,6 +674,7 @@ void *os_if_kernel_malloc (size_t buffer_size)
 {
   return kmalloc(buffer_size, GFP_KERNEL);
 }
+EXPORT_SYMBOL(os_if_kernel_malloc);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_kernel_free
@@ -653,6 +684,7 @@ void os_if_kernel_free (void *mem_ptr)
 {
   kfree(mem_ptr);
 }
+EXPORT_SYMBOL(os_if_kernel_free);
 
 //////////////////////////////////////////////////////////////////////
 // Thread management functions
@@ -668,6 +700,7 @@ OS_IF_THREAD os_if_kernel_thread (int (*thread)(void *context), void *context)
 
   return kthread_run(thread, context, "Kvaser kernel thread");
 }
+EXPORT_SYMBOL(os_if_kernel_thread);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_remove_thread
@@ -681,10 +714,12 @@ void os_if_remove_thread (OS_IF_THREAD thread)
 // os_if_exit_thread
 //
 //////////////////////////////////////////////////////////////////////
-void os_if_exit_thread (int result)
+void os_if_exit_thread (void *module, int result)
 {
-  module_put_and_exit(result);
+  module_put(module);
+  do_exit(result);
 }
+EXPORT_SYMBOL(os_if_exit_thread);
 
 void os_if_init_atomic_bit (OS_IF_ATOMIC_BIT *ab)
 {

@@ -86,7 +86,7 @@ typedef unsigned char VeventTag;
 /* Structure for V_RECEIVE_MSG, V_TRANSMIT_MSG */
 
 /* Message flags */
-#define MAX_MSG_LEN 8
+#define MAX_MSG_LEN                 128
 #define EXT_MSG                     0x80000000 // signs an extended identifier
 #define VCAN_EXT_MSG_ID             EXT_MSG
 
@@ -104,12 +104,18 @@ typedef unsigned char VeventTag;
 #define VCAN_MSG_FLAG_TX_START      0x80  /* Transmit Message stored into Controller  */
 #define VCAN_MSG_FLAG_TXRQ          0x80  /* Transmit Message stored into Controller  */
 
+#define VCAN_MSG_FLAG_EDL           0x100  /* Extended Data Length (CAN FD) */
+#define VCAN_MSG_FLAG_BRS           0x200  /* Bit Rate Switch (CAN FD)  */
+#define VCAN_MSG_FLAG_ESI           0x400  /* Error Status Indication (CAN FD)  */
+
+
+
 struct s_vcan_msg {  /* 14 Bytes */
-         uint32_t      id;
-         unsigned char flags;
-         unsigned char dlc;
-         unsigned char data[MAX_MSG_LEN];
-       };
+  uint32_t           id;
+  unsigned short int flags;
+  unsigned char      dlc;
+  unsigned char      data[MAX_MSG_LEN];
+};
 
 
 /* Structure for V_CHIP_STATE */
@@ -213,16 +219,16 @@ typedef struct s_vcan_event VCAN_EVENT, Vevent, *PVevent;
 
 
 typedef struct s_can_msg {
-          VeventTag     tag;
-          unsigned char channel_index;
-          unsigned char user_data;
-          unsigned char unused_1;
-          uint32_t      timestamp;
-          uint32_t      id;
-          unsigned char flags;
-          unsigned char length;
-          unsigned char data [8];
-        } CAN_MSG;
+  VeventTag          tag;
+  unsigned char      channel_index;
+  unsigned char      user_data;
+  unsigned char      unused_1;
+  uint32_t           timestamp;
+  uint32_t           id;
+  unsigned short int flags;
+  unsigned char      length;
+  unsigned char      data [MAX_MSG_LEN];
+} CAN_MSG;
 
 
 /*****************************************************************************/

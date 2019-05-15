@@ -116,15 +116,15 @@ int main (int argc, char *argv[])
   i = 0;
   while(!willExit){
     /* Send some messages */
-    for (k = 0 ; k < 10000 ; k++) {
-      ret = canWriteWait(h, channel + 100, "Kvaser!", 8, 0, -1);       
+    for (k = 0 ; k < 1000 ; k++) {
+      ret = canWriteWait(h, channel + 100, "Kvaser!", 8, 0/*|canMSG_EXT*/, -1);       
       if (ret != canOK || willExit) {
         break;
       }
       i++;
     }
     printf("Total sent=%d\n", i);
-    //sleep(1);
+    sleep(1);
   }
    
   if (canWriteSync(h, 1000) != canOK) {

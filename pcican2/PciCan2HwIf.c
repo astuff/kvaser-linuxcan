@@ -98,6 +98,8 @@
 #include "vcan_ioctl.h"
 
 
+MODULE_LICENSE("Dual BSD/GPL");
+MODULE_AUTHOR("KVASER");
 MODULE_DESCRIPTION("PCIcanII CAN module.");
 
 //
@@ -166,7 +168,9 @@ static int pciCanObjbufSetPeriod(VCanChanData *chd, int bufType, int bufNo,
                                  int period);
 
 
-VCanHWInterface hwIf = {
+static VCanDriverData driverData;
+
+static VCanHWInterface hwIf = {
     .initAllDevices    = pciCanInitAllDevices,
     .setBusParams      = pciCanSetBusParams,
     .getBusParams      = pciCanGetBusParams,
@@ -875,7 +879,7 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
                                       VCAN_CHANNEL_CAP_TXREQUEST            |
                                       VCAN_CHANNEL_CAP_TXACKNOWLEDGE;
 
-                vCard->hw_type      = HWTYPE_PCICAN_2;
+                vCard->hw_type      = HWTYPE_PCICAN_II;
 
                 if (hCd->isWaiting) {
                     os_if_wake_up_interruptible(&hCd->waitHwInfo);
@@ -1666,6 +1670,8 @@ static void DEVINIT pciCanInitData (VCanCardData *vCard)
     PciCan2CardData *hCd = vCard->hwCardData;
 
     int chNr;
+
+    vCard->driverData = &driverData;
     vCanInitData(vCard);
 
 #if defined(TRY_DIRECT_SEND)
@@ -1791,10 +1797,10 @@ static int DEVINIT pciCanInitOne (struct pci_dev *dev,
     }
 
     // Insert into list of cards
-    os_if_spin_lock(&canCardsLock);
-    vCard->next = canCards;
-    canCards = vCard;
-    os_if_spin_unlock(&canCardsLock);
+    os_if_spin_lock(&driverData.canCardsLock);
+    vCard->next = driverData.canCards;
+    driverData.canCards = vCard;
+    os_if_spin_unlock(&driverData.canCardsLock);
 
     return VCAN_STAT_OK;
 
@@ -1870,10 +1876,10 @@ static void DEVEXIT pciCanRemoveOne (struct pci_dev *dev)
   pci_release_regions(dev);
 
   // Remove from canCards list
-  os_if_spin_lock(&canCardsLock);
-  lastCard = canCards;
+  os_if_spin_lock(&driverData.canCardsLock);
+  lastCard = driverData.canCards;
   if (lastCard == vCard) {
-    canCards = vCard->next;
+    driverData.canCards = vCard->next;
   } else {
     while (lastCard && (lastCard->next != vCard)) {
       lastCard = lastCard->next;
@@ -1884,7 +1890,7 @@ static void DEVEXIT pciCanRemoveOne (struct pci_dev *dev)
       lastCard->next = vCard->next;
     }
   }
-  os_if_spin_unlock(&canCardsLock);
+  os_if_spin_unlock(&driverData.canCardsLock);
 
   for(i = 0; i < MAX_CHANNELS; i++) {
     VCanChanData *vChd     = vCard->chanData[i];
@@ -2267,4 +2273,15 @@ static int pciCanObjbufExists (VCanChanData *chd, int bufType, int bufNo)
   }
 
   return 1;
+}
+
+INIT int init_module (void)
+{
+  driverData.hwIf = &hwIf;
+  return vCanInit (&driverData, MAX_CHANNELS);
+}
+
+EXIT void cleanup_module (void)
+{
+  vCanCleanup (&driverData);
 }

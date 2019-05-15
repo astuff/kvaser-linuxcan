@@ -110,12 +110,15 @@
 #define CMD_TX_REQUEST                               60
 #define CMD_SET_HEARTBEAT_RATE_REQ                   61
 #define CMD_HEARTBEAT_RESP                           62
-// 63 can be reused
+#define CMD_SET_AUTO_TX_BUFFER                       63
 #define CMD_GET_EXTENDED_INFO                        64
 #define CMD_TCP_KEEPALIVE                            65
 #define CMD_FLUSH_QUEUE_RESP                         66
-// 67-72 can be reused
-
+#define CMD_HYDRA_TX_INTERVAL_REQ                    67
+#define CMD_HYDRA_TX_INTERVAL_RESP                   68
+#define CMD_SET_BUSPARAMS_FD_REQ                     69
+#define CMD_SET_BUSPARAMS_FD_RESP                    70
+// 71 can be reused
 #define CMD_AUTO_TX_BUFFER_REQ                       72
 #define CMD_AUTO_TX_BUFFER_RESP                      73
 #define CMD_SET_TRANSCEIVER_MODE_REQ                 74
@@ -780,17 +783,18 @@ typedef struct {
 } hcmdSetBusparamsReq;
 
 typedef struct {
-    unsigned char reserved;
+    unsigned char param_type;
+    unsigned char reserved[27];
 } hcmdGetBusparamsReq;
 
 typedef struct {
-  uint32_t      bitRate;
-  unsigned char tseg1;
-  unsigned char tseg2;
-  unsigned char sjw;
-  unsigned char noSamp;
-  unsigned char channel;
-  unsigned char padding[19];
+    uint32_t      bitRate;
+    unsigned char tseg1;
+    unsigned char tseg2;
+    unsigned char sjw;
+    unsigned char noSamp;
+    unsigned char channel;
+    unsigned char padding[19];
 } hcmdGetBusparamsResp;
 
 typedef struct {
@@ -918,7 +922,8 @@ typedef struct {
   uint32_t  swVersion;
   uint32_t  swName;
   uint32_t  EAN[2];
-  uint32_t  padding[2];
+  uint32_t  maxBitrate;
+  uint32_t  padding[1];
 } hcmdGetSoftwareDetailsResp;
 
 

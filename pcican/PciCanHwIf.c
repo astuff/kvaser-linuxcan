@@ -101,6 +101,8 @@
 #include "hwnames.h"
 
 
+MODULE_LICENSE("Dual BSD/GPL");
+MODULE_AUTHOR("KVASER");
 MODULE_DESCRIPTION("PCIcan CAN module.");
 
 //
@@ -142,7 +144,9 @@ static unsigned long pciCanTxQLen(VCanChanData *vChd);
 static void pciCanRequestSend (VCanCardData *vCard, VCanChanData *vChan);
 
 
-VCanHWInterface hwIf = {
+static VCanDriverData driverData;
+
+static VCanHWInterface hwIf = {
     .initAllDevices     = pciCanInitAllDevices,
     .setBusParams       = pciCanSetBusParams,
     .getBusParams       = pciCanGetBusParams,
@@ -1745,6 +1749,7 @@ void pciCanSend (OS_IF_TASK_QUEUE_HANDLE *work)
 static void DEVINIT pciCanInitData (VCanCardData *vCard)
 {
     int chNr;
+    vCard->driverData = &driverData;
     vCanInitData(vCard);
     for (chNr = 0; chNr < vCard->nrChannels; chNr++) {
         VCanChanData *vChd   = vCard->chanData[chNr];
@@ -1850,10 +1855,10 @@ static int DEVINIT pciCanInitOne (struct pci_dev *dev, const struct pci_device_i
     }
 
     // Insert into list of cards
-    os_if_spin_lock(&canCardsLock);
-    vCard->next = canCards;
-    canCards = vCard;
-    os_if_spin_unlock(&canCardsLock);
+    os_if_spin_lock(&driverData.canCardsLock);
+    vCard->next = driverData.canCards;
+    driverData.canCards = vCard;
+    os_if_spin_unlock(&driverData.canCardsLock);
 
     return VCAN_STAT_OK;
 
@@ -1932,10 +1937,10 @@ static void DEVEXIT pciCanRemoveOne (struct pci_dev *dev)
   pci_release_regions(dev);
 
   // Remove from canCards list
-  os_if_spin_lock(&canCardsLock);
-  lastCard = canCards;
+  os_if_spin_lock(&driverData.canCardsLock);
+  lastCard = driverData.canCards;
   if (lastCard == vCard) {
-    canCards = vCard->next;
+    driverData.canCards = vCard->next;
   } else {
     while (lastCard && (lastCard->next != vCard)) {
       lastCard = lastCard->next;
@@ -1946,7 +1951,7 @@ static void DEVEXIT pciCanRemoveOne (struct pci_dev *dev)
       lastCard->next = vCard->next;
     }
   }
-  os_if_spin_unlock(&canCardsLock);
+  os_if_spin_unlock(&driverData.canCardsLock);
 
   os_if_kernel_free(vCard->chanData);
   os_if_kernel_free(vCard);
@@ -1981,3 +1986,14 @@ static int EXIT pciCanCloseAllDevices (void)
 
     return 0;
 } // pciCanCloseAllDevices
+
+INIT int init_module (void)
+{
+  driverData.hwIf = &hwIf;
+  return vCanInit (&driverData, MAX_CHANNELS);
+}
+
+EXIT void cleanup_module (void)
+{
+  vCanCleanup (&driverData);
+}

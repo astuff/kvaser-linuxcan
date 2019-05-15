@@ -51,12 +51,16 @@
 #  ---------------------------------------------------------------------------
 # 
 
+-include ../kveyes.mak
+
 LIBNAME = libcanlib.so
 LIBRARY = $(LIBNAME).1.1.0
 SONAME  = $(LIBNAME).1
 
-CFLAGS  += -Wall -DCANLIB_NAME_STRING=\"$(LIBRARY)\" -O2 -fomit-frame-pointer $(XTRA_CFLAGS) -pthread #-DPCMCIA_DEBUG=0
+CFLAGS  += -Wall -DCANLIB_NAME_STRING=\"$(LIBRARY)\" -O2 -fomit-frame-pointer \
+	$(XTRA_CFLAGS) -pthread #-DPCMCIA_DEBUG=0
 CFLAGS  += -DSPLIT -DLINUX=1 -D_LINUX=1 # maybe remove in time
+CFLAGS  += $(ccflags-y)
 CFLAGS  += -I. -I../include
 
 # Flags for  reentrant, position independent code

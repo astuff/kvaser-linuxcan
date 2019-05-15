@@ -50,8 +50,8 @@
 ** ---------------------------------------------------------------------------
 **/
 
+#include <linux/module.h>
 #include "asm/div64.h"
-
 #include "util.h"
 
 
@@ -147,6 +147,7 @@ void packed_EAN_to_BCD_with_csum(unsigned char *ean, unsigned char *bcd)
     bcd++;
   }
 }
+EXPORT_SYMBOL(packed_EAN_to_BCD_with_csum);
 
 
 /****************************************************************************/
@@ -188,3 +189,4 @@ unsigned int calculateCRC32(void *buf, unsigned int bufsiz)
   }
   return ~crc;            /* transmit complement, per CRC-32 spec */
 }
+EXPORT_SYMBOL(calculateCRC32);

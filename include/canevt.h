@@ -90,7 +90,7 @@
 #define CANEVT_EXIT_HARDWARE         30
 #define CANEVT_READ_CLOCK            31
 
-
+// TODO: Change to 64 for CAN FD
 #define MAX_MSG_LEN 8
 #define EXT_MSG                     0x80000000  // signs an extended identifier
 

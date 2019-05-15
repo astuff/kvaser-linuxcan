@@ -59,6 +59,9 @@
 #  error HWTYPE_NONE is already defined.
 #endif
 
+//
+// Hardware types
+//
 #define HWTYPE_NONE            0
 #define HWTYPE_VIRTUAL         1
 #define HWTYPE_CANCARDX        2
@@ -70,23 +73,24 @@
 #define HWTYPE_PCCAN           8
 #define HWTYPE_HERMES          9  // also the deceased ISAcan
 #define HWTYPE_PCICAN          HWTYPE_HERMES
-#define HWTYPE_NEWPCMCIA      10  // Mars
+#define HWTYPE_NEWPCMCIA      10  // Was Mars; now unused.
 #define HWTYPE_DAPHNE         11  // also HWTYPE_NEWUSB
 #define HWTYPE_CANCARDY       12  // the one-channel CANcardX
 /* 13-39 are reserved to Vector, just to be sure */
 /* Vector will use all odd numbers and Kvaser all even numbers, as per a
    semi-official agreement */
-// Vector CANcardXL           15  // Information only
+// Vector CANcardXL           15  // Information only.
 // Vector CANcaseXL           21  // Information only
 #define HWTYPE_HELIOS         40  // Helios / PCIcan II
-#define HWTYPE_PCICAN_2      HWTYPE_HELIOS
-// Reserved to Vector         41
+#define HWTYPE_PCICAN_II      HWTYPE_HELIOS
+// Reserved to Vector      41
 #define HWTYPE_DEMETER        42  // USBcan II, Memorator et al
 #define HWTYPE_SIMULATION     44  // kcanc for Creator
 #define HWTYPE_AURORA         46
 #define HWTYPE_FILO           48  // Leaf
+#define HWTYPE_LEAF           HWTYPE_FILO
 #define HWTYPE_PC104_PLUS     50
-#define HWTYPE_PCICANX_2      52
+#define HWTYPE_PCICANX_II     52
 #define HWTYPE_MEMORATOR_II   54
 #define HWTYPE_MEMORATOR_PRO  HWTYPE_MEMORATOR_II
 #define HWTYPE_USBCAN_PRO     56
@@ -100,7 +104,12 @@
 #define HWTYPE_USBCAN_KLINE   68
 #define HWTYPE_ETHERCAN       70
 #define HWTYPE_USBCAN_LIGHT   72
-
+#define HWTYPE_USBCAN_PRO2    74
+#define HWTYPE_PCIE_V2        76
+#define HWTYPE_PCIECANFD      HWTYPE_PCIE_V2
+#define HWTYPE_MEMORATOR_PRO2 78
+#define HWTYPE_LEAF2              80  ///< Kvaser Leaf Pro HS (2nd generation)
+#define HWTYPE_MEMORATOR_LIGHT2   82  ///< Kvaser Memorator Light (2nd generation)
 
 
 /* Transceiver types */
@@ -125,11 +134,16 @@
 #define VCAN_TRANSCEIVER_TYPE_1041_OPTO        17  // 1041 with optical isolation
 #define VCAN_TRANSCEIVER_TYPE_RS485            18  // J1708
 #define VCAN_TRANSCEIVER_TYPE_LIN              19  // LIN
-#define VCAN_TRANSCEIVER_TYPE_GAL              20  // Galathea piggyback
-
+#define VCAN_TRANSCEIVER_TYPE_KONE             20  // KONE piggyback
+#define VCAN_TRANSCEIVER_TYPE_GAL              VCAN_TRANSCEIVER_TYPE_KONE  // Galathea piggyback
 // Agreement: Vector to use all odd numbers, Kvaser all even numbers
+#define VCAN_TRANSCEIVER_TYPE_CANFD            22  // Generic CAN-FD capable transceiver
+#define VCAN_TRANSCEIVER_TYPE_LINX_LIN         64
+#define VCAN_TRANSCEIVER_TYPE_LINX_J1708       66
+#define VCAN_TRANSCEIVER_TYPE_LINX_K           68
+#define VCAN_TRANSCEIVER_TYPE_LINX_SWC         70
+#define VCAN_TRANSCEIVER_TYPE_LINX_LS          72
 
-#define MAX_TRANSCEIVER_TYPE 20
 
 /* old style transciver type names */
 #define TRANSCEIVER_TYPE_NONE           VCAN_TRANSCEIVER_TYPE_NONE
@@ -139,6 +153,5 @@
 #define TRANSCEIVER_TYPE_W210           VCAN_TRANSCEIVER_TYPE_W210
 #define TRANSCEIVER_TYPE_SWC_PROTO      VCAN_TRANSCEIVER_TYPE_SWC_PROTO
 #define TRANSCEIVER_TYPE_SWC            VCAN_TRANSCEIVER_TYPE_SWC
-
 
 #endif

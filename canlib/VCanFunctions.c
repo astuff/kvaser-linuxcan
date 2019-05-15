@@ -99,7 +99,9 @@ static uint32_t capabilities_table[][2] = {
   {VCAN_CHANNEL_CAP_TXACKNOWLEDGE,       canCHANNEL_CAP_TXACKNOWLEDGE},
   {VCAN_CHANNEL_CAP_VIRTUAL,             canCHANNEL_CAP_VIRTUAL},
   {VCAN_CHANNEL_CAP_SIMULATED,           canCHANNEL_CAP_SIMULATED},
-  {VCAN_CHANNEL_CAP_REMOTE,              canCHANNEL_CAP_REMOTE}
+  {VCAN_CHANNEL_CAP_REMOTE,              canCHANNEL_CAP_REMOTE},
+  {VCAN_CHANNEL_CAP_CANFD,               canCHANNEL_CAP_CAN_FD},
+  {VCAN_CHANNEL_CAP_CANFD_NONISO,        canCHANNEL_CAP_CAN_FD_NONISO}
 };
 
 
@@ -235,6 +237,101 @@ static void notify (HandleData *hData, VCAN_EVENT *msg)
 }
 
 
+enum {
+  DLC12   = 9,
+  DLC16   = 10,
+  DLC20   = 11,
+  DLC24   = 12,
+  DLC32   = 13,
+  DLC48   = 14,
+  DLC64   = 15
+};
+
+static unsigned int dlcToBytesFD(unsigned int dlc)
+{
+  dlc &= 0xf;
+
+  switch(dlc) {
+  case 9:   return 12;
+  case 10:  return 16;
+  case 11:  return 20;
+  case 12:  return 24;
+  case 13:  return 32;
+  case 14:  return 48;
+  case 15:  return 64;
+  default:  return dlc;
+  }
+}
+
+static unsigned int bytesToDlcFD(unsigned int bytes)
+{
+  if(bytes > 48)
+    return DLC64;
+  else if(bytes > 32)
+    return DLC48;
+  else if(bytes > 24)
+    return DLC32;
+  else if(bytes > 20)
+    return DLC24;
+  else if(bytes > 16)
+    return DLC20;
+  else if(bytes > 12)
+    return DLC16;
+  else if(bytes > 8)
+    return DLC12;
+  else
+    return bytes;
+}
+
+int DlcOk (struct HandleData *h, unsigned int dlc, unsigned int flags)
+{
+  if (flags & canFDMSG_EDL) {
+    return (((dlc >= 0) && (dlc <= 8)) ||
+            ((dlc == 12) || (dlc == 16) ||
+             (dlc == 20) || (dlc == 24) ||
+             (dlc == 32) || (dlc == 48) ||
+             (dlc == 64)));
+  }
+  else {
+    if (h->acceptLargeDlc) {
+      // Should be 15 but if we change this, we change the API
+      return 1;
+      //return dlc <= UINT_MAX;
+    }
+    else {
+      return dlc <= 8;
+    }
+  }
+  return 0;
+}
+
+//======================================================================
+// Set CAN FD mode
+//======================================================================
+static canStatus kCanSetCanFD (HandleData *hData)
+{
+  int ret;
+  KCAN_IOCTL_CANFD_T fd_data;
+
+  memset(&fd_data, 0, sizeof(KCAN_IOCTL_CANFD_T));
+  fd_data.fd = hData->fdMode;
+  fd_data.action = CAN_CANFD_SET;
+
+  ret = os_if_ioctl_write(hData->fd, KCAN_IOCTL_CANFD, &fd_data, sizeof(KCAN_IOCTL_CANFD_T));
+  if (ret != 0) {
+    DEBUGPRINT((TXT("kCanSetCanFD failed!\n")));
+    return toStatus(errno);
+  }
+
+  if (fd_data.status != CAN_CANFD_SUCCESS) {
+    DEBUGPRINT((TXT("CAN FD / CAN Mismatch -> can't open channel. fd status %d\n"), fd_data.status));
+
+    return canERR_NOTFOUND;
+  }
+
+  return canOK;
+}
+
 
 //======================================================================
 // Notification thread
@@ -317,7 +414,7 @@ static canStatus vCanSetNotify (HandleData *hData,
     hData->notifyFd = os_if_open(hData->deviceName);
     if (hData->notifyFd != OS_IF_INVALID_HANDLE) {
       int ch = hData->channelNr;
-      if (os_if_ioctl_write(hData->notifyFd, VCAN_IOC_OPEN_TRANSP, 
+      if (os_if_ioctl_write(hData->notifyFd, VCAN_IOC_OPEN_TRANSP,
                             &ch, sizeof(ch))) {
         OS_IF_CLOSE_HANDLE(hData->notifyFd);
         hData->notifyFd = OS_IF_INVALID_HANDLE;
@@ -336,7 +433,7 @@ static canStatus vCanSetNotify (HandleData *hData,
                       &timeout, sizeof(timeout));
 
   }
-  
+
   hData->notifyFlags = notifyFlags;
 
   // Set filters
@@ -401,6 +498,7 @@ static canStatus vCanOpenChannel (HandleData *hData)
 {
   int ret;
   VCanMsgFilter filter;
+  uint32_t capability;
 
   hData->fd = os_if_open(hData->deviceName);
   if (hData->fd == OS_IF_INVALID_HANDLE) {
@@ -427,17 +525,23 @@ static canStatus vCanOpenChannel (HandleData *hData)
     return canERR_NOCHANNELS;
   }
 
-  if (!hData->acceptVirtual) {
-    uint32_t capability;
-    ret = os_if_ioctl_read(hData->fd, VCAN_IOC_GET_CHAN_CAP,
+  ret = os_if_ioctl_read(hData->fd, VCAN_IOC_GET_CHAN_CAP,
                            &capability, sizeof(capability));
 
-    if (ret) {
-      OS_IF_CLOSE_HANDLE(hData->fd);
-      return canERR_NOTFOUND;   // qqq Other error code? Should never happen.
-    }
+  if (ret) {
+    OS_IF_CLOSE_HANDLE(hData->fd);
+    return canERR_NOTFOUND;   // qqq Other error code? Should never happen.
+  }
 
+  if (!hData->acceptVirtual) {
     if (capability & VCAN_CHANNEL_CAP_VIRTUAL) {
+      OS_IF_CLOSE_HANDLE(hData->fd);
+      return canERR_NOTFOUND;
+    }
+  }
+
+  if (capability & VCAN_CHANNEL_CAP_CANFD) {
+    if ( canOK != kCanSetCanFD(hData) ) {
       OS_IF_CLOSE_HANDLE(hData->fd);
       return canERR_NOTFOUND;
     }
@@ -486,23 +590,34 @@ static canStatus vCanBusOff (HandleData *hData)
   return canOK;
 }
 
-
 //======================================================================
 // vCanSetBusparams
 //======================================================================
-static canStatus vCanSetBusParams (HandleData *hData, long freq,
-                                   unsigned int tseg1, unsigned int tseg2,
+static canStatus vCanSetBusParams (HandleData *hData,
+                                   long freq,
+                                   unsigned int tseg1,
+                                   unsigned int tseg2,
                                    unsigned int sjw,
-                                   unsigned int noSamp, unsigned int syncmode)
+                                   unsigned int noSamp,
+                                   long freq_brs,
+                                   unsigned int tseg1_brs,
+                                   unsigned int tseg2_brs,
+                                   unsigned int sjw_brs,
+                                   unsigned int syncmode)
 {
   VCanBusParams busParams;
   int ret;
 
   busParams.freq    = (signed long)freq;
-  busParams.sjw     = (unsigned char)sjw;
-  busParams.tseg1   = (unsigned char)tseg1;
-  busParams.tseg2   = (unsigned char)tseg2;
+  busParams.sjw     = sjw;
+  busParams.tseg1   = tseg1;
+  busParams.tseg2   = tseg2;
   busParams.samp3   = noSamp;   // This variable is # of samples inspite of name!
+
+  busParams.freq_brs  = (signed long)freq_brs;
+  busParams.sjw_brs   = sjw_brs;
+  busParams.tseg1_brs = tseg1_brs;
+  busParams.tseg2_brs = tseg2_brs;
 
   ret = os_if_ioctl_write(hData->fd, VCAN_IOC_SET_BITRATE,
                           &busParams, sizeof(VCanBusParams));
@@ -520,10 +635,17 @@ static canStatus vCanSetBusParams (HandleData *hData, long freq,
 //======================================================================
 // vCanGetBusParams
 //======================================================================
-static canStatus vCanGetBusParams(HandleData *hData, long *freq,
-                                  unsigned int *tseg1, unsigned int *tseg2,
+static canStatus vCanGetBusParams(HandleData *hData,
+                                  long *freq,
+                                  unsigned int *tseg1,
+                                  unsigned int *tseg2,
                                   unsigned int *sjw,
-                                  unsigned int *noSamp, unsigned int *syncmode)
+                                  unsigned int *noSamp,
+                                  long *freq_brs,
+                                  unsigned int *tseg1_brs,
+                                  unsigned int *tseg2_brs,
+                                  unsigned int *sjw_brs,
+                                  unsigned int *syncmode)
 {
   VCanBusParams busParams;
   int ret;
@@ -540,6 +662,12 @@ static canStatus vCanGetBusParams(HandleData *hData, long *freq,
   if (tseg1)    *tseg1    = busParams.tseg1;
   if (tseg2)    *tseg2    = busParams.tseg2;
   if (noSamp)   *noSamp   = busParams.samp3;
+
+  if (freq_brs)  *freq_brs  = busParams.freq_brs;
+  if (sjw_brs)   *sjw_brs   = busParams.sjw_brs;
+  if (tseg1_brs) *tseg1_brs = busParams.tseg1_brs;
+  if (tseg2_brs) *tseg2_brs = busParams.tseg2_brs;
+
   if (syncmode) *syncmode = 0;
 
   return canOK;
@@ -571,8 +699,15 @@ static canStatus vCanReadInternal (HandleData *hData, long *id,
       } else {
         flags = canMSG_STD;
       }
+
+      if (msg.tagData.msg.flags & VCAN_MSG_FLAG_EDL)
+        flags |= canFDMSG_EDL;
+      if (msg.tagData.msg.flags & VCAN_MSG_FLAG_BRS)
+        flags |= canFDMSG_BRS;
+      if (msg.tagData.msg.flags & VCAN_MSG_FLAG_ESI)
+        flags |= canFDMSG_ESI;
       if (msg.tagData.msg.flags & VCAN_MSG_FLAG_OVERRUN)
-        flags |= canMSGERR_HW_OVERRUN | canMSGERR_SW_OVERRUN;;
+        flags |= canMSGERR_HW_OVERRUN | canMSGERR_SW_OVERRUN;
       if (msg.tagData.msg.flags & VCAN_MSG_FLAG_REMOTE_FRAME)
         flags |= canMSG_RTR;
       if (msg.tagData.msg.flags & VCAN_MSG_FLAG_ERROR_FRAME)
@@ -582,21 +717,31 @@ static canStatus vCanReadInternal (HandleData *hData, long *id,
       if (msg.tagData.msg.flags & VCAN_MSG_FLAG_TX_START)
         flags |= canMSG_TXRQ;
 
+      // Copy data
+      if (msgPtr != NULL) {
+        int count = msg.tagData.msg.dlc;
+
+        if (flags & canFDMSG_EDL) {
+          count = dlcToBytesFD(count);
+        } 
+        else if (count > 8) {
+          count = 8;
+        }
+        
+        if (!hData->acceptLargeDlc) {
+          msg.tagData.msg.dlc = count;
+        }
+        
+        for (i = 0; i < count; i++)
+          ((unsigned char *)msgPtr)[i] = msg.tagData.msg.data[i];
+      }
+
       // MSb is extended flag
       if (id)   *id   = msg.tagData.msg.id & ~EXT_MSG;
       if (dlc)  *dlc  = msg.tagData.msg.dlc;
       if (time) *time = (msg.timeStamp * 10UL) / (hData->timerResolution) ;
       if (flag) *flag = flags;
 
-      // Copy data
-      if (msgPtr != NULL) {
-        int count = msg.tagData.msg.dlc;
-        if (count > 8) {
-          count = 8;
-        }
-        for (i = 0; i < count; i++)
-          ((unsigned char *)msgPtr)[i] = msg.tagData.msg.data[i];
-      }
       break;
     }
   }
@@ -640,7 +785,7 @@ static canStatus vCanReadWait (HandleData    *hData,
 {
   int one = 1;
   int timeout_int = timeout;
-  
+
   if (timeout_int == 0) {
     return vCanRead(hData, id, msgPtr, dlc, flag, time);
   }
@@ -776,14 +921,53 @@ static canStatus vCanWriteInternal(HandleData *hData, long id, void *msgPtr,
 
   int ret;
   unsigned char sendExtended;
+  unsigned int nbytes;
+  unsigned int dlcFD = dlc;
+  int msgFlags = 0;
 
   if      (flag & canMSG_STD) sendExtended = 0;
   else if (flag & canMSG_EXT) sendExtended = 1;
   else                        sendExtended = hData->isExtended;
 
   if  (( sendExtended && (id >= (1 << 29))) ||
-       (!sendExtended && (id >= (1 << 11))) ||
-       (dlc > 15)) {
+       (!sendExtended && (id >= (1 << 11)))) {
+    DEBUGPRINT((TXT("canERR_PARAM on line %d\n"), __LINE__));  // Was 3,
+    return canERR_PARAM;
+  }
+
+  if (!DlcOk(hData, dlc, flag)) {
+    return canERR_PARAM;
+  }
+
+  if (flag & canFDMSG_BRS && !(flag & canFDMSG_EDL))
+  {
+    // BRS is only allowed in CAN FD
+    return canERR_PARAM;
+  }
+  if (flag & canFDMSG_ESI) {
+    // ESI can only be received, not transmitted
+    return canERR_PARAM;
+  }
+
+  if (flag & canFDMSG_EDL) {
+    if (hData->fdMode) {
+      msgFlags |= VCAN_MSG_FLAG_EDL;
+    }
+    else {
+      return canERR_PARAM;
+    }
+  }
+
+  if (flag & canFDMSG_EDL) {
+    dlcFD = bytesToDlcFD(dlc);
+    nbytes = dlcToBytesFD(dlcFD);
+  }
+  else {
+    nbytes = dlc > 8 ? 8 : dlc;
+  }
+
+
+  if (dlcFD > 15) {
     DEBUGPRINT((TXT("canERR_PARAM on line %d\n"), __LINE__));  // Was 3,
     return canERR_PARAM;
   }
@@ -792,12 +976,17 @@ static canStatus vCanWriteInternal(HandleData *hData, long id, void *msgPtr,
     id |= EXT_MSG;
   }
   msg.id     = id;
-  msg.length = dlc;
-  msg.flags  = 0;
+  msg.length = dlcFD;
+  msg.flags  = msgFlags;
   if (flag & canMSG_ERROR_FRAME) msg.flags |= VCAN_MSG_FLAG_ERROR_FRAME;
   if (flag & canMSG_RTR)         msg.flags |= VCAN_MSG_FLAG_REMOTE_FRAME;
+
+  if (flag & canFDMSG_EDL)       msg.flags |= VCAN_MSG_FLAG_EDL;
+
+  if (flag & canFDMSG_BRS)       msg.flags |= VCAN_MSG_FLAG_BRS;
+
   if (msgPtr) {
-    memcpy(msg.data, msgPtr, dlc > 8 ? 8 : dlc);
+    memcpy(msg.data, msgPtr, nbytes);
   }
 
   // ret = ioctl(hData->fd, VCAN_IOC_SENDMSG, &msg);
@@ -850,7 +1039,7 @@ static canStatus vCanWriteWait (HandleData *hData, long id, void *msgPtr,
 {
   int one = 1;
   int timeout_int = timeout;
-  
+
   if (timeout == 0) {
     return vCanWrite(hData, id, msgPtr, dlc, flag);
   }
@@ -1013,7 +1202,7 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
     DEBUGPRINT((TXT("Unable to open %s\n"), deviceName));
     return canERR_NOTFOUND;
   }
-  
+
   switch (item) {
   case canCHANNELDATA_CARD_SERIAL_NO:
     err = os_if_ioctl_read(fd, VCAN_IOC_GET_SERIAL, buffer, bufsize);
@@ -1228,7 +1417,7 @@ static canStatus kCanObjbufWrite (HandleData *hData, int idx, int id, void* msg,
   ioc.dlc           = dlc;
   memcpy(ioc.data, msg, sizeof(ioc.data));
   ioc.flags         = flags;
-  
+
   ret = os_if_ioctl_write(hData->fd, KCAN_IOCTL_OBJBUF_WRITE,
                           &ioc, sizeof(ioc));
   if (ret != 0) {
@@ -1364,6 +1553,7 @@ static canStatus kCanObjbufDisable (HandleData *hData, int idx)
   return canOK;
 }
 
+
 CANOps vCanOps = {
   // VCan Functions
   .setNotify           = vCanSetNotify,
@@ -1395,5 +1585,5 @@ CANOps vCanOps = {
   .objbufSetMsgCount   = kCanObjbufSetMsgCount,
   .objbufSendBurst     = kCanObjbufSendBurst,
   .objbufEnable        = kCanObjbufEnable,
-  .objbufDisable       = kCanObjbufDisable
+  .objbufDisable       = kCanObjbufDisable,
 };

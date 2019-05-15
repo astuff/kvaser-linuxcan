@@ -183,6 +183,7 @@ void queue_reinit (Queue *queue)
   QUEUE_DEBUG_UNLOCK;
   UNLOCKQ(queue, flags);
 }
+EXPORT_SYMBOL(queue_reinit);
 
 
 void queue_init (Queue *queue, int size)
@@ -194,12 +195,14 @@ void queue_init (Queue *queue, int size)
   queue->locked = 0;
   queue_reinit(queue);
 }
+EXPORT_SYMBOL(queue_init);
 
 
 void queue_irq_lock (Queue *queue)
 {
   queue->lock_type = Irq_lock;
 }
+EXPORT_SYMBOL(queue_irq_lock);
 
 
 int queue_length (Queue *queue)
@@ -224,6 +227,7 @@ int queue_length (Queue *queue)
 
   return length;
 }
+EXPORT_SYMBOL(queue_length);
 
 
 int queue_full (Queue *queue)
@@ -240,6 +244,7 @@ int queue_empty (Queue *queue)
 
   return queue_length(queue) == 0;
 }
+EXPORT_SYMBOL(queue_empty);
 
 
 // Lock will be held when this returns.
@@ -278,6 +283,7 @@ int queue_back (Queue *queue)
 
   return back;
 }
+EXPORT_SYMBOL(queue_back);
 
 
 // Lock must be held from a previous queue_back().
@@ -294,6 +300,7 @@ void queue_push (Queue *queue)
   QUEUE_DEBUG_UNLOCK;
   UNLOCKQ(queue, queue->flags);
 }
+EXPORT_SYMBOL(queue_push);
 
 
 // Lock will be held when this returns.
@@ -325,6 +332,7 @@ int queue_front (Queue *queue)
 
   return front;
 }
+EXPORT_SYMBOL(queue_front);
 
 
 // Lock must be held from a previous queue_front().
@@ -341,6 +349,7 @@ void queue_pop (Queue *queue)
   QUEUE_DEBUG_UNLOCK;
   UNLOCKQ(queue, queue->flags);
 }
+EXPORT_SYMBOL(queue_pop);
 
 
 // Lock must be held from a previous queue_front/back().
@@ -351,6 +360,7 @@ void queue_release (Queue *queue)
   QUEUE_DEBUG_UNLOCK;
   UNLOCKQ(queue, queue->flags);
 }
+EXPORT_SYMBOL(queue_release);
 
 
 void queue_add_wait_for_space (Queue *queue, OS_IF_WAITQUEUE *waiter)
@@ -359,6 +369,7 @@ void queue_add_wait_for_space (Queue *queue, OS_IF_WAITQUEUE *waiter)
 
   os_if_add_wait_queue(&queue->space_event, waiter);
 }
+EXPORT_SYMBOL(queue_add_wait_for_space);
 
 
 void queue_remove_wait_for_space (Queue *queue, OS_IF_WAITQUEUE *waiter)
@@ -367,6 +378,7 @@ void queue_remove_wait_for_space (Queue *queue, OS_IF_WAITQUEUE *waiter)
 
   os_if_remove_wait_queue(&queue->space_event, waiter);
 }
+EXPORT_SYMBOL(queue_remove_wait_for_space);
 
 
 
@@ -377,6 +389,7 @@ void queue_wakeup_on_space (Queue *queue)
 
   os_if_wake_up_interruptible(&queue->space_event);
 }
+EXPORT_SYMBOL(queue_wakeup_on_space);
 
 
 OS_IF_WAITQUEUE_HEAD *queue_space_event (Queue *queue)
