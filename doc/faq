@@ -1,0 +1,69 @@
+**********************************************
+Kvaser LINUX Drivers 
+**********************************************
+
+Frequently Asked Questions - FAQ
+
+
+
+--------------------------------------------------------------------------------
+Q
+    After doing make/make install you get an error like:
+    
+    make: *** /usr/src/linux-something: No such file or directory. 
+    Stop.
+ 
+A    
+    This probably means that the kernel source either is not installed or that 
+    the path to the kernel source in the settings.mak file is incorrect. 
+    The path is typically /usr/src/linux-*the version of the kernel*. 
+    However there is often a link to the source directory that can be used 
+    (/usr/src/linux). 
+    
+    In Fedora there doesn't seem to be a link to the kernel source and it is not
+    in the *regular* place. In fedora core 4 (kernel 2.6.11) it can be found in
+    /usr/src/kernels/2.6.11-1.1369_FC4-i686
+    
+    The correct path should be entered here in the settings.mak file:
+    
+    #----------------------------------------
+    # Select kernel source folder
+    #----------------------------------------
+    KERNEL_SOURCE_DIR=/usr/src/linux-`uname -r`
+    
+    If the kernel source is not installed consult your Linux distribution help
+    files on howto do this. 
+    
+--------------------------------------------------------------------------------
+    
+Q
+    Compilation succeeded but the driver will not install. You get an error like:
+    
+    installscript_lapcan_26.sh: line 13: cardctl: command not found
+    ...
+        
+A
+    This probably means that cardctl are not in your path. It is usually found
+    in /sbin/.  Add this path to your path and then run make install again. 
+
+--------------------------------------------------------------------------------
+Q
+    Compilation succeeded but the driver will not install. You get an error like:
+
+    Permission denied
+
+    To install the driver you have to be logged in as root. 
+    
+    
+--------------------------------------------------------------------------------
+Q
+    I have compiled and installed everything but I still cannot get the drivers
+    to work. 
+    
+A
+    This might have to do with that the dependency files need to be recreated
+    so that modprobe can load correct module. Run depmod and then restart the driver 
+    (e.g. pcican.sh start).
+    
+--------------------------------------------------------------------------------
+     

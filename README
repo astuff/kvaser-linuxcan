@@ -1,0 +1,98 @@
+/*
+** Copyright 2002-2005 KVASER AB, Sweden.  All rights reserved.
+*/
+
+
+- Linux drivers for Kvaser LAPcan, PCIcan, PCIcan II and USBcanII -
+
+System requirements:
+
+* Linux 2.4 or 2.6 (only 2.6 for USBcanII)
+* System setup for kernel compilation.
+* PCMCIA subsystem configured if you are using LAPcan.
+
+NOTE! The current driver only supports ONE USBcanII device.
+NOTE! Not tested on SMP kernels.
+NOTE! Read ReleaseNotes before using the driver.
+
+Compilation:
+
+* logged in as root do:
+  "make"/"make install" to build/install all drivers
+
+* to build just a single driver:
+  "make pcican_install"/ "make lapcan_install" 
+
+View/change default settings in settings.mak.
+
+
+Usage:
+
+* Run depmod before loading the driver. 
+  This will create a dependency file that is needed for modprobe 
+  to load the correct module.
+* "pcican.sh start" or "pcicanII.sh start" to load driver.
+* "pcican.sh stop" or "pcicanII.sh stop" to unload driver.
+* LAPcan/LAPcanII and USBcanII will load when inserting the device.
+* Try examples in /usr/doc/canlib/examples/.
+
+
+
+
+Installed Files:
+
+* Driver modules
+----------------------------------
+/lib/modules/`uname -r`/pcmcia/lapcan_cs.o (lapcan)
+/lib/modules/`uname -r`/kernel/drivers/char/kvpcican.o (pcican)
+/lib/modules/`uname -r`/kernel/drivers/char/kvpcicanII.o (pcicanII)
+/lib/modules/`uname -r`/kernel/drivers/usb/misc/usbcanII.ko (usbcanII)
+note: for kernel 2.6.x the module ending is .ko instead of .o.  
+
+* Module setup
+----------------------------------
+The following lines are added to /etc/modules.conf for PCIcan:
+
+    alias pcican kvpcican
+    install kvpcican /usr/sbin/pcican.sh start
+
+The following lines are added to /etc/modules.conf for PCIcan II:
+
+    alias pcicanII kvpcicanII
+    install kvpcicanII /usr/sbin/pcicanII.sh start
+
+For LAPcan this goes into /etc/pcmcia/config:
+
+    device "lapcan_cs" class "can" module "lapcan_cs"
+    card "Kvaser LAPcan" manfid 0x01ee, 0x001d bind "lapcan_cs"
+    card "Kvaser LAPcan II" manfid 0x01ee, 0x0073 bind "lapcan_cs"
+
+* Module loading
+----------------------------------
+/etc/pcmcia/can (start/stop the lapcan driver from pcmcia subsystem)
+/usr/sbin/pcican.sh (start pcican driver; by modprobe or manually)
+/usr/sbin/pcicanII.sh (start pcicanII driver; by modprobe or manually)
+
+
+* Include files for canlib library
+----------------------------------
+/usr/include/canlib.h
+/usr/include/canstat.h
+
+* Canlib library and links
+----------------------------------
+/usr/lib/libcanlib.so
+/usr/lib/libcanlib.so.1.0.1
+/usr/lib/libcanlib.so.1
+
+* Canlib documentation
+----------------------------------
+/usr/doc/canlib/HTMLhelp
+
+* Canlib examples
+----------------------------------
+/usr/doc/canlib/examples
+
+* Canlib Makefile template
+----------------------------------
+/usr/doc/canlib/examples/Makefile

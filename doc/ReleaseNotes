@@ -1,0 +1,177 @@
+/*
+** Copyright 2002-2006 KVASER AB, Sweden.  All rights reserved.
+*/
+
+================================================================
+Release notes
+================================================================
+
+Linux device drivers for
+
+  *  KVASER LAPcan
+  *  KVASER LAPcan II 
+  *  KVASER PCIcan-S
+  *  KVASER PCIcan-D
+  *  KVASER PCIcan-Q
+  *  KVASER PCIcan II HS/HS
+  *  KVASER USBcanII HS/HS
+  *  KVASER USBcanII HS/LS
+  *  KVASER USBcanII HS
+  *  KVASER USBcanII Rugged HS/HS
+  *  KVASER USBcanII Rugged HS
+  *  KVASER Memorator HS/HS**
+  *  KVASER Memorator HS/LS**
+  
+  ** Only with USBcanII functionality. 
+
+- Kvaser, December 28, 2005 - 
+
+
+================================================================
+Support
+================================================================
+If you have any problems you are welcome to contact us. 
+You will find the contact information on the web at 
+http://www.kvaser.com.
+
+================================================================
+Version info
+================================================================
+   * Tested with Mandrake Linux 9.0 (2.4.19-16mdk) 
+     and Mandrake Linux  10.0 (2.6.3-7mdk)
+   * Compiled with gcc version 3.2 and 3.3.2
+   * Used version 2.2.5 and 2.3.3 of glibc
+  
+================================================================
+Information about version 4.2
+================================================================
+Small changes and solved bugs.
+No major changes done.
+System requirements: Linux 2.4, 2.6 (only 2.6 for USBcanII).
+
+NOTE! Not tested on SMP kernels.
+NOTE! The current driver only supports ONE USBcanII device.
+NOTE! Read 'Known problems in version 4.2' below carefully.
+
+================================================================
+Updates in version 4.2
+================================================================
+   * Added locking for pcicanII queues.
+   * For USBcanII URB_ASYNC_UNLINK is removed from kernel source 
+     code since kernel version 2.6.14.
+ 
+================================================================
+Information about version 4.1 BETA
+================================================================
+USBcan II beta driver is now available.
+PCIcan II beta driver is now available.
+System requirements: Linux 2.2, 2.4 or 2.6 (only 2.6 for USBcanII).
+NOTE! The current driver only supports ONE USBcanII device.
+NOTE! Not tested on SMP kernels.
+
+No major changes for LAPcan and PCIcan drivers.
+The driver structure is modified and the code rewritten since 
+version 3.0 and 3.1. The functionality is the same as before.
+
+NOTE! Read 'Known problems in version 4.1 BETA' below carefully.
+
+================================================================
+Updates in version 4.1 BETA
+================================================================
+   * USBcan II beta driver is now available.
+   * PCIcan II beta driver is now available.
+   * No major changes for LAPcan and PCIcan drivers.
+
+================================================================
+Updates in version 3.1
+================================================================
+   * PCIcan canReadStatus parameter flags returns correct flag.
+   * PCIcan canReadErrorCounters returns correct values.
+   * PCIcan overrun counter zeroed in canOpenChannel.
+   
+================================================================
+New features in version 3.0
+================================================================
+   * LAPcan message buffer is now emptied correctly. 
+   * LAPcan acceptance filters are not inverted anymore. 
+  
+================================================================
+Known problems in version 4.01 BETA:
+================================================================
+   * Do not eject a LAPcan card that is currently being 
+     used. This could cause a system crash.
+   
+   * Before removing LAPcan card please unload it 
+     ('cardctl eject') to avoid system crasch. This is known to 
+     happen for ISA to PCMCIA bridges such as SCM Microsystem Inc's 
+     SwapBox with VADEM VG-465 and 469.
+   
+   * During insertion of LAPcan card it is sometimes not recognized.
+     Instead it is recognized as a memory card. Eject card and reinsert it.
+     In case that does not help, restart computer.
+     See the PCMCIA-HOWTO in case of any further problem.
+
+   * Doing 'make install' when LAPcan card is plugged in might 
+     cause error. Eject card before installing ('cardctl eject').
+
+   * During 24 hour tests canReadTimer have had the wrong 
+     value a few times.
+
+================================================================
+Solved problems in 4.01 BETA:
+================================================================
+   * pcmcia_core is not loaded when PCIcan is loaded.
+
+================================================================
+Known problems in version 4.1 BETA:
+================================================================
+   * Do not eject a LAPcan card that is currently being 
+     used. This could cause a system crash.
+   
+   * Before removing LAPcan card please unload it 
+     ('cardctl eject') to avoid system crasch. This is known to 
+     happen for ISA to PCMCIA bridges such as SCM Microsystem Inc's 
+     SwapBox with VADEM VG-465 and 469.
+   
+   * During insertion of LAPcan card it is sometimes not recognized.
+     Instead it is recognized as a memory card. Eject card and reinsert it.
+     In case that does not help, restart computer.
+     See the PCMCIA-HOWTO in case of any further problem.
+
+   * Doing 'make install' when LAPcan card is plugged in might 
+     cause error. Eject card before installing ('cardctl eject').
+
+   * During 24 hour tests canReadTimer have had the wrong 
+     value a few times.
+    * Firmware bug in PCIcanII and USBcanII that can cause a "jump" in 
+     the timestamps (655 ms). 
+     This can happen both with the message timestamps and the time read 
+     from canReadTimer(). 
+
+================================================================
+Known problems in version 4.2:
+================================================================
+   * Do not eject a LAPcan card that is currently being 
+     used. This could cause a system crash.
+   
+   * Before removing LAPcan card please unload it 
+     ('cardctl eject') to avoid system crasch. This is known to 
+     happen for ISA to PCMCIA bridges such as SCM Microsystem Inc's 
+     SwapBox with VADEM VG-465 and 469.
+   
+   * During insertion of LAPcan card it is sometimes not recognized.
+     Instead it is recognized as a memory card. Eject card and reinsert it.
+     In case that does not help, restart computer.
+     See the PCMCIA-HOWTO in case of any further problem.
+
+   * Doing 'make install' when LAPcan card is plugged in might 
+     cause error. Eject card before installing ('cardctl eject').
+
+   * Firmware bug in PCIcanII and USBcanII that can cause a "jump" in 
+     the timestamps (655 ms). 
+     This can happen both with the message timestamps and the time read 
+     from canReadTimer(). 
+
+   * The Lapcan driver will not compile under kernel versions higher than 
+     2.6.12 due to changes in the pcmcia module. 
+

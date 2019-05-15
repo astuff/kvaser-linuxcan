@@ -1,0 +1,45 @@
+# Script for start/stop of lapcan 
+/etc/pcmcia/can
+# PCMCIA card configuration database
+/etc/pcmcia/config:
+
+device "lapcan_cs"
+  class "network"
+  module "lapcan_cs"
+
+card "Kvaser LapCAN"
+  manfid 0x01ee, 0x001d
+  bind "lapcan_cs"
+
+ opts "ei_debug=4", "pcnet_cs" ????
+
+# LAPcan Driver
+/lib/modules/`uname -r`/pcmcia/lapcan_cs.o 
+
+# Doc
+/usr/doc/kernel-pcmcia-cs-2.2.14
+
+# System Setup
+/etc/sysconfig/pcmcia:
+PCMCIA=yes
+PCIC=i82365
+PCIC_OPTS=
+CORE_OPTS=
+
+-----------------------------------------
+serial console:
+
+Add "console=ttyS0"  to the -fl string you boot with, or if you use aboot.conf, 
+add "console=ttyS0" to the entries.
+(example boot  dka0 -fi 2/boot/vmlinuz -fl "root=/dev/sda2 console=ttyS0") 
+Add a "getty" to  /etc/inittab so you can get a prompt.  Copy the tty6 entry, make it 7: and the device is /dev/ttyS0
+Edit "/etc/securetty"  and add ttyS0, so you can login as root on ttyS0.
+
+Here are the relevant two lines from my lilo.conf file for serial port 1: 
+
+append="panic=40 console=ttyS0,38400n8 console=tty0"
+serial=0,38400n8
+
+
+
+
