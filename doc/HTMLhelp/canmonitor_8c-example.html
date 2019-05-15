@@ -114,7 +114,177 @@ function toggleVisibility(linkObj) {
 <h1>canmonitor.c</h1>  </div>
 </div>
 <div class="contents">
-<div class="fragment"><pre class="fragment"></pre></div> </div>
+<div class="fragment"><pre class="fragment"><span class="comment">/*</span>
+<span class="comment">**                Copyright 2012 by Kvaser AB, Mölndal, Sweden</span>
+<span class="comment">**                        http://www.kvaser.com</span>
+<span class="comment">**</span>
+<span class="comment">** This software is dual licensed under the following two licenses:</span>
+<span class="comment">** BSD-new and GPLv2. You may use either one. See the included</span>
+<span class="comment">** COPYING file for details.</span>
+<span class="comment">**</span>
+<span class="comment">** License: BSD-new</span>
+<span class="comment">** ===============================================================================</span>
+<span class="comment">** Redistribution and use in source and binary forms, with or without</span>
+<span class="comment">** modification, are permitted provided that the following conditions are met:</span>
+<span class="comment">**     * Redistributions of source code must retain the above copyright</span>
+<span class="comment">**       notice, this list of conditions and the following disclaimer.</span>
+<span class="comment">**     * Redistributions in binary form must reproduce the above copyright</span>
+<span class="comment">**       notice, this list of conditions and the following disclaimer in the</span>
+<span class="comment">**       documentation and/or other materials provided with the distribution.</span>
+<span class="comment">**     * Neither the name of the &lt;organization&gt; nor the</span>
+<span class="comment">**       names of its contributors may be used to endorse or promote products</span>
+<span class="comment">**       derived from this software without specific prior written permission.</span>
+<span class="comment">**</span>
+<span class="comment">** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND</span>
+<span class="comment">** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="comment">** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</span>
+<span class="comment">** DISCLAIMED. IN NO EVENT SHALL &lt;COPYRIGHT HOLDER&gt; BE LIABLE FOR ANY</span>
+<span class="comment">** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES</span>
+<span class="comment">** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span>
+<span class="comment">** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND</span>
+<span class="comment">** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="comment">** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS</span>
+<span class="comment">** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="comment">**</span>
+<span class="comment">**</span>
+<span class="comment">** License: GPLv2</span>
+<span class="comment">** ===============================================================================</span>
+<span class="comment">** This program is free software; you can redistribute it and/or</span>
+<span class="comment">** modify it under the terms of the GNU General Public License</span>
+<span class="comment">** as published by the Free Software Foundation; either version 2</span>
+<span class="comment">** of the License, or (at your option) any later version.</span>
+<span class="comment">**</span>
+<span class="comment">** This program is distributed in the hope that it will be useful,</span>
+<span class="comment">** but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="comment">** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="comment">** GNU General Public License for more details.</span>
+<span class="comment">**</span>
+<span class="comment">** You should have received a copy of the GNU General Public License</span>
+<span class="comment">** along with this program; if not, write to the Free Software</span>
+<span class="comment">** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.</span>
+<span class="comment">**</span>
+<span class="comment">** ---------------------------------------------------------------------------</span>
+<span class="comment">**/</span>
+
+<span class="comment">/*</span>
+<span class="comment"> * Kvaser Linux Canlib</span>
+<span class="comment"> * Read CAN messages and print out their contents</span>
+<span class="comment"> */</span>
+
+<span class="preprocessor">#include &lt;<a class="code" href="canlib_8h.html">canlib.h</a>&gt;</span>
+<span class="preprocessor">#include &lt;stdio.h&gt;</span>
+<span class="preprocessor">#include &lt;signal.h&gt;</span>
+<span class="preprocessor">#include &lt;errno.h&gt;</span>
+<span class="preprocessor">#include &lt;unistd.h&gt;</span>
+<span class="preprocessor">#include &lt;time.h&gt;</span>
+
+<span class="keywordtype">int</span> i = 0;
+<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> willExit = 0;
+<span class="keywordtype">int</span> last;
+time_t last_time = 0;
+
+
+<span class="keywordtype">void</span> sighand (<span class="keywordtype">int</span> sig)
+{
+  <span class="keywordflow">switch</span> (sig) {
+  <span class="keywordflow">case</span> SIGINT:
+    willExit = 1;
+    alarm(0);
+    <span class="keywordflow">break</span>;
+  }
+}
+
+ 
+<span class="keywordtype">int</span> main (<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> *argv[])
+
+{
+  <a class="code" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canHandle</a> h;
+  <span class="keywordtype">int</span> ret = -1;
+  <span class="keywordtype">long</span> id; 
+  <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> msg[8];
+  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> dlc;
+  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> flag;
+  <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> t;
+  <span class="keywordtype">int</span> channel = 0;
+  <span class="keywordtype">int</span> bitrate = <a name="a0"></a><a class="code" href="canlib_8h.html#af0a3340ea8fe8c3be9881bf03bddc23e">BAUD_1M</a>;
+  <span class="keywordtype">int</span> j;
+
+  errno = 0;
+  <span class="keywordflow">if</span> (argc != 2 || (channel = atoi(argv[1]), errno) != 0) {
+    printf(<span class="stringliteral">&quot;usage %s channel\n&quot;</span>, argv[0]);
+    exit(1);
+  } <span class="keywordflow">else</span> {
+    printf(<span class="stringliteral">&quot;Reading messages on channel %d\n&quot;</span>, channel);
+  }
+
+  <span class="comment">/* Use sighand as our signal handler */</span>
+  signal(SIGALRM, sighand);
+  signal(SIGINT, sighand);
+  alarm(1);
+
+  <span class="comment">/* Allow signals to interrupt syscalls(in canReadBlock) */</span>
+  siginterrupt(SIGINT, 1);
+  
+  <span class="comment">/* Open channels, parameters and go on bus */</span>
+  h = <a name="a1"></a><a class="code" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel</a>(channel, <a name="a2"></a><a class="code" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a> | <a name="a3"></a><a class="code" href="canlib_8h.html#a161c14f3b9d1e5cff276c6246a651fcd">canOPEN_REQUIRE_EXTENDED</a>);
+  <span class="keywordflow">if</span> (h &lt; 0) {
+    printf(<span class="stringliteral">&quot;canOpenChannel %d failed\n&quot;</span>, channel);
+    <span class="keywordflow">return</span> -1;
+  }
+    
+  <a name="a4"></a><a class="code" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams</a>(h, bitrate, 4, 3, 1, 1, 0);
+  <a name="a5"></a><a class="code" href="group___c_a_n.html#gafca31590718ac7101d065b0c18b2410e">canSetBusOutputControl</a>(h, <a name="a6"></a><a class="code" href="canlib_8h.html#ae5d980394050f52fd4af8f8ca75a4bca">canDRIVER_NORMAL</a>);
+  <a name="a7"></a><a class="code" href="group___c_a_n.html#ga99c7c99cc71580f8099a1407f4f9ea1a">canBusOn</a>(h);
+
+  i = 0;
+  <span class="keywordflow">while</span> (!willExit) {
+     
+    <span class="keywordflow">do</span> { 
+      ret = <a name="a8"></a><a class="code" href="group___c_a_n.html#gac01f98e282609b5f6aaf2b1eabfb83ec">canReadWait</a>(h, &amp;<span class="keywordtype">id</span>, &amp;msg, &amp;dlc, &amp;flag, &amp;t, -1);
+      <span class="keywordflow">switch</span> (ret) {
+      <span class="keywordflow">case</span> 0:
+        printf(<span class="stringliteral">&quot;(%d) id:%ld dlc:%d data: &quot;</span>, i, <span class="keywordtype">id</span>, dlc);
+        <span class="keywordflow">if</span> (dlc &gt; 8) {
+          dlc = 8;
+        }
+        <span class="keywordflow">for</span> (j = 0; j &lt; dlc; j++){
+          printf(<span class="stringliteral">&quot;%2.2x &quot;</span>, msg[j]);
+        }
+        printf(<span class="stringliteral">&quot; flags:0x%x time:%ld\n&quot;</span>, flag, t);
+        i++;
+        <span class="keywordflow">if</span> (last_time == 0) {
+          last_time = time(0);
+        } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (time(0) &gt; last_time) {
+          last_time = time(0);
+          <span class="keywordflow">if</span> (i != last) {
+            printf(<span class="stringliteral">&quot;rx : %d total: %d\n&quot;</span>, i - last, i);
+          }
+          last = i;
+        }
+        <span class="keywordflow">break</span>;
+      <span class="keywordflow">case</span> <a name="a9"></a><a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a734089f351bc421c230bf8b6cd9b1e8e">canERR_NOMSG</a>:
+        <span class="keywordflow">break</span>;
+      <span class="keywordflow">default</span>:
+        perror(<span class="stringliteral">&quot;canReadBlock error&quot;</span>);
+        <span class="keywordflow">break</span>;
+      }
+    } <span class="keywordflow">while</span> (ret == <a name="a10"></a><a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a>);
+    willExit = 1;
+  }
+   
+  <a name="a11"></a><a class="code" href="group___c_a_n.html#ga49525373a4d08d93c651ec10f79dd36b">canClose</a>(h);
+   
+  sighand(SIGALRM);
+  printf(<span class="stringliteral">&quot;Ready\n&quot;</span>);
+
+  <span class="keywordflow">return</span> 0;
+}
+
+
+
+
+
+</pre></div> </div>
 </div>
 </div>
   <div id="nav-path" class="navpath">
@@ -135,7 +305,7 @@ function toggleVisibility(linkObj) {
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (CANLIB 5.1) - Generated on Mon May 20 2013</small>
+<small>Kvaser Linux CANLIB (canlib 5.2) - Generated on Tue Sep 24 2013</small>
 </address>
 </body>
 </html>

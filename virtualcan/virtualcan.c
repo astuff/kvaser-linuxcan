@@ -70,6 +70,7 @@
 #include <linux/spinlock.h>
 #include <linux/delay.h>
 #include <linux/proc_fs.h>
+#include <linux/seq_file.h>
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)
 #   include <asm/system.h>
 #endif
@@ -122,8 +123,7 @@ static int virtualGetTxErr(VCanChanData *vChd);
 static int virtualGetRxErr(VCanChanData *vChd);
 static int virtualTxAvailable (VCanChanData *vChd);
 static int EXIT virtualCloseAllDevices(void);
-static int virtualProcRead (char *buf, char **start, off_t offset,
-                            int count, int *eof, void *data);
+static int virtualProcRead (struct seq_file* m, void* v);
 static int virtualRequestChipState (VCanChanData *vChd);
 static unsigned long virtualRxQLen(VCanChanData *vChd);
 static unsigned long virtualTxQLen(VCanChanData *vChd); 
@@ -175,17 +175,13 @@ static unsigned long getTime(VCanCardData *vCard)
 //======================================================================
 // /proc read function
 //======================================================================
-static int virtualProcRead (char *buf, char **start, off_t offset,
-                            int count, int *eof, void *data)
+static int virtualProcRead (struct seq_file* m, void* v)
 {
-    int len = 0;
-    len += sprintf(buf + len,"\ntotal channels %d\n",
+    seq_printf(m, "\ntotal channels %d\n",
                    NR_CHANNELS * NR_VIRTUAL_DEV);
-    *eof = 1;
 
-    return len;
+    return 0;
 }
-
 
 //======================================================================
 //  Can we send now?

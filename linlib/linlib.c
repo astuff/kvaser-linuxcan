@@ -1281,9 +1281,9 @@ LinStatus LINLIBAPI linGetTransceiverData(int channel,
                                           int *ttype)
 {
   canStatus stat;
-  int hnd;
   DWORD hwtype;
 #if WIN32
+  int hnd;
   HANDLE driver_handle;
 #endif
 

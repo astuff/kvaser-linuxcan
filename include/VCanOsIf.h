@@ -294,8 +294,7 @@ typedef struct VCanHWInterface {
     int (*busOn)                (VCanChanData *chd);
     int (*busOff)               (VCanChanData *chd);
     int (*txAvailable)          (VCanChanData *chd);
-    int (*procRead)             (char *buf, char **start, OS_IF_OFFSET offset,
-                                 int count, int *eof, void *data);
+    int (*procRead)             (struct seq_file* m, void* v);
     int (*closeAllDevices)      (void);
     int (*getTime)              (VCanCardData*, unsigned long *time);
     int (*flushSendBuffer)      (VCanChanData*);

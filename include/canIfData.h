@@ -53,63 +53,65 @@
 #ifndef _CANIF_DATA_H_
 #define _CANIF_DATA_H_
 
+#include <linux/types.h>
+
 /* Used as interface datatype */
 typedef struct FilterData
 {
-  unsigned int cmdNr;
-  int cmdNrMask;
-  unsigned char chanNr;
-  char chanNrMask;
-  unsigned char flags;
-  char flagsMask;
-  unsigned char isPass;
+  __u32 cmdNr;
+  __s32 cmdNrMask;
+  __u8 chanNr;
+  __s8 chanNrMask;
+  __u8 flags;
+  __s8 flagsMask;
+  __u8 isPass;
 } FilterData;
 
 typedef struct CanIfStat
 {
-    unsigned int   overruns;
-    unsigned short statSize;
-    unsigned short sendQL;
-    unsigned short rcvQL;
+    __u32   overruns;
+    __u16 statSize;
+    __u16 sendQL;
+    __u16 rcvQL;
 } CanIfStat;
 
 
 typedef struct {
-    signed long freq;
-    unsigned char sjw;
-    unsigned char tseg1;
-    unsigned char tseg2;
-    unsigned char samp3;
+    __s32 freq;
+    __u8 sjw;
+    __u8 tseg1;
+    __u8 tseg2;
+    __u8 samp3;
 } VCanBusParams;
 
 typedef struct {
-    unsigned char eventMask;
-  //unsigned char msgFlags;
-  //unsigned char flagsMask;
-    unsigned long stdId;
-    unsigned long stdMask;
-    unsigned long extId;
-    unsigned long extMask;
-    unsigned char typeBlock;
+    __u8 eventMask;
+  //__u8 msgFlags;
+  //__u8 flagsMask;
+    __u64 stdId;
+    __u64 stdMask;
+    __u64 extId;
+    __u64 extMask;
+    __u8 typeBlock;
 } VCanMsgFilter;
 
 typedef struct {
-  unsigned int buffer_number;
-  unsigned int acc_code;
-  unsigned int acc_mask;
-  unsigned int flags;
-  unsigned int type;
-  unsigned int period;
-//  unsigned int reserved[16];      // For future usage
+  __u32 buffer_number;
+  __u32 acc_code;
+  __u32 acc_mask;
+  __u32 flags;
+  __u32 type;
+  __u32 period;
+//  __u32 reserved[16];      // For future usage
 } KCanObjbufAdminData;
 
 
 typedef struct {
-  unsigned int buffer_number;
-  unsigned int id;
-  unsigned int dlc;
-  unsigned char data[8];
-  unsigned int flags;
+  __u32 buffer_number;
+  __u32 id;
+  __u32 dlc;
+  __u8 data[8];
+  __u32 flags;
 } KCanObjbufBufferData;
 
 #endif /* _CANIF_DATA_H_ */

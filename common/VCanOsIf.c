@@ -73,6 +73,7 @@
 #  include <linux/delay.h>
 #  include <linux/ioport.h>
 #  include <linux/proc_fs.h>
+#  include <linux/seq_file.h>
 #  include <asm/io.h>
 #  if LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)
 #     include <asm/system.h>
@@ -1662,8 +1663,29 @@ int vCanInitData (VCanCardData *vCard)
 }
 
 //======================================================================
+// Proc open
+//======================================================================
+
+static int kvaser_proc_open(struct inode* inode, struct file* file)
+{
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 0)
+  return single_open(file, hwIf.procRead, PDE(inode)->data);
+#else
+  return single_open(file, hwIf.procRead, PDE_DATA(inode));
+#endif
+}
+
+
+//======================================================================
 // Module init
 //======================================================================
+
+static const struct file_operations kvaser_proc_fops = {
+    .open = kvaser_proc_open,
+    .read = seq_read,
+    .llseek = seq_lseek,
+    .release = seq_release,
+};
 
 INIT int init_module (void)
 {
@@ -1685,11 +1707,10 @@ INIT int init_module (void)
     return -1;
   }
 
-
-  if (!create_proc_read_entry(driverData.deviceName,
+  if (!proc_create_data(driverData.deviceName,
                               0,             // default mode
                               NULL,          // parent dir
-                              hwIf.procRead,
+                              &kvaser_proc_fops,
                               NULL           // client data
                               )) {
     DEBUGPRINT(1, (TXT("Error creating proc read entry!\n")));

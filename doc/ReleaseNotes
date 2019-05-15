@@ -25,6 +25,8 @@ Linux device drivers for
   *  KVASER Leaf Professional
   *  KVASER Leaf SemiPro
   *  KVASER Leaf Light
+  *  KVASER Leaf Light v2
+  *  KVASER Mini PCI Express HS
   *  KVASER BlackBird SemiPro ****
   *  KVASER OEM Mercury
   *  KVASER OEM Leaf
@@ -42,25 +44,21 @@ If you have any problems you are welcome to contact us.
 You will find the contact information on the web at 
 http://www.kvaser.com.
 
+
 ================================================================
 Version info
 ================================================================
 
-   * Significant testing under x86_64 SMP Ubuntu 10.10 (2.6.35).
-   * Some testing under x86 SMP Ubuntu 11.04 (2.6.38).
-   * Some testing under x86 and x86_64 SMP Ubuntu 12.04 (3.2.0).
-   * Some testing under x86_64 SMP Ubuntu 7.04 (2.6.20)
-   * Compiled with gcc version 4.1.2, 4.2.4, 4.4.5, 4.5.2 and 4.6.3.
-   * Used glibc version 2.5, 2.7, 2.12.1, 2.13 and 2.15.
+   * Tested under x86_64 SMP Ubuntu 12.04 x32/x64 (3.2.0-29-generic-pae/3.2.0-23-generic).
+   * Tested under x86_64 SMP Ubuntu 13.04 x32/x64 (3.8.0-19-generic/3.8.0-19-generic).
+   * Compiled with gcc version 4.6.3 and 4.7.3.
+   * Used glibc version 2.15 and 2.17.
+
 
 ================================================================
-Information about version 5.1
+General information
 ================================================================
-Build improvements for old and recent Linux distributions.
-Some bug fixes and improvements.
-
-KVASER LAPcan and LAPcanII are excluded from this release and on.
-System requirements: Linux 2.6/3.x (will not build as is on 2.4).
+System requirements: Linux 2.6.26 or later.
 
 NOTE! While SMP (and fully preemptible kernel) has seen significant
       testing, it should still be considered somewhat experimental.
@@ -68,12 +66,51 @@ NOTE! While SMP (and fully preemptible kernel) has seen significant
       Feedback on use under SMP enabled (or fully preemptible)
       and 64 bit kernels is welcome.
       See the FAQ for information on how to disable SMP.
-NOTE! Read 'Known problems in version 4.X' below carefully.
+
+================================================================  
+Known problems
+================================================================
+   * Firmware bug in Leaf will cause it to start up in silent mode.
+     (Set it to normal mode manually using canSetBusOutputControl().)
+
+   * Firmware bug in Leaf will cause it to start up in silent mode.
+     (Set it to normal mode manually using canSetBusOutputControl().)
+
+   * Firmware bug in old Leaf firmware will make the driver report
+     the wrong bus parameters when queried. Update the Leaf firmware.
+
+   * Virtual CAN driver will not behave as it perhaps should when
+     it is "off bus".
+
+   * Single channel PCIcanII may report two channels.
+
+   * It is possible to continue "using" a driver while it is
+     trying to shut down. Nothing useful will happen, but the driver
+     can be blocked from unloading indefinitely.
+
+   * While the driver implements auto response functionality for all
+     hardware, the same is not true for auto tx. The latter is only
+     available if there is firmware support in the device.
+     (This is the same as under Windows.)
+
+
+================================================================
+Updates in version 5.2
+================================================================
+   * Changed types in canIfData.h in order to handle 32/64bit
+     type differences. This implies that both drivers and
+     canlib should be updated together.
+     
+   * Replaced usage of create_proc_read_entry to
+     proc_create_data. Since it is deprecated in kernel 3.10,
+     kernels >= 2.6.26 are now required. 
+     
 
 ================================================================
 Updates in version 5.1
 ================================================================
    * Minor updates to documentation.
+
 
 ================================================================
 Updates in version 5.0
@@ -84,16 +121,19 @@ Updates in version 5.0
    * Fixed build issue on ARM targets. (atomic_set_mask)
    * Updated linuxcan documentation.
 
+
 ================================================================
 Updates in version 4.82
 ================================================================
    * Added missing licence files.
+
 
 ================================================================
 Updates in version 4.81
 ================================================================
    * Added missing licence headers
    * Cleaning files using unifdef
+
 
 ================================================================
 Updates in version 4.80
@@ -107,6 +147,7 @@ Updates in version 4.80
    * Added support for local echo, canIOCTL_SET_LOCAL_TXECHO 
    * Added support for canCHANNELDATA_MFGNAME_ASCII and
      canCHANNELDATA_DEVDESCR_ASCII using canGetChannelData.
+
    
 ================================================================
 Information about version 4.78 ALPHA
@@ -125,6 +166,7 @@ NOTE! While SMP (and fully preemptible kernel) has seen significant
       and 64 bit kernels is welcome.
       See the FAQ for information on how to disable SMP.
 NOTE! Read 'Known problems in version 4.78' below carefully.
+
 
 ================================================================
 Updates in version 4.78 ALPHA
@@ -160,6 +202,7 @@ NOTE! While SMP (and fully preemptible kernel) has seen significant
       See the FAQ for information on how to disable SMP.
 NOTE! Read 'Known problems in version 4.77' below carefully.
 
+
 ================================================================
 Updates in version 4.77 ALPHA
 ================================================================
@@ -190,6 +233,7 @@ NOTE! While SMP (and fully preemptible kernel) has seen significant
       See the FAQ for information on how to disable SMP.
 NOTE! Read 'Known problems in version 4.76' below carefully.
 
+
 ================================================================
 Updates in version 4.76 ALPHA
 ================================================================
@@ -217,6 +261,7 @@ NOTE! While SMP (and fully preemptible kernel) has seen significant
       and 64 bit kernels is welcome.
       See the FAQ for information on how to disable SMP.
 NOTE! Read 'Known problems in version 4.75' below carefully.
+
 
 ================================================================
 Updates in version 4.75 ALPHA
@@ -260,6 +305,7 @@ NOTE! Only limited testing has been done under SMP so far.
       See the FAQ for solutions.
 NOTE! Read 'Known problems in version 4.72' below carefully.
 
+
 ================================================================
 Updates in version 4.72 BETA
 ================================================================
@@ -288,6 +334,7 @@ System requirements: Linux 2.4, 2.6 (only 2.6 for USBcanII and Leaf).
 NOTE! Not tested under SMP or with fully preemptive kernel.
 NOTE! Read 'Known problems in version 4.6' below carefully.
 
+
 ================================================================
 Updates in version 4.6 BETA
 ================================================================
@@ -304,6 +351,7 @@ Information about version 4.5 BETA
 ================================================================
 Fixed spinlock problem causing problems with newer kernels. 
 
+
 ================================================================
 Updates in version 4.5 BETA
 ================================================================
@@ -316,6 +364,7 @@ Updates in version 4.5 BETA
 Information about version 4.4 BETA
 ================================================================
 Small changes and solved bugs.
+
 
 ================================================================
 Updates in version 4.4 BETA
@@ -341,6 +390,7 @@ NOTE! Not tested on SMP kernels.
 NOTE! The current driver only supports ONE USBcan II or Leaf device.
 NOTE! Read 'Known problems in version 4.3' below carefully.
 
+
 ================================================================
 Updates in version 4.3 BETA
 ================================================================
@@ -361,6 +411,7 @@ System requirements: Linux 2.4, 2.6 (only 2.6 for USBcanII).
 NOTE! Not tested on SMP kernels.
 NOTE! The current driver only supports ONE USBcanII device.
 NOTE! Read 'Known problems in version 4.2' below carefully.
+
 
 ================================================================
 Updates in version 4.2
@@ -385,6 +436,7 @@ version 3.0 and 3.1. The functionality is the same as before.
 
 NOTE! Read 'Known problems in version 4.1 BETA' below carefully.
 
+
 ================================================================
 Updates in version 4.1 BETA
 ================================================================
@@ -394,93 +446,7 @@ Updates in version 4.1 BETA
 
 
 ================================================================
-Updates in version 3.1
-================================================================
-   * PCIcan canReadStatus parameter flags returns correct flag.
-   * PCIcan canReadErrorCounters returns correct values.
-   * PCIcan overrun counter zeroed in canOpenChannel.
-   
-================================================================
-New features in version 3.0
-================================================================
-   * LAPcan message buffer is now emptied correctly. 
-   * LAPcan acceptance filters are not inverted anymore. 
-
-  
-================================================================
-Known problems in version 4.01 BETA:
-================================================================
-   * Do not eject a LAPcan card that is currently being 
-     used. This could cause a system crash.
-   
-   * Before removing LAPcan card please unload it 
-     ('cardctl eject') to avoid system crasch. This is known to 
-     happen for ISA to PCMCIA bridges such as SCM Microsystem Inc's 
-     SwapBox with VADEM VG-465 and 469.
-   
-   * During insertion of LAPcan card it is sometimes not recognized.
-     Instead it is recognized as a memory card. Eject card and reinsert it.
-     In case that does not help, restart computer.
-     See the PCMCIA-HOWTO in case of any further problem.
-
-   * Doing 'make install' when LAPcan card is plugged in might 
-     cause error. Eject card before installing ('cardctl eject').
-
-   * During 24 hour tests canReadTimer have had the wrong 
-     value a few times.
-
-================================================================
 Solved problems in 4.01 BETA:
 ================================================================
    * pcmcia_core is not loaded when PCIcan is loaded.
 
-
-================================================================  
-Known problems in version 4.78 ALPHA
-================================================================
-   * Lapcan is not working in this alpha version of the driver.
-
-   * Firmware bug in Leaf will cause it to start up in silent mode.
-     (Set it to normal mode manually using canSetBusOutputControl().)
-
-   * Firmware bug in old Leaf firmware will make the driver report
-     the wrong bus parameters when queried. Update the Leaf firmware.
-
-   * Virtual CAN driver will not behave as it perhaps should when
-     it is "off bus".
-
-   * PCIcanII may not report EAN (likely not real problem).
-
-   * Single channel PCIcanII may report two channels.
-
-   * It is possible to continue "using" a driver while it is
-     trying to shut down. Nothing useful will happen, but the driver
-     can be blocked from unloading indefinitely.
-
-   * While the driver implements auto response functionality for all
-     hardware, the same is not true for auto tx. The latter is only
-     available if there is firmware support in the device.
-     (This is the same as under Windows.)
-
-================================================================  
-Known problems in version 4.80 - 5.x
-================================================================
-   * Firmware bug in Leaf will cause it to start up in silent mode.
-     (Set it to normal mode manually using canSetBusOutputControl().)
-
-   * Firmware bug in old Leaf firmware will make the driver report
-     the wrong bus parameters when queried. Update the Leaf firmware.
-
-   * Virtual CAN driver will not behave as it perhaps should when
-     it is "off bus".
-
-   * Single channel PCIcanII may report two channels.
-
-   * It is possible to continue "using" a driver while it is
-     trying to shut down. Nothing useful will happen, but the driver
-     can be blocked from unloading indefinitely.
-
-   * While the driver implements auto response functionality for all
-     hardware, the same is not true for auto tx. The latter is only
-     available if there is firmware support in the device.
-     (This is the same as under Windows.)

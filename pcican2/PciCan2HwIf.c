@@ -75,8 +75,8 @@
 #include <linux/delay.h>
 #include <linux/ioport.h>
 #include <linux/proc_fs.h>
-
 #include <asm/io.h>
+#include <linux/seq_file.h>
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)
 #   include <asm/system.h>
@@ -139,8 +139,7 @@ static int pciCanGetTxErr(VCanChanData *vChd);
 static int pciCanGetRxErr(VCanChanData *vChd);
 static int pciCanInSync (VCanChanData *vChd);
 static int EXIT pciCanCloseAllDevices(void);
-static int pciCanProcRead (char *buf, char **start, off_t offset,
-                           int count, int *eof, void *data);
+static int pciCanProcRead (struct seq_file* m, void* v);
 static int pciCanRequestChipState (VCanChanData *vChd);
 static unsigned long pciCanRxQLen(VCanChanData *vChd);
 static unsigned long pciCanTxQLen(VCanChanData *vChd); 
@@ -255,16 +254,12 @@ static OS_IF_INLINE int getTransId (heliosCmd *cmd)
 //======================================================================
 // /proc read function
 //======================================================================
-static int pciCanProcRead (char *buf, char **start, off_t offset,
-                           int count, int *eof, void *data)
+static int pciCanProcRead (struct seq_file* m, void* v)
 {
-    int len = 0;
-    len += sprintf(buf + len, "\ntotal channels %d\n", driverData.noOfDevices);
-    *eof = 1;
+	seq_printf(m, "\ntotal channels %d\n", driverData.noOfDevices);
 
-    return len;
+	return 0;
 }
-
 
 //======================================================================
 //  All acks received?

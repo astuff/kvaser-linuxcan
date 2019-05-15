@@ -447,7 +447,8 @@ DESCRIPTION</h2>
 </div>
 <div class="memdoc">
 <p>The <a class="el" href="canlib_8h.html#BAUD_xxx">BAUD_xxx</a> names are deprecated, use <a class="el" href="canlib_8h.html#ac823cae7d94763607a7ca40fcdb5196d">canBITRATE_1M</a> instead. </p>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a2">cancount.c</a>, <a class="el" href="canmonitor_8c-example.html#a0">canmonitor.c</a>, <a class="el" href="simplewrite_8c-example.html#a2">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a0">writeloop.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="acd040c85b166e139294ed5d3295d525c"></a><!-- doxytag: member="canlib.h::BAUD_250K" ref="acd040c85b166e139294ed5d3295d525c" args="" -->
@@ -475,7 +476,8 @@ DESCRIPTION</h2>
 </div>
 <div class="memdoc">
 <p>The <a class="el" href="canlib_8h.html#BAUD_xxx">BAUD_xxx</a> names are deprecated, use <a class="el" href="canlib_8h.html#ae72ee3c12379c4817de3b53c7cc6d89c">canBITRATE_500K</a> instead. </p>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="opentest_8c-example.html#a6">opentest.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="a00d3a118d0760f0cdbc6a7298beb4f3a"></a><!-- doxytag: member="canlib.h::BAUD_50K" ref="a00d3a118d0760f0cdbc6a7298beb4f3a" args="" -->
@@ -851,7 +853,8 @@ DESCRIPTION</h2>
 <div class="memdoc">
 <p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to a 64-bit (8 bytes) area which receives the firmware revision number on the card. This number consists of four 16-bit words: the major revision, the minor revision, the release number and the build number, listed in order from the most significant to the least significant. </p>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a6">listChannels.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="a78c72932de87adc579871b797817fa7c"></a><!-- doxytag: member="canlib.h::canCHANNELDATA_CARD_HARDWARE_REV" ref="a78c72932de87adc579871b797817fa7c" args="" -->
@@ -896,7 +899,8 @@ DESCRIPTION</h2>
 <div class="memdoc">
 <p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to a 64-bit (8 bytes) area which receives the serial number of the card. If the card doesn't have a serial number, 0 is returned. The serial number is an 8-byte unsigned integer. Currently, no products are using all 8 bytes; at most 4 bytes are used. </p>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a5">listChannels.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="ace40b923db9c9dc4f3f47ab1032a3db2"></a><!-- doxytag: member="canlib.h::canCHANNELDATA_CARD_TYPE" ref="ace40b923db9c9dc4f3f47ab1032a3db2" args="" -->
@@ -926,7 +930,8 @@ DESCRIPTION</h2>
 <div class="memdoc">
 <p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to a 8-byte area which receives the UPC (EAN) number for the card. If there is no UPC number, the buffer is filled with zeros. The UPC (EAN) number is coded as a BCD string with the LSB first, so e.g. 733-0130-00122-0 is coded as 0x30001220 0x00073301. </p>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a4">listChannels.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="a4e0823a649d26191cde50f2c4fa5a65d"></a><!-- doxytag: member="canlib.h::canCHANNELDATA_CHAN_NO_ON_CARD" ref="a4e0823a649d26191cde50f2c4fa5a65d" args="" -->
@@ -987,7 +992,8 @@ DESCRIPTION</h2>
 <p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to an area which receives a zero-terminated string with a clear-text name of the channel.</p>
 <dl class="note"><dt><b>Note:</b></dt><dd>Use of this item code is no longer recommended. The returned channel name doesn't contain the exact hardware type (it just contains the device family) and uses zero-based channel numbering, which is not user friendly. Instead, use e.g. <a class="el" href="canlib_8h.html#afc7edc82e3d370444c3b83c66a9c6479">canCHANNELDATA_DEVDESCR_ASCII</a> and <a class="el" href="canlib_8h.html#a4e0823a649d26191cde50f2c4fa5a65d">canCHANNELDATA_CHAN_NO_ON_CARD</a> to build your own channel name. </dd></dl>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a3">listChannels.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="afc7edc82e3d370444c3b83c66a9c6479"></a><!-- doxytag: member="canlib.h::canCHANNELDATA_DEVDESCR_ASCII" ref="afc7edc82e3d370444c3b83c66a9c6479" args="" -->
@@ -1002,7 +1008,8 @@ DESCRIPTION</h2>
 <div class="memdoc">
 <p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to a buffer which receives the product name of the device as a zero-terminated ASCII string. </p>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a2">listChannels.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="a895b938753bd2ea1e22f15647e816a7d"></a><!-- doxytag: member="canlib.h::canCHANNELDATA_DEVDESCR_UNICODE" ref="a895b938753bd2ea1e22f15647e816a7d" args="" -->
@@ -1321,7 +1328,8 @@ DESCRIPTION</h2>
 </div>
 <div class="memdoc">
 <p>The "normal" driver type (push-pull). This is the default. </p>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="canmonitor_8c-example.html#a6">canmonitor.c</a>, <a class="el" href="simplewrite_8c-example.html#a9">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a6">writeloop.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="a2b395831191936ba483e8c779166e906"></a><!-- doxytag: member="canlib.h::canDRIVER_OFF" ref="a2b395831191936ba483e8c779166e906" args="" -->
@@ -2350,15 +2358,7 @@ You can't use this function code when the channel is on bus. </dd></dl>
       </table>
 </div>
 <div class="memdoc">
-<h2><a class="anchor" id="LICENSE"></a>
-LICENSE</h2>
-<p>This software is dual licensed under the following two licenses: BSD-new and GPLv2. You may use either one. See the included COPYING file for details.</p>
-<p>License: BSD-new =============================================================================== Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. * Neither the name of the &lt;organization&gt; nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.</p>
-<p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL &lt;COPYRIGHT holder&gt;=""&gt; BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
-<p>License: GPLv2 =============================================================================== This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.</p>
-<p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
-<p>You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.</p>
-<p>--------------------------------------------------------------------------- </p>
+<p>This is only intended for internal use. </p>
 
 </div>
 </div>
@@ -2435,7 +2435,8 @@ LICENSE</h2>
 <div class="memdoc">
 <p>Don't allow sharing of this circuit between applications.</p>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> </p>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a3">busparms.c</a>, <a class="el" href="cancount_8c-example.html#a4">cancount.c</a>, <a class="el" href="canmonitor_8c-example.html#a2">canmonitor.c</a>, <a class="el" href="simplewrite_8c-example.html#a4">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a2">writeloop.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="a161c14f3b9d1e5cff276c6246a651fcd"></a><!-- doxytag: member="canlib.h::canOPEN_REQUIRE_EXTENDED" ref="a161c14f3b9d1e5cff276c6246a651fcd" args="" -->
@@ -2456,7 +2457,8 @@ LICENSE</h2>
 <li>If no frame-type flag is specified in a call to <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite</a>, it is assumed that extended CAN should be used.</li>
 </ul>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>. </p>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a4">busparms.c</a>, <a class="el" href="cancount_8c-example.html#a5">cancount.c</a>, <a class="el" href="canmonitor_8c-example.html#a3">canmonitor.c</a>, <a class="el" href="simplewrite_8c-example.html#a5">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a3">writeloop.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="a48cd7c2e8ed2e7bf39d3524f7a4294d6"></a><!-- doxytag: member="canlib.h::canWANT_EXCLUSIVE" ref="a48cd7c2e8ed2e7bf39d3524f7a4294d6" args="" -->
@@ -2471,7 +2473,8 @@ LICENSE</h2>
 <div class="memdoc">
 <p>Don't allow sharing of this circuit between applications.</p>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> </p>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="opentest_8c-example.html#a3">opentest.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="ab146450ad0889edc72e3d59dea710a17"></a><!-- doxytag: member="canlib.h::canWANT_EXTENDED" ref="ab146450ad0889edc72e3d59dea710a17" args="" -->
@@ -2486,7 +2489,8 @@ LICENSE</h2>
 <div class="memdoc">
 <p>Don't allow sharing of this circuit between applications.</p>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> </p>
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="opentest_8c-example.html#a4">opentest.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="a568de577a456a8fda2722f1f01e4cdd5"></a><!-- doxytag: member="canlib.h::canWANT_VIRTUAL" ref="a568de577a456a8fda2722f1f01e4cdd5" args="" -->
@@ -2664,7 +2668,7 @@ LICENSE</h2>
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (CANLIB 5.1) - Generated on Mon May 20 2013</small>
+<small>Kvaser Linux CANLIB (canlib 5.2) - Generated on Tue Sep 24 2013</small>
 </address>
 </body>
 </html>

@@ -57,6 +57,7 @@
 #  include <linux/version.h>
 #  include <linux/usb.h>
 #  include <linux/types.h>
+#  include <linux/seq_file.h>
 
 // Non system headers
 #include "osif_kernel.h"
@@ -110,8 +111,7 @@ static int usbcan_get_tx_err(VCanChanData *vChd);
 static int usbcan_get_rx_err(VCanChanData *vChd);
 static int usbcan_outstanding_sync(VCanChanData *vChan);
 static int EXIT usbcan_close_all(void);
-static int usbcan_proc_read(char *buf, char **start, off_t offset,
-                            int count, int *eof, void *data);
+static int usbcan_proc_read(struct seq_file* m, void* v);
 static int usbcan_get_chipstate(VCanChanData *vChd);
 static int usbcan_get_time(VCanCardData *vCard, unsigned long *time);
 static int usbcan_flush_tx_buffer(VCanChanData *vChan);
@@ -2465,25 +2465,21 @@ static int EXIT usbcan_close_all (void)
 //======================================================================
 // proc read function
 //
-static int usbcan_proc_read (char *buf, char **start, off_t offset,
-                             int count, int *eof, void *data)
+static int usbcan_proc_read (struct seq_file* m, void* v)
 {
-  int            len      = 0;
   int            channel  = 0;
   VCanCardData  *cardData = canCards;
 
-  len += sprintf(buf + len,"\ntotal channels %d\n", driverData.noOfDevices);
-  len += sprintf(buf + len,"minor numbers");
+  seq_printf(m, "\ntotal channels %d\n", driverData.noOfDevices);
+  seq_puts(m, "minor numbers");
   while (NULL != cardData) {
     for (channel = 0; channel < cardData->nrChannels; channel++) {
-      len += sprintf(buf + len," %d", cardData->chanData[channel]->minorNr);
+    	seq_printf(m, " %d", cardData->chanData[channel]->minorNr);
     }
     cardData = cardData->next;
   }
-  len += sprintf(buf + len, "\n");
-  *eof = 1;
 
-  return len;
+  return 0;
 } // _proc_read
 
 

@@ -57,6 +57,8 @@
 #  include <linux/version.h>
 #  include <linux/usb.h>
 #  include <linux/types.h>
+#  include <linux/seq_file.h>
+
 
 // Non system headers
 #include "osif_kernel.h"
@@ -110,8 +112,7 @@ static int leaf_get_tx_err(VCanChanData *vChd);
 static int leaf_get_rx_err(VCanChanData *vChd);
 static int leaf_outstanding_sync(VCanChanData *vChan);
 static int EXIT leaf_close_all(void);
-static int leaf_proc_read(char *buf, char **start, off_t offset,
-                          int count, int *eof, void *data);
+static int leaf_proc_read(struct seq_file* m, void* v);
 static int leaf_get_chipstate(VCanChanData *vChd);
 static int leaf_get_time(VCanCardData *vCard, unsigned long *time);
 static int leaf_flush_tx_buffer(VCanChanData *vChan);
@@ -271,6 +272,7 @@ static void   leaf_get_card_info(VCanCardData *vCard);
 #define USB_OEM_KEY_DRIVING_PRODUCT_ID      38 // Key Driving Interface HS 
 #define USB_CAN_R_PRODUCT_ID                39 // Kvaser USBcan R
 #define USB_LEAF_LITE_V2_PRODUCT_ID         288 // Kvaser Leaf Light v2
+#define USB_MINI_PCI_EXPRESS_HS_PRODUCT_ID  289 // Kvaser Mini PCI Express HS
 
 
 
@@ -298,6 +300,7 @@ static struct usb_device_id leaf_table [] = {
   { USB_DEVICE(KVASER_VENDOR_ID, USB_CAN_R_PRODUCT_ID) },
   { USB_DEVICE(KVASER_VENDOR_ID, USB_OEM_KEY_DRIVING_PRODUCT_ID) },
   { USB_DEVICE(KVASER_VENDOR_ID, USB_LEAF_LITE_V2_PRODUCT_ID) },
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_MINI_PCI_EXPRESS_HS_PRODUCT_ID) },
   { }  // Terminating entry
 };
 
@@ -1981,27 +1984,28 @@ static int leaf_plugin (struct usb_interface *interface,
   if (
       (udev->descriptor.idVendor != KVASER_VENDOR_ID) ||
       (
-       (udev->descriptor.idProduct != USB_LEAF_DEVEL_PRODUCT_ID)      &&
-       (udev->descriptor.idProduct != USB_LEAF_LITE_PRODUCT_ID)       &&
-       (udev->descriptor.idProduct != USB_LEAF_PRO_PRODUCT_ID)        &&
-       (udev->descriptor.idProduct != USB_LEAF_SPRO_PRODUCT_ID)       &&
-       (udev->descriptor.idProduct != USB_LEAF_PRO_LS_PRODUCT_ID)     &&
-       (udev->descriptor.idProduct != USB_LEAF_PRO_SWC_PRODUCT_ID)    &&
-       (udev->descriptor.idProduct != USB_LEAF_PRO_LIN_PRODUCT_ID)    &&
-       (udev->descriptor.idProduct != USB_LEAF_SPRO_LS_PRODUCT_ID)    &&
-       (udev->descriptor.idProduct != USB_LEAF_SPRO_SWC_PRODUCT_ID)   &&
-       (udev->descriptor.idProduct != USB_MEMO2_DEVEL_PRODUCT_ID)     &&
-       (udev->descriptor.idProduct != USB_MEMO2_HSHS_PRODUCT_ID)      &&
-       (udev->descriptor.idProduct != USB_UPRO_HSHS_PRODUCT_ID)       &&
-       (udev->descriptor.idProduct != USB_LEAF_LITE_GI_PRODUCT_ID)    &&
-       (udev->descriptor.idProduct != USB_LEAF_PRO_OBDII_PRODUCT_ID)  &&
-       (udev->descriptor.idProduct != USB_MEMO2_HSLS_PRODUCT_ID)      &&
-       (udev->descriptor.idProduct != USB_LEAF_LITE_CH_PRODUCT_ID)    &&
-       (udev->descriptor.idProduct != USB_BLACKBIRD_SPRO_PRODUCT_ID)  &&
-       (udev->descriptor.idProduct != USB_OEM_MERCURY_PRODUCT_ID)     &&
-       (udev->descriptor.idProduct != USB_OEM_LEAF_PRODUCT_ID)        &&
-       (udev->descriptor.idProduct != USB_OEM_KEY_DRIVING_PRODUCT_ID) &&
-       (udev->descriptor.idProduct != USB_LEAF_LITE_V2_PRODUCT_ID)    &&
+       (udev->descriptor.idProduct != USB_LEAF_DEVEL_PRODUCT_ID)            &&
+       (udev->descriptor.idProduct != USB_LEAF_LITE_PRODUCT_ID)             &&
+       (udev->descriptor.idProduct != USB_LEAF_PRO_PRODUCT_ID)              &&
+       (udev->descriptor.idProduct != USB_LEAF_SPRO_PRODUCT_ID)             &&
+       (udev->descriptor.idProduct != USB_LEAF_PRO_LS_PRODUCT_ID)           &&
+       (udev->descriptor.idProduct != USB_LEAF_PRO_SWC_PRODUCT_ID)          &&
+       (udev->descriptor.idProduct != USB_LEAF_PRO_LIN_PRODUCT_ID)          &&
+       (udev->descriptor.idProduct != USB_LEAF_SPRO_LS_PRODUCT_ID)          &&
+       (udev->descriptor.idProduct != USB_LEAF_SPRO_SWC_PRODUCT_ID)         &&
+       (udev->descriptor.idProduct != USB_MEMO2_DEVEL_PRODUCT_ID)           &&
+       (udev->descriptor.idProduct != USB_MEMO2_HSHS_PRODUCT_ID)            &&
+       (udev->descriptor.idProduct != USB_UPRO_HSHS_PRODUCT_ID)             &&
+       (udev->descriptor.idProduct != USB_LEAF_LITE_GI_PRODUCT_ID)          &&
+       (udev->descriptor.idProduct != USB_LEAF_PRO_OBDII_PRODUCT_ID)        &&
+       (udev->descriptor.idProduct != USB_MEMO2_HSLS_PRODUCT_ID)            &&
+       (udev->descriptor.idProduct != USB_LEAF_LITE_CH_PRODUCT_ID)          &&
+       (udev->descriptor.idProduct != USB_BLACKBIRD_SPRO_PRODUCT_ID)        &&
+       (udev->descriptor.idProduct != USB_OEM_MERCURY_PRODUCT_ID)           &&
+       (udev->descriptor.idProduct != USB_OEM_LEAF_PRODUCT_ID)              &&
+       (udev->descriptor.idProduct != USB_OEM_KEY_DRIVING_PRODUCT_ID)       &&
+       (udev->descriptor.idProduct != USB_LEAF_LITE_V2_PRODUCT_ID)          &&
+       (udev->descriptor.idProduct != USB_MINI_PCI_EXPRESS_HS_PRODUCT_ID)   &&
        (udev->descriptor.idProduct != USB_CAN_R_PRODUCT_ID)
       )
      )
@@ -2123,7 +2127,12 @@ static int leaf_plugin (struct usb_interface *interface,
       DEBUGPRINT(2, (TXT("\nKVASER ")));
       DEBUGPRINT(2, (TXT("Leaf Light v2 plugged in\n")));
       break;
-      
+
+    case USB_MINI_PCI_EXPRESS_HS_PRODUCT_ID:
+          DEBUGPRINT(2, (TXT("\nKVASER ")));
+          DEBUGPRINT(2, (TXT("Mini PCI Express HS plugged in\n")));
+          break;
+
     default:
       DEBUGPRINT(2, (TXT("UNKNOWN product plugged in\n")));
       break;
@@ -2979,25 +2988,22 @@ static int EXIT leaf_close_all (void)
 //======================================================================
 // proc read function
 //
-static int leaf_proc_read (char *buf, char **start, off_t offset,
-                           int count, int *eof, void *data)
+static int leaf_proc_read (struct seq_file* m, void* v)
 {
-  int            len      = 0;
   int            channel  = 0;
   VCanCardData  *cardData = canCards;
 
-  len += sprintf(buf + len,"\ntotal channels %d\n", driverData.noOfDevices);
-  len += sprintf(buf + len,"minor numbers");
+  seq_printf(m,"\ntotal channels %d\n", driverData.noOfDevices);
+  seq_puts(m,"minor numbers");
   while (NULL != cardData) {
     for (channel = 0; channel < cardData->nrChannels; channel++) {
-      len += sprintf(buf + len," %d", cardData->chanData[channel]->minorNr);
+    	seq_printf(m," %d", cardData->chanData[channel]->minorNr);
     }
     cardData = cardData->next;
   }
-  len += sprintf(buf + len, "\n");
-  *eof = 1;
+  seq_puts(m, "\n");
 
-  return len;
+  return 0;
 } // _proc_read
 
 

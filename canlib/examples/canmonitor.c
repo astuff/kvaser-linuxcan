@@ -60,6 +60,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <unistd.h>
+#include <time.h>
 
 int i = 0;
 unsigned char willExit = 0;

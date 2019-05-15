@@ -190,7 +190,8 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser USBcan R",                                   {0x30005792, 0x00073301}},
           {"Kvaser BlackBird SemiPro",                          {0x30006294, 0x00073301}},
           {"Kvaser USBcan Professional CB",                     {0x30006843, 0x00073301}},
-          {"Kvaser Leaf Light v2",                              {0x30006850, 0x00073301}}
+          {"Kvaser Leaf Light v2",                              {0x30006850, 0x00073301}},
+          {"Kvaser Mini PCI Express HS",                        {0x30006881, 0x00073301}}
 };
 
 //******************************************************

@@ -8,9 +8,11 @@ SUBSYSTEM=="usb",ENV{PRODUCT}=="bfd/[245]/*",ACTION=="remove",RUN+="/usr/sbin/us
 SUBSYSTEM=="usb",ENV{PRODUCT}=="bfd/[a-f]/*",ACTION=="add",RUN+="/usr/sbin/leaf.sh start"
 SUBSYSTEM=="usb",ENV{PRODUCT}=="bfd/1[0-3]/*",ACTION=="add",RUN+="/usr/sbin/leaf.sh start"
 SUBSYSTEM=="usb",ENV{PRODUCT}=="bfd/120/*",ACTION=="add",RUN+="/usr/sbin/leaf.sh start"
+SUBSYSTEM=="usb",ENV{PRODUCT}=="bfd/121/*",ACTION=="add",RUN+="/usr/sbin/leaf.sh start"
 SUBSYSTEM=="usb",ENV{PRODUCT}=="bfd/[a-f]/*",ACTION=="remove",RUN+="/usr/sbin/leaf.sh stop"
 SUBSYSTEM=="usb",ENV{PRODUCT}=="bfd/1[0-3]/*",ACTION=="remove",RUN+="/usr/sbin/leaf.sh stop"
 SUBSYSTEM=="usb",ENV{PRODUCT}=="bfd/120/*",ACTION=="remove",RUN+="/usr/sbin/leaf.sh stop"
+SUBSYSTEM=="usb",ENV{PRODUCT}=="bfd/121/*",ACTION=="remove",RUN+="/usr/sbin/leaf.sh stop"
 
 # Memorator Pro, USBcan Pro, Leaf Light GI, BlackBird (id = 22-29)
 SUBSYSTEM=="usb",ENV{PRODUCT}=="bfd/1[6-9]/*",ACTION=="add",RUN+="/usr/sbin/leaf.sh start"

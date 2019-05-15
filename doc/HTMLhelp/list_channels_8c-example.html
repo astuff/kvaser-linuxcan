@@ -114,7 +114,144 @@ function toggleVisibility(linkObj) {
 <h1>listChannels.c</h1>  </div>
 </div>
 <div class="contents">
-<div class="fragment"><pre class="fragment"></pre></div> </div>
+<div class="fragment"><pre class="fragment"><span class="comment">/*</span>
+<span class="comment">**                Copyright 2012 by Kvaser AB, Mölndal, Sweden</span>
+<span class="comment">**                        http://www.kvaser.com</span>
+<span class="comment">**</span>
+<span class="comment">** This software is dual licensed under the following two licenses:</span>
+<span class="comment">** BSD-new and GPLv2. You may use either one. See the included</span>
+<span class="comment">** COPYING file for details.</span>
+<span class="comment">**</span>
+<span class="comment">** License: BSD-new</span>
+<span class="comment">** ===============================================================================</span>
+<span class="comment">** Redistribution and use in source and binary forms, with or without</span>
+<span class="comment">** modification, are permitted provided that the following conditions are met:</span>
+<span class="comment">**     * Redistributions of source code must retain the above copyright</span>
+<span class="comment">**       notice, this list of conditions and the following disclaimer.</span>
+<span class="comment">**     * Redistributions in binary form must reproduce the above copyright</span>
+<span class="comment">**       notice, this list of conditions and the following disclaimer in the</span>
+<span class="comment">**       documentation and/or other materials provided with the distribution.</span>
+<span class="comment">**     * Neither the name of the &lt;organization&gt; nor the</span>
+<span class="comment">**       names of its contributors may be used to endorse or promote products</span>
+<span class="comment">**       derived from this software without specific prior written permission.</span>
+<span class="comment">**</span>
+<span class="comment">** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND</span>
+<span class="comment">** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="comment">** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</span>
+<span class="comment">** DISCLAIMED. IN NO EVENT SHALL &lt;COPYRIGHT HOLDER&gt; BE LIABLE FOR ANY</span>
+<span class="comment">** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES</span>
+<span class="comment">** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span>
+<span class="comment">** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND</span>
+<span class="comment">** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="comment">** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS</span>
+<span class="comment">** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="comment">**</span>
+<span class="comment">**</span>
+<span class="comment">** License: GPLv2</span>
+<span class="comment">** ===============================================================================</span>
+<span class="comment">** This program is free software; you can redistribute it and/or</span>
+<span class="comment">** modify it under the terms of the GNU General Public License</span>
+<span class="comment">** as published by the Free Software Foundation; either version 2</span>
+<span class="comment">** of the License, or (at your option) any later version.</span>
+<span class="comment">**</span>
+<span class="comment">** This program is distributed in the hope that it will be useful,</span>
+<span class="comment">** but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="comment">** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="comment">** GNU General Public License for more details.</span>
+<span class="comment">**</span>
+<span class="comment">** You should have received a copy of the GNU General Public License</span>
+<span class="comment">** along with this program; if not, write to the Free Software</span>
+<span class="comment">** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.</span>
+<span class="comment">**</span>
+<span class="comment">** ---------------------------------------------------------------------------</span>
+<span class="comment">**/</span>
+
+<span class="comment">/*</span>
+<span class="comment"> * Kvaser Linux Canlib</span>
+<span class="comment"> * List available channels</span>
+<span class="comment"> */</span>
+
+<span class="preprocessor">#include &quot;<a class="code" href="canlib_8h.html">canlib.h</a>&quot;</span>
+<span class="preprocessor">#include &lt;stdio.h&gt;</span>
+<span class="preprocessor">#include &lt;string.h&gt;</span>
+
+ <span class="comment">/*</span>
+<span class="comment"> Lists available CAN channels</span>
+<span class="comment"> */</span>
+
+
+<span class="keywordtype">int</span> main (<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>* argv[])
+{
+  <span class="keywordtype">int</span> chanCount = 0;
+  <span class="keywordtype">int</span> stat, i;
+  <span class="keywordtype">char</span> name[256];
+  <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ean[2], fw[2], serial[2];
+    
+  stat = <a name="a0"></a><a class="code" href="group___general.html#ga65169ca633cd30aa92b8a80e28a5378b">canGetNumberOfChannels</a>(&amp;chanCount);
+  <span class="keywordflow">if</span> (stat &lt; 0) {
+    printf(<span class="stringliteral">&quot;Error in canGetNumberOfChannels\n&quot;</span>);
+    exit(1);
+  }
+  <span class="keywordflow">if</span> (chanCount &lt; 0 || chanCount &gt; 64) {
+      printf(<span class="stringliteral">&quot;ChannelCount = %d but I don&#39;t believe it.\n&quot;</span>, chanCount);
+      exit(1);
+  }
+  <span class="keywordflow">else</span> {
+    <span class="keywordflow">if</span> (chanCount == 1)
+      printf(<span class="stringliteral">&quot;Found %d channel.\n&quot;</span>, chanCount);
+    <span class="keywordflow">else</span>
+      printf(<span class="stringliteral">&quot;Found %d channels.\n&quot;</span>, chanCount);
+  }
+
+  <span class="keywordflow">for</span> (i = 0; i &lt; chanCount; i++) {
+    stat = <a name="a1"></a><a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a2"></a><a class="code" href="canlib_8h.html#afc7edc82e3d370444c3b83c66a9c6479">canCHANNELDATA_DEVDESCR_ASCII</a>,
+                             &amp;name, <span class="keyword">sizeof</span>(name));
+    <span class="keywordflow">if</span> (stat &lt; 0) {
+      printf(<span class="stringliteral">&quot;Error in canGetChannelData - DEVDESCR_ASCII\n&quot;</span>);
+      exit(1);
+    }
+
+    <span class="keywordflow">if</span> (strcmp(name, <span class="stringliteral">&quot;Kvaser Unknown&quot;</span>) == 0) {
+      stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a3"></a><a class="code" href="canlib_8h.html#aa4fc3066c84e718b90e870103837259b">canCHANNELDATA_CHANNEL_NAME</a>,
+                               &amp;name, <span class="keyword">sizeof</span>(name));
+      <span class="keywordflow">if</span> (stat &lt; 0) {
+        printf(<span class="stringliteral">&quot;Error in canGetChannelData - CHANNEL_NAME\n&quot;</span>);
+        exit(1);
+      }
+    }
+
+    stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a4"></a><a class="code" href="canlib_8h.html#a9062beaa59d9787667bac6cbbc6b4e20">canCHANNELDATA_CARD_UPC_NO</a>,
+                             &amp;ean, <span class="keyword">sizeof</span>(ean));
+    <span class="keywordflow">if</span> (stat &lt; 0) {
+      printf(<span class="stringliteral">&quot;Error in canGetChannelData - CARD_UPC_NO\n&quot;</span>);
+      exit(1);
+    }
+
+    stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a5"></a><a class="code" href="canlib_8h.html#a8b3b4903a766565c95afd7c90f76d994">canCHANNELDATA_CARD_SERIAL_NO</a>,
+                             &amp;serial, <span class="keyword">sizeof</span>(serial));
+    <span class="keywordflow">if</span> (stat &lt; 0) {
+      printf(<span class="stringliteral">&quot;Error in canGetChannelData - CARD_SERIAL_NO\n&quot;</span>);
+      exit(1);
+    }
+
+    stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a6"></a><a class="code" href="canlib_8h.html#a1ab7e59c0771f2f9850e8fe1d2d58ff1">canCHANNELDATA_CARD_FIRMWARE_REV</a>,
+                             &amp;fw, <span class="keyword">sizeof</span>(fw));
+    <span class="keywordflow">if</span> (stat &lt; 0) {
+      printf(<span class="stringliteral">&quot;Error in canGetChannelData - CARD_FIRMWARE_REV\n&quot;</span>);
+      exit(1);
+    }
+
+    printf(<span class="stringliteral">&quot;channel %d = %s, %x-%04x-%05x-%x, (%d)%d, %d.%d.%d.%d\n&quot;</span>,
+           i, name,
+           ean[1] &gt;&gt; 8, ((ean[1] &amp; 0xff) &lt;&lt; 8) | ((ean[0] &gt;&gt; 24) &amp; 0xff),
+           (ean[0] &gt;&gt; 4) &amp; 0xfffff, ean[0] &amp; 0x0f,
+           serial[1], serial[0],
+           fw[1] &gt;&gt; 16, fw[1] &amp; 0xffff, fw[0] &gt;&gt; 16, fw[0] &amp; 0xffff);
+  }    
+
+  <span class="keywordflow">return</span> 0;
+}
+</pre></div> </div>
 </div>
 </div>
   <div id="nav-path" class="navpath">
@@ -135,7 +272,7 @@ function toggleVisibility(linkObj) {
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (CANLIB 5.1) - Generated on Mon May 20 2013</small>
+<small>Kvaser Linux CANLIB (canlib 5.2) - Generated on Tue Sep 24 2013</small>
 </address>
 </body>
 </html>

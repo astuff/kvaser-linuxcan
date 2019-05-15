@@ -591,7 +591,7 @@ static dsStatus ds_read_rom_64bit_single (DALLAS_CONTEXT *dc, int port,
 dsStatus ds_read_rom_64bit (DALLAS_CONTEXT *dc, int port, unsigned char *data)
 {
   int maxLoop = 10;
-  dsStatus stat;
+  dsStatus stat = dsError_None;
 
   while (maxLoop--) {
     stat = ds_read_rom_64bit_single(dc, port, data);
