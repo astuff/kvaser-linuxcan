@@ -67,7 +67,8 @@ var kva_db_lib_8h =
       [ "kvaDbErr_NoNode", "kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57a032af07b829ffbdf0ceac5a44e103151", null ],
       [ "kvaDbErr_NoAttrib", "kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57afb95ae02d4a074fd25d9cc2cc2915ce3", null ],
       [ "kvaDbErr_OnlyOneAllowed", "kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57a2e6abe94cabd988083a9bff0917ad82c", null ],
-      [ "kvaDbErr_WrongOwner", "kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57a0d58c63614683ccc7085893224806db6", null ]
+      [ "kvaDbErr_WrongOwner", "kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57a0d58c63614683ccc7085893224806db6", null ],
+      [ "kvaDbErr_InUse", "kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57aa67dee2da991c9d854d167c7db921cf4", null ]
     ] ],
     [ "kvaDbAddAttribute", "group__kvadb__attributes.html#ga260cd9cb2cccec515596389e51556f5b", null ],
     [ "kvaDbAddAttributeDefinition", "group__kvadb__attributes.html#gabbc2f38c6b7c0f437d1d679be2158d7f", null ],
@@ -85,6 +86,7 @@ var kva_db_lib_8h =
     [ "kvaDbClose", "group__kvadb__database.html#ga08c85db8a33c4dcdb9d1114b72ab7c30", null ],
     [ "kvaDbCreate", "group__kvadb__database.html#ga0da72bb21d2664d6443f7b3349ec9df5", null ],
     [ "kvaDbDeleteAttribute", "group__kvadb__attributes.html#gaa43ebaec0d07b20058225ffd05b7ce1d", null ],
+    [ "kvaDbDeleteAttributeDefinition", "group__kvadb__attributes.html#ga39d81ba79c3d67ad550675dc580dd20e", null ],
     [ "kvaDbDeleteAttributeDefinitionEnum", "group__kvadb__attributes.html#gad32397697c2d9566e6287c1d33ae9376", null ],
     [ "kvaDbDeleteEnumValue", "group__kvadb__signals.html#gaef7c3535c1edd6709c5c1bc666780bb9", null ],
     [ "kvaDbDeleteMsg", "group__kvadb__messages.html#ga35653db199de9237996e708ef9cfd7c1", null ],

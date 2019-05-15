@@ -8,6 +8,7 @@ var searchData=
   ['int64',['int64',['../kvmlib_8h.html#a7cde0074dfd288f2d70c0e035dacb28a',1,'kvmlib.h']]],
   ['int8',['int8',['../kvmlib_8h.html#aa79c2d3de4fcd200458c406f40b2ae64',1,'kvmlib.h']]],
   ['invalid_5fhandle_5fvalue',['INVALID_HANDLE_VALUE',['../kvmlib_8h.html#a5fdc7facea201bfce4ad308105f88d0c',1,'kvmlib.h']]],
+  ['i_2fo_20pin_20handling',['I/O Pin Handling',['../group__kv__io.html',1,'']]],
   ['initialization',['Initialization',['../group__kvaxml__initialization.html',1,'']]],
   ['initialization',['Initialization',['../group__kvm__initialization.html',1,'']]],
   ['initialization',['Initialization',['../page_user_guide_init.html',1,'page_user_guide']]],

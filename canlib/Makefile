@@ -1,5 +1,5 @@
 #
-#             Copyright 2017 by Kvaser AB, Molndal, Sweden
+#             Copyright 2018 by Kvaser AB, Molndal, Sweden
 #                         http://www.kvaser.com
 #
 #  This software is dual licensed under the following two licenses:
@@ -84,6 +84,8 @@ SRCS += VCanFunctions.c
 SRCS += VCanFuncUtil.c
 SRCS += VCanMemoFunctions.c
 SRCS += VCanScriptFunctions.c
+SRCS += txe.c
+SRCS += txe_fopen.c
 SRCS += dlc.c
 
 OBJS := $(patsubst %.c, %.o, $(SRCS))

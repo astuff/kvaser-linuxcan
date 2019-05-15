@@ -56,19 +56,34 @@ A4
 
 --------------------------------------------------------------------------------
 Q5
+    When executing make you get an error like:
+
+    make[2]: Entering directory '/usr/src/linux-headers-4.4.38-tegra'
+      CC [M]  /home/nvidia/linuxcan/linuxcan/common/VCanOsIf.o
+    scripts/basic/fixdep: 1: scripts/basic/fixdep: Syntax error: "(" unexpected
+
+A5
+    This probably means that the kernel build system has to be prepared using
+    the following command:
+
+    $ cd /lib/modules/`uname -r`/build
+    $ sudo make modules_prepare
+
+--------------------------------------------------------------------------------
+Q6
     Compilation succeeded but install failed. You get an error like:
 
     Permission denied
 
-A5
+A6
     You need root permissions to install linuxcan. Use 'sudo' or log in as root.
 
 --------------------------------------------------------------------------------
-Q6
+Q7
     I have compiled and installed everything but I still cannot get the drivers
     to work.
 
-A6.1
+A7.1
     Check the kernel log for errors using 'dmesg'. For Kvaser USB interfaces you
     typically see something like this when plugged in:
 
@@ -79,7 +94,7 @@ A6.1
     [32.30212] usb 1-2: Manufacturer: Kvaser AB
     [35.42160] usbcore: registered new interface driver mhydra
 
-A6.2
+A7.2
     Check the syslog for errors. On systems running systemd-journald:
 
     $ journalctl -b
@@ -97,7 +112,7 @@ A6.2
     Apr 19 15:07:54 mypc /usr/sbin/mhydra.sh: Created /dev/mhydra0
     Apr 19 15:07:54 mypc /usr/sbin/mhydra.sh: Created /dev/mhydra1
 
-A6.3
+A7.3
     Make sure the modules are loaded. The following command should print
     kvcommon and at least one more module:
 
@@ -106,7 +121,7 @@ A6.3
     kvcommon               45056  1 mhydra
 
 --------------------------------------------------------------------------------
-Q7
+Q8
     When I execute 'sudo make install' I see a warning like this in the output
     from make:
 
@@ -116,50 +131,50 @@ Q7
              installation. Or do a reboot after installation.
     ***********************************************************************
 
-A7
+A8
     Make sure you execute 'sudo make uninstall' before you install linuxcan.
 
 --------------------------------------------------------------------------------
-Q8
+Q9
     I have unplugged all Kvaser USB interfaces but the module (mhydra, leaf or
     usbcanII) is still loaded?
 
-A8
+A9
     Usually this is caused by a running application using CANlib. Make sure you
     close all applications that are using CANlib.
 
 --------------------------------------------------------------------------------
-Q9
+Q10
     I see warnings like this in the kernel log:
 
     [ 266.950566] mhydra: disagrees about version of symbol vCanInit
     [ 266.950570] mhydra: Unknown symbol vCanInit (err -22)
     ...
 
-A9
+A10
     A old version of kvcommon is already loaded. You probably reinstalled
     linuxcan and the drivers, but forgot to execute 'sudo make uninstall' before
     you executed 'sudo make install'.
 
 --------------------------------------------------------------------------------
-Q10
+Q11
     I see warnings like this in the kernel log:
 
     [ 321.875210] kvcommon: disagrees about version of symbol module_layout
 
-A10
+A11
     You probably built the modules against a different kernel version than what
     your system is running. Make sure your kernel source version is equal to
     what 'uname -r' reports.
 
 --------------------------------------------------------------------------------
-Q11
+Q12
     I see errors like this in syslog:
 
     apr 19 16:05:38 mypc /usr/sbin/mhydra.sh[22789]: modprobe: ERROR: could not insert 'mhydra': Required key not available
     apr 19 16:05:38 mypc systemd-udevd[22776]: Process '/usr/sbin/mhydra.sh start' failed with exit code 1.
 
-A11
+A12
     Your kernel is probably configured to only allow loading of validly signed
     modules. There are at least two different kernel configurations causing this
     error, CONFIG_EFI_SECURE_BOOT_SIG_ENFORCE and CONFIG_MODULE_SIG_FORCE.
@@ -179,10 +194,10 @@ A11
     https://static.lwn.net/kerneldoc/admin-guide/module-signing.html
 
 --------------------------------------------------------------------------------
-Q12
+Q13
     When and how are the modules loaded/unloaded?
 
-A12
+A13
     For Kvaser USB interfaces the corresponding module is loaded when the
     interface is plugged in. This is triggered by the udev rules in
     /etc/udev/rules.d/10-kvaser.rules. Similarly the module is unloaded when the
@@ -197,11 +212,11 @@ A12
     /etc/modules-load.d/kvaser.conf.
 
 --------------------------------------------------------------------------------
-Q13
+Q14
     I have compiled and installed everything but the Kvaser interface is not
     listed when I execute '/usr/doc/canlib/examples/listChannels'.
 
-A13
+A14
     Make sure you have connected the Kvaser interface and verify that the
     SocketCAN module does not pick up any CAN interfaces by executing 'ip -d a'.
     Here is an example of what the output could look like:
@@ -222,10 +237,10 @@ A13
     modules).
 
 --------------------------------------------------------------------------------
-Q14
+Q15
     What is SocketCAN and how can I use it?
 
-A14
+A15
     SocketCAN is a set of open source CAN drivers and a networking stack, that
     is part of the Linux kernel. Many Kvaser CAN interfaces are supported by
     SocketCAN, including Leaf, USBcan and PCI cards. SocketCAN is not maintained

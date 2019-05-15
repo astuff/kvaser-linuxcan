@@ -33,6 +33,7 @@ var searchData=
   ['kvadberr_5fdbfileopen',['kvaDbErr_DbFileOpen',['../kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57a4c94ae42af8f8aa1a3fadc2ebcbf6305',1,'kvaDbLib.h']]],
   ['kvadberr_5ffail',['kvaDbErr_Fail',['../kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57a8ded1a0b9302cdfd59e79be4aaf85dad',1,'kvaDbLib.h']]],
   ['kvadberr_5finternal',['kvaDbErr_Internal',['../kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57a52a76d653ea86d911d987872cf59b79e',1,'kvaDbLib.h']]],
+  ['kvadberr_5finuse',['kvaDbErr_InUse',['../kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57aa67dee2da991c9d854d167c7db921cf4',1,'kvaDbLib.h']]],
   ['kvadberr_5fnoattrib',['kvaDbErr_NoAttrib',['../kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57afb95ae02d4a074fd25d9cc2cc2915ce3',1,'kvaDbLib.h']]],
   ['kvadberr_5fnodatabase',['kvaDbErr_NoDatabase',['../kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57ad9dc7d6741e7ee32e9195c9612d50be3',1,'kvaDbLib.h']]],
   ['kvadberr_5fnomsg',['kvaDbErr_NoMsg',['../kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57ad915012efc83c37186d25c28de905e55',1,'kvaDbLib.h']]],

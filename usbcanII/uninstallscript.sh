@@ -115,7 +115,11 @@ grep -v "^${BLACKLIST}" < $CONF                          > newconf
 cat newconf > $CONF
 rm newconf
 
-$DEPMOD -a
-if [ "$?" -ne 0 ] ; then
-  echo Failed to execute $DEPMOD -a
+if [ "$#" -gt 0 ] && [ $1 = "develinstall" ] ; then
+  echo "Ignoring $DEPMOD -a for now.."
+else
+  $DEPMOD -a
+  if [ "$?" -ne 0 ] ; then
+    echo Failed to execute $DEPMOD -a
+  fi
 fi

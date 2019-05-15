@@ -277,7 +277,7 @@ static unsigned long ticks_to_10us (VCanCardData *vCard,
     timestamp = softSyncLoc2Glob(vCard, timestamp);
   }
 
-  retval = div_u64 (timestamp + 4999, 10000) - vCard->timestamp_offset;
+  retval = div_u64 (timestamp + 4999, 10000);
   return retval;
 }
 
@@ -2969,11 +2969,15 @@ static int mhydra_start (VCanCardData *vCard)
       DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_HAS_SCRIPT\n")));
     }
 
+    stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_HAS_IO_API);
+    if (stat != VCAN_STAT_OK) {
+      DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_HAS_IO_API\n")));
+    }
+
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_DIAGNOSTICS);
     if (stat != VCAN_STAT_OK) {
       DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_DIAGNOSTICS\n")));
     }
-
   }
 
   set_capability_value (vCard,
@@ -4634,6 +4638,10 @@ static int mhydra_capabilities (VCanCardData *vCard, uint32_t vcan_cmd) {
       case CAP_SUB_CMD_HAS_SCRIPT:
         value = reply.capabilitiesResp.scriptCap.value;
         mask  = reply.capabilitiesResp.scriptCap.mask;
+        break;
+      case CAP_SUB_CMD_HAS_IO_API:
+        value = reply.capabilitiesResp.ioApiCap.value;
+        mask  = reply.capabilitiesResp.ioApiCap.mask;
         break;
       case CAP_SUB_CMD_HAS_KDI:
         value = reply.capabilitiesResp.kdiCap.value;

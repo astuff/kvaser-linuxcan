@@ -231,6 +231,7 @@ In the same files, the following lines are added to blacklist SocketCAN:
 
     blacklist kvaser_usb
     blacklist kvaser_pci
+    blacklist kvaser_pciefd
 
 * Module loading
 ----------------------------------

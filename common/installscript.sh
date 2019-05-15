@@ -79,12 +79,17 @@ if [ $? -eq 0 ] ; then
   echo "***********************************************************************"
 fi
 
+install -d -m 755 /lib/modules/`uname -r`/kernel/drivers/usb/misc
 install -D -m 644 $MODNAME.ko /lib/modules/`uname -r`/kernel/drivers/usb/misc
 if [ "$?" -ne 0 ] ; then
   exit 1
 fi
 
-$DEPMOD -a
-if [ "$?" -ne 0 ] ; then
-  echo Failed to execute $DEPMOD -a
+if [ "$#" -gt 0 ] && [ $1 = "develinstall" ] ; then
+  echo "Ignoring $DEPMOD -a for now.."
+else
+  $DEPMOD -a
+  if [ "$?" -ne 0 ] ; then
+    echo Failed to execute $DEPMOD -a
+  fi
 fi

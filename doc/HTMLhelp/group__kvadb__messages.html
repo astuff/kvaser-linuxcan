@@ -648,7 +648,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns handle to a multiplexer signal of a given message</p>
+<p>Returns handle to a multiplexer signal of a given message. If there are no multiplexer signal, KvaDbOk will be returned and <em>*sh</em> will be <code>NULL</code>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">mh</td><td>A message handle </td></tr>
@@ -656,7 +656,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57ad8a19899af8c1e42208a67afb572b2fc">kvaDbOK</a> (zero if success </dd>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57ad8a19899af8c1e42208a67afb572b2fc">kvaDbOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="kva_db_lib_8h.html#kvaDbErr_xxx">kvaDbErr_xxx</a> (negative) if failure </dd></dl>
 
@@ -1183,7 +1183,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.24) Tue Jul 3 2018</li>
+    <li class="footer"> (canlib 5.25) Sun Sep 16 2018</li>
   </ul>
 </div>
 </body>

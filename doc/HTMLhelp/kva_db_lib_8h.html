@@ -153,7 +153,9 @@ Enumerations</h2></td></tr>
 <br />
 &#160;&#160;<a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57a2e6abe94cabd988083a9bff0917ad82c">kvaDbErr_OnlyOneAllowed</a> = -11, 
 <br />
-&#160;&#160;<a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57a0d58c63614683ccc7085893224806db6">kvaDbErr_WrongOwner</a> = -12
+&#160;&#160;<a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57a0d58c63614683ccc7085893224806db6">kvaDbErr_WrongOwner</a> = -12, 
+<br />
+&#160;&#160;<a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57aa67dee2da991c9d854d167c7db921cf4">kvaDbErr_InUse</a> = -13
 <br />
  }</td></tr>
 <tr class="separator:a2f504ec74e40048f49ed23d630528d57"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -440,6 +442,8 @@ Functions</h2></td></tr>
 <tr class="separator:ga6f1a812eee5818210df7d3e1c1bca0af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gabbc2f38c6b7c0f437d1d679be2158d7f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__attributes.html#gabbc2f38c6b7c0f437d1d679be2158d7f">kvaDbAddAttributeDefinition</a> (<a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a> dh, <a class="el" href="kva_db_lib_8h.html#a4be0bd27b01ad1ef6e1117369416e7d6">KvaDbAttributeDefHnd</a> *adh)</td></tr>
 <tr class="separator:gabbc2f38c6b7c0f437d1d679be2158d7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga39d81ba79c3d67ad550675dc580dd20e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__attributes.html#ga39d81ba79c3d67ad550675dc580dd20e">kvaDbDeleteAttributeDefinition</a> (<a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a> dh, <a class="el" href="kva_db_lib_8h.html#a4be0bd27b01ad1ef6e1117369416e7d6">KvaDbAttributeDefHnd</a> adh)</td></tr>
+<tr class="separator:ga39d81ba79c3d67ad550675dc580dd20e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0cca3a491071a7ac3c67c243a95fcf56"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__attributes.html#ga0cca3a491071a7ac3c67c243a95fcf56">kvaDbSetAttributeDefinitionName</a> (<a class="el" href="kva_db_lib_8h.html#a4be0bd27b01ad1ef6e1117369416e7d6">KvaDbAttributeDefHnd</a> adh, const char *adName)</td></tr>
 <tr class="separator:ga0cca3a491071a7ac3c67c243a95fcf56"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0dd26a857f42e172fcddbccfc374b645"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__attributes.html#ga0dd26a857f42e172fcddbccfc374b645">kvaDbSetAttributeDefinitionType</a> (<a class="el" href="kva_db_lib_8h.html#a4be0bd27b01ad1ef6e1117369416e7d6">KvaDbAttributeDefHnd</a> adh, <a class="el" href="kva_db_lib_8h.html#a097f44c9d7fcb1cd04d12ff5d0f2a133">KvaDbAttributeType</a> adType)</td></tr>
@@ -971,6 +975,8 @@ CANDBDatabaseFlags API Database Flags</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="a2f504ec74e40048f49ed23d630528d57a0d58c63614683ccc7085893224806db6"></a>kvaDbErr_WrongOwner&#160;</td><td class="fielddoc"><p>Wrong owner for attribute. </p>
 </td></tr>
+<tr><td class="fieldname"><a id="a2f504ec74e40048f49ed23d630528d57aa67dee2da991c9d854d167c7db921cf4"></a>kvaDbErr_InUse&#160;</td><td class="fielddoc"><p>An item is in use. </p>
+</td></tr>
 </table>
 
 </div>
@@ -982,7 +988,7 @@ CANDBDatabaseFlags API Database Flags</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="kva_db_lib_8h.html">kvaDbLib.h</a></li>
-    <li class="footer"> (canlib 5.24) Tue Jul 3 2018</li>
+    <li class="footer"> (canlib 5.25) Sun Sep 16 2018</li>
   </ul>
 </div>
 </body>

@@ -1,5 +1,5 @@
 /*
-**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**             Copyright 2018 by Kvaser AB, Molndal, Sweden
 **                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -61,16 +61,5 @@
 ** -----------------------------------------------------------------------------
 */
 
-/*
-** DO NOT EDIT - THIS FILE IS GENERATED AUTOMATICALLY.
-*/
-#ifndef CANLIB_VERSION_H
-#define CANLIB_VERSION_H
 
-#define CANLIB_PRODUCT_MAJOR_VERSION (8 - 3)
-#define CANLIB_MAJOR_VERSION 8
-#define CANLIB_MINOR_VERSION 25
-#define CANLIB_BUILD_VERSION 608
-#define CANLIB_BETA 0
-
-#endif
+extern FILE* txe_fopen(const char* path);

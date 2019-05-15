@@ -62,7 +62,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.24  
+Release notes for linuxcan V5.25  
 ================================================================
 
 These release notes apply to both CANLIB SDK and the Linux drivers.
@@ -159,16 +159,48 @@ Known problems
      available if there is firmware support in the device.
      (This is the same as under Windows.)
 
-   * There is a limitation in kvadblib which requires the attribute definition
-     enumeration members to be defined in a strictly increasing value order. If
-     an attribute definition enumeration member is defined to have a value of
-     x, all previously defined members with values greater than x are removed.
+
+New Features and Fixed Problems in V5.25   (16-SEP-2018)
+===========================================================================
+
+* Blacklisting SocketCAN kvaser_pciefd driver when installing pcican, pcican2
+  and pciefd drivers.
+
+* The installation script will create any missing folders in 
+  /lib/modules/`uname -r`/kernel/drivers prior to installation.
+
+* Added compiled script file (.txe) information retrieval function
+  kvScriptTxeGetData.
+
+* SDK (canlib)
+  - The clock will now be resetted at buson.
+    To disable this behaviour, call canIoCtl (canIOCTL_SET_BUSON_TIME_AUTO_RESET, 0) before
+    going onbus.
+
+  - Implemented canNOTIFY_BUSONOFF.
+
+* SDK (kvlclib)
+  - Added Vector MDF .log input format.
+  - Added API to access information about reader formats.
+  - Added option KVLC_PROPERTY_FULLY_QUALIFIED_NAMES to enable use of fully qualified
+    signal names when converting log files to output format "selected signals in CSV format".
+  - Added number of data decimals property for csv-format. Default value is 4.
+
+* SDK (kvmlib)
+  - Fixed a bug where kvmLogFileReadEvent() returned kvmERR_FILE_ERROR
+    and not kvmEOF after the last event.
+
+* SDK (kvadblib)
+  - Added GetDatabaseName to kvadblibCLSNET.
+  - Added function to delete attribute definitions, kvaDbDeleteAttributeDefinition.
 
 
 New Features and Fixed Problems in V5.24   (03-JUL-2018)
 ===========================================================================
+
 * SDK (canlib)
   - Rolled back canOPEN_NO_INIT_ACCESS changes. 
+
 
 
 New Features and Fixed Problems in V5.23   (13-MAY-2018)

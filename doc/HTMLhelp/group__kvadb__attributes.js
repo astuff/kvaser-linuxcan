@@ -7,6 +7,7 @@ var group__kvadb__attributes =
     [ "kvaDbAddNodeAttribute", "group__kvadb__attributes.html#ga572aececa809758b5be2a9281dc51c5b", null ],
     [ "kvaDbAddSignalAttribute", "group__kvadb__attributes.html#gaff8d4a4fabf98a9da8327baa8f0aed25", null ],
     [ "kvaDbDeleteAttribute", "group__kvadb__attributes.html#gaa43ebaec0d07b20058225ffd05b7ce1d", null ],
+    [ "kvaDbDeleteAttributeDefinition", "group__kvadb__attributes.html#ga39d81ba79c3d67ad550675dc580dd20e", null ],
     [ "kvaDbDeleteAttributeDefinitionEnum", "group__kvadb__attributes.html#gad32397697c2d9566e6287c1d33ae9376", null ],
     [ "kvaDbDeleteMsgAttribute", "group__kvadb__attributes.html#ga537998cc1fd0bc2e8f2960d75f53b672", null ],
     [ "kvaDbDeleteNodeAttribute", "group__kvadb__attributes.html#gaf8b92b8e9118412510779b3ed39472e9", null ],

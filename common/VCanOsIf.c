@@ -330,15 +330,17 @@ int vCanDispatchEvent (VCanChanData *chd, VCAN_EVENT *e)
 
     unsigned short int msg_flags;
 
-    if (!fileNodePtr->isBusOn) {
+    if (!fileNodePtr->isBusOn && !fileNodePtr->notify) {
       continue;
     }
-
+    
     if (e->tag == V_CHIP_STATE) {
       fileNodePtr->chip_status.busStatus      = e->tagData.chipState.busStatus;
       fileNodePtr->chip_status.txErrorCounter = e->tagData.chipState.txErrorCounter;
       fileNodePtr->chip_status.rxErrorCounter = e->tagData.chipState.rxErrorCounter;
-      continue;
+      if (!fileNodePtr->notify) {
+        continue;
+      }
     }
 
     // Event filter
@@ -458,9 +460,9 @@ int vCanDispatchEvent (VCanChanData *chd, VCAN_EVENT *e)
     }
 
     spin_lock_irqsave(&fileNodePtr->rcv.rcvLock, rcvLock_irqFlags);
-    memcpy(&(fileNodePtr->rcv.fileRcvBuffer[fileNodePtr->rcv.bufHead]),
-           e, sizeof(VCAN_EVENT));
+    memcpy(&(fileNodePtr->rcv.fileRcvBuffer[fileNodePtr->rcv.bufHead]), e, sizeof(VCAN_EVENT));
     fileNodePtr->rcv.fileRcvBuffer[fileNodePtr->rcv.bufHead].tagData.msg.flags = msg_flags;
+    fileNodePtr->rcv.fileRcvBuffer[fileNodePtr->rcv.bufHead].timeStamp -= fileNodePtr->time_start_10usec;
     vCanPushReceiveBuffer(&fileNodePtr->rcv);
     queue_length = getQLen(fileNodePtr->rcv.bufHead,
                            fileNodePtr->rcv.bufTail,
@@ -561,6 +563,7 @@ int vCanOpen (struct inode *inode, struct file *filp)
   openFileNodePtr->overrun.hw           = 0;
 
   openFileNodePtr->isBusOn              = 0;
+  openFileNodePtr->notify               = 0;
   openFileNodePtr->init_access          = 0;
   spin_lock_init(&(openFileNodePtr->rcv.rcvLock));
 
@@ -573,6 +576,7 @@ int vCanOpen (struct inode *inode, struct file *filp)
   openFileNodePtr->chip_status.busStatus      = CHIPSTAT_BUSOFF;
   openFileNodePtr->chip_status.txErrorCounter = 0;
   openFileNodePtr->chip_status.rxErrorCounter = 0;
+  openFileNodePtr->time_start_10usec          = 0;
 
   atomic_inc(&chanData->fileOpenCount);
   openFileNodePtr->next  = chanData->openFileList;
@@ -972,7 +976,7 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
   switch (ioctl_cmd) {
     case VCAN_IOC_BUS_ON:
       {
-        uint64_t ttime;
+        uint64_t      ttime;
         unsigned long rcvLock_irqFlags;
 
         DEBUGPRINT(3, (TXT("VCAN_IOC_BUS_ON\n")));
@@ -1003,6 +1007,23 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
         wait_for_completion(&chd->busOnCountCompletion);
 
         chd->busOnCount++;
+
+
+        {
+          uint64_t     time;
+          VCanSetBusOn my_arg;
+
+          copy_from_user_ret (&my_arg, (VCanSetBusOn*)arg, sizeof(VCanSetBusOn), -EFAULT);
+          if (my_arg.reset_time) {
+            vStat = hwIf->getTime(chd->vCard, &time);
+            if (vStat == VCAN_STAT_OK) {
+              fileNodePtr->time_start_10usec = time;
+            } else {
+              my_arg.retval = VCANSETBUSON_FAIL;
+              break;
+            }
+          }
+        }
 
         if(chd->busOnCount == 1) {
           vStat = hwIf->flushSendBuffer(chd);
@@ -1428,6 +1449,7 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
     case VCAN_IOC_SET_TRANSID:
       ArgPtrIn(sizeof(unsigned char));
       get_user(fileNodePtr->transId, (unsigned char*)arg);
+      fileNodePtr->notify = 1;
       break;
     //------------------------------------------------------------------
     case VCAN_IOC_GET_TRANSID:
@@ -1709,6 +1731,7 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
         uint64_t time;
         vStat = hwIf->getTime(chd->vCard, &time);
         if (vStat == VCAN_STAT_OK) {
+          time = time - fileNodePtr->time_start_10usec;
           copy_to_user_ret((uint64_t *)arg, &time, sizeof(uint64_t), -EFAULT);
         }
       }
@@ -2497,8 +2520,7 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
         return -EINVAL;
       }
 
-      chd->vCard->timestamp_offset = 0;
-      vStat = hwIf->getTime(chd->vCard, &chd->vCard->timestamp_offset);
+      vStat = hwIf->getTime(chd->vCard, &fileNodePtr->time_start_10usec);
 
       if (vStat != VCAN_STAT_OK) {
         return -EINVAL;
@@ -2509,22 +2531,21 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
   //------------------------------------------------------------------
   case VCAN_IOC_GET_CLOCK_OFFSET:
     {
-      ArgPtrOut(sizeof chd->vCard->timestamp_offset);
-      vStat = VCAN_STAT_OK;
-      copy_to_user_ret((void *)arg, &chd->vCard->timestamp_offset,
-                       sizeof chd->vCard->timestamp_offset, -EFAULT);
-
+      copy_to_user_ret((uint64_t *)arg,
+                       &fileNodePtr->time_start_10usec,
+                       sizeof(fileNodePtr->time_start_10usec),
+                       -EFAULT);
     }
     break;
 
   //------------------------------------------------------------------
   case VCAN_IOC_SET_CLOCK_OFFSET:
     {
-      ArgPtrIn(sizeof vCard->timestamp_offset);
-      vStat = VCAN_STAT_OK;
-      copy_from_user_ret(&chd->vCard->timestamp_offset, (void *)arg,
-                         sizeof chd->vCard->timestamp_offset, -EFAULT);
-    }
+      copy_from_user_ret(&fileNodePtr->time_start_10usec,
+                         (uint64_t *)arg,
+                         sizeof(fileNodePtr->time_start_10usec), 
+                         -EFAULT);
+   }
     break;
 
   //------------------------------------------------------------------

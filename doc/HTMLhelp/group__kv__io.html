@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>tmp Directory Reference</title>
+<title>I/O Pin Handling</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -58,7 +58,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('dir_8af83c0dc83a45a35ca6968cdc29a7af.html','');});
+$(document).ready(function(){initNavTree('group__kv__io.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -77,22 +77,22 @@ $(document).ready(function(){initNavTree('dir_8af83c0dc83a45a35ca6968cdc29a7af.h
 
 <div class="header">
   <div class="headertitle">
-<div class="title">tmp Directory Reference</div>  </div>
+<div class="title">I/O Pin Handling<div class="ingroups"><a class="el" href="group__grp__canlib.html">CANlib</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
-<table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="subdirs"></a>
-Directories</h2></td></tr>
-<tr class="memitem:dir_b077c42d920d220d4fe5af62a68f598c"><td class="memItemLeft" align="right" valign="top">directory &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
+
+<p>Functions related to handling I/O pins.  
+<a href="#details">More...</a></p>
+<p>Functions related to handling I/O pins. </p>
+<p>The kvIoXxx functions are used for configuring and controlling I/O pins on I/O modules connected to a device.</p>
+<p>I/O functions use a pin number to access each pin on connected I/O modules. Pin enumeration is product dependent.</p>
+<p>It is required to verify the configuration before it is possible to use any kvIoPinSetXxx()/kvIoPinGetXxx() function. The module configuration can be examined with kvIoGetNumberOfPins() and kvIoGetPinInfo(). If the configuration is as expected, a call to kvIoConfirmConfig() will confirm the configuration. Removing or adding I/O modules will change the configuration and the pins are re-enumerated. It is always required to confirm the new configuration after a configuration change. </p>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li>
     <li class="footer"> (canlib 5.25) Sun Sep 16 2018</li>
   </ul>
 </div>

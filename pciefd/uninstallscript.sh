@@ -75,11 +75,11 @@ echo Remove SocketCAN Kvaser PCI driver from blacklist.
 if [ -f /etc/modprobe.conf ] ; then
   # CentOS/Redhat/RHEL/Fedora Linux...
   CONF=/etc/modprobe.conf
-  BLACKLIST="alias     kvaser_pci   /dev/null"
+  BLACKLIST=$(printf "alias     kvaser_pci   /dev/null\nalias     kvaser_pciefd  /dev/null")
 else
   # Debian/Ubuntu Linux
   CONF=/etc/modprobe.d/kvaser.conf
-  BLACKLIST="blacklist kvaser_pci"
+  BLACKLIST=$(printf "blacklist kvaser_pci\nblacklist kvaser_pciefd")
   if [ ! -f $CONF ] ; then
     touch $CONF
   fi
@@ -91,9 +91,13 @@ grep -v "^${BLACKLIST}\|pciefd" < $CONF                > newconf
 cat newconf > $CONF
 rm newconf
 
-$DEPMOD -a
-if [ "$?" -ne 0 ] ; then
-  echo Failed to execute $DEPMOD -a
+if [ "$#" -gt 0 ] && [ $1 = "develinstall" ] ; then
+  echo "Ignoring $DEPMOD -a for now.."
+else
+  $DEPMOD -a
+  if [ "$?" -ne 0 ] ; then
+    echo Failed to execute $DEPMOD -a
+  fi
 fi
 
 MODCONF=/etc/modules-load.d/kvaser.conf

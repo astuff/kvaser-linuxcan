@@ -209,6 +209,12 @@ typedef struct {
   int  retval;
 }VCanSetBusOutputControl;
 
+#define VCANSETBUSON_FAIL -1
+typedef struct {
+  int  reset_time;
+  int  retval;
+}VCanSetBusOn;
+
 // Other missing driver stuff
 //===========================================================================
 

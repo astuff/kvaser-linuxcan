@@ -138,6 +138,9 @@ static const char *errorStrings[] = {
   "Memo failure",                    // canERR_MEMO_FAIL
   "Script error",                    // canERR_SCRIPT_FAIL
   "Script version mismatch",         // canERR_SCRIPT_WRONG_VERSION
+  "Script container version mismatch",  // canERR_SCRIPT_TXE_CONTAINER_VERSION
+  "Script container format error",   // canERR_SCRIPT_TXE_CONTAINER_FORMAT
+  "Buffer provided too small to hold data",  // canERR_BUFFER_TOO_SMALL
 };
 
 struct dev_descr {
@@ -418,8 +421,9 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags)
   hData->requireInitAccess   = ((flags & canOPEN_REQUIRE_INIT_ACCESS) != 0);
   hData->initAccess          = ((flags & canOPEN_NO_INIT_ACCESS)      == 0);
 
-  hData->notifyFd = canINVALID_HANDLE;
-  hData->valid    = TRUE;
+  hData->notifyFd   = canINVALID_HANDLE;
+  hData->valid      = TRUE;
+  hData->auto_reset = 1;
 
   status = getDevParams(channel,
                         hData->deviceName,
@@ -2703,7 +2707,7 @@ canSetNotify (const CanHandle hnd, void (*callback)(canNotifyData *),
 {
   HandleData *hData;
   const int validFlags = canNOTIFY_RX | canNOTIFY_TX | canNOTIFY_ERROR |
-                         canNOTIFY_STATUS | canNOTIFY_ENVVAR;
+                         canNOTIFY_STATUS | canNOTIFY_ENVVAR  | canNOTIFY_BUSONOFF;
 
   if (notifyFlags & ~validFlags) {
     return canERR_PARAM;
@@ -2742,7 +2746,7 @@ kvStatus CANLIBAPI kvSetNotifyCallback(const CanHandle hnd,
 {
   HandleData *hData;
   const unsigned int validFlags = canNOTIFY_RX | canNOTIFY_TX | canNOTIFY_ERROR |
-                                  canNOTIFY_STATUS | canNOTIFY_ENVVAR;
+                                  canNOTIFY_STATUS | canNOTIFY_ENVVAR | canNOTIFY_BUSONOFF;
 
   if (notifyFlags & ~validFlags) {
     return canERR_PARAM;

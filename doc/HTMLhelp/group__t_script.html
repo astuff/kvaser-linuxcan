@@ -120,6 +120,8 @@ Functions</h2></td></tr>
 <tr class="separator:gadcbe8f74ee454f27f22f9645ce0a144f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gafe38fc6634a1743f404001def0ffa392"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__t_script.html#gafe38fc6634a1743f404001def0ffa392">kvScriptGetMaxEnvvarSize</a> (int hnd, int *envvarSize)</td></tr>
 <tr class="separator:gafe38fc6634a1743f404001def0ffa392"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga442c63a2cddbf96ffa0a100e9d9e4283"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__t_script.html#ga442c63a2cddbf96ffa0a100e9d9e4283">kvScriptTxeGetData</a> (const char *filePathOnPC, int item, void *buffer, unsigned int *bufsize)</td></tr>
+<tr class="separator:ga442c63a2cddbf96ffa0a100e9d9e4283"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga17b1093e1d294442635e5899120c548e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__t_script.html#ga17b1093e1d294442635e5899120c548e">kvFileCopyToDevice</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, char *hostFileName, char *deviceFileName)</td></tr>
 <tr class="separator:ga17b1093e1d294442635e5899120c548e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga95f4a1383f8be77e74ff48d8be71aecf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__t_script.html#ga95f4a1383f8be77e74ff48d8be71aecf">kvFileCopyFromDevice</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, char *deviceFileName, char *hostFileName)</td></tr>
@@ -1124,6 +1126,61 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ga442c63a2cddbf96ffa0a100e9d9e4283"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga442c63a2cddbf96ffa0a100e9d9e4283">&#9670;&nbsp;</a></span>kvScriptTxeGetData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a> kvScriptTxeGetData </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>filePathOnPC</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>item</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int *&#160;</td>
+          <td class="paramname"><em>bufsize</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This function can be used to retrieve information from a compiled script file (.txe).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">filePathOnPC</td><td>The compiled script file name; a pointer to a <code>NULL</code> terminated array of chars.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">item</td><td>This parameter specifies what data to obtain. Valid values are one of the constants <a class="el" href="canlib_8h.html#canTXEDATA_xxx">canTXEDATA_xxx</a>. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">buffer</td><td>The address of a buffer which is to receive the data. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">bufsize</td><td>The size of the buffer to which the buffer parameter points. When the function returns, bufsize contains the number of bytes copied into the buffer.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
+<p>If the buffer specified by <em>buffer</em> and <em>bufsize</em> is not large enough to hold the data requested, the function returns <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7afc999ab39dd6545165d8bfd44bf900ec">canERR_BUFFER_TOO_SMALL</a> and stores the required buffer size in the integer pointed to by <em>bufsize</em>. The content of buffer is undefined.</p>
+<p>If parameter <em>buffer</em> is NULL, and bufsize is non-NULL, the function returns <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> and stores the required buffer size in the integer pointed to by <em>bufsize</em>. </p>
+
+</div>
+</div>
 <a id="ga5281c6fb6a81282850d8022293fd92d5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga5281c6fb6a81282850d8022293fd92d5">&#9670;&nbsp;</a></span>kvScriptUnload()</h2>
 
@@ -1170,7 +1227,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.24) Tue Jul 3 2018</li>
+    <li class="footer"> (canlib 5.25) Sun Sep 16 2018</li>
   </ul>
 </div>
 </body>

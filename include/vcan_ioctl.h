@@ -167,6 +167,8 @@
 #define VCAN_CHANNEL_CAP_EXTENDED_CAN           0x00000080
 #define VCAN_CHANNEL_CAP_SYNC_TX_FLUSH          0x00000100
 /* Flags for Kvasers channel capabilities */
+#define VCAN_CHANNEL_CAP_RESERVED_1             0x00004000  // Reserved for future use 2018-08-28
+#define VCAN_CHANNEL_CAP_HAS_IO_API             0x00008000  // Device supports IO API
 #define VCAN_CHANNEL_CAP_ERROR_COUNTERS         0x00010000
 #define VCAN_CHANNEL_CAP_CAN_DIAGNOSTICS        0x00020000
 #define VCAN_CHANNEL_CAP_TXREQUEST              0x00040000

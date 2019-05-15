@@ -80,7 +80,11 @@ fi
 
 rm -f /lib/modules/`uname -r`/kernel/drivers/usb/misc/$MODNAME.ko
 
-$DEPMOD -a
-if [ "$?" -ne 0 ] ; then
-  echo Failed to execute $DEPMOD -a
+if [ "$#" -gt 0 ] && [ $1 = "develinstall" ] ; then
+  echo "Ignoring $DEPMOD -a for now.."
+else
+  $DEPMOD -a
+  if [ "$?" -ne 0 ] ; then
+    echo Failed to execute $DEPMOD -a
+  fi
 fi

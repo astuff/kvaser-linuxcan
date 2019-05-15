@@ -295,27 +295,50 @@ static canStatus kCanSetOpenMode (HandleData *hData)
   return canOK;
 }
 
-static void notify (HandleData *hData, VCAN_EVENT *msg)
+static void notify (HandleData *hData, VCAN_EVENT *msg, uint32_t *prev_busoff)
 {
   canNotifyData *notifyData = &hData->notifyData;
-  unsigned int   cb2_notify;
+  unsigned int   cb2_notify = 0;
+  uint32_t       curr_busoff;
 
   if (msg->tag == V_CHIP_STATE) {
-    struct s_vcan_chip_state *chipState    = &msg->tagData.chipState;
-    notifyData->eventType                  = canEVENT_STATUS;
+    struct s_vcan_chip_state *chipState = &msg->tagData.chipState;
+
+    if (chipState->busStatus & CHIPSTAT_BUSOFF) {
+      curr_busoff = 1;
+    } else {
+      curr_busoff = 0;
+    }
+
+    if (hData->notifyFlags & canNOTIFY_BUSONOFF) {
+      if (curr_busoff != *prev_busoff) {
+        cb2_notify   |= canNOTIFY_BUSONOFF;
+        *prev_busoff  = curr_busoff;
+      }
+    }
+
+    if (hData->notifyFlags & canNOTIFY_STATUS) {
+      cb2_notify |= canNOTIFY_STATUS;
+    }
+
+    //just 1 event
+    if (cb2_notify & canNOTIFY_BUSONOFF) {
+      notifyData->eventType = canEVENT_BUSONOFF;
+    } else if (cb2_notify & canNOTIFY_STATUS) {
+      notifyData->eventType = canEVENT_STATUS;
+    }
+
     notifyData->info.status.busStatus      = chipState->busStatus;
     notifyData->info.status.txErrorCounter = chipState->txErrorCounter;
     notifyData->info.status.rxErrorCounter = chipState->rxErrorCounter;
     notifyData->info.status.time           = (msg->timeStamp * 10UL) / (hData->timerResolution);
-    cb2_notify                             = canNOTIFY_STATUS;
+
   } else if (msg->tag == V_RECEIVE_MSG) {
     if (msg->tagData.msg.flags & VCAN_MSG_FLAG_ERROR_FRAME) {
       if (hData->notifyFlags & canNOTIFY_ERROR) {
         notifyData->eventType        = canEVENT_ERROR;
         notifyData->info.busErr.time = (msg->timeStamp * 10UL) / (hData->timerResolution);
         cb2_notify                   = canNOTIFY_ERROR;
-      } else {
-        return;
       }
     } else if (msg->tagData.msg.flags & VCAN_MSG_FLAG_TXACK) {
       if (hData->notifyFlags & canNOTIFY_TX) {
@@ -323,8 +346,6 @@ static void notify (HandleData *hData, VCAN_EVENT *msg)
         notifyData->info.tx.id   = msg->tagData.msg.id & ~EXT_MSG;
         notifyData->info.tx.time = (msg->timeStamp * 10UL) / (hData->timerResolution);
         cb2_notify               = canNOTIFY_TX;
-      } else {
-        return;
       }
     } else {
       if (hData->notifyFlags & canNOTIFY_RX) {
@@ -332,14 +353,14 @@ static void notify (HandleData *hData, VCAN_EVENT *msg)
         notifyData->info.rx.id   = msg->tagData.msg.id & ~EXT_MSG;
         notifyData->info.rx.time = (msg->timeStamp * 10UL) / (hData->timerResolution);
         cb2_notify               = canNOTIFY_RX;
-      } else {
-        return;
       }
     }
-  } else {
-    return;
   }
 
+  if (!cb2_notify) {
+    return;
+  }
+  
   if (hData->callback) {
     hData->callback(notifyData);
   } else if (hData->callback2) {
@@ -353,23 +374,56 @@ static void notify (HandleData *hData, VCAN_EVENT *msg)
 static void *vCanNotifyThread (void *arg)
 {
   HandleData        *hData = (HandleData *)arg;
-  int               ret;
-  VCAN_IOCTL_READ_T ioctl_read_arg;
-  VCAN_EVENT        msg;
-  VCanRead          read;
+  int                ret;
+  VCAN_IOCTL_READ_T  ioctl_read_arg;
+  VCAN_EVENT         msg;
+  VCanRead           read;
+  uint32_t           busoff;
 
   memset(&read, 0, sizeof(VCanRead));
-  read.timeout = 50;
-  ioctl_read_arg.msg = &msg;
+
+  read.timeout        = 1;  //1 ms
+  ioctl_read_arg.msg  = &msg;
   ioctl_read_arg.read = &read;
 
+  //are we buson or busoff?
+  {
+    VCanRequestChipStatus  chip_status;
+    
+    if (ioctl(hData->notifyFd, VCAN_IOC_GET_CHIP_STATE, &chip_status)) {
+      pthread_exit(0); // When this thread is cancelled, ioctl will be interrupted by a signal.
+    }
+    
+    if (chip_status.busStatus & CHIPSTAT_BUSOFF) {
+      busoff = 1;
+    } else {
+      busoff = 0;
+    }
+  }
+  
+  //wait 1ms before we say that the thread is running in order to not miss any events
+  ret = ioctl(hData->notifyFd, VCAN_IOC_RECVMSG, &ioctl_read_arg);
+
+  hData->notifyThread_running = 1;
+
+  if (ret == 0) {
+    notify(hData, &msg, &busoff);
+  } else {
+    if (errno != EAGAIN) {
+      pthread_exit(0); // When this thread is cancelled, ioctl will be interrupted by a signal.
+    }
+  }
+
+  read.timeout = 50;
+  
   while (1) {
     pthread_testcancel();
 
+    hData->notifyThread_running = 1;
     ret = ioctl(hData->notifyFd, VCAN_IOC_RECVMSG, &ioctl_read_arg);
 
     if (ret == 0) {
-      notify(hData, &msg);
+      notify(hData, &msg, &busoff);
     } else {
       if (errno != EAGAIN) {
         pthread_exit(0); // When this thread is cancelled, ioctl will be interrupted by a signal.
@@ -409,11 +463,6 @@ static canStatus vCanSetNotify (HandleData *hData,
     if (ret != 0) {
       goto error_ioc;
     }
-
-    ret = ioctl(hData->notifyFd, VCAN_IOC_BUS_ON, NULL);
-    if (ret != 0) {
-      goto error_ioc;
-    }
   } else { //must kill thread in order to set new params.
     pthread_cancel(hData->notifyThread);
 
@@ -421,7 +470,8 @@ static canStatus vCanSetNotify (HandleData *hData,
     pthread_join(hData->notifyThread, NULL);
   }
 
-  hData->notifyFlags = notifyFlags;
+  hData->notifyThread_running = 0;
+  hData->notifyFlags          = notifyFlags;
 
   // Set filters
   memset(&filter, 0, sizeof(VCanMsgFilter));
@@ -433,7 +483,8 @@ static canStatus vCanSetNotify (HandleData *hData,
     filter.eventMask |= V_RECEIVE_MSG;
   }
 
-  if (notifyFlags & canNOTIFY_STATUS) {
+  if ((notifyFlags & canNOTIFY_STATUS) ||
+      (notifyFlags & canNOTIFY_BUSONOFF)) {
     filter.eventMask |= V_CHIP_STATE;
   }
 
@@ -462,6 +513,23 @@ static canStatus vCanSetNotify (HandleData *hData,
 
   hData->callback  = callback;
   hData->callback2 = callback2;
+
+  //wait for the thread to start
+  {
+    uint32_t n = 0;
+    while (1) {
+      if (hData->notifyThread_running) {
+        break;
+      }
+
+      n++;
+      if (n > 10) {
+        break;
+      }
+      usleep(1000);
+    }
+  }
+
   return canOK;
 
 error_ioc:
@@ -578,12 +646,22 @@ static canStatus vCanOpenChannel (HandleData *hData)
 //======================================================================
 static canStatus vCanBusOn (HandleData *hData)
 {
-  int ret;
-  ret = ioctl(hData->fd, VCAN_IOC_BUS_ON, NULL);
+  int          ret;
+  VCanSetBusOn my_arg;
+
+  my_arg.retval     = 0;
+  my_arg.reset_time = (uint32_t)hData->auto_reset;
+
+  ret = ioctl(hData->fd, VCAN_IOC_BUS_ON, &my_arg);
+
   if (ret != 0) {
     return errnoToCanStatus(errno);
   }
 
+  if (my_arg.retval == VCANSETBUSON_FAIL) {
+    return canERR_INTERNAL;
+  }
+  
   return canOK;
 }
 
@@ -622,7 +700,6 @@ static canStatus vCanSetBusParams (HandleData *hData,
   int              ret;
 
   (void)syncmode; // Unused.
-  my_arg.retval = 0;
 
   my_arg.retval = 0;
 
@@ -1933,6 +2010,17 @@ static canStatus vCanIoCtl(HandleData *hData, unsigned int func,
       if (ioctl(hData->fd, KCAN_IOCTL_LIN_MODE, &v_flags)) {
         return errnoToCanStatus(errno);
       }
+      break;
+    }
+
+   case canIOCTL_SET_BUSON_TIME_AUTO_RESET:
+    {
+      if (check_args (buf, buflen, sizeof (uint32_t), ERROR_WHEN_NEQ)) {
+        return canERR_PARAM;
+      }
+
+      hData->auto_reset = (unsigned char)*(uint32_t *)buf;
+
       break;
     }
 

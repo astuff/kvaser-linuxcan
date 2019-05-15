@@ -283,7 +283,6 @@ typedef struct VCanCardData
     int                     softsync_running;
     unsigned int            usb_root_hub_id;
 
-    uint64_t                timestamp_offset;
     ticks_class             ticks;
     uint32_t                default_max_bitrate;
     uint32_t                current_max_bitrate;
@@ -328,8 +327,10 @@ typedef struct VCanOpenFileNode {
     atomic_t                 objbufActive;
     VCanOverrun              overrun;
     uint8_t                  isBusOn;
+    uint8_t                  notify;
     struct VCanOpenFileNode *next;
     uint8_t                  init_access;
+    uint64_t                 time_start_10usec;
 } VCanOpenFileNode;
 
 

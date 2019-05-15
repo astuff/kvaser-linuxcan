@@ -66,6 +66,7 @@
 MODNAME=kvpcican
 DEPMOD=`which depmod`
 
+install -d -m 755 /lib/modules/`uname -r`/kernel/drivers/char/
 install -m 644 $MODNAME.ko /lib/modules/`uname -r`/kernel/drivers/char/
 if [ "$?" -ne 0 ] ; then
   exit 1
@@ -80,6 +81,9 @@ echo Checking for loaded SocketCAN driver for Kvaser PCI devices.
 if lsmod | grep kvaser_pci ; then
   echo Unloading SocketCAN driver...
   modprobe -r kvaser_pci
+  if lsmod | grep -q kvaser_pciefd ; then
+    modprobe -r kvaser_pciefd
+  fi
 else
   echo SocketCAN driver not found.
 fi
@@ -89,11 +93,11 @@ echo Blacklisting SocketCAN Kvaser PCI driver to prevent it from auto-loading.
 if [ -f /etc/modprobe.conf ] ; then
   # CentOS/Redhat/RHEL/Fedora Linux...
   CONF=/etc/modprobe.conf
-  BLACKLIST="alias     kvaser_pci   /dev/null"
+  BLACKLIST=$(printf "alias     kvaser_pci   /dev/null\nalias     kvaser_pciefd  /dev/null")
 else
   # Debian/Ubuntu Linux
   CONF=/etc/modprobe.d/kvaser.conf
-  BLACKLIST="blacklist kvaser_pci"
+  BLACKLIST=$(printf "blacklist kvaser_pci\nblacklist kvaser_pciefd")
   if [ ! -f $CONF ] ; then
     touch $CONF
   fi
@@ -115,9 +119,13 @@ echo "${BLACKLIST}"                                     >> newconf
 cat newconf > $CONF
 rm newconf
 
-$DEPMOD -a
-if [ "$?" -ne 0 ] ; then
-  echo Failed to execute $DEPMOD -a
+if [ "$#" -gt 0 ] && [ $1 = "develinstall" ] ; then
+  echo "Ignoring $DEPMOD -a for now.."
+else
+  $DEPMOD -a
+  if [ "$?" -ne 0 ] ; then
+    echo Failed to execute $DEPMOD -a
+  fi
 fi
 
 MODCONF=/etc/modules-load.d/kvaser.conf

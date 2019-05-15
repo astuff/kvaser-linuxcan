@@ -231,7 +231,7 @@ static unsigned long ticks_to_10us (VCanCardData *vCard,
     timestamp = softSyncLoc2Glob(vCard, timestamp);
   }
 
-  retval = div_u64 (timestamp + 4999, 10000) - vCard->timestamp_offset;
+  retval = div_u64 (timestamp + 4999, 10000);
   return retval;
 }
 

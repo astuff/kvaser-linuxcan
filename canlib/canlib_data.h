@@ -114,11 +114,13 @@ typedef struct HandleData
   void               (*callback2)(CanHandle hnd, void* ctx, unsigned int event);
   canNotifyData      notifyData;
   int                notifyFd;
+  uint32_t           notifyThread_running;
   pthread_t          notifyThread;
   unsigned int       notifyFlags;
   struct CANOps      *canOps;
   int                valid;
   uint32_t           capabilities;
+  unsigned char      auto_reset;
 } HandleData;
 
 

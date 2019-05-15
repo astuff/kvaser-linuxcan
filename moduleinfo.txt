@@ -1,6 +1,6 @@
 module=canlib
-version=5_24_533
-hgid=42bcde8ca223 (REL_INIT_ACCESS_FIX) tip
+version=5_25_608
+hgid=85c9a39c69cb tip
 
 LIBNAME = libcanlib.so
 MAJOR = 1

@@ -8,6 +8,7 @@ var group__kvlc__converter =
     [ "kvlcGetErrorText", "group__kvlc__converter.html#ga35aa5a3d620e90d75b9d81185112bfd5", null ],
     [ "kvlcGetOutputFilename", "group__kvlc__converter.html#ga593bc635fd4f3d936da6ee7d1f3ab0af", null ],
     [ "kvlcGetProperty", "group__kvlc__converter.html#ga94e72f6db13869a2eff923540c2a2d4a", null ],
+    [ "kvlcGetReaderPropertyDefault", "group__kvlc__converter.html#ga3a1a8458ac7d6299eb8a2570c08427de", null ],
     [ "kvlcGetVersion", "group__kvlc__converter.html#gabe3aad62e3d15fca3c5fe7241bb3929d", null ],
     [ "kvlcGetWriterPropertyDefault", "group__kvlc__converter.html#gaa674bba6c26b0146d416051b4d048d7c", null ],
     [ "kvlcIsDataTruncated", "group__kvlc__converter.html#gabf8a016a451ad446ec9723fba939c53b", null ],

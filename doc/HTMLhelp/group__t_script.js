@@ -21,5 +21,6 @@ var group__t_script =
     [ "kvScriptStart", "group__t_script.html#gabcba6dfd72c06214b4bac2059846b4d0", null ],
     [ "kvScriptStatus", "group__t_script.html#gadcbe8f74ee454f27f22f9645ce0a144f", null ],
     [ "kvScriptStop", "group__t_script.html#gaf07b9d776a3682f0093d1cfe4e26f31c", null ],
+    [ "kvScriptTxeGetData", "group__t_script.html#ga442c63a2cddbf96ffa0a100e9d9e4283", null ],
     [ "kvScriptUnload", "group__t_script.html#ga5281c6fb6a81282850d8022293fd92d5", null ]
 ];

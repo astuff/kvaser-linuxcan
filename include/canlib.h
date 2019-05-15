@@ -97,6 +97,16 @@
  * \defgroup tScript                 t-script
  * \ingroup grp_canlib
  * \brief Starting, stopping scripts, moving files to/from device
+ * \defgroup kv_io                  I/O Pin Handling
+ * \brief Functions related to handling I/O pins
+ * \details The kvIoXxx functions are used for configuring and controlling I/O pins on I/O modules connected to a device.
+ *
+ * I/O functions use a pin number to access each pin on connected I/O modules. Pin enumeration is product dependent.
+ *
+ * It is required to verify the configuration before it is possible to use any kvIoPinSetXxx()/kvIoPinGetXxx() function.
+ * The module configuration can be examined with kvIoGetNumberOfPins() and kvIoGetPinInfo(). If the configuration is as expected, a call to kvIoConfirmConfig() will confirm the configuration. Removing or adding I/O modules will change the configuration and the pins are re-enumerated. It is always required to confirm the new configuration after a configuration change.
+ *
+ * \ingroup grp_canlib
  */
 
 /**
@@ -223,7 +233,7 @@ typedef struct canNotifyData {
 /**
  * Fail the call if the channel cannot be opened with init access.
  *
- * Init access means that the the CAN handle can set bit rate and CAN driver
+ * Init access means that the CAN handle can set bit rate and CAN driver
  * mode. At most one CAN handle may have init access to any given channel. If
  * you try to set the bit rate or CAN driver mode for a handle to which you
  * don't have init access, the call will silently fail (i.e. \ref canOK is
@@ -365,7 +375,7 @@ typedef struct canNotifyData {
  * Common bus speeds. Used in \ref canSetBusParams() and \ref canSetBusParamsC200().
  * The values are translated in canlib, \ref canTranslateBaud().
  *
- * \note The \ref BAUD_xxx names are only retained for compability.
+ * \note The \ref BAUD_xxx names are only retained for compatibility.
  *
  * \sa \ref section_user_guide_misc_bitrate
  *
@@ -1728,7 +1738,6 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * \li 1: The build number
    * \li 2: The minor revision number
    * \li 3: The major revision number
-   * \note Not implemented in linux.
    */
 # define canCHANNELDATA_DLL_FILE_VERSION          14
 
@@ -1740,13 +1749,12 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * the product version number of the second-level DLL driver file, i.e. the
    * DLL that interfaces between canlib32.dll and the driver proper.
    *
-   * Contents depening on index:
+   * Contents depending on index:
    *
    * \li 0: 0
    * \li 1: 1
    * \li 2: The minor revision number
    * \li 3: The major revision number
-   * \note Not implemented in linux.
    */
 # define canCHANNELDATA_DLL_PRODUCT_VERSION       15
 
@@ -1848,13 +1856,12 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * \a buffer points to an array of four 16-bit unsigned integers which
    * receives the file version number of the kernel-mode driver.
    *
-   * Contents depening on index:
+   * Contents depending on index:
    *
    * \li 0: The build number
    * \li 1: 0
    * \li 2: The minor revision number
    * \li 3: The major revision number
-   * \note Not implemented in linux.
    */
 # define canCHANNELDATA_DRIVER_FILE_VERSION       21
 
@@ -1865,13 +1872,12 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    *  \a buffer points to an array of four 16-bit unsigned integers which
    *  receives the product version number of the kernel-mode driver.
    *
-   * Contents depening on index:
+   * Contents depending on index:
    *
    * \li 0: 0
    * \li 1: 0
    * \li 2: The minor revision number
    * \li 3: The major revision number
-   * \note Not implemented in linux.
    */
 # define canCHANNELDATA_DRIVER_PRODUCT_VERSION    22
 
@@ -1918,7 +1924,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * mentioned below refers to this functions argument.
    *
    * \a buffer points to a buffer which receives the name of the device
-   * driver (e.g. "kcans") as a zero-terminated ASCII string.
+   * driver (e.g. "kcanl") as a zero-terminated ASCII string.
    *
    * \note The device driver names have no special meanings and may change
    * from a release to another.
@@ -1977,7 +1983,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * mentioned below refers to this functions argument.
    *
    * \a buffer points to a 32-bit unsigned integer that contains the time in
-   * milliseconds since the last communication occured.
+   * milliseconds since the last communication occurred.
    *
    * For WLAN devices, this is the time since the last keep-alive message.
    * \note Not implemented in linux.
@@ -2053,7 +2059,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    *
    * \a buffer points to a 32-bit unsigned integer that is 1 if
    * the channel(device) is currently connected as a remote device. 0 if it is not
-   * currenty a remote device.
+   * currently a remote device.
    * \note Not implemented in linux.
    */
 #  define canCHANNELDATA_IS_REMOTE  40
@@ -2228,8 +2234,8 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canCHANNEL_CAP_REMOTE_ACCESS     0x01000000L ///< Channel has remote capabilities
 #define canCHANNEL_CAP_SCRIPT            0x02000000L ///< Channel has script capabilities.
 #define canCHANNEL_CAP_LIN_HYBRID        0x04000000L ///< Channel has LIN capabilities.
-#define canCHANNEL_CAP_DIAGNOSTICS       0x08000000L ///< Channel has diagnostic capabilities.
-
+#define canCHANNEL_CAP_IO_API            0x08000000L ///< Channel has IO API capabilities.
+#define canCHANNEL_CAP_DIAGNOSTICS       0x10000000L ///< Channel has diagnostic capabilities.
 
 /**
  * \name canCHANNEL_OPMODE_xxx
@@ -2508,7 +2514,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
    * functions argument.
    *
-   * Disonnects the handle from the virtual bus number (0..31) which the \a buf
+   * Disconnects the handle from the virtual bus number (0..31) which the \a buf
    * points to.
    *
    * \note Not implemented in linux.
@@ -2553,7 +2559,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * specific handle. \a buf points to an unsigned integer which contains the
    * new size (number of messages) of the receive buffer.
    *
-   * \note The receive buffer consumes system nonpaged pool memory, which is a
+   * \note The receive buffer consumes system non-paged pool memory, which is a
    *       limited resource. Do not increase the receive buffer size unless you
    *       have good reasons to do so.
    *
@@ -2586,8 +2592,6 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * buson.
    *
    * Default value is \c 1, the CAN clock will be reset at buson.
-   *
-   * \note Not implemented in linux.
    */
 # define canIOCTL_SET_BUSON_TIME_AUTO_RESET       30
 
@@ -2689,7 +2693,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * functions argument.
    *
    * \a buf points to a \c DWORD that contains the time in milliseconds since the last
-   * communication occured.
+   * communication occurred.
    *
    * For WLAN devices, this is the time since the last keep-alive message.
    *
@@ -2741,7 +2745,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    *
    * Some hardware have a bitrate limit, which must be met when using any of \a canSetBusParams(),
    * \a canSetBusParamsC200() and \a canSetBusParamsFd() functions.
-   * The bitrate limit can be overriden with this IOCTL.
+   * The bitrate limit can be overridden with this IOCTL.
    * \a buf points to a \c long value that contains a user defined bitrate.
    * A value of 0 means that the device should use its own default bitrate limit.<br>
    * To find out which devices that have a bitrate limit, see \ref canCHANNELDATA_MAX_BITRATE.
@@ -2756,7 +2760,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * This ioctl can be used to set the responsitivity of some devices.
    * \a buf points to a \c DWORD that should contain a value between 0 and 100.
    * A value of 0 means that the device should be very responsive and a value
-   * of 100 means that the device generates less cpu load or requires more bandwidth.
+   * of 100 means that the device generates less CPU load or requires more bandwidth.
    * Note that not all
    * devices support this. Some hardware will accept this command but neglect it.
    * This can be found out by reading the scaled throttle.
@@ -2773,7 +2777,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * This ioctl can be used to set the responsitivity of some devices.
    * \a buf points to a \c DWORD that should contain a value between 0 and 100.
    * A value of 0 means that the device should be very responsive and a value
-   * of 100 means that the device generates less cpu load or requires more bandwidth.
+   * of 100 means that the device generates less CPU load or requires more bandwidth.
    * Note that not all
    * devices support this. Some hardware will accept this command but neglect it.
    * This can be found out by reading the scaled throttle.
@@ -3480,7 +3484,7 @@ canStatus CANLIBAPI canSetAcceptanceFilter (const CanHandle hnd,
  * \source_end
  *
  * This function removes all received messages from the handle's receive queue.
- * Other handles open to the same channel are not affcted by this
+ * Other handles open to the same channel are not affected by this
  * operation. That is, only the messages belonging to the handle you are
  * passing to \ref canFlushReceiveQueue are discarded.
  *
@@ -3740,7 +3744,7 @@ typedef struct kvTimeDomainData_s {
  * \note A time domain is a set of channels with a common time base.
  *
  * \param[out] domain  A pointer to a caller allocated, opaque variable of type
- *                     \ref kvTimeDomain that holds data to identify a particlar
+ *                     \ref kvTimeDomain that holds data to identify a particular
  *                     time domain.
  *
  * \return \ref canOK (zero) if success
@@ -4007,30 +4011,30 @@ kvStatus CANLIBAPI kvSetNotifyCallback (const CanHandle hnd,
  *
  * Bus type group, returned when using \ref canCHANNELDATA_BUS_TYPE
  * This is a grouping of the individual \ref kvBUSTYPE_xxx.
- * \note Not inplemented in linux.
+ * \note Not implemented in linux.
  * @{
  */
 
 /**
 * \ref kvBUSTYPE_VIRTUAL
-* \note Not inplemented in linux.
+* \note Not implemented in linux.
 */
 #define kvBUSTYPE_GROUP_VIRTUAL  1
 
 /**
 * \ref kvBUSTYPE_USB
-* \note Not inplemented in linux.
+* \note Not implemented in linux.
 */
 #define kvBUSTYPE_GROUP_LOCAL    2
 
 /**
 * \ref kvBUSTYPE_WLAN, \ref kvBUSTYPE_LAN
-* \note Not inplemented in linux.
+* \note Not implemented in linux.
 */
 #define kvBUSTYPE_GROUP_REMOTE   3
 /**
 * \ref kvBUSTYPE_PCI, \ref kvBUSTYPE_PCMCIA, ...
-* \note Not inplemented in linux.
+* \note Not implemented in linux.
 */
 #define kvBUSTYPE_GROUP_INTERNAL 4
 /** @} */
@@ -4606,6 +4610,157 @@ kvStatus CANLIBAPI kvScriptStatus(const CanHandle hnd,
  */
 kvStatus CANLIBAPI kvScriptGetMaxEnvvarSize(int hnd, int *envvarSize);
 
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptTxeGetData(string filePathOnPC, int item, out object buffer);</b>
+ *
+ * \source_delphi   <b>function kvScriptTxeGetData(filePathOnPC: PChar; item: Integer; var buffer; var bufsize: Cardinal): canStatus;</b>
+ * \source_end
+ *
+ * This function can be used to retrieve information from a compiled script file (.txe).
+ *
+ * \param[in] filePathOnPC  The compiled script file name; a pointer to a \c NULL
+ *                          terminated array of chars.
+ *
+ * \param[in] item          This parameter specifies what data to obtain. Valid values are one of the constants
+ *                          \ref canTXEDATA_xxx.
+ * \param[out] buffer       The address of a buffer which is to receive the data.
+ * \param[in,out] bufsize   The size of the buffer to which the buffer parameter
+ *                          points. When the function returns, bufsize contains the number of bytes copied into the buffer.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * If the buffer specified by \a buffer and \a bufsize is not large enough to hold the data requested,
+ * the function returns \ref canERR_BUFFER_TOO_SMALL and stores the required buffer size in the integer pointed to by \a bufsize.
+ * The content of buffer is undefined.
+ *
+ * If parameter \a buffer is NULL, and bufsize is non-NULL, the function returns \ref canOK and stores the required
+ * buffer size in the integer pointed to by \a bufsize.
+ *
+ */
+kvStatus CANLIBAPI kvScriptTxeGetData(const char *filePathOnPC,
+                                      int item,
+                                      void *buffer,
+                                      unsigned int *bufsize);
+
+/**
+ * \ingroup tScript
+ * \anchor canTXEDATA_xxx
+ * \name canTXEDATA_xxx
+ *
+ * These defines are used in \ref kvScriptTxeGetData().
+ *
+ *  @{
+ */
+
+  /**
+   * This define is used in \ref kvScriptTxeGetData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \source_cs <b>buffer contains a uint[3] array.</b>
+   *
+   * \a buffer points to an array of 3 32-bit unsigned integers which receives
+   * the three part version number of the compiled script file (.txe) file format.
+   *
+   * Contents
+   *
+   * \li 0: major
+   * \li 1: minor
+   * \li 2: build
+   */
+#define canTXEDATA_FILE_VERSION               1
+
+  /**
+   * This define is used in \ref kvScriptTxeGetData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \source_cs <b>buffer contains a uint[3] array.</b>
+   *
+   * \a buffer points to an array of 3 32-bit unsigned integers which receives
+   * the three part version number of the compiler used to create the compiled script file (.txe).
+   *
+   * Contents
+   *
+   * \li 0: major
+   * \li 1: minor
+   * \li 2: build
+   */
+#define canTXEDATA_COMPILER_VERSION      2
+
+  /**
+   * This define is used in \ref kvScriptTxeGetData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \source_cs <b>buffer contains a DateTime object.</b>
+   *
+   * \a buffer points to an array of 6 32-bit unsigned integers which receives
+   * the compilation date in Coordinated Universal Time (UTC) of the compiled script file (.txe).
+   *
+   * Contents
+   *
+   * \li 0: year
+   * \li 1: mon
+   * \li 2: day
+   * \li 3: hour
+   * \li 4: min
+   * \li 5: sec
+   */
+#define canTXEDATA_DATE                  3
+
+  /**
+   * This define is used in \ref kvScriptTxeGetData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \source_cs <b>buffer contains a string.</b>
+   *
+   * \a buffer points to an area which receives a zero-terminated string with a
+   * description of the compiled script file (.txe).
+   * If no description is available then bufsize is set to zero and no data is written into buffer.
+   */
+#define canTXEDATA_DESCRIPTION           4
+
+/**
+ * This define is used in \ref kvScriptTxeGetData(), \a buffer
+ * mentioned below refers to this functions argument.
+ *
+ * \source_cs <b>buffer contains a string.</b>
+ *
+ * \a buffer points to an area which receives a list containing the names and content of all source files which were
+ * used to generate the compiled script file (.txe).
+ *
+ * The name followed by the content of each source file is written into \a buffer as consecutive zero-terminated strings.
+ *
+ * If no source code is available or the container is encrypted, then bufsize is set to zero and no data is written into buffer.
+ */
+#define canTXEDATA_SOURCE               5
+
+/**
+ * This define is used in \ref kvScriptTxeGetData(), \a buffer
+ * mentioned below refers to this functions argument.
+ *
+ * \source_cs <b>buffer contains a uint.</b>
+ *
+ * \a buffer points to a single unsigned integer which receives the size of the compiled code of the
+ * compiled script file (.txe).
+ */
+#define canTXEDATA_SIZE_OF_CODE          6
+
+/**
+ * This define is used in \ref kvScriptTxeGetData(), \a buffer
+ * mentioned below refers to this functions argument.
+ *
+ * \source_cs <b>buffer contains a bool.</b>
+ *
+ * \a buffer points to a single unsigned integer which will receive a non-zero value if the compiled script file (.txe) contents
+ * is encrypted.
+ */
+#define canTXEDATA_IS_ENCRYPTED           7
+
+
+/** @} */
+
 
 /**
  * \ingroup tScript
@@ -4881,6 +5036,7 @@ kvStatus CANLIBAPI kvReadTimer (const CanHandle hnd, unsigned int *time);
  * \sa \ref kvReadTimer(), \ref canReadTimer()
  */
 kvStatus CANLIBAPI kvReadTimer64 (const CanHandle hnd, uint64_t *time);
+
 
 #ifdef __cplusplus
 }

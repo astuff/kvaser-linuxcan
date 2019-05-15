@@ -307,6 +307,7 @@ typedef enum {
 #define canEVENT_ERROR          32002       ///< when a CAN bus error is reported by the CAN controller
 #define canEVENT_STATUS         32003       ///< when the CAN controller changes state
 #define canEVENT_ENVVAR         32004       ///< An envvar changed
+# define canEVENT_BUSONOFF       32005       ///< Bus on/off status changed
 /** @} */
 
 /**
@@ -326,6 +327,8 @@ typedef enum {
 #define canNOTIFY_ERROR         0x0004      ///< CAN bus error notification
 #define canNOTIFY_STATUS        0x0008      ///< CAN chip status change
 #define canNOTIFY_ENVVAR        0x0010      ///< An environment variable was changed by a script. Note that you will not be notified when an environment variable is updated from the Canlib API.
+
+# define canNOTIFY_BUSONOFF      0x0020      ///< Notify on bus on/off status changed
 /** @} */
 
 
@@ -354,8 +357,8 @@ typedef enum {
 #define canSTAT_RESERVED_1      0x00000040
 #define canSTAT_TXERR           0x00000080  ///< There has been at least one TX error
 #define canSTAT_RXERR           0x00000100  ///< There has been at least one RX error of some sort
-#define canSTAT_HW_OVERRUN      0x00000200  ///< The has been at least one HW buffer overflow
-#define canSTAT_SW_OVERRUN      0x00000400  ///< The has been at least one SW buffer overflow
+#define canSTAT_HW_OVERRUN      0x00000200  ///< There has been at least one HW buffer overflow
+#define canSTAT_SW_OVERRUN      0x00000400  ///< There has been at least one SW buffer overflow
 #define canSTAT_OVERRUN         (canSTAT_HW_OVERRUN | canSTAT_SW_OVERRUN) ///< For convenience.
 /** @} */
 

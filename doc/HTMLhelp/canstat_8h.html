@@ -121,6 +121,9 @@ Macros</h2></td></tr>
 <tr class="memitem:accbc123f913273ebadcdf894a8748df8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#accbc123f913273ebadcdf894a8748df8">canEVENT_ENVVAR</a>&#160;&#160;&#160;32004</td></tr>
 <tr class="memdesc:accbc123f913273ebadcdf894a8748df8"><td class="mdescLeft">&#160;</td><td class="mdescRight">An envvar changed.  <a href="#accbc123f913273ebadcdf894a8748df8">More...</a><br /></td></tr>
 <tr class="separator:accbc123f913273ebadcdf894a8748df8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7cb834f7374f19ec2c9f7cf8705c9fb3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a7cb834f7374f19ec2c9f7cf8705c9fb3">canEVENT_BUSONOFF</a>&#160;&#160;&#160;32005</td></tr>
+<tr class="memdesc:a7cb834f7374f19ec2c9f7cf8705c9fb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bus on/off status changed.  <a href="#a7cb834f7374f19ec2c9f7cf8705c9fb3">More...</a><br /></td></tr>
+<tr class="separator:a7cb834f7374f19ec2c9f7cf8705c9fb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canNOTIFY_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canNOTIFY_xxx"></a> These are notification codes used in calls to <a class="el" href="group___c_a_n.html#gaa5dd0f277c7059169055321fbda87486">canSetNotify()</a> and <a class="el" href="group__can__general.html#ga99976c5b8e2c534b27bf9ec2e715d8d3">kvSetNotifyCallback()</a>.</p>
 <p>This can be <a class="el" href="canstat_8h.html#aac3167adc3230d49b3a359ed3e9c6422">canNOTIFY_NONE</a> (zero), meaning that no event notification is to occur, or a combination of any of the following constants </p>
@@ -143,6 +146,9 @@ Macros</h2></td></tr>
 <tr class="memitem:ab69dc959890826b245c422966c4bf627"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ab69dc959890826b245c422966c4bf627">canNOTIFY_ENVVAR</a>&#160;&#160;&#160;0x0010</td></tr>
 <tr class="memdesc:ab69dc959890826b245c422966c4bf627"><td class="mdescLeft">&#160;</td><td class="mdescRight">An environment variable was changed by a script. Note that you will not be notified when an environment variable is updated from the Canlib API.  <a href="#ab69dc959890826b245c422966c4bf627">More...</a><br /></td></tr>
 <tr class="separator:ab69dc959890826b245c422966c4bf627"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55ea94efdb14977028e56f7c6042e3ff"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a55ea94efdb14977028e56f7c6042e3ff">canNOTIFY_BUSONOFF</a>&#160;&#160;&#160;0x0020</td></tr>
+<tr class="memdesc:a55ea94efdb14977028e56f7c6042e3ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Notify on bus on/off status changed.  <a href="#a55ea94efdb14977028e56f7c6042e3ff">More...</a><br /></td></tr>
+<tr class="separator:a55ea94efdb14977028e56f7c6042e3ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canSTAT_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canSTAT_xxx"></a> The following circuit status flags are returned by <a class="el" href="group___c_a_n.html#gaca3da209fe673b3838a50a3abe831855">canReadStatus()</a>. Note that more than one flag might be set at any one time.</p>
 <dl class="section note"><dt>Note</dt><dd>Usually both <a class="el" href="canstat_8h.html#a7b3f46760938cbc79f0a81f297f1e2b4">canSTAT_HW_OVERRUN</a> and <a class="el" href="canstat_8h.html#a81051d406447b59ebfbf6ed31e1478a1">canSTAT_SW_OVERRUN</a> are set when overrun has occurred. This is because the kernel driver can't see the difference between a software overrun and a hardware overrun. So the code should always test for both types of overrun using the <a class="el" href="canstat_8h.html#a3b1c56fe475153972bf7116a0c1cba53">flag</a>. </dd></dl>
@@ -175,10 +181,10 @@ Macros</h2></td></tr>
 <tr class="memdesc:a879d30ec760d1cc76c7231ec4f2269f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">There has been at least one RX error of some sort.  <a href="#a879d30ec760d1cc76c7231ec4f2269f7">More...</a><br /></td></tr>
 <tr class="separator:a879d30ec760d1cc76c7231ec4f2269f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b3f46760938cbc79f0a81f297f1e2b4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a7b3f46760938cbc79f0a81f297f1e2b4">canSTAT_HW_OVERRUN</a>&#160;&#160;&#160;0x00000200</td></tr>
-<tr class="memdesc:a7b3f46760938cbc79f0a81f297f1e2b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The has been at least one HW buffer overflow.  <a href="#a7b3f46760938cbc79f0a81f297f1e2b4">More...</a><br /></td></tr>
+<tr class="memdesc:a7b3f46760938cbc79f0a81f297f1e2b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">There has been at least one HW buffer overflow.  <a href="#a7b3f46760938cbc79f0a81f297f1e2b4">More...</a><br /></td></tr>
 <tr class="separator:a7b3f46760938cbc79f0a81f297f1e2b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81051d406447b59ebfbf6ed31e1478a1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a81051d406447b59ebfbf6ed31e1478a1">canSTAT_SW_OVERRUN</a>&#160;&#160;&#160;0x00000400</td></tr>
-<tr class="memdesc:a81051d406447b59ebfbf6ed31e1478a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The has been at least one SW buffer overflow.  <a href="#a81051d406447b59ebfbf6ed31e1478a1">More...</a><br /></td></tr>
+<tr class="memdesc:a81051d406447b59ebfbf6ed31e1478a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">There has been at least one SW buffer overflow.  <a href="#a81051d406447b59ebfbf6ed31e1478a1">More...</a><br /></td></tr>
 <tr class="separator:a81051d406447b59ebfbf6ed31e1478a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b1c56fe475153972bf7116a0c1cba53"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a3b1c56fe475153972bf7116a0c1cba53">canSTAT_OVERRUN</a>&#160;&#160;&#160;(<a class="el" href="canstat_8h.html#a7b3f46760938cbc79f0a81f297f1e2b4">canSTAT_HW_OVERRUN</a> | <a class="el" href="canstat_8h.html#a81051d406447b59ebfbf6ed31e1478a1">canSTAT_SW_OVERRUN</a>)</td></tr>
 <tr class="memdesc:a3b1c56fe475153972bf7116a0c1cba53"><td class="mdescLeft">&#160;</td><td class="mdescRight">For convenience.  <a href="#a3b1c56fe475153972bf7116a0c1cba53">More...</a><br /></td></tr>
@@ -516,6 +522,22 @@ Enumerations</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Definitions for the CANLIB API. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a7cb834f7374f19ec2c9f7cf8705c9fb3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7cb834f7374f19ec2c9f7cf8705c9fb3">&#9670;&nbsp;</a></span>canEVENT_BUSONOFF</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canEVENT_BUSONOFF&#160;&#160;&#160;32005</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Bus on/off status changed. </p>
+
+</div>
+</div>
 <a id="accbc123f913273ebadcdf894a8748df8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#accbc123f913273ebadcdf894a8748df8">&#9670;&nbsp;</a></span>canEVENT_ENVVAR</h2>
 
@@ -1086,6 +1108,22 @@ Enumerations</h2></td></tr>
 
 </div>
 </div>
+<a id="a55ea94efdb14977028e56f7c6042e3ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55ea94efdb14977028e56f7c6042e3ff">&#9670;&nbsp;</a></span>canNOTIFY_BUSONOFF</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canNOTIFY_BUSONOFF&#160;&#160;&#160;0x0020</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Notify on bus on/off status changed. </p>
+
+</div>
+</div>
 <a id="ab69dc959890826b245c422966c4bf627"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab69dc959890826b245c422966c4bf627">&#9670;&nbsp;</a></span>canNOTIFY_ENVVAR</h2>
 
@@ -1263,7 +1301,7 @@ Enumerations</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>The has been at least one HW buffer overflow. </p>
+<p>There has been at least one HW buffer overflow. </p>
 
 </div>
 </div>
@@ -1343,7 +1381,7 @@ Enumerations</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>The has been at least one SW buffer overflow. </p>
+<p>There has been at least one SW buffer overflow. </p>
 
 </div>
 </div>
@@ -2268,7 +2306,7 @@ Enumerations</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="canstat_8h.html">canstat.h</a></li>
-    <li class="footer"> (canlib 5.24) Tue Jul 3 2018</li>
+    <li class="footer"> (canlib 5.25) Sun Sep 16 2018</li>
   </ul>
 </div>
 </body>

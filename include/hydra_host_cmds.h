@@ -230,6 +230,8 @@
 #define CMD_LOG_RTC_TIME_FD                         174
 #define CMD_LOG_VERSION_FD                          175
 
+#define CMD_IO_PIN_CMD                              190
+
 #define CMD_MAP_CHANNEL_REQ                         200
 #define CMD_MAP_CHANNEL_RESP                        201
 #define CMD_GET_SOFTWARE_DETAILS_REQ                202
@@ -1597,6 +1599,7 @@ typedef struct {
 #define CAP_SUB_CMD_LIN_HYBRID               11
 #define CAP_SUB_CMD_KDI_INFO                 12
 #define CAP_SUB_CMD_HAS_KDI                  13
+#define CAP_SUB_CMD_HAS_IO_API               14
 
 // the following are not capabilities/bits
 #define CAP_SUB_CMD_DATA_START               1024
@@ -1685,6 +1688,7 @@ typedef struct {
     hchannelCap32_t scriptCap;     // CAP_SUB_CMD_HAS_SCRIPT
     hchannelCap32_t linHybridCap;  // CAP_SUB_CMD_LIN_HYBRID
     hchannelCap32_t kdiCap;        // CAP_SUB_CMD_HAS_KDI
+    hchannelCap32_t ioApiCap;      // CAP_SUB_CMD_HAS_IO_API
     hInfo_t loggerType;            // CAP_SUB_CMD_GET_LOGGER_TYPE
     hRemoteInfo_t remoteInfo;      // CAP_SUB_CMD_REMOTE_TYPE
     hhwStatus_t   hwStatus;        // CAP_SUB_CMD_HW_STATUS
@@ -1831,6 +1835,82 @@ typedef struct {
   hkdiCtrlData data;
 } hcmdKDICmd;
 
+// Use with CMD_IO_PIN_CMD
+#define IO_SUBCMD_GET_COUNT                       1
+#define IO_SUBCMD_GET_PIN_INFO                    2
+#define IO_SUBCMD_SET_PIN_INFO                    3
+
+#define IO_SUBCMD_GET_DIGITAL                    10
+#define IO_SUBCMD_SET_DIGITAL                    11
+#define IO_SUBCMD_GET_ANALOG                     12
+#define IO_SUBCMD_SET_ANALOG                     13
+#define IO_SUBCMD_GET_ANALOG_RAW                 14
+#define IO_SUBCMD_SET_ANALOG_RAW                 15
+#define IO_SUBCMD_SET_RELAY                      16
+
+#define IO_SUBCMD_EVENT_SETUP                    20
+#define IO_SUBCMD_EVENT_DISABLE                  21
+#define IO_SUBCMD_CONFIRM_CONFIG                 22
+
+#define IO_PIN_INFO_UNKNOWN                       0
+#define IO_PIN_INFO_MODULE_TYPE                   1
+#define IO_PIN_INFO_DIRECTION                     2
+
+#define IO_PIN_INFO_TYPE                          4
+#define IO_PIN_INFO_NUMBER_OF_BITS                5
+#define IO_PIN_INFO_RANGE_MIN                     6
+#define IO_PIN_INFO_RANGE_MAX                     7
+#define IO_PIN_INFO_DIGITAL_OFF_TO_ON_DELAY       8
+#define IO_PIN_INFO_DIGITAL_ON_TO_OFF_DELAY       9
+#define IO_PIN_INFO_ANALOG_LOWPASS_FILTER_ORDER  10
+#define IO_PIN_INFO_ANALOG_HYSTERESIS            11
+#define IO_PIN_INFO_ANALOG_VALUE_ABOVE           12
+#define IO_PIN_INFO_ANALOG_VALUE_BELOW           13
+
+#define IO_PIN_TYPE_UNKNOWN                       0
+#define IO_PIN_TYPE_DIGITAL                       1
+#define IO_PIN_TYPE_ANALOG                        2
+#define IO_PIN_TYPE_RELAY                         3
+
+#define IO_PIN_DIRECTION_UNKNOWN                  0
+#define IO_PIN_DIRECTION_IN                       4
+#define IO_PIN_DIRECTION_OUT                      8
+
+#define IO_EVENT_UNKNOWN                          0
+#define IO_EVENT_CONFIG_CHANGED                   2
+#define IO_EVENT_VALUE_CHANGED                    3
+#define IO_EVENT_VALUE_ABOVE                      4
+#define IO_EVENT_VALUE_BELOW                      5
+#define IO_EVENT_POSITIVE_FLANK                   6
+#define IO_EVENT_NEGATIVE_FLANK                   7
+
+#define IO_API_OK                                 0
+#define IO_API_ERROR_CONFIG_CHANGED              -1
+#define IO_API_ERROR_NO_CONFIG                   -2
+#define IO_API_ERROR_PIN_NOT_FOUND_IN_CONFIG     -3
+#define IO_API_ERROR_WRONG_PIN_MODULE_TYPE       -4
+#define IO_API_ERROR_PIN_INFO_ITEM_UNKNOWN       -5
+#define IO_API_ERROR_PIN_INFO_ITEM_READ_ONLY     -6
+#define IO_API_ERROR_PIN_PENDING                 -7
+#define IO_API_ERROR_UNKNOWN_EVENT               -8
+#define IO_API_ERROR_TOO_MANY_EVENTS             -9
+#define IO_API_ERROR_COMMUNICATION              -10
+#define IO_API_ERROR_CONFIG_NOT_CONFIRMED       -11
+
+typedef struct {
+  uint8_t subCmdNo;
+  int8_t status;
+  uint16_t dummy; // Needed for alignment
+  uint16_t pinNo;
+  uint16_t item;
+
+  union {
+    uint32_t int_value;
+    float float_value;
+    uint8_t buffer[20];
+  };
+} hcmdIOCmd;
+
 // Well-known HEs
 #define BROADCAST         0x0f
 #define BROADCAST_DEBUG   0x1f
@@ -1838,7 +1918,6 @@ typedef struct {
 #define ROUTER_HE         0x00
 #define DYNAMIC_HE        ROUTER_HE
 #define ILLEGAL_HE        0x3e
-
 
 #define HYDRA_CMD_SIZE          32
 
@@ -2007,6 +2086,7 @@ typedef struct hydraHostCmd {
     hcmdCapabilitiesResp          capabilitiesResp;
 
     hcmdKDICmd                    kdiCmd;
+    hcmdIOCmd                     ioCmd;
 
     hcmdHydraOtherCommand        o;
 
