@@ -3,6 +3,8 @@ jobs:
   xenial-gcc-5.3:
     docker:
       - image: ubuntu:xenial
+    environment:
+      KDIR: /lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*$' -o | sed -r 's/(.*)\./\1-/')-generic/build
     steps:
       - checkout
       - run:
@@ -12,19 +14,21 @@ jobs:
       - run:
           name: Build
           command: |
-            make KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*$' -o)/build
+            make
       - run:
           name: Test
           command: |
-            make check KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*$' -o)/build
+            make check
       - run:
           name: Install
           command: |
-            make install KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*$' -o)/build
+            make install
 
   bionic-gcc-7.4:
     docker:
       - image: ubuntu:bionic
+    environment:
+      KDIR: /lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*$' -o | sed -r 's/(.*)\./\1-/')-generic/build
     steps:
       - checkout
       - run:
@@ -34,15 +38,15 @@ jobs:
       - run:
           name: Build
           command: |
-            make KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*$' -o)/build
+            make
       - run:
           name: Test
           command: |
-            make check KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*$' -o)/build
+            make check
       - run:
           name: Install
           command: |
-            make install KDIR=/lib/modules/$(dpkg -s linux-headers-generic | egrep '[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*\.[0-9]+*$' -o)/build
+            make install
 
 workflows:
   version: 2
