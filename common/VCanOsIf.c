@@ -559,10 +559,9 @@ int vCanOpen (struct inode *inode, struct file *filp)
 
   openFileNodePtr->overrun.sw           = 0;
   openFileNodePtr->overrun.hw           = 0;
+
   openFileNodePtr->isBusOn              = 0;
   openFileNodePtr->init_access          = 0;
-  openFileNodePtr->onbus_state          = ONBUS_OPENCHANNEL_WAIT;
-
   spin_lock_init(&(openFileNodePtr->rcv.rcvLock));
 
   // Insert this node first in list of "opens"
@@ -966,7 +965,6 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
   unsigned long     irqFlags;
   int               tmp;
   VCanHWInterface   *hwIf;
-  uint32_t          n_delayd_buson = 0;
 
   chd  = fileNodePtr->chanData;
   hwIf = chd->vCard->driverData->hwIf;
@@ -974,28 +972,16 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
   switch (ioctl_cmd) {
     case VCAN_IOC_BUS_ON:
       {
-        uint64_t      ttime;
+        uint64_t ttime;
         unsigned long rcvLock_irqFlags;
 
         DEBUGPRINT(3, (TXT("VCAN_IOC_BUS_ON\n")));
-
         if (fileNodePtr->isBusOn) {
-          break;
-        }
-
-        if (fileNodePtr->onbus_state == ONBUS_BUSON_WAIT) {
-          DEBUGPRINT(2, (TXT("VCAN_IOC_BUS_ON. refuse buson. waiting to go bus on.\n")));
-          break;
-        } 
-
-        if ((chd->busOnCount == 0) && (fileNodePtr->onbus_state == ONBUS_OPENCHANNEL_WAIT)) {
-          DEBUGPRINT(2, (TXT("VCAN_IOC_BUS_ON. refuse buson. buson delayed.\n")));
-          fileNodePtr->onbus_state = ONBUS_BUSON_WAIT;
-          break;
+          break; // Already bus on, do nothing
         }
 
         if (chd->vCard->card_flags & DEVHND_CARD_REFUSE_TO_USE_CAN) {
-          DEBUGPRINT(2, (TXT("VCAN_IOC_BUS_ON. refuse to run. returning -EACCES\n")));
+          DEBUGPRINT(2, (TXT("VCAN_IOC_BUS_ON Refuse to run. returning -EACCES\n")));
           return -EACCES;
         }
 
@@ -1009,75 +995,28 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
 
         // Important to set this before channel get busOn, otherwise
         // we may miss messasges.
-        fileNodePtr->isBusOn                     = 1;
+        fileNodePtr->isBusOn                    |= 1;
         fileNodePtr->chip_status.busStatus       = CHIPSTAT_ERROR_ACTIVE;
         fileNodePtr->chip_status.txErrorCounter  = 0;
         fileNodePtr->chip_status.rxErrorCounter  = 0;
-
-        //put handles opened with NO_INIT_ACCESS onbus
-        {
-          VCanOpenFileNode *fp;
-          unsigned long     openLock_irqFlags;
-          
-          spin_lock_irqsave(&chd->openLock, openLock_irqFlags);
-          
-          for (fp = chd->openFileList; fp != NULL; fp = fp->next) {
-            if (fp->onbus_state == ONBUS_BUSON_WAIT) {
-              spin_lock_irqsave(&fp->rcv.rcvLock, rcvLock_irqFlags);
-              vCanFlushReceiveBuffer(fp);
-              spin_unlock_irqrestore(&fp->rcv.rcvLock, rcvLock_irqFlags);
-              
-              fp->onbus_state                 = ONBUS_BUSON_WAIT_ONBUS;
-              fp->isBusOn                     = 1;
-              fp->chip_status.busStatus       = CHIPSTAT_ERROR_ACTIVE;
-              fp->chip_status.txErrorCounter  = 0;
-              fp->chip_status.rxErrorCounter  = 0;
-              
-              n_delayd_buson++;
-            }
-          }
-          
-          spin_unlock_irqrestore(&chd->openLock, openLock_irqFlags);
-        }
 
         wait_for_completion(&chd->busOnCountCompletion);
 
         chd->busOnCount++;
 
         if(chd->busOnCount == 1) {
-          chd->busOnCount += n_delayd_buson;
-
           vStat = hwIf->flushSendBuffer(chd);
-
           if (vStat == VCAN_STAT_OK) {
             vStat = hwIf->busOn(chd);
-
             if (vStat != VCAN_STAT_OK) {
+              fileNodePtr->isBusOn = 0;
+              chd->busOnCount--;
               DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_BUS_ON 1 failed with %d\n"), vStat));
             }
           } else {
-            DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_BUS_ON 2 failed with %d\n"), vStat));
-          }
-
-          if (vStat != VCAN_STAT_OK) {
-            if (n_delayd_buson != 0) {
-              VCanOpenFileNode *fp;
-              unsigned long     openLock_irqFlags;
-          
-              spin_lock_irqsave(&chd->openLock, openLock_irqFlags);
-          
-              //put handles opened with NO_INIT_ACCESS busoff
-              for (fp = chd->openFileList; fp != NULL; fp = fp->next) {
-                if (fp->onbus_state == ONBUS_BUSON_WAIT_ONBUS) {
-                  fp->onbus_state = ONBUS_BUSON_WAIT;
-                  fp->isBusOn     = 0;
-                }
-              }
-              
-              spin_unlock_irqrestore(&chd->openLock, openLock_irqFlags);
-            }
             fileNodePtr->isBusOn = 0;
-            chd->busOnCount = chd->busOnCount - n_delayd_buson - 1;
+            chd->busOnCount--;
+            DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_BUS_ON 2 failed with %d\n"), vStat));
           }
         }
         complete(&chd->busOnCountCompletion);
@@ -1094,10 +1033,6 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
         vCanFlushReceiveBuffer(fileNodePtr);
         spin_unlock_irqrestore(&fileNodePtr->rcv.rcvLock, rcvLock_irqFlags);
 
-        if (fileNodePtr->onbus_state != ONBUS_OPENCHANNEL_GO_ONBUS) {
-          fileNodePtr->onbus_state = ONBUS_OPENCHANNEL_WAIT;
-        }
-        
         if (fileNodePtr->isBusOn) {
           fileNodePtr->chip_status.busStatus = CHIPSTAT_BUSOFF;
           wait_for_completion(&chd->busOnCountCompletion);
@@ -1628,27 +1563,19 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
           if (tmpFnp) {//we already have a handle with init access
             if (flags.require_init_access) {
               flags.retval = -1;
-            } else {
-              fileNodePtr->onbus_state = ONBUS_OPENCHANNEL_GO_ONBUS;
             }
           } else {
             if (flags.wants_init_access == 0) {
               if (flags.require_init_access) {
                 flags.retval = -1;
-              } else {
-                fileNodePtr->onbus_state = ONBUS_OPENCHANNEL_WAIT;
               }
-            } else {
-              fileNodePtr->onbus_state = ONBUS_OPENCHANNEL_GO_ONBUS;
             }
-
             fileNodePtr->init_access = flags.wants_init_access;
           }
-          
+
           //report back to caller if we got init access or not
           flags.wants_init_access = fileNodePtr->init_access;
         }
-
         spin_unlock_irqrestore(&chd->openLock, irqFlags);
 
         if (copy_to_user((VCanInitAccess *)arg, &flags, sizeof(VCanInitAccess))) {

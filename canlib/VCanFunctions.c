@@ -410,26 +410,6 @@ static canStatus vCanSetNotify (HandleData *hData,
       goto error_ioc;
     }
 
-    {
-      VCanInitAccess my_arg;
-      my_arg.retval = 0;
-      
-      my_arg.require_init_access = 0;
-      my_arg.wants_init_access   = 1;
-      
-      ret = ioctl(hData->notifyFd, VCAN_IOC_OPEN_INIT_ACCESS, &my_arg);
-      
-      if (ret) {
-        close(hData->fd);
-        goto error_ioc;
-      }
-      
-      if (my_arg.retval == VCANINITACCESS_FAIL) {
-        close(hData->fd);
-        goto error_ioc;
-      }
-    }
-
     ret = ioctl(hData->notifyFd, VCAN_IOC_BUS_ON, NULL);
     if (ret != 0) {
       goto error_ioc;

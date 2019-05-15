@@ -330,29 +330,8 @@ typedef struct VCanOpenFileNode {
     uint8_t                  isBusOn;
     struct VCanOpenFileNode *next;
     uint8_t                  init_access;
-    uint8_t                  onbus_state; // see ONBUS_STATE_xxx 
 } VCanOpenFileNode;
 
-/*ONBUS_STATE_xxx*/
-
-//we are not allowed to go onBus on a handle opened with NO_INIT_ACCESS
-//if there isn't another handle on the same channel that already is onBus.
-
-//openChannel called with NO_INIT_ACCESS set.
-#define ONBUS_OPENCHANNEL_WAIT 0
-
-//busOn called and no other handle is on bus.
-#define ONBUS_BUSON_WAIT  1
-
-//busOn called for another handle on the same channel.
-//we are onbus.
-#define ONBUS_BUSON_WAIT_ONBUS 2
-
-//openChannel called without NO_INIT_ACCESS set.
-//go onBus even if no other handle is onBus.
-#define ONBUS_OPENCHANNEL_GO_ONBUS    3
-
-/*ONBUS_STATE_xxx*/
 
 /* Dispatch call structure */
 typedef struct VCanHWInterface {
