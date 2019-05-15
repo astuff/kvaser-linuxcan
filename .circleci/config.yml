@@ -8,7 +8,7 @@ jobs:
       - run:
           name: Set Up Container
           command: |
-            apt update -qq && apt install -y gcc make linux-headers-generic cppcheck
+            apt update -qq && apt install -y gcc make linux-headers-generic cppcheck kmod udev
       - run:
           name: Build
           command: |
@@ -33,7 +33,7 @@ jobs:
       - run:
           name: Set Up Container
           command: |
-            apt update -qq && apt install -y gcc make linux-headers-generic cppcheck
+            apt update -qq && apt install -y gcc make linux-headers-generic cppcheck kmod udev
       - run:
           name: Build
           command: |
