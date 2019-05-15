@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**                Copyright 2012 by Kvaser AB, Mï¿½lndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -125,10 +125,10 @@ int main (int argc, char* argv[])
       exit(1);
     }
 
-    printf("channel %d = %s, %x-%04x-%05x-%x, (%d)%d, %d.%d.%d.%d\n",
+    printf("channel %d = %s, %x-%05x-%05x-%x, (%d)%d, %d.%d.%d.%d\n",
            i, name,
-           ean[1] >> 8, ((ean[1] & 0xff) << 8) | ((ean[0] >> 24) & 0xff),
-           (ean[0] >> 4) & 0xfffff, ean[0] & 0x0f,
+           (ean[1] >> 12), ((ean[1] & 0xfff) << 8) | ((ean[0] >> 24) & 0xff),
+           (ean[0] >> 4) & 0xfffff, (ean[0] & 0x0f),
            serial[1], serial[0],
            fw[1] >> 16, fw[1] & 0xffff, fw[0] >> 16, fw[0] & 0xffff);
   }    

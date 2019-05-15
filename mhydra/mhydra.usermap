@@ -1,0 +1,16 @@
+#
+# Supported Kvaser Mhydra CAN interfaces
+#
+# Kvaser USB_VENDOR_ID 0x0bfd
+# Kvaser Eagle                      0x0100
+# Kvaser BlackBird v2               0x0102
+# Kvaser Memorator Pro 5xHS         0x0104
+# Kvaser USBcan Pro 5xHS            0x0105
+#
+
+
+# usb module      match_flags  idVendor idProduct bcdDevice_lo bcdDevice_hi bDeviceClass bDeviceSubClass bDeviceProtocol bInterfaceClass bInterfaceSubClass bInterfaceProtocol driver_info
+mhydra            0x0003       0x0bfd   0x0100    0x0000       0x0000       0x00         0x00            0x00            0x00            0x00               0x00               0x0
+mhydra            0x0003       0x0bfd   0x0102    0x0000       0x0000       0x00         0x00            0x00            0x00            0x00               0x00               0x0
+mhydra            0x0003       0x0bfd   0x0104    0x0000       0x0000       0x00         0x00            0x00            0x00            0x00               0x00               0x0
+mhydra            0x0003       0x0bfd   0x0105    0x0000       0x0000       0x00         0x00            0x00            0x00            0x00               0x00               0x0

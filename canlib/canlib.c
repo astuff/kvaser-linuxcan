@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**                Copyright 2012 by Kvaser AB, Mï¿½lndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -130,9 +130,9 @@ struct dev_descr {
 
 // qqq This has to be modified if we add/remove drivers.
 static const char *dev_name[] = {"lapcan",   "pcican",   "pcicanII",
-                                 "usbcanII", "leaf",     "kvvirtualcan", "minipciecan" };
+                                 "usbcanII", "leaf",     "kvvirtualcan", "minipciecan", "mhydra" };
 static const char *off_name[] = {"LAPcan",   "PCIcan",   "PCIcanII",
-                                 "USBcanII", "Leaf",     "VIRTUALcan", "Mini PCIe CAN"};
+                                 "USBcanII", "Leaf",     "VIRTUALcan", "Mini PCIe CAN", "Minihydra"};
 static struct dev_descr dev_descr_list[] = {
           {"Kvaser Unknown",                                    {0x00000000, 0x00000000}},
           {"Kvaser Virtual CAN",                                {0x00000000, 0x00000000}},
@@ -189,6 +189,7 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser USBcan Pro SHS/SHS",                         {0x30005723, 0x00073301}},
           {"Kvaser USBcan R",                                   {0x30005792, 0x00073301}},
           {"Kvaser BlackBird SemiPro",                          {0x30006294, 0x00073301}},
+          {"Kvaser BlackBird v2",                               {0x30006713, 0x00073301}},
           {"Kvaser USBcan Professional CB",                     {0x30006843, 0x00073301}},
           {"Kvaser Leaf Light v2",                              {0x30006850, 0x00073301}},
           {"Kvaser Mini PCI Express HS",                        {0x30006881, 0x00073301}},
@@ -196,6 +197,8 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser Ethercan Light HS",                          {0x30007130, 0x00073301}},
           {"Kvaser Mini PCI Express 2xHS",                      {0x30007437, 0x00073301}},
           {"Kvaser USBcan Light 2xHS",                          {0x30007147, 0x00073301}},
+          {"Kvaser Memorator Pro 5xHS",                         {0x30007789, 0x00073301}},
+          {"Kvaser USBcan Pro 5xHS",                            {0x30007796, 0x00073301}},
 };
 
 //******************************************************

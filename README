@@ -3,7 +3,7 @@
 */
 
 
-- Linux drivers for Kvaser PCIcan, PCIcan II, USBcanII and Leaf -
+- Linux drivers for Kvaser PCIcan, PCIcan II, USBcanII, Leaf and Mhydra -
 
   Interface   Product                  Driver Name  
  -----------+------------------------+-------------
@@ -12,6 +12,9 @@
               Leaf Professional                     
               Memorator Professional                
               BlackBird                             
+ -----------+------------------------+-------------
+  USB         Eagle                    mhydra         
+              BlackBird v2                            
  -----------+------------------------+-------------
   USB         USBcanII                 usbcanII     
               Memorator                             
@@ -64,7 +67,7 @@ Usage:
 
 * "modprobe pcican" or "modprobe pcicanII" to load driver.
 * "modprobe -r pcican" or "modprobe -r pcicanII" to unload driver.
-* USBcanII and Leaf will load/unload when inserting/removing the device.
+* USBcanII, Leaf and Mhydra will load/unload when inserting/removing the device.
 * Try examples in /usr/doc/canlib/examples/.
 
 
@@ -79,6 +82,7 @@ Installed Files:
 /lib/modules/`uname -r`/kernel/drivers/char/kvvirtualcan.ko (Virtualcan)
 /lib/modules/`uname -r`/kernel/drivers/usb/misc/usbcanII.ko (USBcanII)
 /lib/modules/`uname -r`/kernel/drivers/usb/misc/leaf.ko (Leaf)
+/lib/modules/`uname -r`/kernel/drivers/usb/misc/mhydra.ko (Mhydra)
 
 * Module setup
 ----------------------------------
@@ -103,11 +107,12 @@ The following lines are added to /etc/modules.conf for Virtualcan:
 
 * Module loading
 ----------------------------------
-/usr/sbin/pcican.sh     (start/stop pcican driver;     by modprobe or manually)
+/usr/sbin/pcican.sh      (start/stop pcican driver;      by modprobe or manually)
 /usr/sbin/pcicanII.sh    (start/stop pcicanII driver;    by modprobe or manually)
-/usr/sbin/virtualcan.sh (start/stop virtualcan driver; by modprobe or manually)
-/usr/sbin/usbcanII.sh   (start/stop usbcanII driver;   by udev or manually)
-/usr/sbin/leaf.sh       (start/stop leaf driver;       by udev or manually)
+/usr/sbin/virtualcan.sh  (start/stop virtualcan driver;  by modprobe or manually)
+/usr/sbin/usbcanII.sh    (start/stop usbcanII driver;    by udev or manually)
+/usr/sbin/leaf.sh        (start/stop leaf driver;        by udev or manually)
+/usr/sbin/mhydra.sh      (start/stop mhydra driver;      by udev or manually)
 
 * Module hotplug support
 ----------------------------------
@@ -116,6 +121,8 @@ If /etc/hotplug exists:
 /etc/hotplug/usb/usbcanII
 /etc/hotplug/leaf.usermap
 /etc/hotplug/usb/leaf
+/etc/hotplug/mhydra.usermap
+/etc/hotplug/usb/mhydra
 
 /etc/udev/rules.d/10-kvaser.rules
 

@@ -258,6 +258,9 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a944b12497ceefa82bd4de5b4198496f4">canHWTYPE_USBCAN_KLINE</a>&#160;&#160;&#160;68</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a4400a999679943a45a0cc9be5518fc7e">canHWTYPE_ETHERCAN</a>&#160;&#160;&#160;70</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a28896ba95ab7687306d598bb7afe3c77">canHWTYPE_USBCAN_LIGHT</a>&#160;&#160;&#160;72</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a413698d2e94159e137d58ed50fb99a10">canHWTYPE_USBCAN_PRO2</a>&#160;&#160;&#160;74</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aa6b9a1812ed1b470705cb38cfd732699">canHWTYPE_PCIE_V2</a>&#160;&#160;&#160;76</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aa14a2e33eee7ea02ebe4a9c5935d30ad">canHWTYPE_MEMORATOR_PRO2</a>&#160;&#160;&#160;78</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canCHANNEL_CAP_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canCHANNEL_CAP_xxx"></a></p>
 <p>Channel capabilities. </p>
@@ -1621,7 +1624,7 @@ DESCRIPTION</h2>
 </div>
 <div class="memdoc">
 
-<p>Iris. </p>
+<p>Obsolete name, use canHWTYPE_BLACKBIRD instead. </p>
 
 </div>
 </div>
@@ -1700,6 +1703,21 @@ DESCRIPTION</h2>
 
 </div>
 </div>
+<a class="anchor" id="aa14a2e33eee7ea02ebe4a9c5935d30ad"></a><!-- doxytag: member="canlib.h::canHWTYPE_MEMORATOR_PRO2" ref="aa14a2e33eee7ea02ebe4a9c5935d30ad" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canHWTYPE_MEMORATOR_PRO2&#160;&#160;&#160;78</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Kvaser Memorator Pro 5xHS and variants. </p>
+
+</div>
+</div>
 <a class="anchor" id="aa395c2ee00de84a7549cea3bb211d1da"></a><!-- doxytag: member="canlib.h::canHWTYPE_MINIHYDRA" ref="aa395c2ee00de84a7549cea3bb211d1da" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -1711,7 +1729,7 @@ DESCRIPTION</h2>
 </div>
 <div class="memdoc">
 
-<p>Eagle n&eacute;e Minihydra. </p>
+<p>Obsolete name, use canHWTYPE_EAGLE instead. </p>
 
 </div>
 </div>
@@ -1820,6 +1838,21 @@ DESCRIPTION</h2>
 
 </div>
 </div>
+<a class="anchor" id="aa6b9a1812ed1b470705cb38cfd732699"></a><!-- doxytag: member="canlib.h::canHWTYPE_PCIE_V2" ref="aa6b9a1812ed1b470705cb38cfd732699" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canHWTYPE_PCIE_V2&#160;&#160;&#160;76</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>PCIe for now. </p>
+
+</div>
+</div>
 <a class="anchor" id="a95d07a58ea752b36e5224ec42258f36b"></a><!-- doxytag: member="canlib.h::canHWTYPE_SIMULATED" ref="a95d07a58ea752b36e5224ec42258f36b" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -1907,6 +1940,21 @@ DESCRIPTION</h2>
 <div class="memdoc">
 
 <p>Kvaser USBcan Professional. </p>
+
+</div>
+</div>
+<a class="anchor" id="a413698d2e94159e137d58ed50fb99a10"></a><!-- doxytag: member="canlib.h::canHWTYPE_USBCAN_PRO2" ref="a413698d2e94159e137d58ed50fb99a10" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canHWTYPE_USBCAN_PRO2&#160;&#160;&#160;74</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Kvaser USBcan Pro 5xHS and variants. </p>
 
 </div>
 </div>
@@ -2729,7 +2777,7 @@ canERR_xxx (negative) if failure</dd></dl>
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.3) - Generated on Thu Mar 20 2014</small>
+<small>Kvaser Linux CANLIB (canlib 5.8) - Generated on Mon Feb 2 2015</small>
 </address>
 </body>
 </html>

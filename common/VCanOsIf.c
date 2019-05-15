@@ -313,7 +313,7 @@ int vCanDispatchEvent (VCanChanData *chd, VCAN_EVENT *e)
                                               msg_flags)) != 0)) {
         // This is something that matched the code/mask for at least one buffer,
         // and it's *not* a TXRQ or a TXACK.
-#ifdef __arm_
+#ifdef __arm__
         unsigned int rd;
         unsigned int new_rd;
         do {

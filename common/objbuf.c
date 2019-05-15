@@ -119,6 +119,11 @@ static void objbuf_write_all (OS_IF_TASK_QUEUE_HANDLE *work)
   CAN_MSG          *bufMsgPtr;
   int              queuePos;
 
+#ifdef __arm__
+  unsigned int rd;
+  unsigned int new_rd;
+#endif
+
   DEBUGOUT(2, (TXT("objbuf_write_all: dev = 0x%p  vCard = 0x%p\n"),
                vChan, vCard));
 
@@ -175,7 +180,14 @@ static void objbuf_write_all (OS_IF_TASK_QUEUE_HANDLE *work)
 
     done_mask |= (1 << i);
   }
+#ifdef __arm__
+  do {
+    rd = atomic_read(&fileNodePtr->objbufActive);
+    new_rd = rd & ~done_mask;
+  } while (atomic_cmpxchg(&fileNodePtr->objbufActive, rd, new_rd) != rd);
+#else
   atomic_clear_mask(done_mask, &fileNodePtr->objbufActive);
+#endif
 
   if (active_mask != done_mask) {
     // Give ourselves a little extra work in case all the sends could not

@@ -1,5 +1,8 @@
-# Main Makefile for the Kvaser Linux drivers.
-# 
+#!/bin/sh
+# Kvaser CAN driver                     
+# mhydra.sh - start/stop mhydra and create/delete device files  
+# this script can be used if hotplugging doesn't work
+#
 #                 Copyright 2012 by Kvaser AB, M�lndal, Sweden
 #                         http://www.kvaser.com
 # 
@@ -49,68 +52,69 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # 
 #  ---------------------------------------------------------------------------
-# 
+#
 
-#----------------------------------------
-# included in build
-#----------------------------------------
-USERLIBS  += canlib
-USERLIBS  += linlib
+LOG=`which logger`
 
-DRIVERS   += leaf
-DRIVERS   += mhydra
-DRIVERS   += pcican
-DRIVERS   += pcican2
-DRIVERS   += usbcanII
-DRIVERS   += virtualcan
+#     
+# test kernel version
+#     
+kernel_major=`uname -r |cut -d \. -f 1` 
+kernel_minor=`uname -r |cut -d \. -f 2` 
 
-#---------------------------------
-# Debug levels are defined in config.mak
-KV_DEBUG_ON=0
-export KV_DEBUG_ON
+if [ $kernel_major = 2 ] && [ $kernel_minor = 4 ]; then
+  kv_module_install=insmod
+else
+  kv_module_install=modprobe
+fi
 
-#---------------------------------
-SUBDIRS   = $(USERLIBS) $(DRIVERS)
+#
+# Install
+#
 
-#---------------------------------------------------------------------------
-# RULES
-.PHONY: debug canlib linlib leaf mhydra minipciecan pcican pcican2 usbcanII virtualcan install clean
+# Add or remove mhydra module
+case "$1" in
+   start)
+      /bin/sleep 3 # Sleep a second or two to be sure that module init is executed
+      /sbin/rmmod mhydra
+      /sbin/$kv_module_install mhydra || exit 1
+      $LOG -t $0 "Module mhydra added"
+      minors=`cat /proc/mhydra | grep 'minor numbers' | cut -d ' ' -f 3-`
+      major=`cat /proc/devices | grep 'mhydra' | cut -d \  -f 1`
+      rm -f /dev/mhydra*
+      for minor in $minors; do
+         $LOG -t $0 "Created /dev/mhydra$minor"
+         mknod /dev/mhydra$minor c $major $minor
+      done
+      ;;
+   stop)
+      if [ -f /proc/mhydra ]; then
+         minors=`cat /proc/mhydra | grep 'minor numbers' | cut -d ' ' -f 3-`
+         for mhydra in `ls /dev/mhydra*`; do
+            l=`echo $mhydra | grep -o '[0-9]*$'`
+            found=0
+            for m in $minors; do
+               if [ $l -eq $m ]; then
+                  found=1
+               fi
+            done
+            if [ $found -eq 0 ]; then
+               rm -f $mhydra
+               $LOG -t $0 "Device $mhydra removed"
+            fi
+         done
+      fi
+      /sbin/rmmod mhydra || exit 1
+      rm -f /dev/mhydra*
+      $LOG -t $0 "Module mhydra removed"
+      ;;
+   restart)
+      $LOG -t $0 "Module mhydra restart"
+      $0 stop
+      $0 start
+      ;;
+   *)
+      printf "Usage: %s {start|stop|restart}\n" $0
+esac
 
-all:  $(SUBDIRS)
-
-canlib:
-	$(MAKE) -C canlib examples
-
-linlib:
-	$(MAKE) -C linlib
-
-pcican:
-	@cd ./pcican; $(MAKE) kv_module
-
-minipciecan:
-	@cd ./minipciecan; $(MAKE) kv_module
-
-pcican2:
-	@cd ./pcican2; $(MAKE) kv_module
-
-usbcanII:
-	@cd ./usbcanII; $(MAKE) kv_module
-
-leaf:
-	@cd ./leaf; $(MAKE) kv_module
-
-mhydra:
-	@cd ./mhydra; $(MAKE) kv_module
-
-virtualcan:
-	@cd ./virtualcan; $(MAKE) kv_module
-
-install: $(DRIVERS)
-	@for dir in $(DRIVERS) ; do cd $$dir; echo Installing $$dir;./installscript.sh; cd ..; done
-	$(MAKE) -C canlib install
-	$(MAKE) -C linlib install
-
-clean:
-	@for dir in $(SUBDIRS) ; do cd $$dir; $(MAKE) clean; cd ..; done
-	rm -f modules.order Module.symvers
-	rm -rf .tmp_versions
+exit 0 

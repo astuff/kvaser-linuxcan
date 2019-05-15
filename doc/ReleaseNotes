@@ -3,7 +3,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.3  
+Release notes for linuxcan V5.8  
 ================================================================
 
 Linux device drivers for
@@ -33,10 +33,15 @@ Linux device drivers for
   *  KVASER OEM Mercury
   *  KVASER OEM Leaf
   *  KVASER Virtual CAN
+  *  KVASER Eagle *****
+  *  KVASER BlackBird v2 *****
+  *  KVASER Memorator Pro 5xHS *****
+  *  KVASER USBcan Pro 5xHS *****
 
-  **   Recommended firmware > 3.0
-  ***  Only with USBcan II functionality. 
-  **** Only with USBcan Professional functionality. 
+  **    Recommended firmware > 3.0
+  ***   Only with USBcan II functionality. 
+  ****  Only with USBcan Professional functionality.
+  ***** Only with usb CAN communication. 
 
 
 ================================================================
@@ -53,8 +58,9 @@ Version info
 
    * Tested under x86_64 SMP Ubuntu 12.04 x32/x64 (3.2.0-29-generic-pae/3.2.0-23-generic).
    * Tested under x86_64 SMP Ubuntu 13.04 x32/x64 (3.8.0-19-generic/3.8.0-19-generic).
-   * Compiled with gcc version 4.6.3 and 4.7.3.
-   * Used glibc version 2.15 and 2.17.
+   * Tested under x86_64 SMP Ubuntu 14.04 x32/x64 (3.13.0-32-generic/3.13.0-32-generic).
+   * Compiled with gcc version 4.6.3, 4.7.3 and 4.8.2.
+   * Used glibc version 2.15, 2.17 and 2.19.
 
 
 ================================================================
@@ -94,6 +100,36 @@ Known problems
      hardware, the same is not true for auto tx. The latter is only
      available if there is firmware support in the device.
      (This is the same as under Windows.)
+
+
+New Features and Fixed Problems in V5.8   (02-FEB-2015)
+===========================================================================
+   * Support for Kvaser Memorator Pro 5xHS 00778-9 and tentative support 
+     for Kvaser USBcan Pro 5xHS 00779-6. 
+     Only usb CAN communication supported.
+
+
+New Features and Fixed Problems in V5.7   (28-SEP-2014)
+===========================================================================
+   * Fixed bug when compiling on arm architecture. 
+
+   * Tentative support for Kvaser Eagle 00567-9 and Kvaser BlackBird v2 00671-3.
+     Only usb CAN communication supported.
+
+
+New Features and Fixed Problems in V5.6   (25-JUN-2014)
+===========================================================================
+   * Minor changes.
+
+
+New Features and Fixed Problems in V5.5   (18-JUN-2014)
+===========================================================================
+   * Minor changes.
+
+
+New Features and Fixed Problems in V5.4   (07-APR-2014)
+===========================================================================
+   * No changes.
 
 
 New Features and Fixed Problems in V5.3   (20-MAR-2014)
@@ -213,7 +249,6 @@ NOTE! While SMP (and fully preemptible kernel) has seen significant
       Feedback on use under SMP enabled (or fully preemptible)
       and 64 bit kernels is welcome.
       See the FAQ for information on how to disable SMP.
-NOTE! Read 'Known problems in version 4.77' below carefully.
 
 
 ================================================================
@@ -244,7 +279,6 @@ NOTE! While SMP (and fully preemptible kernel) has seen significant
       Feedback on use under SMP enabled (or fully preemptible)
       and 64 bit kernels is welcome.
       See the FAQ for information on how to disable SMP.
-NOTE! Read 'Known problems in version 4.76' below carefully.
 
 
 ================================================================
@@ -273,7 +307,6 @@ NOTE! While SMP (and fully preemptible kernel) has seen significant
       Feedback on use under SMP enabled (or fully preemptible)
       and 64 bit kernels is welcome.
       See the FAQ for information on how to disable SMP.
-NOTE! Read 'Known problems in version 4.75' below carefully.
 
 
 ================================================================
@@ -316,7 +349,6 @@ System requirements: Linux 2.4, 2.6 (only 2.6 for USBcanII and Leaf).
 NOTE! Only limited testing has been done under SMP so far.
       Use on an SMP enabled (or fully preemptible) kernel is unsupported.
       See the FAQ for solutions.
-NOTE! Read 'Known problems in version 4.72' below carefully.
 
 
 ================================================================
@@ -345,7 +377,6 @@ KVASER LAPcan and LAPcan II are excluded from this release.
 System requirements: Linux 2.4, 2.6 (only 2.6 for USBcanII and Leaf).
 
 NOTE! Not tested under SMP or with fully preemptive kernel.
-NOTE! Read 'Known problems in version 4.6' below carefully.
 
 
 ================================================================
@@ -401,7 +432,6 @@ System requirements: Linux 2.4, 2.6 (only 2.6 for USBcan II, Leaf).
 
 NOTE! Not tested on SMP kernels.
 NOTE! The current driver only supports ONE USBcan II or Leaf device.
-NOTE! Read 'Known problems in version 4.3' below carefully.
 
 
 ================================================================
@@ -423,7 +453,6 @@ System requirements: Linux 2.4, 2.6 (only 2.6 for USBcanII).
 
 NOTE! Not tested on SMP kernels.
 NOTE! The current driver only supports ONE USBcanII device.
-NOTE! Read 'Known problems in version 4.2' below carefully.
 
 
 ================================================================
@@ -446,8 +475,6 @@ NOTE! Not tested on SMP kernels.
 No major changes for LAPcan and PCIcan drivers.
 The driver structure is modified and the code rewritten since 
 version 3.0 and 3.1. The functionality is the same as before.
-
-NOTE! Read 'Known problems in version 4.1 BETA' below carefully.
 
 
 ================================================================

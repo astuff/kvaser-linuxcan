@@ -115,7 +115,7 @@ function toggleVisibility(linkObj) {
 </div>
 <div class="contents">
 <div class="fragment"><pre class="fragment"><span class="comment">/*</span>
-<span class="comment">**                Copyright 2012 by Kvaser AB, Mölndal, Sweden</span>
+<span class="comment">**                Copyright 2012 by Kvaser AB, Mï¿½lndal, Sweden</span>
 <span class="comment">**                        http://www.kvaser.com</span>
 <span class="comment">**</span>
 <span class="comment">** This software is dual licensed under the following two licenses:</span>
@@ -241,10 +241,10 @@ function toggleVisibility(linkObj) {
       exit(1);
     }
 
-    printf(<span class="stringliteral">&quot;channel %d = %s, %x-%04x-%05x-%x, (%d)%d, %d.%d.%d.%d\n&quot;</span>,
+    printf(<span class="stringliteral">&quot;channel %d = %s, %x-%05x-%05x-%x, (%d)%d, %d.%d.%d.%d\n&quot;</span>,
            i, name,
-           ean[1] &gt;&gt; 8, ((ean[1] &amp; 0xff) &lt;&lt; 8) | ((ean[0] &gt;&gt; 24) &amp; 0xff),
-           (ean[0] &gt;&gt; 4) &amp; 0xfffff, ean[0] &amp; 0x0f,
+           (ean[1] &gt;&gt; 12), ((ean[1] &amp; 0xfff) &lt;&lt; 8) | ((ean[0] &gt;&gt; 24) &amp; 0xff),
+           (ean[0] &gt;&gt; 4) &amp; 0xfffff, (ean[0] &amp; 0x0f),
            serial[1], serial[0],
            fw[1] &gt;&gt; 16, fw[1] &amp; 0xffff, fw[0] &gt;&gt; 16, fw[0] &amp; 0xffff);
   }    
@@ -272,7 +272,7 @@ function toggleVisibility(linkObj) {
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.3) - Generated on Thu Mar 20 2014</small>
+<small>Kvaser Linux CANLIB (canlib 5.8) - Generated on Mon Feb 2 2015</small>
 </address>
 </body>
 </html>

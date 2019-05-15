@@ -1,4 +1,6 @@
-# Main Makefile for the Kvaser Linux drivers.
+#
+# Makefile mhydra
+#
 # 
 #                 Copyright 2012 by Kvaser AB, M�lndal, Sweden
 #                         http://www.kvaser.com
@@ -51,66 +53,23 @@
 #  ---------------------------------------------------------------------------
 # 
 
-#----------------------------------------
-# included in build
-#----------------------------------------
-USERLIBS  += canlib
-USERLIBS  += linlib
+# module name
+KV_MODULE_NAME = mhydra
 
-DRIVERS   += leaf
-DRIVERS   += mhydra
-DRIVERS   += pcican
-DRIVERS   += pcican2
-DRIVERS   += usbcanII
-DRIVERS   += virtualcan
+# Includes
+INCLUDES := $(src)/../include/
 
-#---------------------------------
-# Debug levels are defined in config.mak
-KV_DEBUG_ON=0
-export KV_DEBUG_ON
+# source files
+SRCS :=           mhydraHWIf.c 
+SRCS += ../common/VCanOsIf.c 
+SRCS += ../common/objbuf.c 
+SRCS += ../common/osif_functions_kernel.c
+SRCS += ../common/queue.c
 
-#---------------------------------
-SUBDIRS   = $(USERLIBS) $(DRIVERS)
+ifneq ($(KERNELRELEASE),)
+	RUNDIR := $(src)
+else
+	RUNDIR := $(PWD)
+endif
 
-#---------------------------------------------------------------------------
-# RULES
-.PHONY: debug canlib linlib leaf mhydra minipciecan pcican pcican2 usbcanII virtualcan install clean
-
-all:  $(SUBDIRS)
-
-canlib:
-	$(MAKE) -C canlib examples
-
-linlib:
-	$(MAKE) -C linlib
-
-pcican:
-	@cd ./pcican; $(MAKE) kv_module
-
-minipciecan:
-	@cd ./minipciecan; $(MAKE) kv_module
-
-pcican2:
-	@cd ./pcican2; $(MAKE) kv_module
-
-usbcanII:
-	@cd ./usbcanII; $(MAKE) kv_module
-
-leaf:
-	@cd ./leaf; $(MAKE) kv_module
-
-mhydra:
-	@cd ./mhydra; $(MAKE) kv_module
-
-virtualcan:
-	@cd ./virtualcan; $(MAKE) kv_module
-
-install: $(DRIVERS)
-	@for dir in $(DRIVERS) ; do cd $$dir; echo Installing $$dir;./installscript.sh; cd ..; done
-	$(MAKE) -C canlib install
-	$(MAKE) -C linlib install
-
-clean:
-	@for dir in $(SUBDIRS) ; do cd $$dir; $(MAKE) clean; cd ..; done
-	rm -f modules.order Module.symvers
-	rm -rf .tmp_versions
+include $(RUNDIR)/../config.mak
