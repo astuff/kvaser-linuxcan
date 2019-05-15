@@ -1,4 +1,3 @@
-
 /**
  *                   Copyright 2005 by KVASER AB, SWEDEN      
  *                        WWW: http://www.kvaser.com
@@ -57,6 +56,8 @@
  * ---------------------------------------------------------------------------
  */
 
+#define _GNU_SOURCE // This is required for recursive mutex support in pthread
+
 #if WIN32
 #  include <windows.h>
 #  include <winioctl.h>
@@ -69,6 +70,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include "compilerassert.h"
 
 #if WIN32
 #  include "vcanio.h"
@@ -85,6 +87,14 @@
 #  define OutputDebugString(buf)
 #  define CRITICAL_SECTION            pthread_mutex_t
 #  define PRINTF(x)                   dbg_printf x
+
+#if defined(PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP)
+static pthread_mutex_t handleMutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+#elif defined(PTHREAD_RECURSIVE_MUTEX_INITIALIZER)
+static pthread_mutex_t handleMutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
+#else
+#error Canlib requires GNUC.
+#endif
 #endif
 
 #include <linlib.h>
@@ -92,19 +102,12 @@
 // #define ICD2 0 // Doesn't matter
 #include "linboot.h"
 
-// There has been reports that timing messages are missing or comes out of order.
-// If DEBUG_TIMING is non-zero, the order of what timing messages are received is
-// logged in a vector.
-#define DEBUG_TIMING 0
-
-
 typedef signed char         int8;
 typedef unsigned char       uint8;
 typedef short               int16;
 typedef unsigned short      uint16;
 typedef int                 int32;
 typedef unsigned int        uint32;
-
 
 static void dbg_printf(const char *fmt, ...)
 {
@@ -128,10 +131,19 @@ CRITICAL_SECTION    crit;
 
 int isInitialized = FALSE;
 
-
 typedef struct {
   uint16 frameStart;
   uint8 z[6];
+} Timing0_leaf;
+
+typedef struct {
+  uint32 sof; //start of frame
+  uint32 eof; // end of frame
+} Timing0_flex;
+
+typedef union {
+  Timing0_leaf leaf;
+  Timing0_flex flex;
 } Timing0;
 
 typedef struct {
@@ -140,13 +152,34 @@ typedef struct {
   uint16 frameLength;
   struct {
     // For MSC, the type can't be int, or the struct will be too large 
-    unsigned char timeShift:3;
-    unsigned char parity:2;
-    unsigned char bitError:1;
-    unsigned char z:1;
-    unsigned char msgToCome:1;
+    unsigned char timeShift : 3;
+    unsigned char parity    : 2;
+    unsigned char bitError  : 1;
+    unsigned char z         : 1;
+    unsigned char msgToCome : 1;
   } flags;
   uint8 msgCsum;
+} Timing1_leaf;
+
+typedef struct {
+  uint16 lin_break_length;
+  uint16 lin_synch_length;
+  uint16 res1;
+  struct {
+    // For MSC, the type can't be int, or the struct will be too large 
+    unsigned char timeShift : 3;
+    unsigned char parity    : 2;
+    unsigned char bitError  : 1;
+    unsigned char z         : 1;
+    unsigned char msgToCome : 1;
+  } flags;
+  uint8 msgCsum;
+} Timing1_flex;
+
+typedef union {
+  Timing1_flex common;
+  Timing1_leaf leaf;
+  Timing1_flex flex;
 } Timing1;
 
 typedef struct {
@@ -160,7 +193,11 @@ typedef struct {
 #include "poppack.h"
 #endif
 
+CompilerAssert(sizeof(Timing0_leaf) == 8);
+CompilerAssert(sizeof(Timing0_flex) == 8);
 CompilerAssert(sizeof(Timing0) == 8);
+CompilerAssert(sizeof(Timing1_leaf) == 8);
+CompilerAssert(sizeof(Timing1_flex) == 8);
 CompilerAssert(sizeof(Timing1) == 8);
 CompilerAssert(sizeof(TimingSynch) == 8);
 
@@ -180,10 +217,6 @@ typedef struct {
   BOOL          timingByteTime0Valid;
   BOOL          timingByteTime1Valid;
   
-#if DEBUG_TIMING
-  int           timingMessageNo;
-  int           timingOrder[5];
-#endif
   
   Timing0       timing0;
   Timing1       timing1;
@@ -191,12 +224,15 @@ typedef struct {
   TimingBytes   timingB;
   unsigned long timestamp0;
 
-  unsigned char bootVerMajor;
-  unsigned char bootVerMinor;
-  unsigned char bootVerBuild;
-  unsigned char appVerMajor;
-  unsigned char appVerMinor;
-  unsigned char appVerBuild;
+  uint16        bootVerMajor;
+  uint16        bootVerMinor;
+  uint16        bootVerBuild;
+  uint16        appVerMajor;
+  uint16        appVerMinor;
+  uint16        appVerBuild;
+  
+  unsigned int  openMode;
+  unsigned int  flex;
 } LinChannel;
 
 /*
@@ -243,13 +279,13 @@ static LinStatus lin_read_version(LinHandleInt lh, BOOL reboot);
 #if !WIN32
 void EnterCriticalSection (void *crit)
 {
-  pthread_mutex_lock(crit);
+  pthread_mutex_lock(&handleMutex);
 }
 
 
 void LeaveCriticalSection (void *crit)
 {
-  pthread_mutex_unlock(crit);
+  pthread_mutex_unlock(&handleMutex);
 }
 
 
@@ -264,7 +300,11 @@ static unsigned long timeGetTime (void)
     return 0;
   }
   else {
-    return (tv.tv_sec - start.tv_sec) * 1000  + (tv.tv_usec - start.tv_usec) / 1000;
+    if (tv.tv_usec >= start.tv_usec) {
+      return (tv.tv_sec - start.tv_sec) * 1000 + (tv.tv_usec - start.tv_usec + 500) / 1000;
+    } else {
+      return (tv.tv_sec - 1 - start.tv_sec) * 1000 + (tv.tv_usec + 1000000 - start.tv_usec + 500) / 1000;
+    }
   }
 }
 
@@ -341,6 +381,20 @@ LinStatus LINLIBAPI linGetCanHandle(LinHandle h, unsigned int *canHandle)
   return linOK;
 }
 
+//===========================================================================
+static BOOL is_supported_flex_hw(int channel) 
+{
+  int stat;
+  unsigned int cap = 0;
+  unsigned int cap_mask = 0;
+    
+  stat = canGetChannelData(channel, canCHANNELDATA_CHANNEL_CAP, &cap, sizeof(cap));
+  if (stat != canOK) return 0;
+  stat = canGetChannelData(channel, canCHANNELDATA_CHANNEL_CAP_MASK, &cap_mask, sizeof(cap_mask));
+  if (stat != canOK) return 0;
+
+  return ((cap & cap_mask & canCHANNEL_CAP_LIN_FLEX) != 0);
+}
 
 //===========================================================================
 LinHandle LINLIBAPI linOpenChannel(int channel, int flags)
@@ -371,16 +425,17 @@ LinHandle LINLIBAPI linOpenChannel(int channel, int flags)
   lh = &linChannels[h];
   memset(lh, 0, sizeof(*lh));
   
-  PRINTF(("linOpenChannel (%d) - %s\n", channel,
-                flags & LIN_MASTER?"MASTER":"SLAVE"));
-  
   // Assign to linChannels[h]. We doesn't set inUse, so it is left
   // unallocated for a while.
+  lh->openMode = 0;
   lh->canChannel = channel;
   lh->bitrate = 10000;
   lh->running = 0;
   lh->canChannel = channel;
   lh->h = h;
+
+  lh->flex = is_supported_flex_hw (channel);
+
   if (flags & LIN_MASTER) {
     lh->master = 1;
   }
@@ -407,9 +462,15 @@ LinHandle LINLIBAPI linOpenChannel(int channel, int flags)
     return linERR_NOTFOUND;
   }
   
-  if (is_supported_lin_hw(hwtype) == FALSE) {
+  if (lh->flex == FALSE) {
+    if (is_supported_lin_hw(hwtype) == FALSE) {
       LeaveCriticalSection(&crit);
       return linERR_NOTFOUND;
+    }
+  }
+  else {
+    canlibFlags |= canOPEN_LIN;
+    lh->openMode = canOPEN_LIN;
   }
   // Now, we could check that there is a LIN transceiver connected to
   // the CAN channel, but this currently doesn't work very well.
@@ -433,7 +494,8 @@ LinHandle LINLIBAPI linOpenChannel(int channel, int flags)
     (void)canClose(lh->ch);
     LeaveCriticalSection(&crit);
     return linERR_NOTFOUND;
-  }
+  } 
+
   
   stat = canBusOn(lh->ch);
   if (stat < 0) {
@@ -441,7 +503,8 @@ LinHandle LINLIBAPI linOpenChannel(int channel, int flags)
     LeaveCriticalSection(&crit);
     return linERR_NOTFOUND;
   }
-  
+ 
+ 
   if ((stat = check_for_lin_cable(lh))) {
       (void)canClose(lh->ch);
       LeaveCriticalSection(&crit);
@@ -481,7 +544,7 @@ LinStatus LINLIBAPI linClose(LinHandle h)
 {
   LinHandleInt lh;
   LinStatus r = linOK;
-  
+
   EnterCriticalSection(&crit);
   if (!ASSIGN_LIN_HANDLE(lh, h)) {
     LeaveCriticalSection(&crit);
@@ -496,7 +559,6 @@ LinStatus LINLIBAPI linClose(LinHandle h)
 
   lh->inUse = 0;
   LeaveCriticalSection(&crit);
-  
   return r;
 }
 
@@ -518,21 +580,54 @@ LinStatus LINLIBAPI linGetFirmwareVersion(LinHandle h,
     return linERR_INVHANDLE;
   }
 
+  // if it is a flex-interface the version will be truncated from short -> char
   if (bootVerMajor)
-    *bootVerMajor = lh->bootVerMajor;
+    *bootVerMajor = (unsigned char)lh->bootVerMajor;
   if (bootVerMinor)
-    *bootVerMinor = lh->bootVerMinor;
+    *bootVerMinor = (unsigned char)lh->bootVerMinor;
   if (bootVerBuild)
-    *bootVerBuild = lh->bootVerBuild;
+    *bootVerBuild = (unsigned char)lh->bootVerBuild;
   if (appVerMajor)
-    *appVerMajor = lh->appVerMajor;
+    *appVerMajor = (unsigned char)lh->appVerMajor;
   if (appVerMinor)
-    *appVerMinor = lh->appVerMinor;
+    *appVerMinor = (unsigned char)lh->appVerMinor;
   if (appVerBuild)
-    *appVerBuild = lh->appVerBuild;
+    *appVerBuild = (unsigned char)lh->appVerBuild;
 
   LeaveCriticalSection(&crit);
   return linOK;
+}
+
+//===========================================================================
+LinStatus LINLIBAPI linGetChannelData(int channel, int item, void *buffer, size_t bufsize)
+{
+  int channels = 0;
+
+  if (!isInitialized) return linERR_NOTINITIALIZED;
+  
+  if ((buffer == NULL) || (bufsize == 0)) {
+    return linERR_PARAM;
+  }
+  canGetNumberOfChannels(&channels);
+  if (channel >= channels) return linERR_NOTFOUND;
+  
+  switch (item) {
+    case linCHANNELDATA_CARD_FIRMWARE_REV:
+    {
+      int stat;
+      uint16 fw[4];
+      
+      if (bufsize < sizeof(fw)) return linERR_PARAM;
+      
+      stat = canGetChannelData(channel, canCHANNELDATA_CARD_FIRMWARE_REV, &fw, sizeof(fw));    
+      if (stat != canOK) return linERR_NOCHANNELS;
+    
+      memcpy(buffer, fw, sizeof(fw));      
+      return linOK;
+    }
+    default:
+      return linERR_PARAM;
+  }
 }
 
 
@@ -595,14 +690,24 @@ LinStatus LINLIBAPI linBusOn(LinHandle h)
     return linERR_INVHANDLE;
   }
   
-  // lin_read_version reboots lin-interface 
-  // but this should be ok here since the only 
-  // settings made are written to the eeprom
-  r = lin_read_version(lh, 0); 
-  if (r != linOK) {
-    (void)canClose(lh->ch);
-    LeaveCriticalSection(&crit);
-    return r;
+  if (lh->openMode == canOPEN_LIN) {
+    r = reset_lin_cable(lh, TRUE);    
+    if (r) {
+      LeaveCriticalSection(&crit);
+      PRINTF(("Failed resetting LIN cable %d (buson)\n", r));
+      return r;
+    }
+  }
+  else {
+    // lin_read_version reboots lin-interface 
+    // but this should be ok here since the only 
+    // settings made are written to the eeprom
+    r = lin_read_version(lh, 0); 
+    if (r != linOK) {
+      (void)canClose(lh->ch);
+      LeaveCriticalSection(&crit);
+      return r;
+    }
   }
   
   lh->timing0Valid = FALSE;
@@ -610,10 +715,6 @@ LinStatus LINLIBAPI linBusOn(LinHandle h)
   lh->timingSValid = FALSE;
   lh->timingByteTime0Valid = FALSE;
   lh->timingByteTime1Valid = FALSE;
-#if DEBUG_TIMING
-  lh->timingMessageNo = 0;
-  memset(lh->timingOrder, 0, sizeof(lh->timingOrder));
-#endif
 
   lh->running = 1;
 
@@ -636,23 +737,29 @@ LinStatus LINLIBAPI linBusOff(LinHandle h)
     LeaveCriticalSection(&crit);
     return linERR_INVHANDLE;
   }
-  // If the cable is nusy receiving or transmitting a LIN message, it won't
-  // react on the reset command until done.
-  // So we transmit a dummy command first.
-  r = lin_command(lh,
+  
+  if (lh->openMode == canOPEN_LIN) { 
+    r = reset_lin_cable(lh, FALSE);
+  }
+  else {
+    // If the cable is busy receiving or transmitting a LIN message, it won't
+    // react on the reset command until done.
+    // So we transmit a dummy command first.
+    
+    r = lin_command(lh,
                   COMMAND_GET_STATUS,
                   command_counter++,
                   0,0,0,0,0,0,
                   NULL, LIN_COMMAND_DEF_TIMEOUT);
 
 
-  if (r) {
-    LeaveCriticalSection(&crit);
-    PRINTF(("Reading of status failed\n"));
-    return r;
+    if (r) {
+      LeaveCriticalSection(&crit);
+      PRINTF(("Reading of status failed\n"));
+      return r;
+    }
+    r = reset_lin_cable(lh, TRUE); 
   }
-  
-  r = reset_lin_cable(lh, TRUE);
   if (r)
     PRINTF(("Failed resetting LIN cable in linBusOff()"));
   lh->running = 0;
@@ -1001,11 +1108,6 @@ LinStatus LINLIBAPI linReadMessage(LinHandle h, unsigned int *id,
     return linERR_NOTRUNNING;
   }
 
-  // Check if it is a LINLEAF or LAPCAN
-  //stat = canGetChannelData(lh->ch, canCHANNELDATA_CARD_TYPE, &hwtype, sizeof (hwtype));
-  //if (stat != canOK)
-  //   return linERR_INVHANDLE;
-
   linFlags = 0;
   for (;;) {
     stat = canRead(lh->ch, (long*)&canId, msg, dlc, &canFlags, &timestamp);
@@ -1017,57 +1119,53 @@ LinStatus LINLIBAPI linReadMessage(LinHandle h, unsigned int *id,
       continue; // This is nothing we want.
     if (canId == CAN_ID_TIMING0 && *dlc == 8) {
       lh->timing0Valid = TRUE;
-#if DEBUG_TIMING
-      lh->timingOrder[0] = ++lh->timingMessageNo;
-#endif
-      memcpy(&lh->timing0, msg, 8);
+      memcpy(&lh->timing0.flex, msg, 8);
       lh->timestamp0 = timestamp;
-    } else if (canId == CAN_ID_TIMING && *dlc == 8) {
+    } 
+    else if (canId == CAN_ID_TIMING && *dlc == 8) {
       lh->timing1Valid = TRUE;
-#if DEBUG_TIMING
-      lh->timingOrder[1] = ++lh->timingMessageNo;
-#endif
-      memcpy(&lh->timing1, msg, 8);
-    } else if (canId == CAN_ID_TIMING_SYNCH && *dlc == 8) {
+      memcpy(&lh->timing1.common, msg, 8);
+    } 
+    else if (canId == CAN_ID_TIMING_SYNCH && *dlc == 8) {
       lh->timingSValid = TRUE;
-#if DEBUG_TIMING
-      lh->timingOrder[2] = ++lh->timingMessageNo;
-#endif
       memcpy(&lh->timingS, msg, 8);
-    } else if (canId == CAN_ID_TIMING_DATA0 && *dlc == 8) {
+    } 
+    else if (canId == CAN_ID_TIMING_DATA0 && *dlc == 8) {
       lh->timingByteTime0Valid = TRUE;
-#if DEBUG_TIMING
-      lh->timingOrder[3] = ++lh->timingMessageNo;
-#endif
       memcpy(&lh->timingB.t, msg, 8);
-    } else if (canId == CAN_ID_TIMING_DATA1 && *dlc == 8) {
+    } 
+    else if (canId == CAN_ID_TIMING_DATA1 && *dlc == 8) {
       lh->timingByteTime1Valid = TRUE;
-#if DEBUG_TIMING
-      lh->timingOrder[4] = ++lh->timingMessageNo;
-#endif
       memcpy(&(lh->timingB.t[4]), msg, 8);
-    } else if (canId == CAN_ID_SYNCHERROR) {
+    } 
+    else if (canId == CAN_ID_SYNCHERROR) {
       linFlags |= LIN_SYNCH_ERROR;
       break;
-    } else if(canId == CAN_ID_RX_WAKEUP) {
+    } 
+    else if(canId == CAN_ID_RX_WAKEUP) {
       /* We will receive a CAN_ID_RX_WAKEUP if we received a wake up frame
       * as a master or a slave. */
       linFlags |= (LIN_WAKEUP_FRAME | LIN_RX);
       break;
-    } else if(canId == CAN_ID_TXE_WAKEUP) {
+    } 
+    else if(canId == CAN_ID_TXE_WAKEUP) {
       /* We will receive a CAN_ID_TXE_WAKEUP both if we transmitted a wake up frame
       * as a master or a slave. */
       linFlags |= (LIN_WAKEUP_FRAME | LIN_TX);
       break;
-    } else if (canId == CAN_ID_COMMAND || canId == CAN_ID_RESPONSE || canId == CAN_ID_STATUS) {
+    } 
+    else if (canId == CAN_ID_COMMAND || canId == CAN_ID_RESPONSE || canId == CAN_ID_STATUS) {
       continue;
-    } else if (canId == CAN_ID_TERM) {
+    } 
+    else if (canId == CAN_ID_TERM) {
       continue;
-    } else if (canId & 0xc00) {
+    } 
+    else if (canId & 0xc00) {
       // Drop any CAN message that isn't a LIN message.
       // Only the '0x400'-bit can be set for a CAN id, but we check also the high bit.
       continue;
-    } else {
+    } 
+    else {
       unsigned long canIdM;
       canIdM = canId & 0xfffffc3f;  // set status bits to zero.
       if (canIdM > 63)
@@ -1094,19 +1192,39 @@ LinStatus LINLIBAPI linReadMessage(LinHandle h, unsigned int *id,
     memset(msgInfo, 0, sizeof(*msgInfo));
     if (lh->timing0Valid) {
       unsigned long frameStart;
-      frameStart = (lh->timing0.frameStart << lh->timing1.flags.timeShift)/4; // Unit: us
-      msgInfo->timestamp = lh->timestamp0-(frameStart+500)/1000;
-    } else
+
+      if (lh->flex) {
+        if (lh->timing0.flex.eof > lh->timing0.flex.sof) {
+          msgInfo->frameLength = lh->timing0.flex.eof - lh->timing0.flex.sof;
+        } else {
+          msgInfo->frameLength = 1048575 + lh->timing0.flex.eof - lh->timing0.flex.sof;
+        }
+
+        msgInfo->frameLength =  msgInfo->frameLength / 5;
+        msgInfo->timestamp   = (lh->timestamp0 * 1000 - msgInfo->frameLength + 500) / 1000;
+      } else {
+        frameStart = (lh->timing0.leaf.frameStart << lh->timing1.common.flags.timeShift)/4; // Unit: us
+        msgInfo->timestamp = lh->timestamp0 - (frameStart + 500) / 1000;
+      }
+    } else {
       msgInfo->timestamp = lh->timestamp0;
+    }
+
     if (lh->timing1Valid) {
-      msgInfo->synchBreakLength = (lh->timing1.lin_break_length+2)/4;
-      msgInfo->checkSum = lh->timing1.msgCsum;
-      if (lh->timing1.flags.bitError)
+      msgInfo->synchBreakLength = (lh->timing1.common.lin_break_length+2)/4;
+      msgInfo->checkSum = lh->timing1.common.msgCsum;
+      if (lh->timing1.common.flags.bitError)
         linFlags |= LIN_BIT_ERROR;
-      msgInfo->frameLength = (lh->timing1.frameLength << lh->timing1.flags.timeShift)/4;
-      if (lh->timing1.lin_synch_length)
-        msgInfo->bitrate = 4*8*1000000L/lh->timing1.lin_synch_length;
-      msgInfo->idPar = (*id & 0x3f) + (lh->timing1.flags.parity << 6);
+
+      if (!lh->flex) {
+        msgInfo->frameLength = (lh->timing1.leaf.frameLength << lh->timing1.common.flags.timeShift)/4;
+      }
+
+      if (lh->timing1.common.lin_synch_length)
+        msgInfo->bitrate = 4*8*1000000L/lh->timing1.common.lin_synch_length;
+
+      msgInfo->idPar = (*id & 0x3f) + (lh->timing1.common.flags.parity << 6);
+
       if (linFlags & LIN_WAKEUP_FRAME) // The frame length is sometimes not correct
         msgInfo->frameLength = msgInfo->synchBreakLength;
     }
@@ -1117,35 +1235,42 @@ LinStatus LINLIBAPI linReadMessage(LinHandle h, unsigned int *id,
     }
     if (lh->timingByteTime0Valid && lh->timingByteTime1Valid) {
       int i;
-      for (i = 0; i < 8; i++)
-        msgInfo->byteTime[i] = (lh->timingB.t[i] << lh->timing1.flags.timeShift)/4;
-    }
-#if DEBUG_TIMING
-    {
-      int i;
-      for (i = 0; i < 5; i++)
-        if (lh->timingOrder[i] != 1+i)
-          break;
-      if (i < 5) {
-        PRINTF(("Timing error for id %d: %d,%d,%d,%d,%d\n", canId & 0xfffffc3f,
-                      lh->timingOrder[0], lh->timingOrder[1], lh->timingOrder[2],
-                      lh->timingOrder[3], lh->timingOrder[4], lh->timingOrder[5]));
+      if (lh->flex) {
+        uint16 sof;
+        
+        switch (lh->timing1.common.flags.timeShift) {
+          case  0: sof =  0x0000FFFF & lh->timing0.flex.sof; break;
+          case  1: sof = (0x0001FFFE & lh->timing0.flex.sof) >> 1; break;
+          case  2: sof = (0x0003FFFC & lh->timing0.flex.sof) >> 2; break;
+          case  3: sof = (0x0007FFF8 & lh->timing0.flex.sof) >> 3; break;
+          case  4: sof = (0x000FFFF0 & lh->timing0.flex.sof) >> 4; break;
+          default: return linERR_INTERNAL;
+        }
+        
+        for (i = 0; i < 8; i++) {
+          if (sof < lh->timingB.t[i]) {
+            msgInfo->byteTime[i] = (unsigned long)lh->timingB.t[i] - (unsigned long)sof;
+        } else {
+            msgInfo->byteTime[i] = (unsigned long)65535 + (unsigned long)lh->timingB.t[i] - (unsigned long)sof;
+          }
+          msgInfo->byteTime[i] = (msgInfo->byteTime[i] << (lh->timing1.common.flags.timeShift + 4)) / 80;
+        }
+      } else {
+        for (i = 0; i < 8; i++)
+          msgInfo->byteTime[i] = (lh->timingB.t[i] << lh->timing1.common.flags.timeShift)/4;
       }
     }
-#endif
   }
-  if (flags)
+
+  if (flags) {
     *flags = linFlags;
+  }
 
   lh->timing0Valid = FALSE;
   lh->timing1Valid = FALSE;
   lh->timingSValid = FALSE;
   lh->timingByteTime0Valid = FALSE;
   lh->timingByteTime1Valid = FALSE;
-#if DEBUG_TIMING
-  lh->timingMessageNo = 0;
-  memset(lh->timingOrder, 0, sizeof(lh->timingOrder));
-#endif
   LeaveCriticalSection(&crit);
   return linOK;
 }
@@ -1212,6 +1337,36 @@ static LinStatus waitForBootMsg(LinHandleInt lh)
 
 
 //===========================================================================
+/* Check if we have ref-power connected to the lin channel
+*/
+static LinStatus check_for_lin_refpower(LinHandleInt lh)
+{
+  LinStatus r;
+  unsigned char response[8];
+  
+  if (lh->openMode != canOPEN_LIN) return linOK;
+  
+  memset(response, 0, sizeof(response));
+
+  r = lin_command(lh, COMMAND_GET_INFO,
+                  command_counter++,
+                  0,GET_INFO_TYPE_REFPOWER,0,0,0,0, response, LIN_COMMAND_DEF_TIMEOUT);
+  if (r) {
+    return r;
+  }
+  
+  // response[3] == 0 -> no power
+  if ((response[3] != GET_INFO_TYPE_REFPOWER) || (response[4] == 0)) { 
+    LeaveCriticalSection(&crit);
+    PRINTF(("No power supplied!\n"));
+    return linERR_NO_REF_POWER;
+  }
+  
+  return linOK;  
+}
+
+
+//===========================================================================
 /* Verifies that there is a LIN cable connected to the CAN channel.
 * The parameter shuold be a CAN handle.
 * The cable will be reset and left in boot mode.
@@ -1221,6 +1376,12 @@ static LinStatus check_for_lin_cable(LinHandleInt lh)
   unsigned long retry_count = 3;
   LinStatus r;
 
+  
+  // no point for !FLEX
+  if (lh->openMode == canOPEN_LIN) {    
+    return check_for_lin_refpower(lh);
+  }
+  
   lh->running = 0;
   
   while (retry_count-- > 0) {
@@ -1241,7 +1402,6 @@ static LinStatus check_for_lin_cable(LinHandleInt lh)
 static LinStatus reset_lin_cable(LinHandleInt lh, BOOL wait_for_bootloader)
 {
   LinStatus r;
-
   lh->running = 0;
   
   r = lin_command(lh, COMMAND_RESET,
@@ -1309,6 +1469,27 @@ LinStatus LINLIBAPI linGetTransceiverData(int channel,
   int hnd;
   HANDLE driver_handle;
 #endif
+
+  if (is_supported_flex_hw(channel))
+  {
+    stat = canGetChannelData(channel, canCHANNELDATA_CARD_UPC_NO, eanNo, 8);
+    if (stat != canOK) {
+      return linERR_CANERROR;
+    }
+    stat = canGetChannelData(channel, canCHANNELDATA_CARD_SERIAL_NO, serNo, 8);
+    if (stat != canOK) {
+      return linERR_CANERROR;
+    }
+        
+    if (ttype) {
+      stat = canGetChannelData(channel, canCHANNELDATA_TRANS_TYPE, ttype, sizeof(ttype));
+      if (stat != canOK) {
+        return linERR_CANERROR;
+      }
+    }
+     
+    return linOK; 
+  }
 
   stat = canGetChannelData(channel, canCHANNELDATA_CARD_TYPE, &hwtype, sizeof(hwtype));
   if (stat != canOK) {
@@ -1425,8 +1606,26 @@ static unsigned long crc32one(unsigned char b, unsigned long crc)
 static LinStatus lin_read_version(LinHandleInt lh, BOOL reboot) 
 {
   LinStatus r;
-  unsigned char response[8];
-  
+  unsigned char response[8];  
+    
+  // handle FLEX differently.
+  if (lh->openMode == canOPEN_LIN) {
+    int stat;
+    uint16 fw[4];
+    stat = canGetChannelData(lh->canChannel, canCHANNELDATA_CARD_FIRMWARE_REV, &fw, sizeof(fw));    
+    if (stat != canOK) return linERR_NOCHANNELS;
+    
+    lh->bootVerMajor = 0;
+    lh->bootVerMinor = 0;
+    lh->bootVerBuild = 0;
+    
+    lh->appVerMajor = fw[3];
+    lh->appVerMinor = fw[2];
+    lh->appVerBuild = fw[0];
+    
+    return linOK;
+  }
+    
   // make sure we reside in the bootcode
   r = reset_lin_cable(lh, TRUE);
   if (r) {
@@ -1532,6 +1731,11 @@ static LinStatus lin_authorize(LinHandleInt lh)
   unsigned char *randV = (unsigned char*)&rand;
   unsigned char salt;
   int i;
+  
+  // no point for FLEX
+  if (lh->openMode == canOPEN_LIN) {    
+    return linOK;
+  }
   
   r = lin_command(lh, COMMAND_HELLO,
                   command_counter++,

@@ -51,7 +51,7 @@
 **/
 
 /*  Kvaser Linux Canlib VCan layer functions */
-#define _GNU_SOURCE
+#define _GNU_SOURCE // This is required for recursive mutex support in pthread
 
 #include <stdint.h>
 #include "vcan_ioctl.h"
@@ -75,7 +75,10 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include "VCanMemoFunctions.h"
+#include "VCanScriptFunctions.h"
 #include "VCanFunctions.h"
+#include "VCanFuncUtil.h"
 #include "debug.h"
 
 
@@ -107,7 +110,8 @@ static uint32_t capabilities_table[][2] = {
   {VCAN_CHANNEL_CAP_SINGLE_SHOT,         canCHANNEL_CAP_SINGLE_SHOT},
   {VCAN_CHANNEL_CAP_HAS_LOGGER,          canCHANNEL_CAP_LOGGER},
   {VCAN_CHANNEL_CAP_HAS_REMOTE,          canCHANNEL_CAP_REMOTE_ACCESS},
-  {VCAN_CHANNEL_CAP_HAS_SCRIPT,          canCHANNEL_CAP_SCRIPT}
+  {VCAN_CHANNEL_CAP_HAS_SCRIPT,          canCHANNEL_CAP_SCRIPT},
+  {VCAN_CHANNEL_CAP_LIN_FLEX,            canCHANNEL_CAP_LIN_FLEX}
 };
 
 
@@ -250,57 +254,27 @@ void foreachHandle (int (*func)(const CanHandle))
   pthread_mutex_unlock(&handleMutex);
 }
 
-static canStatus toStatus (int error)
-{
-  switch (error) {
-  case 0:
-    return canOK;
-  case EINVAL:
-    return canERR_PARAM;
-  case ENOMEM:
-    return canERR_NOMEM;
-  case EAGAIN:
-    return canERR_NOMSG;      // Sometimes overridden
-  case EIO:
-    return canERR_NOTFOUND;   // Not so good
-  case ENODEV:
-    return canERR_NOTFOUND;
-  case EINTR:
-    return canERR_INTERRUPTED;
-  case EBADMSG:
-    return canERR_PARAM;      // Used?
-  case EACCES:
-    return canERR_NO_ACCESS;
-  case ETIMEDOUT:
-    return canERR_TIMEOUT;
-  case ENOSYS:                // Function not implemented
-    return canERR_NOT_IMPLEMENTED;
-  default:
-    return canERR_INTERNAL;   // Not so good
-  }
-}
-
 
 //======================================================================
 // Set CAN FD mode
 //======================================================================
-static canStatus kCanSetCanFD (HandleData *hData)
+static canStatus kCanSetOpenMode (HandleData *hData)
 {
   int ret;
-  KCAN_IOCTL_CANFD_T fd_data;
+  KCAN_IOCTL_OPEN_MODE_T open_data;
 
-  memset(&fd_data, 0, sizeof(KCAN_IOCTL_CANFD_T));
-  fd_data.fd = hData->fdMode;
-  fd_data.action = CAN_CANFD_SET;
+  memset(&open_data, 0, sizeof(KCAN_IOCTL_OPEN_MODE_T));
+  open_data.mode = hData->openMode;
+  open_data.action = CAN_MODE_SET;
 
-  ret = ioctl(hData->fd, KCAN_IOCTL_CANFD, &fd_data);
+  ret = ioctl(hData->fd, KCAN_IOCTL_OPEN_MODE, &open_data);
   if (ret != 0) {
-    DEBUGPRINT((TXT("kCanSetCanFD failed!\n")));
-    return toStatus(errno);
+    DEBUGPRINT((TXT("kCanSetOpenMode failed!\n")));
+    return errnoToCanStatus(errno);
   }
 
-  if (fd_data.status != CAN_CANFD_SUCCESS) {
-    DEBUGPRINT((TXT("CAN FD / CAN Mismatch -> can't open channel. fd status %d\n"), fd_data.status));
+  if (open_data.status != CAN_OPEN_MODE_SUCCESS) {
+    DEBUGPRINT((TXT("Open mode (CAN FD / CAN / LIN) Mismatch -> can't open channel. Open mode status %d\n"), open_data.status));
 
     return canERR_NOTFOUND;
   }
@@ -311,6 +285,7 @@ static canStatus kCanSetCanFD (HandleData *hData)
 static void notify (HandleData *hData, VCAN_EVENT *msg)
 {
   canNotifyData *notifyData = &hData->notifyData;
+  unsigned int   cb2_notify;
 
   if (msg->tag == V_CHIP_STATE) {
     struct s_vcan_chip_state *chipState    = &msg->tagData.chipState;
@@ -318,28 +293,32 @@ static void notify (HandleData *hData, VCAN_EVENT *msg)
     notifyData->info.status.busStatus      = chipState->busStatus;
     notifyData->info.status.txErrorCounter = chipState->txErrorCounter;
     notifyData->info.status.rxErrorCounter = chipState->rxErrorCounter;
-    notifyData->info.status.time           = (msg->timeStamp * 10UL) / (hData->timerResolution) ;
+    notifyData->info.status.time           = (msg->timeStamp * 10UL) / (hData->timerResolution);
+    cb2_notify                             = canNOTIFY_STATUS;
   } else if (msg->tag == V_RECEIVE_MSG) {
     if (msg->tagData.msg.flags & VCAN_MSG_FLAG_ERROR_FRAME) {
       if (hData->notifyFlags & canNOTIFY_ERROR) {
-        notifyData->eventType = canNOTIFY_ERROR;
-        notifyData->info.busErr.time = (msg->timeStamp * 10UL) / (hData->timerResolution) ;
+        notifyData->eventType        = canEVENT_ERROR;
+        notifyData->info.busErr.time = (msg->timeStamp * 10UL) / (hData->timerResolution);
+        cb2_notify                   = canNOTIFY_ERROR;
       } else {
         return;
       }
     } else if (msg->tagData.msg.flags & VCAN_MSG_FLAG_TXACK) {
       if (hData->notifyFlags & canNOTIFY_TX) {
-        notifyData->eventType    = canNOTIFY_TX;
-        notifyData->info.tx.id   = msg->tagData.msg.id;
-        notifyData->info.tx.time = (msg->timeStamp * 10UL) / (hData->timerResolution) ;
+        notifyData->eventType    = canEVENT_TX;
+        notifyData->info.tx.id   = msg->tagData.msg.id & ~EXT_MSG;
+        notifyData->info.tx.time = (msg->timeStamp * 10UL) / (hData->timerResolution);
+        cb2_notify               = canNOTIFY_TX;
       } else {
         return;
       }
     } else {
       if (hData->notifyFlags & canNOTIFY_RX) {
-        notifyData->eventType    = canNOTIFY_RX;
-        notifyData->info.rx.id   = msg->tagData.msg.id;
-        notifyData->info.tx.time = (msg->timeStamp * 10UL) / (hData->timerResolution) ;
+        notifyData->eventType    = canEVENT_RX;
+        notifyData->info.rx.id   = msg->tagData.msg.id & ~EXT_MSG;
+        notifyData->info.rx.time = (msg->timeStamp * 10UL) / (hData->timerResolution);
+        cb2_notify               = canNOTIFY_RX;
       } else {
         return;
       }
@@ -351,7 +330,7 @@ static void notify (HandleData *hData, VCAN_EVENT *msg)
   if (hData->callback) {
     hData->callback(notifyData);
   } else if (hData->callback2) {
-    hData->callback2(hData->handle, notifyData->tag, notifyData->eventType);
+    hData->callback2(hData->handle, notifyData->tag, cb2_notify);
   }
 }
 
@@ -513,7 +492,6 @@ static canStatus vCanOpenChannel (HandleData *hData)
   }
 
   ret = ioctl(hData->fd, VCAN_IOC_GET_CHAN_CAP, &capability);
-
   if (ret) {
     close(hData->fd);
     return canERR_NOTFOUND;
@@ -530,7 +508,7 @@ static canStatus vCanOpenChannel (HandleData *hData)
   }
 
   if (capability & VCAN_CHANNEL_CAP_CANFD) {
-    if ( canOK != kCanSetCanFD(hData) ) {
+    if ( canOK != kCanSetOpenMode(hData) ) {
       close(hData->fd);
       return canERR_NOTFOUND;
     }
@@ -555,7 +533,7 @@ static canStatus vCanBusOn (HandleData *hData)
   int ret;
   ret = ioctl(hData->fd, VCAN_IOC_BUS_ON, NULL);
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -589,7 +567,7 @@ static canStatus vCanSetBusParams (HandleData *hData,
                                    long freq_brs,
                                    unsigned int tseg1_brs,
                                    unsigned int tseg2_brs,
-                                   unsigned int sjw_brs,
+                                   unsigned int sjw_brs, 
                                    unsigned int syncmode)
 {
   VCanBusParams busParams;
@@ -611,7 +589,7 @@ static canStatus vCanSetBusParams (HandleData *hData,
   ret = ioctl(hData->fd, VCAN_IOC_SET_BITRATE, &busParams);
 
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -639,7 +617,7 @@ static canStatus vCanGetBusParams(HandleData *hData,
   ret = ioctl(hData->fd, VCAN_IOC_GET_BITRATE, &busParams);
 
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   if (freq)     *freq     = busParams.freq;
@@ -664,7 +642,7 @@ static canStatus vCanGetBusParams(HandleData *hData,
 static canStatus vCanReqBusStats(HandleData *hData)
 {
   if (ioctl(hData->fd, VCAN_IOC_REQ_BUS_STATS, NULL)) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
   return canOK;
 }
@@ -677,7 +655,7 @@ static canStatus vCanGetBusStats(HandleData *hData, canBusStatistics *stat)
   VCanBusStatistics tstat;
   memset(stat, 0, sizeof(canBusStatistics));
   if (ioctl(hData->fd, VCAN_IOC_GET_BUS_STATS, &tstat)) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   stat->stdData = tstat.stdData;
@@ -708,7 +686,7 @@ static canStatus vCanReadInternal (HandleData *hData, unsigned int iotcl_cmd,
   while (1) {
     ret = ioctl(hData->fd, iotcl_cmd, &msg);
     if (ret != 0) {
-      return toStatus(errno);
+      return errnoToCanStatus(errno);
     }
     // Receive CAN message
     if (msg.tag == V_RECEIVE_MSG) {
@@ -807,7 +785,7 @@ static canStatus vCanReadSync (HandleData    *hData,
 
   ret = ioctl(hData->fd, VCAN_IOC_RECVMSG_SYNC, &timeout);
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -914,7 +892,7 @@ static canStatus vCanSetBusOutputControl (HandleData *hData,
   ret = ioctl(hData->fd, VCAN_IOC_SET_OUTPUT_MODE, &silent);
 
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -933,7 +911,7 @@ static canStatus vCanGetBusOutputControl (HandleData *hData,
   ret = ioctl(hData->fd, VCAN_IOC_GET_OUTPUT_MODE, &silent);
 
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   switch (silent) {
@@ -950,6 +928,133 @@ static canStatus vCanGetBusOutputControl (HandleData *hData,
   return canOK;
 }
 
+//======================================================================
+// vCanSetDeviceMode
+//======================================================================
+static canStatus vCanSetDeviceMode (HandleData *hData,
+                                            int mode)
+{
+  int ret;
+
+  ret = ioctl(hData->fd, VCAN_IOC_SET_DEVICE_MODE, &mode);
+  DEBUGPRINT((TXT("VCAN_IOC_SET_DEVICE_MODE 0x%x, ret %d\n"), mode, ret));
+  if (ret != 0) {
+    return errnoToCanStatus(errno);
+  }
+
+  return canOK;
+}
+
+
+//======================================================================
+// vCanGetDeviceMode
+//======================================================================
+static canStatus vCanGetDeviceMode (HandleData *hData,
+                                           int *mode)
+{
+  int ret;
+  int devicemode;
+
+  ret = ioctl(hData->fd, VCAN_IOC_GET_DEVICE_MODE, &devicemode);
+  DEBUGPRINT((TXT("VCAN_IOC_GET_DEVICE_MODE 0x%x, ret %d\n"), devicemode, ret));
+  if (ret != 0) {
+    return errnoToCanStatus(errno);
+  }
+  *mode = devicemode;
+  return canOK;
+}
+
+//======================================================================
+// vCanFileGetCount
+//======================================================================
+static canStatus vCanFileGetCount(HandleData *hData, int *count)
+{
+  int ret = 0;
+
+  ret = ioctl(hData->fd, VCAN_IOC_FILE_GET_COUNT, count);
+  if (ret != 0) {
+    return errnoToCanStatus(errno);
+  }
+  return canOK;
+}
+
+//======================================================================
+// vCanFileGetName
+//======================================================================
+static canStatus vCanFileGetName(HandleData *hData, int fileNo, char *name, int namelen)
+{
+  VCAN_FILE_GET_NAME_T fileGetName;
+  int ret;
+
+  memset(&fileGetName, 0, sizeof(fileGetName));
+  fileGetName.fileNo = fileNo;
+  fileGetName.name = name;
+  fileGetName.namelen = namelen;
+  ret = ioctl(hData->fd, VCAN_IOC_FILE_GET_NAME, &fileGetName);
+  if (ret != 0) {
+    return errnoToCanStatus(errno);
+  }
+  return canOK;
+}
+
+//======================================================================
+// vCanFileDelete
+//======================================================================
+static canStatus vCanFileDelete(HandleData *hData, char *deviceFileName)
+{
+  return vCanMemo_file_delete(hData, deviceFileName);
+}
+
+//======================================================================
+// vCanFileCopyToDevice
+//======================================================================
+static canStatus vCanFileCopyToDevice(HandleData *hData, char *hostFileName,
+                                      char *deviceFileName)
+{
+  return vCanMemo_file_copy_to_device(hData, hostFileName, deviceFileName);
+}
+
+//======================================================================
+// vCanFileCopyFromDevice
+//======================================================================
+static canStatus vCanFileCopyFromDevice(HandleData *hData, char *deviceFileName,
+                                        char *hostFileName)
+{
+  return vCanMemo_file_copy_from_device(hData, deviceFileName, hostFileName);
+}
+
+//======================================================================
+// vCanScriptStart
+//======================================================================
+static canStatus vCanScriptStart(HandleData *hData, int slotNo)
+{
+  return vCanScript_start(hData, slotNo);
+}
+
+//======================================================================
+// vCanScriptStop
+//======================================================================
+static canStatus vCanScriptStop(HandleData *hData, int slotNo, int mode)
+{
+  return vCanScript_stop(hData, slotNo, mode);
+}
+
+//======================================================================
+// vCanScriptLoadFile
+//======================================================================
+static canStatus vCanScriptLoadFile(HandleData *hData, int slotNo,
+                                    char *hostFileName)
+{
+  return vCanScript_load_file(hData, slotNo, hostFileName);
+}
+
+//======================================================================
+// vCanScriptUnLoad
+//======================================================================
+static canStatus vCanScriptUnload(HandleData *hData, int slotNo)
+{
+  return vCanScript_unload(hData, slotNo);
+}
 
 //======================================================================
 // vCanAccept
@@ -963,7 +1068,7 @@ static canStatus vCanAccept(HandleData *hData,
 
   ret = ioctl(hData->fd, VCAN_IOC_GET_MSG_FILTER, &filter);
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   switch (flag) {
@@ -984,7 +1089,7 @@ static canStatus vCanAccept(HandleData *hData,
   }
   ret = ioctl(hData->fd, VCAN_IOC_SET_MSG_FILTER, &filter);
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -1029,7 +1134,7 @@ static canStatus vCanWriteInternal(HandleData *hData, long id, void *msgPtr,
   }
   
   if (flag & canFDMSG_FDF) {
-    if (hData->fdMode) {
+    if (hData->openMode) {
       msg.flags |= VCAN_MSG_FLAG_FDF;
     } else {
       return canERR_PARAM;
@@ -1095,7 +1200,7 @@ static canStatus vCanWriteInternal(HandleData *hData, long id, void *msgPtr,
 
   if      (ret   == 0)       return canOK;
   else if (errno == EAGAIN)  return canERR_TXBUFOFL;
-  else                       return toStatus(errno);
+  else                       return errnoToCanStatus(errno);
 }
 
 
@@ -1119,7 +1224,7 @@ static canStatus vCanWriteSync (HandleData *hData, unsigned long timeout)
 
   if      (ret   == 0)       return canOK;
   else if (errno == EAGAIN)  return canERR_TIMEOUT;
-  else                       return toStatus(errno);
+  else                       return errnoToCanStatus(errno);
 }
 
 //======================================================================
@@ -1152,7 +1257,7 @@ static canStatus vKvReadTimer64 (HandleData *hData, uint64_t *time)
   }
 
   if (ioctl(hData->fd, VCAN_IOC_READ_TIMER, &tmpTime)) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
   *time = (tmpTime * 10UL) / (hData->timerResolution) ;
 
@@ -1232,7 +1337,7 @@ static canStatus vCanReadErrorCounters (HandleData *hData, unsigned int *txErr,
   return canOK;
 
 ioc_error:
-  return toStatus(errno);
+  return errnoToCanStatus(errno);
 }
 
 //======================================================================
@@ -1301,7 +1406,7 @@ static canStatus vCanReadStatus (HandleData *hData, unsigned long *flags)
   return canOK;
 
 ioctl_error:
-  return toStatus(errno);
+  return errnoToCanStatus(errno);
 }
 
 //======================================================================
@@ -1315,7 +1420,7 @@ static canStatus vKvFlashLeds (HandleData *hData, int action, int timeout)
   buffer.timeout = timeout;
 
   if (ioctl(hData->fd, VCAN_IOC_FLASH_LEDS, &buffer)) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
   return canOK;
 }
@@ -1347,12 +1452,24 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
   }
 
   switch (item) {
+  case canCHANNELDATA_CARD_NUMBER:
+    err = ioctl(fd, VCAN_IOC_GET_CARD_NUMBER, buffer);
+    break;
+
+  case canCHANNELDATA_TRANS_TYPE:
+    err = ioctl(fd, VCAN_IOC_GET_TRANSCEIVER_INFO, buffer);
+    break;
+
   case canCHANNELDATA_CARD_SERIAL_NO:
     err = ioctl(fd, VCAN_IOC_GET_SERIAL, buffer);
     break;
 
   case canCHANNELDATA_CARD_UPC_NO:
     err = ioctl(fd, VCAN_IOC_GET_EAN, buffer);
+    break;
+
+  case canCHANNELDATA_DRIVER_NAME:
+    err = ioctl(fd, VCAN_IOC_GET_DRIVER_NAME, buffer);
     break;
 
   case canCHANNELDATA_CARD_FIRMWARE_REV:
@@ -1391,12 +1508,14 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
       unsigned int maxCopySize;
 
       if (bufsize == 0) {
+        close(fd);
         return canERR_PARAM;
       }
 
       memset(buffer, 0, bufsize);
       maxCopySize = bufsize - 1; // Assure null termination.
       if (maxCopySize == 0) {
+        close(fd);
         return canOK;
       }
 
@@ -1410,12 +1529,13 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
         memcpy(buffer, custChannelName.data, maxCopySize);
       }
       else {
-        err = ENOSYS; // Always return 'not implemented' on failure.
+        close(fd);
+        return canERR_NOT_IMPLEMENTED;
       }
     }
     break;
-     
-  case canCHANNELDATA_IS_REMOTE:  
+    
+  case canCHANNELDATA_IS_REMOTE:
     // No remote devices for Linux so far
     {
       if (bufsize < 4 /*"32-bit unsigned int"*/|| !buffer) {
@@ -1425,42 +1545,72 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
     }
     break;
     
+  case canCHANNELDATA_FEATURE_EAN:
+  case canCHANNELDATA_HW_STATUS:
   case canCHANNELDATA_LOGGER_TYPE:
   case canCHANNELDATA_REMOTE_TYPE:
     {
       KCAN_IOCTL_MISC_INFO miscInfo;
-      int infoType;
       if (bufsize < 4 /*"32-bit unsigned int"*/|| !buffer) {
-         return canERR_PARAM;
+        close(fd);
+        return canERR_PARAM;
       }    
       
       memset(&miscInfo, 0, sizeof(miscInfo));
         
       switch (item) {
+        case canCHANNELDATA_FEATURE_EAN:
+          miscInfo.subcmd = KCAN_IOCTL_MISC_INFO_SUBCMD_FEATURE_EAN;
+          break;
+        case canCHANNELDATA_HW_STATUS:
+          miscInfo.subcmd = KCAN_IOCTL_MISC_INFO_SUBCMD_HW_STATUS;
+          break;
         case canCHANNELDATA_LOGGER_TYPE: 
-          infoType = KCAN_IOCTL_MISC_INFO_LOGGER_TYPE;
+          miscInfo.subcmd = KCAN_IOCTL_MISC_INFO_SUBCMD_CHANNEL_LOGGER_INFO;
           break;
+
         case canCHANNELDATA_REMOTE_TYPE: 
-          infoType = KCAN_IOCTL_MISC_INFO_REMOTE_TYPE;
+          miscInfo.subcmd = KCAN_IOCTL_MISC_INFO_SUBCMD_CHANNEL_REMOTE_INFO;
           break;
-        
         default:
-          infoType = -1;        
+          close(fd);        
+          return canERR_PARAM;
       }
       
-      if (infoType < 0) {
-        return canERR_PARAM;
-      }
-      
-      miscInfo.type = infoType;
       err = ioctl(fd, KCAN_IOCTL_GET_CARD_INFO_MISC, &miscInfo);
       if (!err) {
-        if (item == canCHANNELDATA_IS_REMOTE) {
-          *(uint32_t*)buffer = miscInfo.value > 0? 1: 0;
+        if (miscInfo.retcode == KCAN_IOCTL_MISC_INFO_RETCODE_SUCCESS){
+          switch (item) {
+            case canCHANNELDATA_FEATURE_EAN:  
+              if (bufsize < sizeof(miscSubCmdFeatureEan)) {
+                close(fd);
+                return canERR_PARAM;
+              }
+              memcpy(buffer, &miscInfo.payload.featureEan, sizeof(miscSubCmdFeatureEan));
+              break;
+            case canCHANNELDATA_HW_STATUS:
+              if (bufsize < sizeof(sizeof(miscSubCmdHwStatus))) {
+                close(fd);
+                return canERR_PARAM;
+              }
+              memcpy(buffer, &miscInfo.payload.hwStatus, sizeof(miscSubCmdHwStatus)); 
+              break;
+            case canCHANNELDATA_LOGGER_TYPE: 
+              *(uint32_t *)buffer = miscInfo.payload.loggerInfo.loggerType;
+              break;
+            case canCHANNELDATA_REMOTE_TYPE: 
+              *(uint32_t *)buffer = miscInfo.payload.remoteInfo.remoteType;
+              break;
+            default:
+              close(fd);          
+              return canERR_PARAM;
+          }
         }
         else {
-          *(uint32_t*)buffer = miscInfo.value;
+          close(fd);
+          return canERR_NOT_IMPLEMENTED;
         }
+        
       }
     }
     break;
@@ -1476,7 +1626,7 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
     if (!(item == canCHANNELDATA_CUST_CHANNEL_NAME && err == ENOSYS)) {
       DEBUGPRINT((TXT("Error on ioctl %d: %d / %d\n"), item, err, errno));
     }
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -1497,7 +1647,7 @@ static canStatus vCanIoCtl(HandleData *hData, unsigned int func,
     }
 
     if (ioctl(hData->fd, VCAN_IOC_GET_RX_QUEUE_LEVEL, buf)) {
-      return toStatus(errno);
+      return errnoToCanStatus(errno);
     }
     break;
   case canIOCTL_GET_TX_BUFFER_LEVEL:
@@ -1507,19 +1657,19 @@ static canStatus vCanIoCtl(HandleData *hData, unsigned int func,
     }
 
     if (ioctl(hData->fd, VCAN_IOC_GET_TX_QUEUE_LEVEL, buf)) {
-      return toStatus(errno);
+      return errnoToCanStatus(errno);
     }
     break;
   case canIOCTL_FLUSH_RX_BUFFER:
     // Discard the current contents of the RX queue.
     if (ioctl(hData->fd, VCAN_IOC_FLUSH_RCVBUFFER, buf)) {
-      return toStatus(errno);
+      return errnoToCanStatus(errno);
     }
     break;
   case canIOCTL_FLUSH_TX_BUFFER:
     //  Discard the current contents of the TX queue.
     if (ioctl(hData->fd, VCAN_IOC_FLUSH_SENDBUFFER, buf)) {
-      return toStatus(errno);
+      return errnoToCanStatus(errno);
     }
     break;
   case canIOCTL_SET_TXACK:
@@ -1529,7 +1679,7 @@ static canStatus vCanIoCtl(HandleData *hData, unsigned int func,
     }
 
     if (ioctl(hData->fd, VCAN_IOC_SET_TXACK, buf)) {
-      return toStatus(errno);
+      return errnoToCanStatus(errno);
     }
     break;
   case canIOCTL_GET_TXACK:
@@ -1539,7 +1689,7 @@ static canStatus vCanIoCtl(HandleData *hData, unsigned int func,
     }
 
     if (ioctl(hData->fd, VCAN_IOC_GET_TXACK, buf)) {
-      return toStatus(errno);
+      return errnoToCanStatus(errno);
     }
     break;
   case canIOCTL_SET_TXRQ:
@@ -1549,7 +1699,7 @@ static canStatus vCanIoCtl(HandleData *hData, unsigned int func,
     }
 
     if (ioctl(hData->fd, VCAN_IOC_SET_TXRQ, buf)) {
-      return toStatus(errno);
+      return errnoToCanStatus(errno);
     }
     break;
   case canIOCTL_SET_LOCAL_TXECHO:
@@ -1559,13 +1709,13 @@ static canStatus vCanIoCtl(HandleData *hData, unsigned int func,
     }
 
     if (ioctl(hData->fd, VCAN_IOC_SET_TXECHO, buf)) {
-      return toStatus(errno);
+      return errnoToCanStatus(errno);
     }
     break;
 
   case canIOCTL_RESET_OVERRUN_COUNT:
     if (ioctl(hData->fd, VCAN_IOC_RESET_OVERRUN_COUNT, NULL)) {
-      return toStatus(errno);
+      return errnoToCanStatus(errno);
     }
     break;
 
@@ -1606,7 +1756,7 @@ static canStatus vCanIoCtl(HandleData *hData, unsigned int func,
       }
 
       if (ioctl(hData->fd, KCAN_IOCTL_TX_INTERVAL, buf)) {
-        return toStatus(errno);
+        return errnoToCanStatus(errno);
       }
       break;
 
@@ -1616,7 +1766,7 @@ static canStatus vCanIoCtl(HandleData *hData, unsigned int func,
       }
 
       if (ioctl(hData->fd, KCAN_IOCTL_SET_BRLIMIT, buf)) {
-        return toStatus(errno);
+        return errnoToCanStatus(errno);
       }
 
       break;
@@ -1634,7 +1784,7 @@ static canStatus kCanObjbufFreeAll (HandleData *hData)
 
   ret = ioctl(hData->fd, KCAN_IOCTL_OBJBUF_FREE_ALL, NULL);
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -1649,7 +1799,7 @@ static canStatus kCanObjbufAllocate (HandleData *hData, int type, int *number)
 
   ret = ioctl(hData->fd, KCAN_IOCTL_OBJBUF_ALLOCATE, &ioc);
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   *number = ioc.buffer_number;
@@ -1667,7 +1817,7 @@ static canStatus kCanObjbufFree (HandleData *hData, int idx)
 
   ret = ioctl(hData->fd, KCAN_IOCTL_OBJBUF_FREE, &ioc);
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -1687,7 +1837,7 @@ static canStatus kCanObjbufWrite (HandleData *hData, int idx, int id, void* msg,
   }
   
   if (flags & canFDMSG_FDF) {
-    if (!hData->fdMode) {
+    if (!hData->openMode) {
       return canERR_PARAM;
     }
     
@@ -1740,7 +1890,7 @@ static canStatus kCanObjbufWrite (HandleData *hData, int idx, int id, void* msg,
   retval = ioctl(hData->fd, KCAN_IOCTL_OBJBUF_WRITE, &ioc);
 
   if (retval != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -1759,7 +1909,7 @@ static canStatus kCanObjbufSetFilter (HandleData *hData, int idx,
 
   ret = ioctl(hData->fd, KCAN_IOCTL_OBJBUF_SET_FILTER, &ioc);
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -1776,7 +1926,7 @@ static canStatus kCanObjbufSetFlags (HandleData *hData, int idx, unsigned int fl
 
   ret = ioctl(hData->fd, KCAN_IOCTL_OBJBUF_SET_FLAGS, &ioc);
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -1793,7 +1943,7 @@ static canStatus kCanObjbufSetPeriod (HandleData *hData, int idx, unsigned int p
 
   ret = ioctl(hData->fd, KCAN_IOCTL_OBJBUF_SET_PERIOD, &ioc);
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -1810,7 +1960,7 @@ static canStatus kCanObjbufSetMsgCount (HandleData *hData, int idx, unsigned int
 
   ret = ioctl(hData->fd, KCAN_IOCTL_OBJBUF_SET_MSG_COUNT, &ioc);
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -1827,7 +1977,7 @@ static canStatus kCanObjbufSendBurst (HandleData *hData, int idx, unsigned int b
 
   ret = ioctl(hData->fd, KCAN_IOCTL_OBJBUF_SEND_BURST, &ioc);
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -1843,7 +1993,7 @@ static canStatus kCanObjbufEnable (HandleData *hData, int idx)
 
   ret = ioctl(hData->fd, KCAN_IOCTL_OBJBUF_ENABLE, &ioc);
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -1859,7 +2009,7 @@ static canStatus kCanObjbufDisable (HandleData *hData, int idx)
 
   ret = ioctl(hData->fd, KCAN_IOCTL_OBJBUF_DISABLE, &ioc);
   if (ret != 0) {
-    return toStatus(errno);
+    return errnoToCanStatus(errno);
   }
 
   return canOK;
@@ -1904,7 +2054,7 @@ static canStatus vCanGetCardInfo (HandleData *hData, VCAN_IOCTL_CARD_INFO *ci)
   return canOK;
 
  ioc_error:
-  return toStatus(errno);
+  return errnoToCanStatus(errno);
 }
 
 static canStatus vCanGetCardInfo2 (HandleData *hData, KCAN_IOCTL_CARD_INFO_2 *ci)
@@ -1915,7 +2065,7 @@ static canStatus vCanGetCardInfo2 (HandleData *hData, KCAN_IOCTL_CARD_INFO_2 *ci
   return canOK;
 
  ioc_error:
-  return toStatus(errno);
+  return errnoToCanStatus(errno);
 }
 
 CANOps vCanOps = {
@@ -1936,6 +2086,17 @@ CANOps vCanOps = {
   .readSyncSpecific    = vCanReadSyncSpecific,
   .setBusOutputControl = vCanSetBusOutputControl,
   .getBusOutputControl = vCanGetBusOutputControl,
+  .kvDeviceGetMode     = vCanGetDeviceMode,
+  .kvDeviceSetMode     = vCanSetDeviceMode,
+  .kvFileGetCount      = vCanFileGetCount,
+  .kvFileGetName       = vCanFileGetName,
+  .kvFileDelete        = vCanFileDelete,
+  .kvFileCopyToDevice  = vCanFileCopyToDevice,
+  .kvFileCopyFromDevice  = vCanFileCopyFromDevice,
+  .kvScriptStart       = vCanScriptStart,
+  .kvScriptStop        = vCanScriptStop,
+  .kvScriptLoadFile    = vCanScriptLoadFile,
+  .kvScriptUnload      = vCanScriptUnload,
   .accept              = vCanAccept,
   .write               = vCanWrite,
   .writeWait           = vCanWriteWait,

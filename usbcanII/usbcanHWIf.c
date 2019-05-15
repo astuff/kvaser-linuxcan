@@ -1540,13 +1540,6 @@ static int usbcan_queue_cmd (VCanCardData *vCard, heliosCmd *cmd,
         return VCAN_STAT_NO_RESOURCES;
       }
     }
-
-    // Are we interrupted by a signal?
-    if (signal_pending(current)) {
-      queue_remove_wait_for_space(&dev->txCmdQueue, &wait);
-      DEBUGPRINT(2, (TXT("ERROR 3 SIGNALED\n")));
-      return VCAN_STAT_SIGNALED;
-    }
   }
 
   set_current_state(TASK_RUNNING);
@@ -2075,7 +2068,7 @@ static int usbcan_set_busparams (VCanChanData *vChan, VCanBusParams *par)
                  cmd.setBusparamsReq.tseg2,
                  cmd.setBusparamsReq.noSamp));
 
-  ret = usbcan_queue_cmd(vCard, &cmd, 5 /* There is no response */);
+  ret = usbcan_queue_cmd(vCard, &cmd, 50 /* There is no response */);
 
   if (ret == VCAN_STAT_OK) {
     // Store locally since getBusParams not correct
@@ -2135,7 +2128,7 @@ static int usbcan_set_silent (VCanChanData *vChan, int silent)
   cmd.setDrivermodeReq.driverMode = silent ? DRIVERMODE_SILENT :
                                              DRIVERMODE_NORMAL;
 
-  ret = usbcan_queue_cmd(vChan->vCard, &cmd, 5 /* There is no response */);
+  ret = usbcan_queue_cmd(vChan->vCard, &cmd, 50 /* There is no response */);
 
   return ret;
 } // _set_silent
@@ -2292,7 +2285,7 @@ static int usbcan_flush_tx_buffer (VCanChanData *vChan)
   usbChan->outstanding_tx = 0;
   spin_unlock(&usbChan->outTxLock);
 
-  ret = usbcan_queue_cmd(vChan->vCard, &cmd, 5 /* There is no response */);
+  ret = usbcan_queue_cmd(vChan->vCard, &cmd, 50 /* There is no response */);
 
   if (ret == VCAN_STAT_OK) {
     atomic_set(&vChan->transId, 1);

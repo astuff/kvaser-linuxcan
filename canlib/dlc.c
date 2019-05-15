@@ -1,5 +1,5 @@
 /*
-**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
+**             Copyright 2012-2017 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -52,6 +52,14 @@
 
 #include "dlc.h"
 
+#ifdef __KERNEL__
+#include <linux/version.h>
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 2, 0)
+#include <linux/module.h>
+#else
+#include <linux/export.h>
+#endif /* LINUX_VERSION_CODE */
+#endif /* __KERNEL */
 
 uint32_t dlc_bytes_to_dlc_fd (uint32_t n_bytes)
 {
@@ -64,6 +72,9 @@ uint32_t dlc_bytes_to_dlc_fd (uint32_t n_bytes)
   else if (n_bytes >  8) return 9;
   else return n_bytes;
 }
+#ifdef __KERNEL__
+EXPORT_SYMBOL(dlc_bytes_to_dlc_fd);
+#endif
 
 uint32_t dlc_dlc_to_bytes_fd (uint32_t dlc)
 {
@@ -78,6 +89,9 @@ uint32_t dlc_dlc_to_bytes_fd (uint32_t dlc)
     default:  return dlc;
   }
 }
+#ifdef __KERNEL__
+EXPORT_SYMBOL(dlc_dlc_to_bytes_fd);
+#endif
 
 uint32_t dlc_is_dlc_ok (uint32_t accept_large_dlc, uint32_t is_fd, uint32_t dlc)
 {
@@ -93,6 +107,9 @@ uint32_t dlc_is_dlc_ok (uint32_t accept_large_dlc, uint32_t is_fd, uint32_t dlc)
     return (dlc <= 8);
   }
 }
+#ifdef __KERNEL__
+EXPORT_SYMBOL(dlc_is_dlc_ok);
+#endif
 
 uint32_t dlc_dlc_to_bytes_classic (uint32_t dlc)
 {
@@ -102,3 +119,6 @@ uint32_t dlc_dlc_to_bytes_classic (uint32_t dlc)
     return dlc;
   }
 }
+#ifdef __KERNEL__
+EXPORT_SYMBOL(dlc_dlc_to_bytes_classic);
+#endif

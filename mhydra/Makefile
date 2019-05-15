@@ -63,7 +63,7 @@ KV_MODULE_NAME = mhydra
 INCLUDES := $(src)/../include/
 
 # source files
-SRCS := mhydraHWIf.c
+SRCS := mhydraHWIf.c ioctl_handler.c ringbuf.c winlindrv.c
 
 ifneq ($(KERNELRELEASE),)
 	RUNDIR := $(src)

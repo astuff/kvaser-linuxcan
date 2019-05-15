@@ -53,6 +53,7 @@
 #define FILO_CMDS_H_
 
 #include <pshpack1.h>
+#include "compilerassert.h"
 
 #include "debug.h"
 #include <linux/types.h>
@@ -1522,6 +1523,8 @@ typedef struct {
 #define CAP_SUB_CMD_DATA_START               1024
 #define CAP_SUB_CMD_GET_LOGGER_INFO          CAP_SUB_CMD_DATA_START+1
 #define CAP_SUB_CMD_REMOTE_INFO              CAP_SUB_CMD_DATA_START+2
+#define CAP_SUB_CMD_HW_STATUS                CAP_SUB_CMD_DATA_START+3 // only used in hydra
+#define CAP_SUB_CMD_FEATURE_EAN              CAP_SUB_CMD_DATA_START+4 // only used in hydra
 
 // CAP_SUB_CMD_GET_LOGGER_TYPE
 #define LOGGERTYPE_NOT_A_LOGGER 0
@@ -1791,7 +1794,6 @@ typedef union {
 
 #include <poppack.h>
 
-#if defined(CompilerAssert)
 CompilerAssert(sizeof(filoResponse) == 24);
 // A basic sanity check of all structs:
 #define FILO_CMD_ALIGNMENT(X) CompilerAssert((sizeof(X) % 4) == 0)
@@ -2025,10 +2027,8 @@ CompilerAssert(sizeof(cmdPingReq) == 8);
 CompilerAssert(sizeof(cmdPingResp) == 8);
 
 CompilerAssert(sizeof(cmdSetUnlockCode) == 8);
-CompilerAssert(sizeof(cmdCapabilitiesReq) == 8); 
+CompilerAssert(sizeof(cmdCapabilitiesReq) == 8);
 CompilerAssert(sizeof(cmdCapabilitiesResp) == 16);
 #undef FILO_CMD_ALIGNMENT
-
-#endif // defined(CompilerAssert)
 
 #endif //_FILO_CMDS_H_

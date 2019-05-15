@@ -96,6 +96,10 @@ uint8_t convert_vcan_to_hydra_cmd (uint32_t vcan_cmd) {
     case VCAN_CHANNEL_CAP_ERROR_COUNTERS:      return CAP_SUB_CMD_ERRCOUNT_READ; break;
     case VCAN_CHANNEL_CAP_SINGLE_SHOT:         return CAP_SUB_CMD_SINGLE_SHOT; break;
     case VCAN_CHANNEL_CAP_SYNC_TX_FLUSH:       return CAP_SUB_CMD_SYNC_TX_FLUSH; break;
+    case VCAN_CHANNEL_CAP_LIN_FLEX:            return CAP_SUB_CMD_LIN_FLEX; break;
+    case VCAN_CHANNEL_CAP_HAS_LOGGER:          return CAP_SUB_CMD_HAS_LOGGER; break;
+    case VCAN_CHANNEL_CAP_HAS_REMOTE:          return CAP_SUB_CMD_HAS_REMOTE; break;
+    case VCAN_CHANNEL_CAP_HAS_SCRIPT:          return CAP_SUB_CMD_HAS_SCRIPT; break;    
     default: return 0; break;
   }
 }

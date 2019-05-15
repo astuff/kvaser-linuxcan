@@ -1443,7 +1443,7 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
 
     btrd = PCIEFD_BTR_SEG2(tseg2-1) | PCIEFD_BTR_SEG1(tseg1-1) | PCIEFD_BTR_SJW(sjw-1) | PCIEFD_BTR_BRP(brp-1);
 
-    if (OPEN_AS_CAN != vChd->canFdMode) {
+    if (OPEN_AS_CAN != vChd->openMode) {
       bus_load_prescaler = calcBusloadPrescaler(quantaPerCycle, brp);
     }
   }
@@ -1958,16 +1958,16 @@ static int pciCanBusOn (VCanChanData *vChd)
   // Enable bus load packets
   IOWR_PCIEFD_BLP(hChd->canControllerBase, hChd->bus_load_prescaler);
 
-  if (OPEN_AS_CANFD_NONISO == vChd->canFdMode) {
+  if (OPEN_AS_CANFD_NONISO == vChd->openMode) {
     enableNonIsoMode(hChd->canControllerBase);
   }
-  else if (OPEN_AS_CANFD_ISO == vChd->canFdMode) {
+  else if (OPEN_AS_CANFD_ISO == vChd->openMode) {
     disableNonIsoMode(hChd->canControllerBase);
   }
 
   tmp = IORD_PCIEFD_MOD(hChd->canControllerBase);
 
-  if (OPEN_AS_CAN == vChd->canFdMode) {
+  if (OPEN_AS_CAN == vChd->openMode) {
     tmp |= PCIEFD_MOD_CLASSIC(1);
   } else {
     tmp &= ~PCIEFD_MOD_CLASSIC_MSK;

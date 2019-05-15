@@ -1,6 +1,6 @@
 # Kvaser Linux linlib library Makefile
 #
-#                 Copyright 2012 by Kvaser AB, Mölndal, Sweden
+#                 Copyright 2017 by Kvaser AB, Molndal, Sweden
 #                         http://www.kvaser.com
 #
 #  This software is dual licensed under the following two licenses:
@@ -51,9 +51,10 @@
 #  ---------------------------------------------------------------------------
 #
 
-LIBNAME = liblinlib.so
-LIBRARY = $(LIBNAME).1.1.0
-SONAME  = $(LIBNAME).1
+include version.mk
+
+LIBRARY := $(LIBNAME).$(MAJOR).$(MINOR).$(BUILD)
+SONAME  := $(LIBNAME).$(MAJOR)
 
 CFLAGS  += -Wall -DLINLIB_NAME_STRING=\"$(LIBRARY)\" -O2 -fomit-frame-pointer $(XTRA_CFLAGS) -pthread #-DPCMCIA_DEBUG=0
 CFLAGS  += -DSPLIT -DLINUX=1 -D_LINUX=1 # maybe remove in time
@@ -116,7 +117,7 @@ install: linlib
 	install  -m 644 $(LIBRARY) /usr/lib/
 	ln -sf $(LIBRARY) /usr/lib/$(LIBNAME)
 	ln -sf $(LIBRARY) /usr/lib/$(SONAME)
-	/sbin/ldconfig
+	/sbin/ldconfig -X
 	install -m 644 ../include/linlib.h /usr/include
 #	mkdir -p /usr/doc/linlib
 #	cp -r ../doc/HTMLhelp /usr/doc/linlib

@@ -1,5 +1,5 @@
 /*
-**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
+**             Copyright 2012-2017 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -90,7 +90,6 @@
 #   define MHYDRA_Q_CMD_WAIT_TIME     200
 #endif
 
-
 /* Channel specific data */
 typedef struct MhydraChanData {
   /* These are the number of outgoing packets residing in the device */
@@ -145,6 +144,8 @@ typedef struct MhydraCardData {
   struct work_struct memoBulkWork;
   struct completion  bulk_in_1_data_valid; // bulk_in[1].buffer has valid data
 
+  uint8_t   bulk_in_endpointAddrDiag;   // the address of the diag bulk in endpoint
+
   uint8_t   *bulk_out_buffer;           // the buffer to send data
   size_t    bulk_out_size;              // the size of the send buffer
 
@@ -166,9 +167,22 @@ typedef struct MhydraCardData {
   uint32_t max_bitrate;
   uint8_t  rxCmdBuffer[sizeof(hydraHostCmdExt)];
   uint32_t rxCmdBufferLevel;
-
 } MhydraCardData;
 
+int mhydra_send_and_wait_reply (VCanCardData  *vCard,
+                                hydraHostCmd  *cmd,
+                                hydraHostCmd  *replyPtr,
+                                unsigned char  replyCmdNo,
+                                uint16_t       transId,
+                                unsigned char  error_event);
 
+int mhydra_queue_cmd(VCanCardData *vCard,
+                     hydraHostCmd *cmd,
+                     unsigned int  timeout);
+
+
+#define TRP_DEST_CANHE 1
+uint16_t cmd_create_transId (hydraHostCmd *cmd);
+int32_t device_trp (VCanCardData *vCard, uint32_t dest, uint16_t pipe, uint8_t *buffer, uint32_t buflen);
 
 #endif  /* _MHYDRA_HW_IF_H_ */

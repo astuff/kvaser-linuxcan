@@ -139,6 +139,7 @@
 #define VCAN_STAT_NO_MEMORY         -5    // -ENOMEM
 #define VCAN_STAT_SIGNALED          -6    // -ERESTARTSYS
 #define VCAN_STAT_BAD_PARAMETER     -7    // -EINVAL
+#define VCAN_STAT_NOT_IMPLEMENTED   -8    // -EAGAIN
 
 #define OPEN_AS_CAN           0
 #define OPEN_AS_CANFD_ISO     1
@@ -184,7 +185,7 @@ typedef struct VCanChanData
     unsigned long            errorTime;
     unsigned char            rxErrorCounter;
     unsigned char            txErrorCounter;
-    unsigned char            canFdMode;
+    unsigned char            openMode;
     unsigned char            driverMode;
 
     /* Transmit buffer */
@@ -210,6 +211,7 @@ typedef struct VCanChanData
     VCanBusStatistics       busStats;
 
     struct VCanCardData    *vCard;
+    struct completion       ioctl_completion;
 } VCanChanData;
 
 
@@ -357,13 +359,20 @@ typedef struct VCanHWInterface {
     int (*getCardInfo)          (VCanCardData *vCard, VCAN_IOCTL_CARD_INFO *ci);
     int (*getCardInfo2)         (VCanCardData *vCard, KCAN_IOCTL_CARD_INFO_2 *ci2);
     int (*tx_interval)          (VCanChanData *chd, unsigned int *interval);
+    int (*get_transceiver_type) (VCanChanData *chd, unsigned int *transceiver_type);
     int (*getCustChannelName)   (const VCanChanData * const chd,
                                  unsigned char * const data,
                                  const unsigned int data_size,
                                  unsigned int *status);
-    int (*getCardInfoMisc)      (const VCanChanData *chd, int *value, int type);
+    int (*getCardInfoMisc)      (const VCanChanData *chd, KCAN_IOCTL_MISC_INFO *cardInfoMisc);
     int (*flashLeds)            (const VCanChanData *chd, int action, int timeout);
+    int (*special_ioctl_handler) (VCanOpenFileNode *fileNodePtr, unsigned int ioctl_cmd, unsigned long arg);
     int (*memoConfigMode)       (const VCanChanData *chd, int interval);
+    int (*kvDeviceGetMode)      (const VCanChanData *chd, int *mode);
+    int (*kvDeviceSetMode)      (const VCanChanData *chd, int mode);
+    int (*kvFileGetCount)       (const VCanChanData *chd, int *count);
+    int (*kvFileGetName)        (const VCanChanData *chd, int fileNo, char *name, int namelen);
+    int (*kvScriptControl)      (const VCanChanData *chd, KCAN_IOCTL_SCRIPT_CONTROL_T *scriptControl);
     int (*memoGetData)          (const VCanChanData *chd, int subcmd,
                                 void *buf, int bufsiz,
                                 unsigned long data1, unsigned short data2,
@@ -386,7 +395,7 @@ typedef struct WaitNode {
   struct completion waitCompletion;
   void             *replyPtr;
   unsigned char    cmdNr;
-  unsigned char    transId;
+  uint16_t         transId;
   unsigned char    timedOut;
   unsigned char    check_trans_id; //when not 0, check that transid matches
   unsigned char    error_event;    //used to detect that we have got an "CMD_ERROR_EVENT"

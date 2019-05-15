@@ -93,7 +93,6 @@
 #include "debug.h"
 #include "softsync.h"
 
-
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("KVASER");
 
@@ -371,7 +370,7 @@ int vCanDispatchEvent (VCanChanData *chd, VCAN_EVENT *e)
                                               msg_flags)) != 0)) {
         // This is something that matched the code/mask for at least one buffer,
         // and it's *not* a TXRQ or a TXACK.
-#ifdef __arm__
+#if defined(__arm__) || defined(__aarch64__)
         unsigned int rd;
         unsigned int new_rd;
         do {
@@ -643,160 +642,120 @@ KCANY_MEMO_INFO         memoInfo;
 KCANY_MEMO_DISK_IO      memoDiskMessage;
 KCANY_MEMO_DISK_IO_FAST memoBulkMessage;
 
+static int ioctl_return_value (int vStat) {
+  switch (vStat) {
+    case VCAN_STAT_OK:
+      return 0;
+    case VCAN_STAT_FAIL:
+      return -EIO;
+    case VCAN_STAT_TIMEOUT:
+      return -EAGAIN;
+    case VCAN_STAT_NO_DEVICE:
+      return -ENODEV;
+    case VCAN_STAT_NO_RESOURCES:
+      return -EAGAIN;
+    case VCAN_STAT_NO_MEMORY:
+      return -ENOMEM;
+    case VCAN_STAT_SIGNALED:
+      return -ERESTARTSYS;
+    case VCAN_STAT_BAD_PARAMETER:
+      return -EINVAL;
+    case VCAN_STAT_NOT_IMPLEMENTED:
+      return -ENOSYS;
+    default:
+      return -EIO;
+  }
+}
 
-static int ioctl (VCanOpenFileNode *fileNodePtr,
-                  unsigned int ioctl_cmd, unsigned long arg)
-{
-  VCanChanData      *chd;
-  unsigned long     timeout;
-  int               ret;
-  int               vStat = VCAN_STAT_OK;
-  int               chanNr;
-  unsigned long     irqFlags;
-  int               tmp;
-  VCanHWInterface   *hwIf;
-
-  chd = fileNodePtr->chanData;
-  hwIf = chd->vCard->driverData->hwIf;
+static int ioctl_non_blocking (VCanOpenFileNode *fileNodePtr,
+                               unsigned int      ioctl_cmd,
+                               unsigned long     arg) {
+  int vStat = VCAN_STAT_OK;
 
   switch (ioctl_cmd) {
-  //------------------------------------------------------------------
-    case VCAN_IOC_SENDMSG:
-      ArgPtrIn(sizeof(CAN_MSG));
-
-      if (!fileNodePtr->isBusOn) {
-        DEBUGPRINT(2, (TXT("VCAN_IOC_SENDMSG Handle is not bus on. returning -EAGAIN\n")));
-        return -EAGAIN;
-      }
-
-      if (chd->vCard->card_flags & DEVHND_CARD_REFUSE_TO_USE_CAN) {
-        DEBUGPRINT(2, (TXT("VCAN_IOC_SENDMSG Refuse to run. returning -EACCES\n")));
-        return -EACCES;
-      }
-
-      {
-        CAN_MSG *bufMsgPtr;
-        CAN_MSG message;
-        int queuePos;
-
-        // The copy from user memory can sleep, so it must
-        // not be done while holding the queue lock.
-        // This means an extra memcpy() from a stack buffer,
-        // but that can only be avoided by changing the queue
-        // buffer "allocation" method (queue_back/push).
-        if (copy_from_user(&message, (CAN_MSG *)arg, sizeof(CAN_MSG))) {
-          DEBUGPRINT(2, (TXT("VCAN_IOC_SENDMSG - returning -EFAULT\n")));
-          return -EFAULT;
-        }
-
-        queuePos = queue_back(&chd->txChanQueue);
-        if (queuePos < 0) {
-          queue_release(&chd->txChanQueue);
-          return -EAGAIN;
-        }
-        bufMsgPtr = &chd->txChanBuffer[queuePos];
-
-        memcpy(bufMsgPtr, &message, sizeof(CAN_MSG));
-
-        // This is for keeping track of the originating fileNode
-        bufMsgPtr->user_data = fileNodePtr->transId;
-        bufMsgPtr->flags &= ~(VCAN_MSG_FLAG_TX_NOTIFY | VCAN_MSG_FLAG_TX_START);
-        if (fileNodePtr->modeTx || (atomic_read(&chd->fileOpenCount) > 1)) {
-          bufMsgPtr->flags |= VCAN_MSG_FLAG_TX_NOTIFY;
-        }
-        if (fileNodePtr->modeTxRq) {
-          bufMsgPtr->flags |= VCAN_MSG_FLAG_TX_START;
-        }
-
-        queue_push(&chd->txChanQueue);
-      }
-      hwIf->requestSend(chd->vCard, chd);
-      break;
-    //------------------------------------------------------------------
     case VCAN_IOC_RECVMSG:
     {
-        unsigned long rcvLock_irqFlags;
-        VCAN_EVENT     msg;
-
-        ArgPtrOut(sizeof(VCAN_EVENT));
-
-        if (fileNodePtr->read.timeout) {
-          if (fileNodePtr->read.timeout != -1) {
-            wait_event_interruptible_timeout (fileNodePtr->rcv.rxWaitQ,
-                                              fileNodePtr->rcv.bufHead != fileNodePtr->rcv.bufTail,
-                                              msecs_to_jiffies (fileNodePtr->read.timeout));
-
-            if (fileNodePtr->rcv.bufHead == fileNodePtr->rcv.bufTail) {
-              return -EAGAIN;
-            }
-          } else {
-            wait_event_interruptible (fileNodePtr->rcv.rxWaitQ,
-                                      fileNodePtr->rcv.bufHead != fileNodePtr->rcv.bufTail);
-          }
+      unsigned long rcvLock_irqFlags;
+      VCAN_EVENT    msg;
+      
+      ArgPtrOut(sizeof(VCAN_EVENT));
+      
+      if (fileNodePtr->read.timeout) {
+        if (fileNodePtr->read.timeout != -1) {
+          wait_event_interruptible_timeout (fileNodePtr->rcv.rxWaitQ,
+                                            fileNodePtr->rcv.bufHead != fileNodePtr->rcv.bufTail,
+                                            msecs_to_jiffies (fileNodePtr->read.timeout));
           
-          if (signal_pending(current)) {
-            // Sleep was interrupted by signal
-            DEBUGPRINT(4, (TXT("VCAN_IOC_RECVMSG - returning -ERESTARTSYS, "
-                               "line = %d\n"), __LINE__));
-            return -ERESTARTSYS;
+          if (fileNodePtr->rcv.bufHead == fileNodePtr->rcv.bufTail) {
+            return -EAGAIN;
           }
-
-        } else if (rxQEmpty(fileNodePtr)) {
-          return -EAGAIN;
+        } else {
+          wait_event_interruptible (fileNodePtr->rcv.rxWaitQ,
+                                    fileNodePtr->rcv.bufHead != fileNodePtr->rcv.bufTail);
         }
 
-        spin_lock_irqsave(&fileNodePtr->rcv.rcvLock, rcvLock_irqFlags);
-        msg = fileNodePtr->rcv.fileRcvBuffer[fileNodePtr->rcv.bufTail];
-        vCanPopReceiveBuffer(&fileNodePtr->rcv);
-        spin_unlock_irqrestore(&fileNodePtr->rcv.rcvLock, rcvLock_irqFlags);
-        copy_to_user_ret((VCAN_EVENT *)arg, &msg, sizeof(VCAN_EVENT), -EFAULT);
-
-        break;
+        if (signal_pending(current)) {
+          // Sleep was interrupted by signal
+          DEBUGPRINT(4, (TXT("VCAN_IOC_RECVMSG - returning -ERESTARTSYS, "
+                  "line = %d\n"), __LINE__));
+          return -ERESTARTSYS;
+        }
+      } else if (rxQEmpty(fileNodePtr)) {
+        return -EAGAIN;
+      }
+      
+      spin_lock_irqsave(&fileNodePtr->rcv.rcvLock, rcvLock_irqFlags);
+      msg = fileNodePtr->rcv.fileRcvBuffer[fileNodePtr->rcv.bufTail];
+      vCanPopReceiveBuffer(&fileNodePtr->rcv);
+      spin_unlock_irqrestore(&fileNodePtr->rcv.rcvLock, rcvLock_irqFlags);
+      copy_to_user_ret((VCAN_EVENT *)arg, &msg, sizeof(VCAN_EVENT), -EFAULT);
+      
+      break;
     }
 
+
     case VCAN_IOC_RECVMSG_SYNC:
-      {
-        unsigned long timeout;
-        
-        get_user(timeout, (int *)arg);
-        
-        if (timeout) {
-          if (timeout != -1) {
-            wait_event_interruptible_timeout (fileNodePtr->rcv.rxWaitQ,
-                                              fileNodePtr->rcv.bufHead != fileNodePtr->rcv.bufTail,
-                                              msecs_to_jiffies (timeout));
-
-            if (fileNodePtr->rcv.bufHead == fileNodePtr->rcv.bufTail) {
-              return -ETIMEDOUT;
-            }
-          } else {
-            wait_event_interruptible (fileNodePtr->rcv.rxWaitQ,
-                                      fileNodePtr->rcv.bufHead != fileNodePtr->rcv.bufTail);
+    {
+      unsigned long timeout;
+      
+      get_user(timeout, (int *)arg);
+      
+      if (timeout) {
+        if (timeout != -1) {
+          wait_event_interruptible_timeout (fileNodePtr->rcv.rxWaitQ,
+                                            fileNodePtr->rcv.bufHead != fileNodePtr->rcv.bufTail,
+                                            msecs_to_jiffies (timeout));
+          
+          if (fileNodePtr->rcv.bufHead == fileNodePtr->rcv.bufTail) {
+            return -ETIMEDOUT;
           }
-
-          if (signal_pending(current)) {
-            // Sleep was interrupted by signal
-            DEBUGPRINT(4, (TXT("VCAN_IOC_RECVMSG - returning -ERESTARTSYS, "
-                               "line = %d\n"), __LINE__));
-            return -ERESTARTSYS;
-          }
-
-        } else if (rxQEmpty(fileNodePtr)) {
-          return -ETIMEDOUT;
+        } else {
+          wait_event_interruptible (fileNodePtr->rcv.rxWaitQ,
+                                    fileNodePtr->rcv.bufHead != fileNodePtr->rcv.bufTail);
         }
-        break;
+
+        if (signal_pending(current)) {
+          // Sleep was interrupted by signal
+          DEBUGPRINT(4, (TXT("VCAN_IOC_RECVMSG - returning -ERESTARTSYS, "
+                  "line = %d\n"), __LINE__));
+          return -ERESTARTSYS;
+        }
+      } else if (rxQEmpty(fileNodePtr)) {
+        return -ETIMEDOUT;
       }
+      break;
+    }
       
     case VCAN_IOC_RECVMSG_SPECIFIC:
     {
       long          timeout = fileNodePtr->read_specific.timeout;
       unsigned long rcvLock_irqFlags;
       struct timeval start;
-
+      
       ArgPtrOut(sizeof(VCAN_EVENT));
-
+      
       do_gettimeofday (&start);
-
+      
       while (1) {
         if (timeout) {
           if (timeout != -1) {
@@ -814,17 +773,17 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
             return -ERESTARTSYS;
           }
         }
-
+        
         {
           uint32_t   found = 0;
           VCAN_EVENT msg;
-
+          
           if (!rxQEmpty (fileNodePtr)) {
             spin_lock_irqsave (&fileNodePtr->rcv.rcvLock, rcvLock_irqFlags);
             found = read_specific (fileNodePtr, &msg);
             spin_unlock_irqrestore (&fileNodePtr->rcv.rcvLock, rcvLock_irqFlags);
           }
-
+          
           if (found) {
             copy_to_user_ret((VCAN_EVENT *)arg, &msg, sizeof(VCAN_EVENT), -EFAULT);
             break;
@@ -842,7 +801,84 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
       }
       break;
     }
-    //------------------------------------------------------------------
+
+    case VCAN_IOC_SENDMSG:
+      {
+        VCanChanData    *vChd = fileNodePtr->chanData;
+        VCanHWInterface *hwIf = vChd->vCard->driverData->hwIf;
+        
+        if (!fileNodePtr->isBusOn) {
+          DEBUGPRINT(2, (TXT("VCAN_IOC_SENDMSG Handle is not bus on. returning -EAGAIN\n")));
+          return -EAGAIN;
+        }
+        
+        if (vChd->vCard->card_flags & DEVHND_CARD_REFUSE_TO_USE_CAN) {
+          DEBUGPRINT(2, (TXT("VCAN_IOC_SENDMSG Refuse to run. returning -EACCES\n")));
+          return -EACCES;
+        }
+        
+        {
+          CAN_MSG *bufMsgPtr;
+          CAN_MSG message;
+          int queuePos;
+          
+          // The copy from user memory can sleep, so it must
+          // not be done while holding the queue lock.
+          // This means an extra memcpy() from a stack buffer,
+          // but that can only be avoided by changing the queue
+          // buffer "allocation" method (queue_back/push).
+          if (copy_from_user(&message, (CAN_MSG *)arg, sizeof(CAN_MSG))) {
+            DEBUGPRINT(2, (TXT("VCAN_IOC_SENDMSG - returning -EFAULT\n")));
+            return -EFAULT;
+          }
+          
+          queuePos = queue_back(&vChd->txChanQueue);
+          if (queuePos < 0) {
+            queue_release(&vChd->txChanQueue);
+            return -EAGAIN;
+          }
+          bufMsgPtr = &vChd->txChanBuffer[queuePos];
+          
+          memcpy(bufMsgPtr, &message, sizeof(CAN_MSG));
+          
+          // This is for keeping track of the originating fileNode
+          bufMsgPtr->user_data = fileNodePtr->transId;
+          bufMsgPtr->flags &= ~(VCAN_MSG_FLAG_TX_NOTIFY | VCAN_MSG_FLAG_TX_START);
+          if (fileNodePtr->modeTx || (atomic_read(&vChd->fileOpenCount) > 1)) {
+            bufMsgPtr->flags |= VCAN_MSG_FLAG_TX_NOTIFY;
+          }
+
+          if (fileNodePtr->modeTxRq) {
+            bufMsgPtr->flags |= VCAN_MSG_FLAG_TX_START;
+          }
+          
+          queue_push(&vChd->txChanQueue);
+        }
+        hwIf->requestSend(vChd->vCard, vChd);
+        break;
+      }
+  }
+  
+  return ioctl_return_value(vStat);
+}
+
+static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
+                           unsigned int      ioctl_cmd,
+                           unsigned long     arg)
+{
+  VCanChanData      *chd;
+  unsigned long     timeout;
+  int               ret;
+  int               vStat = VCAN_STAT_OK;
+  int               chanNr;
+  unsigned long     irqFlags;
+  int               tmp;
+  VCanHWInterface   *hwIf;
+
+  chd  = fileNodePtr->chanData;
+  hwIf = chd->vCard->driverData->hwIf;
+
+  switch (ioctl_cmd) {
     case VCAN_IOC_BUS_ON:
       {
         uint64_t ttime;
@@ -933,6 +969,7 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
                            sizeof(VCanBusParams), -EFAULT);
 
         vStat = hwIf->setBusParams(chd, &busParams);
+
         if (vStat != VCAN_STAT_OK) {
           DEBUGPRINT(4, (TXT("hwIf->setBusParams(...) = %d\n"), vStat));
         } else {
@@ -1165,6 +1202,90 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
       break;
 
     //------------------------------------------------------------------
+    case VCAN_IOC_SET_DEVICE_MODE:
+      if (hwIf->kvDeviceSetMode == NULL) {
+        return -ENOSYS;
+      }
+      { uint32_t devicemode;
+        ArgPtrIn(sizeof(uint32_t));
+        copy_from_user_ret(&devicemode, (uint32_t *) arg,
+                             sizeof(uint32_t), -EFAULT);
+        vStat = hwIf->kvDeviceSetMode(chd, devicemode);
+        if (VCAN_STAT_OK == vStat) {
+          DEBUGPRINT(3,(TXT("kvDeviceSetMode: %d\n"), devicemode)); 
+        }
+      }
+      break;
+    //------------------------------------------------------------------
+    case VCAN_IOC_GET_DEVICE_MODE:
+      if (hwIf->kvDeviceGetMode == NULL) {
+        return -ENOSYS;
+      }
+      { uint32_t devicemode;
+        memset(&devicemode, 0, sizeof(uint32_t));
+        ArgPtrIn(sizeof(uint32_t));
+        copy_from_user_ret(&devicemode, (uint32_t *)arg,
+                             sizeof(uint32_t), -EFAULT);
+        vStat = hwIf->kvDeviceGetMode(chd, &devicemode);
+        if (VCAN_STAT_OK == vStat) {
+          DEBUGPRINT(3,(TXT("kvDeviceGetMode: %d\n"), devicemode)); 
+          copy_to_user_ret((uint32_t *)arg, &devicemode,
+                             sizeof(devicemode), -EFAULT);
+        }
+      }
+      break;
+
+    //------------------------------------------------------------------
+    case VCAN_IOC_FILE_GET_COUNT:
+      if (hwIf->kvFileGetCount == NULL) {
+        return -ENOSYS;
+      }
+      {
+        int count;
+        ArgPtrIn(sizeof(int));
+        vStat = hwIf->kvFileGetCount(chd, &count);
+        put_user_ret(count, (int *)arg, -EFAULT);
+      }
+      break;
+    //------------------------------------------------------------------
+    case VCAN_IOC_FILE_GET_NAME:
+      if (hwIf->kvFileGetName == NULL) {
+        return -ENOSYS;
+      }
+
+      {
+        char name[255]; // We currently only support 8.3 names, but let's be nice
+        int len;
+        VCAN_FILE_GET_NAME_T input_arg;
+
+        ArgPtrIn(sizeof(VCAN_FILE_GET_NAME_T));
+        copy_from_user_ret(&input_arg, (VCAN_FILE_GET_NAME_T *)arg,
+                           sizeof(VCAN_FILE_GET_NAME_T), -EFAULT);
+
+        vStat = hwIf->kvFileGetName(chd, input_arg.fileNo, name, sizeof(name));
+        len = sizeof(name);
+        len = len < input_arg.namelen ? len : input_arg.namelen;
+        copy_to_user_ret(((VCAN_FILE_GET_NAME_T *)arg)->name, name, len, -EFAULT);
+      }
+      break;
+    //------------------------------------------------------------------
+    case KCAN_IOCTL_SCRIPT_CONTROL:
+      if (hwIf->kvScriptControl == NULL) {
+        return -ENOSYS;
+      }
+      {
+        KCAN_IOCTL_SCRIPT_CONTROL_T scriptControl;
+        ArgPtrIn(sizeof(KCAN_IOCTL_SCRIPT_CONTROL_T));
+        copy_from_user_ret(&scriptControl, (KCAN_IOCTL_SCRIPT_CONTROL_T *)arg,
+                           sizeof(KCAN_IOCTL_SCRIPT_CONTROL_T), -EFAULT);
+        vStat = hwIf->kvScriptControl(chd, &scriptControl);
+        ArgPtrOut(sizeof(KCAN_IOCTL_SCRIPT_CONTROL_T));
+        copy_to_user_ret((KCAN_IOCTL_SCRIPT_CONTROL_T *)arg,
+                         &scriptControl, sizeof(scriptControl), -EFAULT);
+      }
+      break;
+    //------------------------------------------------------------------
+
     case VCAN_IOC_SET_TRANSID:
       ArgPtrIn(sizeof(unsigned char));
       get_user(fileNodePtr->transId, (unsigned char*)arg);
@@ -1186,6 +1307,20 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
       ArgPtrOut(sizeof(VCanMsgFilter));
       copy_to_user_ret((VCanMsgFilter *)arg, &(fileNodePtr->filter),
                        sizeof(VCanMsgFilter), -EFAULT);
+      break;
+    //------------------------------------------------------------------
+    case VCAN_IOC_GET_CARD_NUMBER:
+      {
+        int minorNr = chd->minorNr;
+        ArgPtrOut(sizeof(int));
+        put_user_ret(minorNr, (int *)arg, -EFAULT);
+      }
+      break;
+    //------------------------------------------------------------------
+    case VCAN_IOC_GET_DRIVER_NAME:
+      ArgPtrOut(MAX_IOCTL_DRIVER_NAME + 1);
+      copy_to_user_ret((char *)arg, chd->vCard->driverData->deviceName,
+                       MAX_IOCTL_DRIVER_NAME + 1, -EFAULT);
       break;
     //------------------------------------------------------------------
     case VCAN_IOC_OPEN_CHAN:
@@ -1476,6 +1611,22 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         }
       }
       break;
+
+    //------------------------------------------------------------------
+    case VCAN_IOC_GET_TRANSCEIVER_INFO:
+      {
+        uint32_t tmp;
+
+        if (!hwIf->get_transceiver_type) {
+          return -ENOSYS;
+        }
+        copy_from_user_ret (&tmp, (uint32_t*)arg, sizeof(uint32_t), -EFAULT);
+        vStat = hwIf->get_transceiver_type(chd, &tmp);
+        copy_to_user_ret((uint32_t*)arg, &tmp, sizeof(uint32_t), -EFAULT);
+      }
+      break;
+
+
     //------------------------------------------------------------------
     case KCAN_IOCTL_TX_INTERVAL:
       {
@@ -1900,15 +2051,15 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
       break;
 
   //------------------------------------------------------------------
-  case KCAN_IOCTL_CANFD:
+  case KCAN_IOCTL_OPEN_MODE:
     {
-      KCAN_IOCTL_CANFD_T fd_data;
+      KCAN_IOCTL_OPEN_MODE_T mode_data;
       unsigned int openHandles = 0;
-      unsigned char canfd_mode = OPEN_AS_CAN;
-      unsigned int req_caps = 0;
-      ArgPtrIn(sizeof(KCAN_IOCTL_CANFD_T));
-      copy_from_user_ret(&fd_data, (KCAN_IOCTL_CANFD_T *)arg,
-                           sizeof(KCAN_IOCTL_CANFD_T), -EFAULT);
+      // unsigned char open_mode = OPEN_AS_CAN;
+      // unsigned int req_caps = 0;
+      ArgPtrIn(sizeof(KCAN_IOCTL_OPEN_MODE_T));
+      copy_from_user_ret(&mode_data, (KCAN_IOCTL_OPEN_MODE_T *)arg,
+                           sizeof(KCAN_IOCTL_OPEN_MODE_T), -EFAULT);
 
       // Count the number of open handles to this channel
       spin_lock_irqsave(&chd->openLock, irqFlags);
@@ -1919,47 +2070,113 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         }
       }
       spin_unlock_irqrestore(&chd->openLock, irqFlags);
-
-      if (fd_data.action == CAN_CANFD_SET)
-        canfd_mode = fd_data.fd;
+      /*
+      if (open_data.action == CAN_MODE_SET)
+        open_mode = open_data.mode;
       else
-        canfd_mode = chd->canFdMode;
-      fd_data.status = CAN_CANFD_NOT_IMPLEMENTED;
-      switch (canfd_mode) {
+        open_mode = chd->openMode;
+      open_data.status = CAN_CANFD_NOT_IMPLEMENTED;
+      switch (open_mode) {
         case OPEN_AS_CANFD_NONISO:
           req_caps |= VCAN_CHANNEL_CAP_CANFD_NONISO;
           //intentional fall-through
         case OPEN_AS_CANFD_ISO:
           req_caps |= VCAN_CHANNEL_CAP_CANFD;
           //intentional fall-through
+        case OPEN_AS_LIN:
+          req_caps |= VCAN_CHANNEL_CAP_LIN_FLEX;
+          //intentional fall-through          
         case OPEN_AS_CAN: {
-          if (fd_data.action == CAN_CANFD_SET) {
-            fd_data.status = CAN_CANFD_FAILURE;
+          if (open_data.action == CAN_MODE_SET) {
+            open_data.status = CAN_CANFD_FAILURE;
             if ((chd->capabilities & req_caps) == req_caps) {
               // 1 since we have to be open to be here.
               if (1 == openHandles) {
-                chd->canFdMode = fd_data.fd;
-                fd_data.status = CAN_CANFD_SUCCESS;
+                chd->openMode = open_data.mode;
+                open_data.status = CAN_CANFD_SUCCESS;
               }
               else {
-                if (fd_data.fd == chd->canFdMode) {
-                  fd_data.status = CAN_CANFD_SUCCESS;
+                if (open_data.mode == chd->openMode) {
+                  open_data.status = CAN_CANFD_SUCCESS;
                 }
                 else {
-                  fd_data.status = CAN_CANFD_MISMATCH;
+                  open_data.status = CAN_CANFD_MISMATCH;
                 }
               }
             }
           }
-          else if (fd_data.action == CAN_CANFD_READ) {
-            fd_data.reply = chd->canFdMode;
-            fd_data.status = CAN_CANFD_SUCCESS;
+          else if (open_data.action == CAN_CANFD_READ) {
+            open_data.reply = chd->openMode;
+            open_data.status = CAN_CANFD_SUCCESS;
           }
         }
       }
-      ArgPtrOut(sizeof(KCAN_IOCTL_CANFD_T));
-      copy_to_user_ret((KCAN_IOCTL_CANFD_T *)arg, &fd_data,
-      sizeof(KCAN_IOCTL_CANFD_T), -EFAULT);
+      */
+      
+      switch (mode_data.action) {
+        case CAN_MODE_SET: 
+        {
+          mode_data.status = CAN_OPEN_MODE_FAILURE;
+          if (chd) {
+            if (mode_data.mode == OPEN_AS_CAN) {
+              // OPEN_AS_CAN is ok!
+            }
+            else if (mode_data.mode == OPEN_AS_CANFD_NONISO) {
+              if (!(chd->capabilities & VCAN_CHANNEL_CAP_CANFD_NONISO)) {
+                mode_data.status = CAN_OPEN_MODE_MISMATCH;
+                break;
+              }
+            }
+            else if (mode_data.mode == OPEN_AS_CANFD_ISO) {
+              if (!(VCAN_CHANNEL_CAP_CANFD & chd->capabilities)) {
+                mode_data.status = CAN_OPEN_MODE_MISMATCH;
+                break;
+              }
+            }
+            else if (mode_data.mode == OPEN_AS_LIN) {
+              if (!(VCAN_CHANNEL_CAP_LIN_FLEX & chd->capabilities)) {
+                mode_data.status = CAN_OPEN_MODE_MISMATCH;
+                break;
+              }
+            }
+            else {
+              // Say what??! Don't think so!
+              mode_data.status = CAN_OPEN_MODE_NOT_IMPLEMENTED;
+              break;
+            }
+          
+            //if (pi->open_count == 1 /* we are the first to open it */) {
+            if (1 == openHandles) { /* we are the first to open it */
+              chd->openMode   = mode_data.mode;
+              mode_data.status = CAN_OPEN_MODE_SUCCESS;
+              break;
+            }
+            else {
+              // same mode as we are already opened in...
+              if (mode_data.mode == chd->openMode) {
+                mode_data.status = CAN_OPEN_MODE_SUCCESS;
+                break;
+              }
+              else {
+                mode_data.status = CAN_OPEN_MODE_MISMATCH;
+                break;
+              }          
+            }
+          }
+        }
+        break;
+        case CAN_MODE_READ:
+          mode_data.status = CAN_OPEN_MODE_SUCCESS;
+          mode_data.mode = chd->openMode;
+        break;
+        default:
+          mode_data.status = CAN_OPEN_MODE_NOT_IMPLEMENTED;
+        break;
+      }
+      
+      ArgPtrOut(sizeof(KCAN_IOCTL_OPEN_MODE_T));
+      copy_to_user_ret((KCAN_IOCTL_OPEN_MODE_T *)arg, &mode_data,
+      sizeof(KCAN_IOCTL_OPEN_MODE_T), -EFAULT);
     }
     break;
 
@@ -2101,38 +2318,24 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
         return -EINVAL;
       }
       copy_from_user_ret(&cardInfoMisc, (KCAN_IOCTL_MISC_INFO *)arg, sizeof(cardInfoMisc), -EFAULT);
-      vStat = hwIf->getCardInfoMisc(chd, &cardInfoMisc.value, cardInfoMisc.type);
+      vStat = hwIf->getCardInfoMisc(chd, &cardInfoMisc);
       copy_to_user_ret((void *)arg, &cardInfoMisc, sizeof(cardInfoMisc), -EFAULT);
     }
     break;
     
     //------------------------------------------------------------------
     default:
-      DEBUGPRINT(1, (TXT("vCanIOCtrl UNKNOWN VCAN_IOC!!!: %d\n"), ioctl_cmd));
-      return -EAGAIN;
-  }
-  //------------------------------------------------------------------
 
-  switch (vStat) {
-  case VCAN_STAT_OK:
-    return 0;
-  case VCAN_STAT_FAIL:
-    return -EIO;
-  case VCAN_STAT_TIMEOUT:
-    return -EAGAIN;
-  case VCAN_STAT_NO_DEVICE:
-    return -ENODEV;
-  case VCAN_STAT_NO_RESOURCES:
-    return -EAGAIN;
-  case VCAN_STAT_NO_MEMORY:
-    return -ENOMEM;
-  case VCAN_STAT_SIGNALED:
-    return -ERESTARTSYS;
-  case VCAN_STAT_BAD_PARAMETER:
-    return -EINVAL;
-  default:
-    return -EIO;
+      if (hwIf->special_ioctl_handler == NULL) {
+        DEBUGPRINT(1, (TXT("vCanIOCtrl UNKNOWN VCAN_IOC!!!: %d\n"), ioctl_cmd));
+        return -ENOSYS;
+      }
+      else {
+        DEBUGPRINT(2, (TXT("vCanIOCtrl calling special_ioctl_handler with %u\n"), ioctl_cmd));
+        vStat = hwIf->special_ioctl_handler(fileNodePtr, ioctl_cmd, arg);
+      }
   }
+  return ioctl_return_value (vStat);
 }
 
 
@@ -2153,12 +2356,25 @@ long vCanIOCtl_unlocked (struct file *filp,
 {
   VCanOpenFileNode  *fileNodePtr = filp->private_data;
   int               ret;
+  VCanChanData *vChd = fileNodePtr->chanData;
 
   // Use semaphore to enforce mutual exclusion
   // for a specific file descriptor.
-  wait_for_completion(&fileNodePtr->ioctl_completion);
-  ret = ioctl(fileNodePtr, ioctl_cmd, arg);
-  complete(&fileNodePtr->ioctl_completion);
+  
+  switch (ioctl_cmd)
+  {
+    case VCAN_IOC_RECVMSG:
+    case VCAN_IOC_RECVMSG_SYNC:
+    case VCAN_IOC_RECVMSG_SPECIFIC:
+    case VCAN_IOC_SENDMSG:
+      ret = ioctl_non_blocking (fileNodePtr, ioctl_cmd, arg);
+      break;
+    default:
+      wait_for_completion(&vChd->ioctl_completion);
+      ret = ioctl_blocking (fileNodePtr, ioctl_cmd, arg);
+      complete(&vChd->ioctl_completion);
+      break;
+  }
 
   return ret;
 }
@@ -2255,6 +2471,9 @@ int vCanInitData (VCanCardData *vCard)
 
     init_completion(&vChd->busOnCountCompletion);
     complete(&vChd->busOnCountCompletion);
+
+    init_completion(&vChd->ioctl_completion);
+    complete(&vChd->ioctl_completion);
 
     spin_lock_init(&(vChd->openLock));
 

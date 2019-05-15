@@ -1,6 +1,5 @@
 /**
- * \section LICENSE
- * <pre style="white-space: pre-wrap">
+* <pre style="white-space: pre-wrap">
  * This software is dual licensed under the following two licenses:
  * BSD-new and GPLv2. You may use either one. See the included
  * COPYING file for details.
@@ -49,11 +48,10 @@
  * ---------------------------------------------------------------------------
  * </pre>
  *
- * \section DESCRIPTION
  *
  *   Definitions for the CANLIB API.
  *
- * \file canlib.h
+ * \file canstat.h
  * \author Kvaser AB
  *
  * \defgroup General                 General
@@ -517,6 +515,7 @@ typedef enum {
 #define canTRANSCEIVER_TYPE_LIN            19  ///< LIN
 #define canTRANSCEIVER_TYPE_KONE           20  ///< KONE
 #define canTRANSCEIVER_TYPE_CANFD          22  ///< CAN-FD
+#define canTRANSCEIVER_TYPE_CANFD_LIN      24  ///< HYBRID CAN-FD/LIN
 #define canTRANSCEIVER_TYPE_LINX_LIN       64
 #define canTRANSCEIVER_TYPE_LINX_J1708     66
 #define canTRANSCEIVER_TYPE_LINX_K         68

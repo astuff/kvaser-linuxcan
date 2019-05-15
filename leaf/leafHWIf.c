@@ -151,7 +151,7 @@ static int leaf_get_cust_channel_name(const VCanChanData * const vChan,
                                       unsigned char * const data,
                                       const unsigned int data_size,
                                       unsigned int * const status);
-static int leaf_get_card_info_misc(const VCanChanData *chd, int *value, int type);
+static int leaf_get_card_info_misc(const VCanChanData *chd, KCAN_IOCTL_MISC_INFO *cardInfoMisc);
 static int leaf_flash_leds(const VCanChanData *chd, int action, int timeout);
 
 static VCanDriverData driverData;
@@ -290,6 +290,7 @@ static void   leaf_get_card_info_dummy(VCanCardData *vCard);
 #define USB_MINI_PCI_EXPRESS_2HS_PRODUCT_ID 292 // Kvaser Mini PCI Express 2xHS
 #define USB_USBCAN_R_V2_PRODUCT_ID          294 // Kvaser USBcan R v2
 #define USB_LEAF_LITE_R_V2_PRODUCT_ID       295 // Kvaser Leaf Light R v2
+#define USB_OEM_ATI_LEAF_LITE_V2_PRODUCT_ID 296 // Kvaser OEM ATI Leaf Light HS v2
 
 
 // Table of devices that work with this driver
@@ -323,6 +324,7 @@ static struct usb_device_id leaf_table [] = {
   { USB_DEVICE(KVASER_VENDOR_ID, USB_MINI_PCI_EXPRESS_2HS_PRODUCT_ID) },
   { USB_DEVICE(KVASER_VENDOR_ID, USB_USBCAN_R_V2_PRODUCT_ID) },
   { USB_DEVICE(KVASER_VENDOR_ID, USB_LEAF_LITE_R_V2_PRODUCT_ID) },
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_OEM_ATI_LEAF_LITE_V2_PRODUCT_ID) },
   { 0 }  // Terminating entry
 };
 
@@ -1928,13 +1930,6 @@ static int leaf_queue_cmd (VCanCardData *vCard, filoCmd *cmd,
         return VCAN_STAT_NO_RESOURCES;
       }
     }
-
-    // Are we interrupted by a signal?
-    if (signal_pending(current)) {
-      queue_remove_wait_for_space(&dev->txCmdQueue, &wait);
-      DEBUGPRINT(2, (TXT("ERROR 3 SIGNALED\n")));
-      return VCAN_STAT_SIGNALED;
-    }
   }
 
   set_current_state(TASK_RUNNING);
@@ -2006,7 +2001,8 @@ static int leaf_plugin (struct usb_interface *interface,
        (udev->descriptor.idProduct != USB_MINI_PCI_EXPRESS_2HS_PRODUCT_ID)  &&
        (udev->descriptor.idProduct != USB_CAN_R_PRODUCT_ID)                 &&
        (udev->descriptor.idProduct != USB_USBCAN_R_V2_PRODUCT_ID)           &&
-       (udev->descriptor.idProduct != USB_LEAF_LITE_R_V2_PRODUCT_ID)
+       (udev->descriptor.idProduct != USB_LEAF_LITE_R_V2_PRODUCT_ID)        &&
+       (udev->descriptor.idProduct != USB_OEM_ATI_LEAF_LITE_V2_PRODUCT_ID)
       )
      )
   {
@@ -2162,6 +2158,11 @@ static int leaf_plugin (struct usb_interface *interface,
     case USB_LEAF_LITE_R_V2_PRODUCT_ID:
       DEBUGPRINT(2, (TXT("\nKVASER ")));
       DEBUGPRINT(2, (TXT("Leaf Light R v2 plugged in\n")));
+      break;
+
+    case USB_OEM_ATI_LEAF_LITE_V2_PRODUCT_ID:
+      DEBUGPRINT(2, (TXT("\nKVASER ")));
+      DEBUGPRINT(2, (TXT("OEM ATI Leaf Light HS v2 plugged in\n")));
       break;
 
     default:
@@ -2391,7 +2392,7 @@ static int leaf_start (VCanCardData *vCard)
     cmd.setDrivermodeReq.channel    = (unsigned char)i;
     cmd.setDrivermodeReq.driverMode = DRIVERMODE_NORMAL;
 
-    r = leaf_queue_cmd(vCard, &cmd, 5);
+    r = leaf_queue_cmd(vCard, &cmd, 50);
     if (r != VCAN_STAT_OK) return r;
   }
 
@@ -2665,7 +2666,7 @@ static int leaf_set_busparams (VCanChanData *vChan, VCanBusParams *par)
                  cmd.setBusparamsReq.tseg2,
                  cmd.setBusparamsReq.noSamp));
 
-  ret = leaf_queue_cmd(vChan->vCard, &cmd, 5 /* There is no response */);
+  ret = leaf_queue_cmd(vChan->vCard, &cmd, 50 /* There is no response */);
 
   return ret;
 } // _set_busparams
@@ -2734,7 +2735,7 @@ static int leaf_set_silent (VCanChanData *vChan, int silent)
   cmd.setDrivermodeReq.driverMode = silent ? DRIVERMODE_SILENT :
                                              DRIVERMODE_NORMAL;
 
-  ret = leaf_queue_cmd(vChan->vCard, &cmd, 5 /* There is no response */);
+  ret = leaf_queue_cmd(vChan->vCard, &cmd, 50 /* There is no response */);
 
   return ret;
 } // _set_silent
@@ -2914,7 +2915,7 @@ static int leaf_flush_tx_buffer (VCanChanData *vChan)
     filoCmd reply;
     ret = leaf_send_and_wait_reply(vChan->vCard, &cmd, &reply, CMD_FILO_FLUSH_QUEUE_RESP, 0, 0);
   } else {
-    ret = leaf_queue_cmd(vChan->vCard, &cmd, 5 /* There is no response */);
+    ret = leaf_queue_cmd(vChan->vCard, &cmd, 50 /* There is no response */);
   }
 
   if (ret == VCAN_STAT_OK) {
@@ -3691,11 +3692,17 @@ int leaf_read_user_parameter(const VCanChanData * const vChan,
 }
 
 /***************************************************************************/
-static int leaf_get_card_info_misc(const VCanChanData *chd, int *value, int type)
+static int leaf_get_card_info_misc(const VCanChanData *chd, KCAN_IOCTL_MISC_INFO *cardInfoMisc)
 {
   int r = 0;
   filoCmd cmd;
   filoCmd reply;
+  
+  if (!(chd->vCard->card_flags & DEVHND_CARD_EXTENDED_CAPABILITIES))
+  {
+    cardInfoMisc->retcode = KCAN_IOCTL_MISC_INFO_NOT_IMPLEMENTED;
+    return r;
+  }
   
   memset(&cmd, 0, sizeof(cmd));
   
@@ -3703,34 +3710,47 @@ static int leaf_get_card_info_misc(const VCanChanData *chd, int *value, int type
   cmd.head.cmdLen = sizeof(cmdCapabilitiesReq);
   cmd.capabilitiesReq.subData.channel = (uint16_t)chd->channel;
   
-  switch (type) {
-    case KCAN_IOCTL_MISC_INFO_WEBSERVER_TYPE:    
-    case KCAN_IOCTL_MISC_INFO_REMOTE_TYPE:
-      cmd.capabilitiesReq.subCmdNo = CAP_SUB_CMD_REMOTE_INFO;
-      break;
-    case KCAN_IOCTL_MISC_INFO_LOGGER_TYPE:
+  switch (cardInfoMisc->subcmd) {
+    case KCAN_IOCTL_MISC_INFO_SUBCMD_CHANNEL_LOGGER_INFO:
       cmd.capabilitiesReq.subCmdNo = CAP_SUB_CMD_GET_LOGGER_INFO;
       break;
+    case KCAN_IOCTL_MISC_INFO_SUBCMD_CHANNEL_REMOTE_INFO:
+      cmd.capabilitiesReq.subCmdNo = CAP_SUB_CMD_REMOTE_INFO;
+      break;
     default:
-      r = -1;
+      r = VCAN_STAT_OK;
+      cardInfoMisc->retcode = KCAN_IOCTL_MISC_INFO_NOT_IMPLEMENTED;
+      return r;
   }
   
-  if (r != 0) {
-    r = leaf_send_and_wait_reply(chd->vCard, &cmd, &reply,
+  r = leaf_send_and_wait_reply(chd->vCard, &cmd, &reply,
                                CMD_GET_CAPABILITIES_RESP, (unsigned char)chd->channel, 0);
-    if (r == VCAN_STAT_OK) {
-      switch (type) {
-        case KCAN_IOCTL_MISC_INFO_WEBSERVER_TYPE:
-          *value = cmd.capabilitiesResp.remoteInfo.webServer != 0 ? 
-             KCAN_IOCTL_MISC_INFO_REMOTE_WEBSERVER_V1: 
-             KCAN_IOCTL_MISC_INFO_NOT_IMPLEMENTED;
-        break;
-        case KCAN_IOCTL_MISC_INFO_REMOTE_TYPE:
-          *value = cmd.capabilitiesResp.remoteInfo.remoteType;
-      }
+  if (r == VCAN_STAT_OK) {
+    if (reply.capabilitiesResp.status == CAP_STATUS_OK)
+    {
+      cardInfoMisc->retcode = KCAN_IOCTL_MISC_INFO_RETCODE_SUCCESS;        
+    }
+    else 
+    {
+      cardInfoMisc->retcode = KCAN_IOCTL_MISC_INFO_NOT_IMPLEMENTED;
+      return r;
+    }
+    
+    switch (cardInfoMisc->subcmd) {
+      case KCAN_IOCTL_MISC_INFO_SUBCMD_CHANNEL_LOGGER_INFO:
+        cardInfoMisc->payload.loggerInfo.loggerType = reply.capabilitiesResp.loggerType.data==LOGGERTYPE_NOT_A_LOGGER?KCAN_IOCTL_MISC_INFO_LOGGER_TYPE_NOT_A_LOGGER:KCAN_IOCTL_MISC_INFO_LOGGER_TYPE_V1;
+      break;
+      case KCAN_IOCTL_MISC_INFO_SUBCMD_CHANNEL_REMOTE_INFO:
+        cardInfoMisc->payload.remoteInfo.webServer = reply.capabilitiesResp.remoteInfo.webServer?KCAN_IOCTL_MISC_INFO_REMOTE_WEBSERVER_V1:KCAN_IOCTL_MISC_INFO_REMOTE_NO_WEBSERVER;
+        if (reply.capabilitiesResp.remoteInfo.remoteType) {
+          cardInfoMisc->payload.remoteInfo.remoteType = reply.capabilitiesResp.remoteInfo.remoteType==REMOTE_TYPE_WLAN?KCAN_IOCTL_MISC_INFO_REMOTE_TYPE_WLAN:KCAN_IOCTL_MISC_INFO_REMOTE_TYPE_LAN;
+        }
+        else {
+          cardInfoMisc->payload.remoteInfo.remoteType = KCAN_IOCTL_MISC_INFO_REMOTE_TYPE_NOT_REMOTE;
+        }
+      break;
     }
   }
-  
   
   return r;
 }

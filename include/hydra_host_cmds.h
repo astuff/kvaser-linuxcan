@@ -52,7 +52,8 @@
 #ifndef HYDRA_HOST_CMDS_H_
 #define HYDRA_HOST_CMDS_H_
 
-#include <linux/types.h>
+# include <linux/types.h>
+
 
 #   include "hydra_host_private_cmds.h"
 
@@ -114,7 +115,9 @@
 #define CMD_HYDRA_TX_INTERVAL_RESP                   68
 #define CMD_SET_BUSPARAMS_FD_REQ                     69
 #define CMD_SET_BUSPARAMS_FD_RESP                    70
+
 // 71 can be reused
+
 #define CMD_AUTO_TX_BUFFER_REQ                       72
 #define CMD_AUTO_TX_BUFFER_RESP                      73
 #define CMD_SET_TRANSCEIVER_MODE_REQ                 74
@@ -130,13 +133,21 @@
 #define CMD_SET_IO_PORTS_REQ                         86
 #define CMD_GET_IO_PORTS_REQ                         87
 #define CMD_GET_IO_PORTS_RESP                        88
-// 89-94 can be used
+
+#define CMD_TRANSPORT_REQ                            91
+#define CMD_TRANSPORT_RESP                           92
+#define CMD_KDI                                      93
+
+// 94 can be used
+
 #define CMD_GET_CAPABILITIES_REQ                     95
 #define CMD_GET_CAPABILITIES_RESP                    96
 #define CMD_GET_TRANSCEIVER_INFO_REQ                 97
 #define CMD_GET_TRANSCEIVER_INFO_RESP                98
 #define CMD_MEMO_CONFIG_MODE                         99
+
 // 100 can be used
+
 #define CMD_LED_ACTION_REQ                          101
 #define CMD_LED_ACTION_RESP                         102
 #define CMD_INTERNAL_DUMMY                          103
@@ -146,7 +157,12 @@
 #define CMD_LOG_TRIG                                107
 #define CMD_LOG_RTC_TIME                            108
 
-// 109 - 118 reserved
+// 109 - 113 reserved
+
+#define CMD_SCRIPT_CTRL_REQ                         116
+#define CMD_SCRIPT_CTRL_RESP                        117
+
+// 118 reserved
 
 #define CMD_IMP_KEY                                 119
 
@@ -233,7 +249,6 @@
 #define CMD_RESERVED_FD_D                           237
 #define CMD_RESERVED_FD_E                           238
 #define CMD_RESERVED_FD_F                           239
-
 #define CMD_EXTENDED                                255
 
 
@@ -242,6 +257,7 @@
 #define MEMO_STATUS_UNKNOWN_COMMAND 2
 #define MEMO_STATUS_FAILED          3
 #define MEMO_STATUS_EOF             4
+
 
 
 typedef struct {
@@ -844,12 +860,12 @@ typedef struct {
 #define HM_STATUS_OK 1
 #define HM_STATUS_FAILED -1
 
-#define TRPDATA_EOF_FLAG        0x01
-#define TRPDATA_ASCII_FLAG      0x02
-#define TRPDATA_DIT_FLAG        0x04
-#define TRPDATA_RESWANTED_FLAG  0x08
-#define TRPDATA_TRUNCATED_FLAG  0x10
-#define TRPDATA_RSP_FLAG        0x20  // This TRP is a Response
+#define TRPDATA_EOF_FLAG          0x01
+#define TRPDATA_ASCII_FLAG        0x02
+#define TRPDATA_DIT_FLAG          0x04
+#define TRPDATA_RESWANTED_FLAG    0x08
+#define TRPDATA_TRUNCATED_FLAG    0x10
+#define TRPDATA_RSP_FLAG          0x20  // This TRP is a Response
 
 #define TRPDATA_STATUS_OK          0
 #define TRPDATA_STATUS_BUSY        1  // Busy, ask me later with an empty TRPDATA
@@ -865,6 +881,64 @@ typedef struct {
 } htrpData;
 
 
+
+typedef union {
+  struct {
+    uint32_t    options;  // any TRP_OPT_XXX
+    uint32_t    transaction_len;
+    uint8_t     padding[16];
+  } start;
+  struct {
+    uint32_t    mtu;
+    uint32_t    status;
+    uint8_t     padding[16];
+  } start_resp;  
+  struct {    
+    uint8_t     payload[24];
+  } data;  
+  struct {
+    uint32_t    checksum;
+    uint8_t     padding[20];
+  } end_req; 
+  struct {
+    uint32_t    status;
+    uint8_t     padding[20];
+  } end_resp;   
+  uint8_t       raw[24];
+} htrpDataEx;
+
+
+#define TRP_START_TRANSACTION_REQ          1
+#define TRP_START_TRANSACTION_RESP         2
+#define TRP_END_TRANSACTION_REQ            3
+#define TRP_END_TRANSACTION_RESP           4
+#define TRP_DATA_TRANSACTION               5
+#define TRP_DATA_TRANSACTION_RESP          6
+#define TRP_DATA_TRANSACTION_MTU_DONE      7
+#define TRP_DATA_TRANSACTION_MTU_DONE_RESP 8
+
+
+#define HYDRA_TRP_PIPE_DIAG_TRIGGER    1
+#define HYDRA_TRP_PIPE_DIAG_PG         2
+#define HYDRA_TRP_PIPE_LAST_ENTRY      HYDRA_TRP_PIPE_DIAG_PG // update this if you add more pipes!!
+
+
+#define TRP_OK 0
+#define TRP_PIPE_NOT_IMPLEMENTED 1
+#define TRP_BUFFER_OVERFLOW      2  // trying to transfer a larger buffer in one chunk than fw can handle. 
+
+
+
+
+typedef struct {
+  uint8_t     cmd;
+  uint8_t     len;
+  uint16_t    seqNo;  
+  htrpDataEx  trp;  
+} htrpDataExtended;
+
+
+
 typedef struct {
   uint8_t     he;        // Set to zero if not known
   uint8_t     channels;
@@ -877,17 +951,6 @@ typedef struct {
 } hcmdRegisterHeResp;
 
 struct hydraHostCmd;
-
-typedef struct {
-  uint8_t     channel;
-  uint8_t     reserved1[3];
-  uint32_t    reserved2;
-  char        name[16];
-} hcmdQueryAddrHeReq;
-
-typedef struct {
-  uint8_t     he;
-} hcmdQueryAddrHeResp;
 
 typedef struct {
   uint8_t     enable;
@@ -1519,11 +1582,14 @@ typedef struct {
 #define CAP_SUB_CMD_HAS_LOGGER               8
 #define CAP_SUB_CMD_HAS_REMOTE               9
 #define CAP_SUB_CMD_HAS_SCRIPT               10
+#define CAP_SUB_CMD_LIN_FLEX                 11
 
 // the following are not capabilities/bits
 #define CAP_SUB_CMD_DATA_START               1024
 #define CAP_SUB_CMD_GET_LOGGER_INFO          CAP_SUB_CMD_DATA_START+1
 #define CAP_SUB_CMD_REMOTE_INFO              CAP_SUB_CMD_DATA_START+2
+#define CAP_SUB_CMD_HW_STATUS                CAP_SUB_CMD_DATA_START+3
+#define CAP_SUB_CMD_FEATURE_EAN              CAP_SUB_CMD_DATA_START+4
 
 // CAP_SUB_CMD_GET_LOGGER_TYPE
 #define LOGGERTYPE_NOT_A_LOGGER 0
@@ -1564,6 +1630,17 @@ typedef struct
   unsigned int     remoteType;
 } hRemoteInfo_t;
 
+typedef struct
+{
+  uint32_t codes[6];
+} hhwStatus_t;
+
+typedef struct
+{
+  uint32_t eanLo;
+  uint32_t eanHi;
+} hfeatureEan_t;
+
 //Status codes in CMD_GET_CAPABILITIES_RESP 
 #define CAP_STATUS_OK 0
 #define CAP_STATUS_NOT_IMPLEMENTED 1
@@ -1580,9 +1657,12 @@ typedef struct {
     hchannelCap32_t singleshotCap; // CAP_SUB_CMD_SINGLE_SHOT    
     hchannelCap32_t loggerCap;     // CAP_SUB_CMD_HAS_LOGGER    
     hchannelCap32_t remoteCap;     // CAP_SUB_CMD_HAS_REMOTE    
-    hchannelCap32_t scriptCap;     // CAP_SUB_CMD_HAS_SCRIPT 
+    hchannelCap32_t scriptCap;     // CAP_SUB_CMD_HAS_SCRIPT
+    hchannelCap32_t linflexCap;    // CAP_SUB_CMD_LIN_FLEX
     hInfo_t loggerType;            // CAP_SUB_CMD_GET_LOGGER_TYPE
     hRemoteInfo_t remoteInfo;      // CAP_SUB_CMD_REMOTE_TYPE
+    hhwStatus_t   hwStatus;        // CAP_SUB_CMD_HW_STATUS
+    hfeatureEan_t featureEan;      // CAP_SUB_CMD_FEATURE_EAN
   };
 } hcmdCapabilitiesResp;
    
@@ -1663,6 +1743,55 @@ typedef struct {
   uint8_t   unknownCmd;
 } hcmdUnknownCommandResp;
 
+#define KDI_SUBCMD_TRIGGER_START     1
+#define KDI_SUBCMD_TRIGGER_STOP      2
+// #define KDI_SUBCMD_TRIGGER_DOWNLOAD  3
+#define KDI_SUBCMD_TRIGGER_RUNNING   6
+
+#define KDI_SUBCMD_PG_START         21
+#define KDI_SUBCMD_PG_STOP          22
+#define KDI_SUBCMD_PG_PLEN          23
+#define KDI_SUBCMD_PG_BURST_LENGTH  24
+#define KDI_SUBCMD_PG_IDLE_LENGTH   25
+#define KDI_SUBCMD_PG_SP_POS        26
+#define KDI_SUBCMD_PG_ADJUST_PLEN   27
+// #define KDI_SUBCMD_PG_PATTERN       28
+#define KDI_SUBCMD_PG_STAT_IDLE     29
+#define KDI_SUBCMD_PG_RUNNING       31
+
+#define SUBCMD_LOOPBACK_GET    50
+#define SUBCMD_LOOPBACK_SET    51
+#define SUBCMD_LOOPBACK_RESP   52
+
+#define KDI_STATUS_OK                 1
+#define KDI_STATUS_NOT_IMPLEMENTED    2
+#define KDI_LOOPBACK_ERROR            3
+
+typedef union {
+  uint32_t             pg_ctrl;
+  uint32_t             trigger_running;
+  uint32_t             pg_running;
+  uint8_t              buffer[24];
+  struct {
+    uint8_t block;
+    uint8_t rx_bus;
+    uint8_t tx_bus;
+  } loopback_set;  
+  struct {
+    uint8_t block;
+  } loopback_get;  
+  struct {
+    uint8_t rx_bus;
+    uint8_t tx_bus;
+  } loopback_resp;  
+} hkdiCtrlData;
+  
+typedef struct {
+  uint8_t subCmdNo; //start, stop
+  uint8_t status;
+  uint8_t padding[2];  
+  hkdiCtrlData data;
+} hcmdKDICmd;
 
 // Well-known HEs
 #define BROADCAST         0x0f
@@ -1698,6 +1827,7 @@ typedef struct hydraHostCmd {
     hcmdPrintf                printfMsg;
     hresPrintf                printfRes;
     htrpData                  trpDataMsg;
+    htrpDataExtended          trpDataMsgExt;
 
     hcmdMemory                memory;
     hcmdMeasure               measure;
@@ -1755,8 +1885,6 @@ typedef struct hydraHostCmd {
 
     hcmdRegisterHeReq            registerHeReq;
     hcmdRegisterHeResp           registerHeResp;
-    hcmdQueryAddrHeReq           queryAddrHeReq;
-    hcmdQueryAddrHeResp          queryAddrHeResp;
     hcmdListenToHeReq            listenToHeReq;
     hcmdListenToHeResp           listenToHeResp;
     hcmdQueryNextHeReq           queryNextHeReq;
@@ -1839,6 +1967,8 @@ typedef struct hydraHostCmd {
     hcmdUnknownCommandResp        unknownCommandResp;
     hcmdCapabilitiesReq           capabilitiesReq;
     hcmdCapabilitiesResp          capabilitiesResp;
+    
+    hcmdKDICmd                    kdiCmd;
 
     hcmdHydraOtherCommand        o;
 
@@ -1958,9 +2088,5 @@ typedef struct {
     hcmdTxAckFd               txAckFd;
   };
 } hydraHostCmdExt;
-
-#if !defined(__IAR_SYSTEMS_ICC__)
-#  include <poppack.h>
-#endif
 
 #endif //_HYDRA_HOST_CMDS_H_

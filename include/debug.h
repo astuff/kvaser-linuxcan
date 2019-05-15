@@ -101,10 +101,6 @@
 #    define DEBUGOUT(c, arg)          if (c)                                 \
                                         printk("<" #c ">" DEBUGPRINTHELP arg)
 
-#    if DEBUG
-#      define CompilerAssert(e) extern char _kvaser_compiler_assert_[(e)?1:-1]
-#    endif
-
 //----------------------------------------------------------------------------
 //#  endif
 #endif

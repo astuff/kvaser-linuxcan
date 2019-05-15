@@ -72,7 +72,7 @@ typedef struct {
   int head;
   int tail;
   atomic_t length;      // For length queries without locking
-  unsigned int flags;   // Only used when holding the lock (Sparc incompatible)!
+  unsigned long flags;  // Only used when holding the lock (Sparc incompatible)!
   wait_queue_head_t space_event;
   Lock_type lock_type;
   spinlock_t lock;

@@ -110,6 +110,7 @@
 #define HWTYPE_MEMORATOR_PRO2 78
 #define HWTYPE_LEAF2              80  ///< Kvaser Leaf Pro HS (2nd generation)
 #define HWTYPE_MEMORATOR_V2   82  ///< Kvaser Memorator (2nd generation)
+#define HWTYPE_CANLINHYBRID   84
 
 
 /* Transceiver types */
@@ -138,6 +139,8 @@
 #define VCAN_TRANSCEIVER_TYPE_GAL              VCAN_TRANSCEIVER_TYPE_KONE  // Galathea piggyback
 // Agreement: Vector to use all odd numbers, Kvaser all even numbers
 #define VCAN_TRANSCEIVER_TYPE_CANFD            22  // Generic CAN-FD capable transceiver
+#define VCAN_TRANSCEIVER_TYPE_CANFD_LIN        24
+
 #define VCAN_TRANSCEIVER_TYPE_LINX_LIN         64
 #define VCAN_TRANSCEIVER_TYPE_LINX_J1708       66
 #define VCAN_TRANSCEIVER_TYPE_LINX_K           68

@@ -1,5 +1,4 @@
 /**
- * \section LICENSE
  * <pre style="white-space: pre-wrap">
  * This software is dual licensed under the following two licenses:
  * BSD-new and GPLv2. You may use either one. See the included
@@ -49,8 +48,6 @@
  * ---------------------------------------------------------------------------
  * </pre>
  *
- * \section DESCRIPTION
- *
  *   Definitions for the LINlib API.
  *
  * \file linlib.h
@@ -62,7 +59,6 @@
 
 /**
  * \defgroup LIN LIN
- * @{
  */
 
  /**
@@ -74,10 +70,6 @@ typedef int LinHandle;
  * Invalid LIN handle
  */
 #define linINVALID_HANDLE      ((LinHandle)(-1))
-
-#if !WIN32
-#  define CompilerAssert(exp) extern char _CompilerAssert[(exp) ? 1 : -1]
-#endif
 
 typedef unsigned char BYTE;
 typedef unsigned int DWORD;
@@ -108,20 +100,18 @@ typedef enum {
   linERR_ERRRESP         = -16,    ///< There was an error response from the LIN interface
   linERR_WRONGRESP       = -17,    ///< The LIN interface response wasn't the expected one
   linERR_DRIVER          = -18,    ///< CAN driver type not supported
-  linERR_DRIVERFAILED    = -19,    ///< DeviceIOControl failed; use the Win32 GetLastError API to get the real (WIn32) error code.
+  linERR_DRIVERFAILED    = -19,    ///< DeviceIOControl failed
   linERR_NOCARD          = -20,    ///< The card was removed or not inserted
   linERR_LICENSE         = -21,    ///< The license is not valid
   linERR_INTERNAL        = -22,    ///< Internal error in the driver
   linERR_NO_ACCESS       = -23,    ///< Access denied
-  linERR_VERSION         = -24     ///< Function not supported in this version
+  linERR_VERSION         = -24,    ///< Function not supported in this version
+  linERR_NO_REF_POWER    = -25     ///< Function not supported in this version
 } LinStatus;
 /** @} */
 
 
 // sizeof(LinMessageInfo) should be 68 for correct alignment
-#if WIN32
-#include <pshpack1.h>
-#endif
 
 /**
  * In certain LIN bus API calls, the following structure is used to provide more 
@@ -195,9 +185,6 @@ typedef struct {
    unsigned long byteTime[8];
 } LinMessageInfo;
 
-#if WIN32
-#include <poppack.h>
-#endif
 
 
 /**
@@ -218,6 +205,31 @@ typedef struct {
 #define LIN_BIT_ERROR       128 ///< Bit error when transmitting
 /** @} */
 
+
+/**
+ * \ingroup General
+ * \anchor linCHANNELDATA_xxx
+ * \name linCHANNELDATA_xxx
+ *
+ * These defines are used in \ref linGetChannelData().
+ *
+ *  @{
+ */
+
+  /**
+   * This define is used in \ref linGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to a 64-bit (8 bytes) area which receives the firmware
+   * revision number on the card. This number consists of four 16-bit words:
+   * the major revision, the minor revision, the release number and the build
+   * number, listed in order from the most significant to the least
+   * significant.
+   */
+#define linCHANNELDATA_CARD_FIRMWARE_REV  9
+/** @} */
+
+
 /**
  * Macro for determining if a flag field contains a LIN error flag bit.
  */
@@ -227,23 +239,14 @@ typedef struct {
 // Define LINLIBAPI unless it's done already.
 // (linlib.c provides its own definition of LINLIBAPI before including this file.)
 //
-#if WIN32
-#ifndef LINLIBAPI
-#   if defined(__BORLANDC__)
-#      define LINLIBAPI __stdcall
-#   elif defined(_MSC_VER) || defined(__MWERKS__) || defined(__GNUC__)
-#      define LINLIBAPI __stdcall
-#   endif
-#endif
-#else
 #define LINLIBAPI
-#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** 
+/**
+ * \ingroup LIN	
  * This function initializes the LIN library and must be called before any other 
  * LIN function is called. If this function isn't called, subsequent calls to 
  * the other LIN functions will return \ref linERR_NOTINITIALIZED.
@@ -252,7 +255,8 @@ extern "C" {
  */
 void LINLIBAPI linInitializeLibrary(void);
 
-/** 
+/**
+ * \ingroup LIN
  * This function de-initializes the LIN library. After this function is called /ref linInitializeLibrary must be called before any other 
  * LIN function is called. 
  *
@@ -260,7 +264,8 @@ void LINLIBAPI linInitializeLibrary(void);
 void LINLIBAPI linUnloadLibrary(void);
 
 
-/** 
+/**
+ * \ingroup LIN
  * Retrieves the transceiver information for a CAN channel. The application 
  * typically uses this call to find out whether a particular CAN channel has a 
  * LIN interface connected to it.
@@ -271,7 +276,8 @@ void LINLIBAPI linUnloadLibrary(void);
  * interface is connected, or if the channel is connected to a CAN system. 
  *
  * \note Attempts to use the channel for LIN communication will be meaningful 
- * only if \ref linGetTransceiverData() stores \ref canTRANSCEIVER_TYPE_LIN in \a ttype. 
+ * only if \ref linGetTransceiverData() stores \ref canTRANSCEIVER_TYPE_LIN or 
+ * \ref canTRANSCEIVER_TYPE_CANFD_LIN in \a ttype. 
  *
  * \note A LIN interface need not be powered for this call to succeed. 
  *
@@ -296,7 +302,8 @@ void LINLIBAPI linUnloadLibrary(void);
 LinStatus LINLIBAPI linGetTransceiverData(int channel, unsigned char eanNo[8],
                                           unsigned char serNo[8], int *ttype);
 
-/** 
+/**
+ * \ingroup LIN 
  * Open a channel to a LIN interface.
  *
  * \note For DRV Lin: The cable must be powered and connected to a LAPcan channel.
@@ -330,6 +337,7 @@ LinHandle LINLIBAPI linOpenChannel(int channel, int flags);
 
 
 /** 
+ * \ingroup LIN
  * Closes an open handle to a LIN channel. The handle becomes invalid and can 
  * not be used in subsequent calls to the LIN functions.
  *
@@ -343,8 +351,11 @@ LinHandle LINLIBAPI linOpenChannel(int channel, int flags);
 LinStatus LINLIBAPI linClose(LinHandle h);
 
 /**
+ * \ingroup LIN
  * This function retrieves the firmware version from the LIN interface.
  *
+ * \note For newer interfaces use \ref linGetChannelData() with linCHANNELDATA_CARD_FIRMWARE_REV 
+ * instead. 
  * 
  * \note The version numbers aren't valid until \ref linBusOn() has been called.
  *
@@ -381,7 +392,33 @@ LinStatus LINLIBAPI linGetFirmwareVersion(LinHandle h,
                                           unsigned char *appVerMinor,
                                           unsigned char *appVerBuild);
 
+                                          
+
+/**
+ * \ingroup LIN
+ *
+ * \anchor linGetChannelData
+ * This function can be used to retrieve certain pieces of information about a channel.
+ *
+ * \note You must pass a channel number and not a channel handle.
+ *
+ * \param[in]  channel  The number of the channel you are interested in. Channel
+ *                        numbers are integers in the interval beginning at 0
+ * \param[in]  item  This parameter specifies what data to obtain for the
+ *                        specified channel. The value is one of the constants
+ *                        \ref linCHANNELDATA_xxx.
+ * \param[out] buffer     The address of a buffer which is to receive the data.
+ * \param[in]  bufsize    The size of the buffer to which the buffer parameter
+ *                        points.
+ *
+ * \return \ref linOK (zero) if success
+ * \return \ref linERR_xxx (negative) if failure
+ *
+ */
+LinStatus LINLIBAPI linGetChannelData(int channel, int item, void *buffer, size_t bufsize);
+
 /** 
+ * \ingroup LIN
  * This function sets the bit rate for a master, or the initial bit rate for a 
  * slave. The LIN interface should not be on-bus when this function is called.
  *
@@ -398,6 +435,7 @@ LinStatus LINLIBAPI linGetFirmwareVersion(LinHandle h,
 LinStatus LINLIBAPI linSetBitrate(LinHandle h, unsigned int bps);
 
 /** 
+ * \ingroup LIN
  * This function activates the LIN interface.
  *
  * \note It will be reset, so any setups done earlier will be lost.
@@ -412,6 +450,7 @@ LinStatus LINLIBAPI linSetBitrate(LinHandle h, unsigned int bps);
 LinStatus LINLIBAPI linBusOn(LinHandle h);
 
 /** 
+ * \ingroup LIN
  * This function deactivates the LIN interface. It will not participate further 
  * in the LIN bus traffic.
  *
@@ -425,6 +464,7 @@ LinStatus LINLIBAPI linBusOn(LinHandle h);
 LinStatus LINLIBAPI linBusOff(LinHandle h);
 
 /** 
+ * \ingroup LIN
  * Return the current timer value (used for timestamps)
  *
  * \note For convenience, this call returns the timer value instead of passing 
@@ -438,6 +478,7 @@ LinStatus LINLIBAPI linBusOff(LinHandle h);
 unsigned long LINLIBAPI linReadTimer(LinHandle h);
 
 /** 
+ * \ingroup LIN
  * Write a LIN message.
  * It is advisable to wait until the message is echoed by \ref linReadMessage() 
  * before transmitting a new message, or in case of a schedule table being used, 
@@ -460,6 +501,7 @@ LinStatus LINLIBAPI linWriteMessage(LinHandle h, unsigned int id, const void *ms
                                     unsigned int dlc);
 
 /** 
+ * \ingroup LIN
  * This function writes a LIN message header to the LIN bus. A slave in the 
  * system is then expected to fill in the header with data. 
  *
@@ -474,6 +516,7 @@ LinStatus LINLIBAPI linWriteMessage(LinHandle h, unsigned int id, const void *ms
 LinStatus LINLIBAPI linRequestMessage(LinHandle h, unsigned int id);
 
 /** 
+ * \ingroup LIN
  * Read a message from the LIN interface. If a message is available for 
  * reception, \ref linOK is returned. This is a non-blocking call. If no message 
  * is available in the LIN interface, an error code is returned.
@@ -503,6 +546,7 @@ LinStatus LINLIBAPI linReadMessage(LinHandle h, unsigned int *id, void *msg,
                                    LinMessageInfo *msgInfo);
 
 /** 
+ * \ingroup LIN
  * Read a message from the LIN interface. If a message is available for 
  * reception, \ref linOK is returned. This is a blocking call. It waits until a 
  * message is received in the LIN interface, or the specified timeout period 
@@ -535,6 +579,7 @@ LinStatus LINLIBAPI linReadMessageWait(LinHandle h, unsigned int *id, void *msg,
                                        LinMessageInfo *msgInfo, unsigned long timeout);
 
 /**
+ * \ingroup LIN
  * This function updates a message buffer in a slave. The contents of the 
  * message buffer will be used the next time the slave is polled for the 
  * specified LIN message id.
@@ -556,6 +601,7 @@ LinStatus LINLIBAPI linUpdateMessage(LinHandle h, unsigned int id, const void *m
 
 
 /**
+ * \ingroup LIN
  * Using this function, it is possible to use the LIN interface to create 
  * corrupted LIN messages. You call the function once for each LIN identifier 
  * that should be affected. 
@@ -612,7 +658,8 @@ LinStatus LINLIBAPI linSetupIllegalMessage(LinHandle h, unsigned int id,
 #define LIN_MSG_USE_ENHANCED_PARITY 0x08 
 /** @} */
 
-/** 
+/**
+ * \ingroup LIN 
  * This function changes various settings on a LIN Interface that is on bus.
  * When going on bus, the bit rate and the flag values listed below are set to 
  * the default value (either as hard-coded in the firmware, or as stored in the 
@@ -669,6 +716,7 @@ LinStatus LINLIBAPI linSetupLIN(LinHandle h, unsigned int lFlags, unsigned int b
 /** @} */
 
 /** 
+ * \ingroup LIN
  * Write a wakeup frame.
  *
  * If count is zero, one single wakeup frame is transmitted. If count > 1, 
@@ -689,6 +737,7 @@ LinStatus LINLIBAPI linWriteWakeup(LinHandle h, unsigned int count,
 
 
 /**
+ * \ingroup LIN
  * Clear a message buffer for a LIN slave. The message buffer will not answer 
  * next time it is polled.
  *
@@ -702,11 +751,12 @@ LinStatus LINLIBAPI linWriteWakeup(LinHandle h, unsigned int count,
 LinStatus LINLIBAPI linClearMessage(LinHandle h, unsigned int id);
 
 /** 
+ * \ingroup LIN
  * Call this function to make sure all messages transmitted to the
  * LIN Interface has been received by it.
  *
  * When messages are transmitted to the LIN Interface, they are queued by
- * Windows before appearing on the CAN bus.
+ * the driver before appearing on the CAN bus.
  *
  * The function returns \ref linOK if all writes are done, \ref linERR_TIMEOUT in
  * case of timeout or possibly some other error code.
@@ -745,6 +795,7 @@ LinStatus LINLIBAPI linClearMessage(LinHandle h, unsigned int id);
 LinStatus LINLIBAPI linWriteSync(LinHandle h, unsigned long timeout);
 
 /**
+ * \ingroup LIN
  * Return the CAN handle given an open LIN handle
  *
  * \param[in]  h          A handle to an open LIN channel.
@@ -760,6 +811,5 @@ LinStatus LINLIBAPI linGetCanHandle(LinHandle h, unsigned int *canHandle);
 }
 #endif
 
-/** @} */
 
 #endif // __LINLIB_H

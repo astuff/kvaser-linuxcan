@@ -1,5 +1,6 @@
+
+
 /**
- * \section LICENSE
  * <pre style="white-space: pre-wrap">
  * This software is dual licensed under the following two licenses:
  * BSD-new and GPLv2. You may use either one. See the included
@@ -49,8 +50,6 @@
  * ---------------------------------------------------------------------------
  * </pre>
  *
- * \section DESCRIPTION
- *
  *   Definitions for the CANLIB API.
  *
  * \file canlib.h
@@ -59,28 +58,26 @@
  * \defgroup General                 General
  * \defgroup CAN                     CAN
  * \defgroup ObjectBuffers           Object buffers
+ * \defgroup tScript                 t-script
  */
 
 #ifndef _CANLIB_H_
 #define _CANLIB_H_
 
 #include <stdlib.h>
+
 #include <stdint.h>
 
-#define CANLIB_DECLARE_ALL
 #include "canstat.h"
 
-/** Handle to an opened circuit. */
+/** Handle to an opened circuit, created with \ref canOpenChannel(). */
 typedef int canHandle;
 
 # define canINVALID_HANDLE      (-1)
 
-/** Handle to an opened circuit. */
-   typedef canHandle CanHandle;
+/** Handle to an opened circuit, created with \ref canOpenChannel(). */
+typedef canHandle CanHandle;
 
-/**
- * \ingroup CAN
- */
 typedef struct canNotifyData {
   void *tag;
   int eventType;
@@ -104,7 +101,6 @@ typedef struct canNotifyData {
     } status;
   } info;
 } canNotifyData;
-
 
 
 /**
@@ -186,6 +182,15 @@ typedef struct canNotifyData {
  * This define is used in \ref canOpenChannel().
  */
 # define canOPEN_CAN_FD_NONISO          0x0800
+
+
+/**
+ * This is for internal use with our LIN interfaces. 
+ *
+ * This define is used in \ref canOpenChannel().
+ */
+# define canOPEN_LIN                 0x1000
+
 /** @} */
 
 /**
@@ -333,12 +338,12 @@ typedef struct canNotifyData {
 //
 #ifndef CANLIBAPI
 #   define CANLIBAPI
-#endif
+#endif /* CANLIBAPI */
 
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * \ingroup General
@@ -674,8 +679,8 @@ canStatus CANLIBAPI canGetBusOutputControl (const CanHandle hnd,
  * filtering is done by software. \ref canAccept() behaves in the same way for all
  * boards, however.
  *
- * \win_start \ref canSetAcceptanceFilter() and \win_end \ref canAccept() both serve the same purpose but the
- * former can set the code and mask in just one call.
+ * \win_start \ref canSetAcceptanceFilter() and \ref canAccept() both serve the same purpose but the
+ * former can set the code and mask in just one call. \win_end
  *
  * If you want to remove a filter, call \ref canAccept() with the mask set to 0.
  *
@@ -906,7 +911,6 @@ canStatus CANLIBAPI canRead (const CanHandle hnd,
                              unsigned int *dlc,
                              unsigned int *flag,
                              unsigned long *time);
-
 /**
  * \ingroup CAN
  *
@@ -963,7 +967,6 @@ canStatus CANLIBAPI canReadWait (const CanHandle hnd,
                                  unsigned long *time,
                                  unsigned long timeout);
 
-#if defined(CANLIB_DECLARE_ALL)
 /**
  * \ingroup CAN
  *
@@ -1133,7 +1136,6 @@ canStatus CANLIBAPI canReadSpecificSkip (const CanHandle hnd,
                                          unsigned int * dlc,
                                          unsigned int * flag,
                                          unsigned long * time);
-#endif
 
 /**
  * \ingroup CAN
@@ -1315,7 +1317,6 @@ canStatus CANLIBAPI canIoCtl (const CanHandle hnd,
                               void *buf,
                               unsigned int buflen);
 
-/* Note the difference from the windows version */
 
 /**
  * \ingroup CAN
@@ -1656,7 +1657,6 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    *\win_end
    */
 #define canCHANNELDATA_CHANNEL_NAME               13
-#if defined(CANLIB_DECLARE_ALL)
 
   /**
    * \win_start
@@ -1739,7 +1739,6 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 # define canCHANNELDATA_TRANS_TYPE                17
 
   /**
-   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
@@ -1760,10 +1759,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    *          low word.
    *
    * \li USB: The port number.
-   * \win_end
-   * \linux_start
    * Not implemented.
-   * \linux_end
    */
 # define canCHANNELDATA_DEVICE_PHYSICAL_POSITION  18
 
@@ -1903,7 +1899,6 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 # define canCHANNELDATA_DEVDESCR_ASCII            26
 
  /**
-   * \win_start
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
@@ -1912,10 +1907,6 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    *
    * \note The device driver names have no special meanings and may change
    * from a release to another.
-   * \win_end
-   * \linux_start
-   * Not implemented.
-   * \linux_end
    */
 # define canCHANNELDATA_DRIVER_NAME               27
 
@@ -2091,7 +2082,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * mentioned below refers to this functions argument.
    *
    * \a buffer points to a 32-bit unsigned integer that returns the type of remote connection. 
-   * in mHz. See \ref kvREMOTE_TYPExxx for returned values. 
+   * See \ref kvREMOTE_TYPExxx for returned values. 
    */
 #  define canCHANNELDATA_REMOTE_TYPE  41
 
@@ -2104,10 +2095,27 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    */
 #  define canCHANNELDATA_LOGGER_TYPE  42
 
+  /**
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to an array of six 32-bit unsigned integers that receives 
+   * hardware status codes for the device.  
+   *
+   * This is only intended for internal use. 
+   */
+#  define canCHANNELDATA_HW_STATUS  43
 
-
-
-#endif
+  /**
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to an array of two 32-bit unsigned integers that returns 
+   * the feature eanLo and feature eanHi of the device.  
+   *
+   * This is only intended for internal use.
+   */
+#  define canCHANNELDATA_FEATURE_EAN  44
 
   /**
    * This define is used in \ref canGetChannelData(), \a buffer
@@ -2195,6 +2203,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canHWTYPE_MEMORATOR_PRO2     78  ///< Kvaser Memorator Pro 5xHS and variants
 #define canHWTYPE_LEAF2              80  ///< Kvaser Leaf Pro HS v2 and variants
 #define canHWTYPE_MEMORATOR_V2       82  ///< Kvaser Memorator (2nd generation)
+#define canHWTYPE_CANLINHYBRID       84  ///< Kvaser Hybrid CAN/LIN
 
 
 /** @} */
@@ -2223,6 +2232,8 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canCHANNEL_CAP_LOGGER            0x00800000L ///< Channel has logger capabilities. 
 #define canCHANNEL_CAP_REMOTE_ACCESS     0x01000000L ///< Channel has remote capabilities
 #define canCHANNEL_CAP_SCRIPT            0x02000000L ///< Channel has script capabilities. 
+#define canCHANNEL_CAP_LIN_FLEX          0x04000000L ///< Channel has LIN capabilities.
+
 
 /** @} */
 
@@ -2271,7 +2282,9 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * and are not affected by this call.
    */
 #define canIOCTL_PREFER_STD             2
+
 // 3-5 is reserved.
+
 #define canIOCTL_SET_TIMER_SCALE        6
 
   /**
@@ -2407,8 +2420,6 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * This is only intended for internal use.
    */
 #define canIOCTL_SET_WAKEUP                       16
-
-#if defined(CANLIB_DECLARE_ALL)
 
   /**
    * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
@@ -2629,20 +2640,14 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * This ioctl resets overrun count and flags, \sa \ref canReadStatus \sa \ref canGetBusStatistics
    */
 #  define canIOCTL_RESET_OVERRUN_COUNT                          44
-#endif
  /** @} */
 
-#if defined(CANLIB_DECLARE_ALL)
 /** Used in \ref canIOCTL_SET_USER_IOPORT and \ref canIOCTL_GET_USER_IOPORT. */
 typedef struct {
   unsigned int portNo;     ///< Port number used in e.g. \ref canIOCTL_SET_USER_IOPORT
   unsigned int portValue;  ///< Port value used in e.g. \ref canIOCTL_SET_USER_IOPORT
 } canUserIoPortData;
 
-#endif
-
-#if defined(CANLIB_DECLARE_ALL)
-#endif
 
 /**
  * \ingroup CAN
@@ -2686,11 +2691,8 @@ typedef struct {
  */
 canStatus CANLIBAPI canSetBusParamsC200 (const CanHandle hnd, unsigned char btr0, unsigned char btr1);
 
-#if defined(CANLIB_DECLARE_ALL)
-#endif
 
 
-#if defined(CANLIB_DECLARE_ALL)
 /**
  * \ingroup ObjectBuffers
  *
@@ -2994,7 +2996,6 @@ canStatus CANLIBAPI canObjBufSendBurst (const CanHandle hnd,
                                         int idx,
                                         unsigned int burstlen);
 
-#endif
 
 /**
  * \ingroup CAN
@@ -3063,8 +3064,6 @@ canStatus CANLIBAPI canWriteWait (const CanHandle hnd,
                                   unsigned int flag,
                                   unsigned long timeout);
 
-
-#if defined(CANLIB_DECLARE_ALL)
 
 /**
  * \ingroup General
@@ -3274,7 +3273,6 @@ canStatus CANLIBAPI canRequestChipStatus (const CanHandle hnd);
 canStatus CANLIBAPI canRequestBusStatistics (const CanHandle hnd);
 
   /**
-   * \ingroup CAN
    * This struct is returned by \ref canGetBusStatistics()
    *
    * The values are cleared when the corresponding channel goes on bus.
@@ -3353,7 +3351,6 @@ typedef void *kvTimeDomain;
 typedef canStatus kvStatus;
 
 /**
- * \ingroup TimeDomainHandling
  *
  * Used for time domain handling.
  */
@@ -3523,8 +3520,6 @@ kvStatus CANLIBAPI kvTimeDomainRemoveHandle (kvTimeDomain domain,
                                              const CanHandle hnd);
 
 /**
- * \name kvCallback_t
- * \anchor kvCallback_t
  * \ref kvCallback_t is used by the function \ref kvSetNotifyCallback()
  *
  * The callback function is called with the following arguments:
@@ -3534,11 +3529,6 @@ kvStatus CANLIBAPI kvTimeDomainRemoveHandle (kvTimeDomain domain,
  *
  * \note It is really the \ref canNOTIFY_xxx codes, and not the
  *  \ref canEVENT_xxx codes that the \ref canSetNotify() API is using.
- *
- * \param[in] hnd          An open handle to a CAN channel.
- * \param[in] context      Arbitrary user-defined context data which
- *                         is passed to the callback function.
- * \param[in] notifyEvent  One or more of the \ref canEVENT_xxx flags.
  *
  */
 typedef void (CANLIBAPI *kvCallback_t) (CanHandle hnd, void* context, unsigned int notifyEvent);
@@ -3584,10 +3574,756 @@ kvStatus CANLIBAPI kvSetNotifyCallback (const CanHandle hnd,
 /**
  * \ingroup General
  *
- * \source_cs       <b>static Canlib.canStatus kvReadTimer(int hnd, out int time);</b>
+ * \source_cs       <b>static Canlib.canStatus kvReadDeviceCustomerData(int hnd, int userNumber, int itemNumber, byte[] data, int bufsize);</b>
  *
- * \source_delphi   <b>function kvReadTimer(handle: canHandle; var time: Cardinal): kvStatus;     </b>
+ * \source_delphi   <b>function kvReadDeviceCustomerData(hnd: canHandle;userNumber, itemNumber: Integer; var data; bufsize: Cardinal): kvStatus;     </b>
  * \source_end
+ *
+ * Reading customer data works with Kvaser Leaf (of all
+ * types), Kvaser USBcan Professional, Kvaser Memorator Professional, Kvaser Eagle and
+ * Kvaser Memorator Light. To write customer data use external tools.
+ *
+ * \linux_start
+ * \note Currently not implemented in Linux.
+ * \linux_end
+ *
+ * \param[in]  hnd        An open handle to a CAN channel.
+ * \param[in]  userNumber Assigned by Kvaser.
+ * \param[in]  itemNumber Must be zero (reserved)
+ * \param[out] data       A pointer to a buffer of up to 8 bytes where
+ *                        the result will be placed.
+ * \param[in]  bufsiz     The size of the buffer that data points at.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ */
+kvStatus CANLIBAPI kvReadDeviceCustomerData (const CanHandle hnd,
+                                             int userNumber,
+                                             int itemNumber,
+                                             void *data,
+                                             size_t bufsiz);
+
+/**
+ * \ingroup tScript
+ * \name kvENVVAR_TYPE_xxx
+ * \anchor kvENVVAR_TYPE_xxx
+ *
+ * These defines are used in \ref kvScriptEnvvarOpen().
+ *  @{
+ */
+  /**
+   * This define is used in \ref kvScriptEnvvarOpen().
+   *
+   * It defines the type of the envvar as \c int.
+   */
+#define kvENVVAR_TYPE_INT       1
+
+  /**
+   * This define is used in \ref kvScriptEnvvarOpen().
+   *
+   * It defines the type of the envvar as \c float.
+   */
+#define kvENVVAR_TYPE_FLOAT     2
+
+  /**
+   * This define is used in \ref kvScriptEnvvarOpen().
+   *
+   * It defines the type of the envvar as \c string.
+   */
+#define kvENVVAR_TYPE_STRING    3
+ /** @} */
+
+/**
+ * \ingroup tScript
+ * \name kvEVENT_xxx
+ * \anchor kvEVENT_xxx
+ *
+ * These defines are used in \ref kvScriptSendEvent().
+ *  @{
+ */
+
+  /**
+   * This define is used in  \ref kvScriptSendEvent().
+   *
+   * It defines an event of type "key pressed".
+   */
+#define kvEVENT_TYPE_KEY        1
+ /** @} */
+
+  /**
+   * \ingroup tScript
+   *
+   * A handle to a t-script envvar.
+   * Returned by the function \ref kvScriptEnvvarOpen().
+   */
+
+  typedef int64_t kvEnvHandle;
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptStart(int hnd, int slotNo);</b>
+ *
+ * \source_delphi   <b>function kvScriptStart(const hnd: canHandle; slotNo: integer): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvScriptStart() function starts a loaded script.
+ *
+ * \param[in] hnd     An open handle to a CAN channel.
+ * \param[in] slotNo  The slot with the loaded script we want to start.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvScriptLoadFile(), \ref kvScriptStop()
+ */
+kvStatus CANLIBAPI kvScriptStart (const CanHandle hnd, int slotNo);
+
+/**
+ * Script stop modes. Used by \ref kvScriptStop().
+ * \anchor kvSCRIPT_STOP_xxx
+ * \name kvSCRIPT_STOP_xxx
+ * @{
+ */
+#define kvSCRIPT_STOP_NORMAL         0 /**< Stop a running script */
+#define kvSCRIPT_STOP_FORCED        -9 /**< Request termination of a hanged script */
+/** @} */
+
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptStop(int hnd, int slotNo, int mode);</b>
+ *
+ * \source_delphi   <b>function kvScriptStop(const hnd: canHandle; slotNo: integer; mode: integer): kvStatus;     </b>
+ * \source_end
+ *
+ *  The \ref kvScriptStop() function stops a started script.
+ *
+ * \param[in] hnd     An open handle to a CAN channel.
+ * \param[in] slotNo  The slot with the loaded and running script we want to stop.
+ * \param[in] mode    Stop mode of type \ref kvSCRIPT_STOP_xxx
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvScriptLoadFile(), \ref kvScriptStart()
+ */
+kvStatus CANLIBAPI kvScriptStop (const CanHandle hnd, int slotNo, int mode);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptUnload(int hnd, int slotNo);</b>
+ *
+ * \source_delphi   <b>function kvScriptUnload(const hnd: canHandle; slotNo: integer): kvStatus;     </b>
+ * \source_end
+ *
+ *  The \ref kvScriptUnload() function unloads a stopped script.
+ *
+ * \param[in] hnd     An open handle to a CAN channel.
+ * \param[in] slotNo  The slot with the loaded and stopped script we want to unload.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvScriptLoadFile(), \ref kvScriptStop()
+ */
+kvStatus CANLIBAPI kvScriptUnload (const CanHandle hnd, int slotNo);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptSendEvent(int hnd, int slotNo, int eventType, int eventNo, uint data);</b>
+ *
+ * \source_delphi   <b>function kvScriptSendEvent(const hnd: canHandle; slotNo: integer; eventType: integer; eventNo: integer; data: Cardinal): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvScriptSendEvent() function sends an event of a type, and an event
+ * number and associated data to a script running in a specific slot.
+ *
+ * \linux_start
+ * \note Currently not implemented in Linux.
+ * \linux_end
+ *
+ * \param[in] hnd        An open handle to a CAN channel.
+ * \param[in] slotNo     The slot where the script was loaded and is running.
+ * \param[in] eventType  The event to send, of type \ref kvEVENT_xxx
+ * \param[in] eventNo    The event's number.
+ * \param[in] data       The event's data.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ */
+kvStatus CANLIBAPI kvScriptSendEvent (const CanHandle hnd,
+                                      int slotNo,
+                                      int eventType,
+                                      int eventNo,
+                                      unsigned int data);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static long kvScriptEnvvarOpen(int hnd, string envvarName, out int envvarType, out int envvarSize);</b>
+ *
+ * \source_delphi   <b>function kvScriptEnvvarOpen(const hnd: canHandle; envvarName: PChar; var envvarType: Integer; var envvarSize: Integer): \ref kvEnvHandle;     </b>
+ * \source_end
+ *
+ * The \ref kvScriptEnvvarOpen() opens an existing envvar and returns a handle to it.
+ *
+ * \param[in]  hnd         An open handle to a CAN channel.
+ * \param[in]  envvarName  The envvar's name; a pointer to a \c NULL terminated
+ *                         array of chars.
+ * \param[out] envvarType  A pointer to a 32-bit integer that will receive the
+ *                         \ref kvENVVAR_TYPE_xxx type.
+ * \param[out] envvarSize  A pointer to a 32-bit integer that will receive the
+ *                         size of the envvar in bytes.
+ *
+ * \linux_start
+ * \note Currently not implemented in Linux.
+ * \linux_end
+ *
+ * \return A \ref kvEnvHandle handle (positive) to an envvar if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvScriptEnvvarClose()
+ */
+kvEnvHandle CANLIBAPI kvScriptEnvvarOpen (const CanHandle hnd,
+                                          char* envvarName,
+                                          int *envvarType,
+                                          int *envvarSize); // returns scriptHandle
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptEnvvarClose(long eHnd);</b>
+ *
+ * \source_delphi   <b>function kvScriptEnvvarClose(const eHnd: kvEnvHandle): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvScriptEnvvarClose() function closes an open envvar.
+ *
+ * \linux_start
+ * \note Currently not implemented in Linux.
+ * \linux_end
+ *
+ * \param[in] eHnd  An open handle to an envvar.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref kvScriptEnvvarOpen()
+ */
+kvStatus CANLIBAPI kvScriptEnvvarClose (kvEnvHandle eHnd);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptEnvvarSetInt(long eHnd, int val);</b>
+ *
+ * \source_delphi   <b>function kvScriptEnvvarSetInt(const eHnd: kvEnvHandle; val: Integer): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvScriptEnvvarSetInt() sets the value of an \c int envvar.
+ *
+ * \linux_start
+ * \note Currently not implemented in Linux.
+ * \linux_end
+ *
+ * \param[in] eHnd  An open handle to an envvar.
+ * \param[in] val   The new value.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvScriptEnvvarOpen(), \ref kvScriptEnvvarGetInt(), \ref kvScriptEnvvarSetFloat(),
+ * \ref kvScriptEnvvarSetData()
+ */
+kvStatus CANLIBAPI kvScriptEnvvarSetInt (kvEnvHandle eHnd, int val);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptEnvvarGetInt(long eHnd, out int val);</b>
+ *
+ * \source_delphi   <b>function kvScriptEnvvarGetInt(const eHnd: kvEnvHandle; var val: Integer): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvScriptEnvvarGetInt() function retrieves the value of an \c int envvar.
+ *
+ * \linux_start
+ * \note Currently not implemented in Linux.
+ * \linux_end
+ *
+ * \param[in]  eHnd An open handle to an envvar.
+ * \param[out] val  The current value.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvScriptEnvvarOpen(), \ref kvScriptEnvvarSetInt(), \ref kvScriptEnvvarGetFloat(),
+ * \ref kvScriptEnvvarGetData()
+ *
+ */
+kvStatus CANLIBAPI kvScriptEnvvarGetInt (kvEnvHandle eHnd, int *val);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptEnvvarSetFloat(long eHnd, float val);</b>
+ *
+ * \source_delphi   <b>function kvScriptEnvvarSetFloat(const eHnd: kvEnvHandle; val: Single): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvScriptEnvvarSetFloat() sets the value of a \c float envvar.
+ *
+ * \linux_start
+ * \note Currently not implemented in Linux.
+ * \linux_end
+ *
+ * \param[in] eHnd  An open handle to an envvar.
+ * \param[in] val   The new value.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvScriptEnvvarOpen(), \ref kvScriptEnvvarGetFloat(), \ref kvScriptEnvvarSetInt(),
+ * \ref kvScriptEnvvarSetData()
+ */
+kvStatus CANLIBAPI kvScriptEnvvarSetFloat (kvEnvHandle eHnd, float val);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptEnvvarGetFloat(long eHnd, out float val);</b>
+ *
+ * \source_delphi   <b>function kvScriptEnvvarGetFloat(const eHnd: kvEnvHandle; var val: Single): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvScriptEnvvarGetFloat() function retrieves the value of a \c float envvar.
+ *
+ * \linux_start
+ * \note Currently not implemented in Linux.
+ * \linux_end
+ *
+ * \param[in]  eHnd  An open handle to an envvar.
+ * \param[out] val   A pointer to a \c float where the retrieved result should be
+ *                   stored.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvScriptEnvvarOpen(), \ref kvScriptEnvvarSetFloat(), \ref kvScriptEnvvarGetInt(),
+ * \ref kvScriptEnvvarGetData()
+ */
+kvStatus CANLIBAPI kvScriptEnvvarGetFloat (kvEnvHandle eHnd, float *val);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptEnvvarSetData(long eHnd, byte[] buf, int start_index, int data_len);</b>
+ *
+ * \source_delphi   <b>function kvScriptEnvvarSetData(const eHnd: kvEnvHandle; var buf; start_index: Integer; data_len: Integer): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvScriptEnvvarSetData() function sets a range of data bytes in an envvar.
+ *
+ * \linux_start
+ * \note Currently not implemented in Linux.
+ * \linux_end
+ *
+ * \param[in] eHnd         An open handle to an envvar.
+ * \param[in] buf          A pointer to a data area with the new values.
+ * \param[in] start_index  The start index of the envvar's data range that we
+ *                         want to update.
+ * \param[in] data_len     The length in bytes of the envvar's data range that
+ *                         we want to update.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvScriptEnvvarOpen(), \ref kvScriptEnvvarGetData(), \ref kvScriptEnvvarSetInt(),
+ * \ref kvScriptEnvvarSetFloat()
+ */
+kvStatus CANLIBAPI kvScriptEnvvarSetData (kvEnvHandle eHnd,
+                                          void *buf,
+                                          int start_index,
+                                          int data_len);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptEnvvarGetData(long eHnd, out byte[] buf, int start_index, int data_len);</b>
+ *
+ * \source_delphi   <b>function kvScriptEnvvarGetData(const eHnd: kvEnvHandle; var buf; start_index: Integer; data_len: Integer): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvScriptEnvvarGetData() function retrieves a range of data bytes from an envvar.
+ *
+ * \linux_start
+ * \note Currently not implemented in Linux.
+ * \linux_end
+ *
+ * \param[in]  eHnd         An open handle to an envvar.
+ * \param[out] buf          A pointer to a data area where the retrieved data
+ *                          range should be stored.
+ * \param[in]  start_index  The start index of the data range.
+ * \param[in]  data_len     The length in bytes of the data range.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvScriptEnvvarOpen(), \ref kvScriptEnvvarSetData(), \ref kvScriptEnvvarGetInt(),
+ * \ref kvScriptEnvvarGetFloat()
+ */
+kvStatus CANLIBAPI kvScriptEnvvarGetData (kvEnvHandle eHnd,
+                                          void *buf,
+                                          int start_index,
+                                          int data_len);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptLoadFileOnDevice(int hnd, int slotNo, ref string localFile);</b>
+ *
+ * \source_delphi   <b>function kvScriptLoadFileOnDevice(hnd: canHandle; slotNo: Integer; localFile: PChar): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvScriptLoadFileOnDevice() function loads a compiled script file (.txe)
+ * stored on the device (SD card) into a script slot on the device.
+ *
+ * \linux_start
+ * \note Currently not implemented in Linux.
+ * \linux_end
+ *
+ * \param[in] hnd        An open handle to a CAN channel.
+ * \param[in] slotNo     The slot where to load the script.
+ * \param[in] localFile  The script file name; a pointer to a \c NULL terminated
+ *                       array of chars.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvScriptLoadFile(), \ref kvFileCopyToDevice(), \ref kvScriptStart(),
+ * \ref kvScriptStop()
+ */
+kvStatus CANLIBAPI kvScriptLoadFileOnDevice (const CanHandle hnd,
+                                             int slotNo,
+                                             char *localFile);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptLoadFile(int hnd, int slotNo, ref string filePathOnPC);</b>
+ *
+ * \source_delphi   <b>function kvScriptLoadFile(hnd: canHandle; slotNo: Integer; filePathOnPC: PChar): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvScriptLoadFile() function loads a compiled script file (.txe) stored
+ * on the host (PC) into a script slot on the device.
+ *
+ * \param[in] hnd           An open handle to a CAN channel.
+ * \param[in] slotNo        The slot where to load the script.
+ * \param[in] filePathOnPC  The script file name; a pointer to a \c NULL
+ *                          terminated array of chars.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_code_snippets_examples
+ * \sa \ref kvScriptLoadFileOnDevice(), \ref kvFileCopyToDevice(), \ref kvScriptStart(),
+ * \ref kvScriptStop()
+ */
+kvStatus CANLIBAPI kvScriptLoadFile (const CanHandle hnd,
+                                     int slotNo,
+                                     char *filePathOnPC);
+
+
+
+/**
+ * Script status flag bits. Used by \ref kvScriptStatus().
+ * \anchor kvSCRIPT_STATUS_xxx
+ * \name kvSCRIPT_STATUS_xxx
+ * @{
+ */
+#define kvSCRIPT_STATUS_LOADED      1 /**< The slot is loaded with a script */
+#define kvSCRIPT_STATUS_RUNNING     2 /**< The slot is running a script. */
+/** @} */
+
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptStatus(int hnd, int slot, out unsigned int status);</b>
+ * \source_delphi   <b>function kvScriptStatus(hnd: canHandle; var slot: integer; var time: integer): kvStatus;</b>
+ * \source_end
+ *
+ * The \ref kvScriptStatus() function reads the current status of a script slot.
+ *
+ * \linux_start
+ * \note Currently not implemented in Linux.
+ * \linux_end
+ *
+ * \param[in] hnd           An open handle to a CAN channel.
+ * \param[in] slot          The slot which status we want.
+ * \param[out] status       The script status, as \ref kvSCRIPT_STATUS_xxx flag bits
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ */
+kvStatus CANLIBAPI kvScriptStatus(const CanHandle hnd,
+                                  int  slot,
+                                  unsigned int *status);
+
+
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvFileCopyToDevice(int hnd, string hostFileName, string deviceFileName);</b>
+ *
+ * \source_delphi   <b>function kvFileCopyToDevice(hnd: canHandle; hostFileName: PChar; deviceFileName: PChar): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvFileCopyToDevice() function copies an arbitrary file from the host to
+ * the device.
+ *
+ * \param[in] hnd             An open handle to a CAN channel.
+ * \param[in] hostFileName    The host file name; a pointer to a \c NULL terminated
+ *                            array of chars.
+ * \param[in] deviceFileName  The target device file name; a pointer to a \c NULL
+ *                            terminated array of chars.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref kvFileCopyFromDevice(), \ref kvFileDelete()
+ */
+kvStatus CANLIBAPI kvFileCopyToDevice (const CanHandle hnd,
+                                       char *hostFileName,
+                                       char *deviceFileName);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvFileCopyFromDevice(int hnd, string deviceFileName, string hostFileName);</b>
+ *
+ * \source_delphi   <b>function kvFileCopyFromDevice(hnd: canHandle; deviceFileName: PChar; hostFileName: PChar): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvFileCopyFromDevice() function copies an arbitrary file from the device
+ * to the host.
+ *
+ * \linux_start
+ * \note Currently not implemented in Linux.
+ * \linux_end
+ *
+ * \param[in] hnd             An open handle to a CAN channel.
+ * \param[in] deviceFileName  The device file name; a pointer to a \c NULL
+ *                            terminated array of chars.
+ * \param[in] hostFileName    The target host file name; a pointer to a \c NULL terminated
+ *                            array of chars.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref kvFileCopyToDevice()
+ */
+kvStatus CANLIBAPI kvFileCopyFromDevice (const CanHandle hnd,
+                                         char *deviceFileName,
+                                         char *hostFileName);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvFileDelete(int hnd, string deviceFileName);</b>
+ *
+ * \source_delphi   <b>function kvFileDelete(hnd: canHandle; deviceFileName: PChar): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvFileDelete() function deletes a file on the device.
+ *
+ * \linux_start
+ * \note Currently not implemented in Linux.
+ * \linux_end
+ *
+ * \note Deleting system files is not recommended.
+ *
+ * \param[in] hnd             An open handle to a CAN channel.
+ * \param[in] deviceFileName  The file on the device to delete; a pointer
+ *                            to a \c NULL terminated array of chars.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref kvFileCopyToDevice()
+ */
+kvStatus CANLIBAPI kvFileDelete (const CanHandle hnd, char *deviceFileName);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvFileGetName(int hnd, int fileNo, out string name);</b>
+ *
+ * \source_delphi   <b>function kvFileGetName(hnd: canHandle; fileNo: Integer; name: PChar; namelen: Integer): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvFileGetName() function returns the name of the file with
+ *   number \a fileNo.
+ *
+ * \param[in]  hnd      An open handle to a CAN channel.
+ * \param[in]  fileNo   The number of the file.
+ * \param[out] name     A buffer that will contain the name of the
+ *                      file. The name is a zero-terminated ASCII string.
+ * \param[in]  namelen  The length, in bytes, of the \a name buffer.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref kvFileGetCount(), \ref kvFileGetSystemData()
+ */
+kvStatus CANLIBAPI kvFileGetName (const CanHandle hnd,
+                                  int fileNo,
+                                  char *name,
+                                  int namelen);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvFileGetCount(int hnd, out int count);</b>
+ *
+ * \source_delphi   <b>function kvFileGetCount(hnd: canHandle; var count: Integer): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvFileGetCount() function returns the number of files.
+ *
+ * \param[in]  hnd    An open handle to a CAN channel.
+ * \param[out] count  A pointer to a 32-bit integer that will receive
+ *                    the file count.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref kvFileGetName(), \ref kvFileGetSystemData()
+ */
+kvStatus CANLIBAPI kvFileGetCount (const CanHandle hnd, int *count);
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvFileGetSystemData(int hnd, int itemCode, out int result);</b>
+ *
+ * \source_delphi   <b>function kvFileGetSystemData(hnd: canHandle; itemCode: Integer; var result: Integer): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvFileGetSystemData() function is used for reading disk parameters,
+ * e.g. size, max number of (user) files, etc.
+ *
+ * \note Not yet implemented
+ *
+ * \param[in]  hnd       An open handle to a CAN channel.
+ * \param[in]  itemCode  The item we want information on.
+ * \param[out] result    A pointer to a 32-bit integer that will
+ *                       receive the result.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ */
+kvStatus CANLIBAPI kvFileGetSystemData (const CanHandle hnd,
+                                        int itemCode,
+                                        int *result);
+
+/**
+ * \ingroup General
+ * \anchor kvDEVICE_MODE_xxx
+ * \name kvDEVICE_MODE_xxx
+ *
+ * These defines are used in \ref kvDeviceSetMode() and \ref kvDeviceGetMode().
+ *
+ * \note The mode is device specific, which means that not all modes are
+ * implemented in all products.
+ *
+ *  @{
+ */
+   /**
+   * This define is used in \ref kvDeviceSetMode() and \ref kvDeviceGetMode().
+   *
+   * Device is running or should be running in interface mode.
+   */
+#define kvDEVICE_MODE_INTERFACE      0x00
+  /**
+   * This define is used in \ref kvDeviceSetMode() and \ref kvDeviceGetMode().
+   *
+   * Device is running or should be running in logger mode.
+   */
+#define kvDEVICE_MODE_LOGGER      0x01
+ /** @} */
+
+
+/**
+ * \ingroup General
+ *
+ * \source_cs       <b>static Canlib.canStatus kvDeviceSetMode(int hnd, int mode);</b>
+ *
+ * \source_delphi   <b>function kvDeviceSetMode(hnd: canHandle; mode: Integer): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvDeviceSetMode() sets the mode.
+ *
+ * \note The mode is device specific, which means that not all modes are
+ * implemented in all products.
+ *
+ * \param[in] hnd   An open handle to a CAN channel.
+ * \param[in] mode  One of the \ref kvDEVICE_MODE_xxx constants,
+ *                  defining which mode to use.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref kvDeviceGetMode()
+ */
+kvStatus CANLIBAPI kvDeviceSetMode (const CanHandle hnd, int mode);
+
+/**
+ * \ingroup General
+ *
+ * \source_cs       <b>static Canlib.canStatus kvDeviceGetMode(int hnd, out int result);</b>
+ *
+ * \source_delphi   <b>function kvDeviceGetMode(hnd: canHandle; var mode: Integer): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvDeviceGetMode() reads the current device's specific mode.
+ *
+ * \note The mode is device specific, which means that not all modes are
+ * implemented in all products.
+ *
+ * \param[in]  hnd     An open handle to a CAN channel.
+ * \param[out] result  A pointer to a 32-bit integer that will receive the
+ *                     \ref kvDEVICE_MODE_xxx value.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref kvDeviceSetMode()
+ */
+kvStatus CANLIBAPI kvDeviceGetMode (const CanHandle hnd, int *result);
+
+
+/**
+ * \ingroup General
  *
  * The \ref kvReadTimer reads the hardware clock on the specified device and returns
  * the value.
@@ -3609,8 +4345,8 @@ kvStatus CANLIBAPI kvSetNotifyCallback (const CanHandle hnd,
  *
  * \sa \ref canReadTimer(), \ref kvReadTimer64()
  */
-kvStatus CANLIBAPI kvReadTimer (const CanHandle hnd, unsigned int *time);
 
+kvStatus CANLIBAPI kvReadTimer (const CanHandle hnd, unsigned int *time);
 /**
  * \ingroup General
  *
@@ -3635,14 +4371,12 @@ kvStatus CANLIBAPI kvReadTimer (const CanHandle hnd, unsigned int *time);
  * \sa \ref kvReadTimer(), \ref canReadTimer()
  */
 kvStatus CANLIBAPI kvReadTimer64 (const CanHandle hnd, uint64_t *time);
-/** @} */
-#endif
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
-# include "obsolete.h"
+#include "obsolete.h"
 
 
-#endif
+#endif /*  _CANLIB_H_ */

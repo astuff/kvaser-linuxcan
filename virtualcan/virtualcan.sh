@@ -76,7 +76,12 @@ fi
 #
 case "$1" in
    start)
-      /sbin/$kv_module_install $devicename || exit 1
+      MODULE_INSTALL_OUT=$(/sbin/$kv_module_install $devicename 2>&1)
+      MODULE_INSTALL_RES=$?
+      if [ $MODULE_INSTALL_RES -ne 0 ] ; then
+        $LOG -t $0 $MODULE_INSTALL_OUT
+        exit 1
+      fi
       nrchan=`cat /proc/$devicename | grep 'total channels' | cut -d \  -f 3`
       major=`cat /proc/devices | grep ${devicename} | cut -d \  -f 1`
      rm -f /dev/${devicename}*

@@ -58,15 +58,17 @@
 
 #include "linkedlist.h"
 #include "vcanevt.h"
+#include "canIfData.h"
 #include "kcan_ioctl.h"
 
 #include <canlib.h>
 #include <canlib_version.h>
 
 
-#define OPEN_AS_CAN          0
-#define OPEN_AS_CANFD_ISO    1
-#define OPEN_AS_CANFD_NONISO 2
+#define OPEN_AS_CAN           0
+#define OPEN_AS_CANFD_ISO     1
+#define OPEN_AS_CANFD_NONISO  2
+#define OPEN_AS_LIN           3
 
 #define DEVICE_NAME_LEN 32
 
@@ -85,7 +87,7 @@ typedef struct HandleData
   int                channelNr; // Absolute ch nr i.e. it can be >2 for lapcan
   CanHandle          handle;
   unsigned char      isExtended;
-  unsigned char      fdMode;
+  unsigned char      openMode;
   unsigned char      acceptLargeDlc;
   unsigned char      wantExclusive;
   unsigned char      acceptVirtual;
@@ -113,6 +115,7 @@ typedef struct CANOps
   /* Read a channel and flags e.g canWANT_EXCLUSIVE and return a file descriptor
    * to read messages from.
    */
+
   canStatus (*openChannel)(HandleData *);
   /* Read a callback function and flags that defines which events triggers it */
   canStatus (*setNotify)(HandleData *hData, void (*callback) (canNotifyData *),
@@ -144,6 +147,17 @@ typedef struct CANOps
   canStatus (*readSyncSpecific)(HandleData *, long, unsigned long);
   canStatus (*setBusOutputControl)(HandleData *, unsigned int);
   canStatus (*getBusOutputControl)(HandleData *, unsigned int *);
+  canStatus (*kvDeviceSetMode) (HandleData *, int);
+  canStatus (*kvDeviceGetMode) (HandleData *, int *);
+  canStatus (*kvFileGetCount) (HandleData *, int *);
+  canStatus (*kvFileGetName) (HandleData *, int, char *, int);
+  canStatus (*kvFileDelete) (HandleData *, char *);
+  canStatus (*kvFileCopyToDevice) (HandleData *, char *, char *);
+  canStatus (*kvFileCopyFromDevice) (HandleData *, char *, char *);
+  canStatus (*kvScriptStart) (HandleData *, int);
+  canStatus (*kvScriptStop) (HandleData *, int, int);
+  canStatus (*kvScriptLoadFile) (HandleData *, int, char *);
+  canStatus (*kvScriptUnload) (HandleData *, int);
   canStatus (*accept)(HandleData *, const long, const unsigned int);
   canStatus (*write)(HandleData *, long, void *, unsigned int, unsigned int);
   canStatus (*writeWait)(HandleData *, long, void *,

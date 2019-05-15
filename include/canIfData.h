@@ -198,6 +198,12 @@ typedef struct {
 }VCanFlashLeds;
 
 typedef struct {
+  uint8_t block;
+  uint8_t rx_bus;
+  uint8_t tx_bus;
+}VCanLoopbackSettings;
+
+typedef struct {
   int timeout;
 }VCanMemoConfigMode;
 

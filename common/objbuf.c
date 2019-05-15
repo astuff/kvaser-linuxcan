@@ -116,7 +116,7 @@ static void objbuf_write_all (struct work_struct *work)
   CAN_MSG          *bufMsgPtr;
   int              queuePos;
 
-#ifdef __arm__
+#if defined(__arm__) || defined(__aarch64__)
   unsigned int rd;
   unsigned int new_rd;
 #endif
@@ -174,7 +174,7 @@ static void objbuf_write_all (struct work_struct *work)
 
     done_mask |= (1 << i);
   }
-#ifdef __arm__
+#if defined(__arm__) || defined(__aarch64__)
   do {
     rd = atomic_read(&fileNodePtr->objbufActive);
     new_rd = rd & ~done_mask;

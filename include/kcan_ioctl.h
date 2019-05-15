@@ -58,6 +58,7 @@
 //#   include <linux/ioctl.h>
 #   include <asm/ioctl.h>
 #   include "debug.h"
+#   include "compilerassert.h"
 
 #   define KCAN_IOC_MAGIC 'k'
 
@@ -66,6 +67,10 @@
 #define KCAN_IOCTL_START 0
 #define METHOD_BUFFERED  0     // dummy
 #define FILE_ANY_ACCESS  0
+
+#define CANIO_MAX_FILE_NAME        (8+1+3)  // Used by MEMO_SUBCMD_OPEN_FILE in FileCopyXxx command
+#define CANIO_DFS_READ                0x01
+#define CANIO_DFS_WRITE               0x02
 
 
 #define CTL_CODE(x,i,y,z) _IO(KCAN_IOC_MAGIC, (i))
@@ -88,7 +93,7 @@
 
 #define  KCAN_IOCTL_TX_INTERVAL                 CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 68, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
-#define KCAN_IOCTL_CANFD                        CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 69, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define KCAN_IOCTL_OPEN_MODE                    CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 69, METHOD_BUFFERED, FILE_ANY_ACCESS)
 // Windows code has this in vcanio.h
 #define VCAN_IOCTL_GET_CARD_INFO                CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 70, METHOD_BUFFERED, FILE_ANY_ACCESS)
 #define KCAN_IOCTL_GET_CARD_INFO_2              CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 71, METHOD_BUFFERED, FILE_ANY_ACCESS)
@@ -102,6 +107,8 @@
 #define KCANY_IOCTL_MEMO_PUT_DATA        CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 77, METHOD_BUFFERED, FILE_ANY_ACCESS)
 #define KCANY_IOCTL_MEMO_DISK_IO         CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 78, METHOD_BUFFERED, FILE_ANY_ACCESS)
 #define KCANY_IOCTL_MEMO_DISK_IO_FAST    CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 79, METHOD_BUFFERED, FILE_ANY_ACCESS)
+
+#define KCAN_IOCTL_SCRIPT_CONTROL        CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 80, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 #define KCAN_CARDFLAG_FIRMWARE_BETA       0x01  // Firmware is beta
 #define KCAN_CARDFLAG_FIRMWARE_RC         0x02  // Firmware is release candidate
@@ -119,7 +126,7 @@ CompilerAssert(KCAN_DRVFLAG_BETA == DEVHND_DRIVER_IS_BETA);
 
 
 
-
+/*
 #define CAN_CANFD_SUCCESS          0
 #define CAN_CANFD_MISMATCH        -1
 #define CAN_CANFD_NOT_IMPLEMENTED -2
@@ -137,28 +144,132 @@ typedef struct {
   int status; // CAN_CANFD_MATCHING, CAN_CANFD_MISMATCH
   unsigned int unused[8];
 } KCAN_IOCTL_CANFD_T;
+*/
+
+// ---------------------------------------------------------------------------
+// status
+#define CAN_OPEN_MODE_SUCCESS          0
+#define CAN_OPEN_MODE_MISMATCH        -1
+#define CAN_OPEN_MODE_NOT_IMPLEMENTED -2
+#define CAN_OPEN_MODE_FAILURE         -3
+
+//fd
+#define OPEN_AS_CAN            0
+#define OPEN_AS_CANFD_ISO      1
+#define OPEN_AS_CANFD_NONISO   2
+#define OPEN_AS_LIN            3
+
+// action
+#define CAN_MODE_SET          1
+#define CAN_MODE_READ         2
+#define CAN_MODE_READ_VERSION 3
+
+typedef struct {
+  unsigned int mode;   // CANFD_NONISO, CANFD_ISO, CAN
+  unsigned int action; // CAN_CANFD_SET, CAN_CANFD_READ
+  unsigned int reply; // reply from read?
+  int status; // CAN_CANFD_MATCHING, CAN_CANFD_MISMATCH
+  unsigned int unused[8];
+} KCAN_IOCTL_OPEN_MODE_T;
+
 
 typedef struct {
   unsigned int  status;     // !0 => no name found for this channel.
   unsigned char data[64];   // Transfered bytes between user space and kernel space
 } KCAN_IOCTL_GET_CUST_CHANNEL_NAME_T;
 
-#define KCAN_IOCTL_MISC_INFO_REMOTE_TYPE     0
-#define KCAN_IOCTL_MISC_INFO_LOGGER_TYPE     1
-#define KCAN_IOCTL_MISC_INFO_WEBSERVER_TYPE  2
+/***************************************************************************/
+// for vCanScriptXxx
+// same script control command numbers as defined in hydra_host_cmds.h
+// Translation done in mhydraHWIf.c
+#define CMD_SCRIPT_START                 0x1
+#define CMD_SCRIPT_STOP                  0x2
 
-/*possible values*/
-#define KCAN_IOCTL_MISC_INFO_NOT_IMPLEMENTED      0
-#define KCAN_IOCTL_MISC_INFO_REMOTE_TYPE_WLAN     1
-#define KCAN_IOCTL_MISC_INFO_REMOTE_TYPE_LAN      2
-#define KCAN_IOCTL_MISC_INFO_LOGGER_TYPE_V1       1
-#define KCAN_IOCTL_MISC_INFO_LOGGER_TYPE_V2       2
-#define KCAN_IOCTL_MISC_INFO_REMOTE_WEBSERVER_V1  1
+#define CMD_SCRIPT_EVENT                 0x4
+#define CMD_SCRIPT_LOAD                  0x5
+#define CMD_SCRIPT_QUERY_STATUS          0x6
+
+#define CMD_SCRIPT_LOAD_REMOTE_START     0x7
+#define CMD_SCRIPT_LOAD_REMOTE_DATA      0x8
+#define CMD_SCRIPT_LOAD_REMOTE_FINISH    0x9
+#define CMD_SCRIPT_UNLOAD                0xA
+
+typedef struct s_kcan_ioctl_script_control {
+  unsigned int scriptNo;  /* which script to deliver command to aka slotNo*/
+  unsigned int command;
+  unsigned int channel;
+  unsigned int script_control_status;
+  union {
+    struct {
+      long type;
+      long number;
+      unsigned long data;
+    } event;
+    struct {
+      char length;
+      char data[11];
+    } script;
+    char data[12];
+    signed char stopMode;
+    unsigned int scriptStatus;
+  };
+} KCAN_IOCTL_SCRIPT_CONTROL_T;
+
+// Get whatever info from a driver/card
+#define KCAN_IOCTL_MISC_INFO_SUBCMD_CHANNEL_REMOTE_INFO     1
+#define KCAN_IOCTL_MISC_INFO_SUBCMD_CHANNEL_LOGGER_INFO     2
+#define KCAN_IOCTL_MISC_INFO_SUBCMD_HW_STATUS               3
+#define KCAN_IOCTL_MISC_INFO_SUBCMD_FEATURE_EAN             4
+
+#define KCAN_IOCTL_MISC_INFO_RETCODE_SUCCESS     0
+#define KCAN_IOCTL_MISC_INFO_NOT_IMPLEMENTED     1
+
+#define KCAN_IOCTL_MISC_INFO_REMOTE_NO_WEBSERVER 0
+#define KCAN_IOCTL_MISC_INFO_REMOTE_WEBSERVER_V1 1
+
+#define KCAN_IOCTL_MISC_INFO_REMOTE_TYPE_NOT_REMOTE  0
+#define KCAN_IOCTL_MISC_INFO_REMOTE_TYPE_WLAN 1
+#define KCAN_IOCTL_MISC_INFO_REMOTE_TYPE_LAN  2 
+
+#define KCAN_IOCTL_MISC_INFO_LOGGER_TYPE_NOT_A_LOGGER  0
+#define KCAN_IOCTL_MISC_INFO_LOGGER_TYPE_V1    1
+#define KCAN_IOCTL_MISC_INFO_LOGGER_TYPE_V2    2
+
 
 typedef struct {
-  unsigned int type;
-  unsigned int value;
+  unsigned int     isRemote;
+  unsigned int     webServer;
+  unsigned int     remoteType;
+} miscSubCmdRemoteInfo;
+
+typedef struct {
+  unsigned int     loggerType;
+} miscSubCmdLoggerInfo;
+
+typedef struct {
+  unsigned int codes[6];
+} miscSubCmdHwStatus;
+
+typedef struct
+{
+  unsigned int eanLo;
+  unsigned int eanHi;
+} miscSubCmdFeatureEan;
+
+union subcmd_payload {
+    unsigned char payload[120]; 
+    miscSubCmdRemoteInfo  remoteInfo;
+    miscSubCmdLoggerInfo  loggerInfo;   
+    miscSubCmdHwStatus    hwStatus;
+    miscSubCmdFeatureEan  featureEan;
+};
+
+typedef struct s_kcan_ioctl_misc_info {
+  unsigned int subcmd;
+  unsigned int retcode;         // Status code from device
+  union subcmd_payload payload;
 } KCAN_IOCTL_MISC_INFO;
+CompilerAssert(sizeof(KCAN_IOCTL_MISC_INFO) == 128);
 
 //===========================================================================
 // for KCAN_IOCTL_LED_ACTION_I
@@ -178,9 +289,16 @@ typedef struct s_kcan_ioctl_led_action {
   int             timeout;
 } KCAN_IOCTL_LED_ACTION_I;
 
+// Arguments from canFileGetName()
 typedef struct {
-  int             interval;
-  int             padding[10]; // for future usage.
+  int fileNo;
+  char *name;
+  int namelen;
+} VCAN_FILE_GET_NAME_T;
+
+typedef struct {
+  int           interval;
+  int           padding[10]; // for future usage.
 } KCANY_CONFIG_MODE;
 
 typedef struct {
@@ -247,8 +365,9 @@ typedef struct s_kcan_ioctl_card_info_2 {
     unsigned int    usb_throttle;         // Enforced delay between transmission of commands.
     unsigned char   reserved[40];
 } KCAN_IOCTL_CARD_INFO_2;
-#if defined(CompilerAssert)
-CompilerAssert(sizeof(KCAN_IOCTL_CARD_INFO_2) == 128);
-#endif
+
+// Fails since we have used long...
+//CompilerAssert(sizeof(KCAN_IOCTL_CARD_INFO_2) == 128);
+
 #endif /* KCANIO_H */
 

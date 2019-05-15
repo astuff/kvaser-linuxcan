@@ -52,10 +52,10 @@
 # Kvaser Linux Canlib library Makefile
 
 -include ../kveyes.mak
+include version.mk
 
-LIBNAME = libcanlib.so
-LIBRARY = $(LIBNAME).1.1.0
-SONAME  = $(LIBNAME).1
+LIBRARY := $(LIBNAME).$(MAJOR).$(MINOR).$(BUILD)
+SONAME  := $(LIBNAME).$(MAJOR)
 
 CFLAGS  += -Wall -Werror -Wextra -DCANLIB_NAME_STRING=\"$(LIBRARY)\" -O2 -fomit-frame-pointer \
 	$(XTRA_CFLAGS) -pthread #-DPCMCIA_DEBUG=0
@@ -71,6 +71,9 @@ LDFLAGS = -lc -pthread
 SRCS := canlib.c
 SRCS += linkedlist.c
 SRCS += VCanFunctions.c
+SRCS += VCanFuncUtil.c
+SRCS += VCanMemoFunctions.c
+SRCS += VCanScriptFunctions.c
 SRCS += dlc.c
 
 OBJS := $(patsubst %.c, %.o, $(SRCS))

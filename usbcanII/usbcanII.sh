@@ -75,7 +75,12 @@ case "$1" in
    start)
       /bin/sleep 3 # Sleep a second or two to be sure that module init is executed
       /sbin/rmmod usbcanII
-      /sbin/$kv_module_install usbcanII || exit 1
+      MODULE_INSTALL_OUT=$(/sbin/$kv_module_install usbcanII 2>&1)
+      MODULE_INSTALL_RES=$?
+      if [ $MODULE_INSTALL_RES -ne 0 ] ; then
+        $LOG -t $0 $MODULE_INSTALL_OUT
+        exit 1
+      fi
       $LOG -t $0 "Module usbcanII added"
       minors=`cat /proc/usbcanII | grep 'minor numbers' | cut -d ' ' -f 3-`
       major=`cat /proc/devices | grep 'usbcanII' | cut -d \  -f 1`

@@ -78,7 +78,12 @@ fi
 case "$1" in
    start)
       /bin/sleep 2 # Sleep a second or two to be sure that module init is executed
-      /sbin/$kv_module_install kvpciefd || exit 1
+      MODULE_INSTALL_OUT=$(/sbin/$kv_module_install kvpciefd 2>&1)
+      MODULE_INSTALL_RES=$?
+      if [ $MODULE_INSTALL_RES -ne 0 ] ; then
+        $LOG -t $0 $MODULE_INSTALL_OUT
+        exit 1
+      fi
       $LOG -t $0 "Module kvpciefd added"
       nrchan=`cat /proc/pciefd | grep 'total channels' | cut -d \  -f 3`
       major=`cat /proc/devices | grep 'pciefd' | cut -d \  -f 1`

@@ -51,7 +51,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.19  
+Release notes for linuxcan V5.20  
 ================================================================
 
 Linux device drivers for
@@ -77,24 +77,24 @@ Linux device drivers for
   *  KVASER Leaf Light v2
   *  KVASER Mini PCI Express HS
   *  KVASER Mini PCI Express 2xHS
-  *  KVASER BlackBird SemiPro ****
+  *  KVASER BlackBird SemiPro *****
   *  KVASER OEM Mercury
   *  KVASER OEM Leaf
   *  KVASER Virtual CAN
-  *  KVASER Eagle *****
+  *  KVASER Eagle
   *  KVASER BlackBird v2 *****
-  *  KVASER Memorator Pro 5xHS *****
-  *  KVASER USBcan Pro 5xHS *****
+  *  KVASER Memorator Pro 5xHS
+  *  KVASER USBcan Pro 5xHS
   *  KVASER USBcan Light 4xHS (00831-1)
   *  KVASER Leaf Pro HS v2 (00843-4)
   *  KVASER USBcan Pro 2xHS v2 (00752-9)
-  *  KVASER Memorator 2xHS v2 (00821-2) *****
-  *  KVASER Memorator Pro 2xHS v2 (00819-9) *****
+  *  KVASER Memorator 2xHS v2 (00821-2)
+  *  KVASER Memorator Pro 2xHS v2 (00819-9)
 
   **    Recommended firmware > 3.0
   ***   Only with USBcan II functionality.
   ****  Only with USBcan Professional functionality.
-  ***** Only with usb CAN communication.
+  ***** Only USB interface mode.
 
 
 ================================================================
@@ -112,21 +112,14 @@ Version info
    * Tested under x86_64 SMP Ubuntu 12.04 x32/x64 (3.2.0-29-generic-pae/3.2.0-23-generic).
    * Tested under x86_64 SMP Ubuntu 14.04 x32/x64 (3.13.0-32-generic/3.13.0-32-generic).
    * Tested under x86_64 SMP Ubuntu 16.04 x32/x64 (4.4.0-generic/4.4.0-generic).
-   * Compiled with gcc version 6.1.1, 4.8.4, 4.6.3, 4.7.3, 4.8.2 and 6.1.1.
-   * Used glibc version 2.48, 2.15, 2.17, 2.19 and 2.24.
+   * Compiled with gcc version 4.6.3, 4.7.3, 4.8.2, 4.8.4, 6.1.1 and 6.3.1.
+   * Used glibc version 2.15, 2.17, 2.19 and 2.24.
 
 
 ================================================================
 General information
 ================================================================
 System requirements: Linux 2.6.26 or later.
-
-NOTE! While SMP (and fully preemptible kernel) has seen significant
-      testing, it should still be considered somewhat experimental.
-      The same applies to use under 64 bit Linux.
-      Feedback on use under SMP enabled (or fully preemptible)
-      and 64 bit kernels is welcome.
-      See the FAQ for information on how to disable SMP.
 
 ================================================================
 Known problems
@@ -147,6 +140,42 @@ Known problems
      hardware, the same is not true for auto tx. The latter is only
      available if there is firmware support in the device.
      (This is the same as under Windows.)
+
+
+New Features and Fixed Problems in V5.20   (05-MAY-2017)
+===========================================================================
+
+* Not implemented functions now correctly returns canERR_NOT_IMPLEMENTED
+  (instead of canERR_NOMSG).
+
+* New CANlib SDK libraries released in kvlibsdk.tar.gz:
+  - kvadblib
+  - kvamemolibxml
+  - kvlclib
+  - kvmlib
+
+* Added new APIs (canlib):
+  - kvFileGetCount
+  - kvFileGetName
+  - kvFileDelete
+  - kvFileCopyToDevice
+  - kvFileCopyFromDevice
+  - kvScriptStart
+  - kvScriptStop
+  - kvScriptLoadFile
+  - kvScriptUnload
+
+* Added canCHANNELDATA_HW_STATUS and canCHANNELDATA_FEATURE_EAN for
+  internal use.
+
+* Fixed bug in USB udev rules, causing each rule to trigger twice when a new
+  Kvaser USB device was plugged in/unplugged.
+
+* Fixed build issue on ARM64 targets. (atomic_set_mask)
+
+* Updated doc/faq.
+
+* Corrected timeGetTime in linlib.
 
 
 New Features and Fixed Problems in V5.19   (15-FEB-2017)

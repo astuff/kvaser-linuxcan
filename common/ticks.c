@@ -52,17 +52,22 @@
 
 #include <linux/seq_file.h>
 #include <linux/math64.h>
+#include <linux/version.h>
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 2, 0)
+#include <linux/module.h>
+#else
 #include <linux/export.h>
+#endif /* LINUX_VERSION_CODE */
 #include "ticks.h"
 
 #define TIMESTAMP_WRAP_STATE_LO       0
 #define TIMESTAMP_WRAP_STATE_NORMAL   1
 #define TIMESTAMP_WRAP_STATE_HIGH     2
 
-#define WRAP_BIT              (uint64_t)0x0001000000000000
-#define WRAP_MAX              (uint64_t)0x0000ffffffffffff
-#define WRAP_LO_LIMIT         (uint64_t)0x0000400000000000
-#define WRAP_HIGH_LIMIT       (uint64_t)0x0000800000000000
+#define WRAP_BIT              (uint64_t)0x0001000000000000ULL
+#define WRAP_MAX              (uint64_t)0x0000ffffffffffffULL
+#define WRAP_LO_LIMIT         (uint64_t)0x0000400000000000ULL
+#define WRAP_HIGH_LIMIT       (uint64_t)0x0000800000000000ULL
 
 void ticks_init  (ticks_class* self)
 {

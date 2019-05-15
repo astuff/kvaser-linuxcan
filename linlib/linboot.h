@@ -169,6 +169,9 @@
 //#define COMMAND_FLASH_DL_PROG           0x42 /* CMD, CCNT, ADDRH,ADDRL, DATAH,DATAL, 0,0 */
 #define COMMAND_FLASH_DL_READ           0x43 /* {CMD, CCNT, 0, ADDRL,ADDRM,ADDRH, 0,0}  -->  {CMD, CCNT, flag, d0,d1,d2,d4, 0} */
 
+#define COMMAND_GET_INFO                0x60 /* {CMD, CCNT, INFO_TYPE, ...}  -->  {CMD, CCNT, flag, INFO_TYPE, d1, d2, d4...} */
+#define GET_INFO_TYPE_REFPOWER             1 /* {CMD, CCNT, GET_INFO_TYPE_REFPOWER, 0, 0, 0, 0, 0}  --> {CMD, CCNT, 0, GET_INFO_TYPE_REFPOWER, 0(power off)/1(powe on), 0, 0, 0} */
+
 /* Programming of an 18f458 must be done 8 bytes at a time, and erase 64 bytes
 * at a time. Start by specifying an address (the three LSB of which must be
 * zero), then a sequence of one or more data block pairs. The response to the

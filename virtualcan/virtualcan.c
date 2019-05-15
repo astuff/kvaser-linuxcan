@@ -129,7 +129,7 @@ static unsigned long virtualTxQLen(VCanChanData *vChd);
 static void virtualRequestSend (VCanCardData *vCard, VCanChanData *vChan);
 
 static int virtualTransmitMessage (VCanChanData *vChd, CAN_MSG *m);
-
+static int virtual_special_ioctl_handler(VCanOpenFileNode *fileNodePtr, unsigned int ioctl_cmd, unsigned long arg);
 
 static VCanDriverData driverData;
 
@@ -150,14 +150,19 @@ static VCanHWInterface hwIf = {
     .getRxErr           = virtualGetRxErr,
     .txQLen             = virtualTxQLen,
     .requestChipState   = virtualRequestChipState,
-    .requestSend        = virtualRequestSend
+    .requestSend        = virtualRequestSend,
+    .special_ioctl_handler = virtual_special_ioctl_handler,
 };
 
 
 // prototype:
 static int virtualSend (void *void_chanData);
 
-
+static int virtual_special_ioctl_handler(VCanOpenFileNode *fileNodePtr, unsigned int ioctl_cmd, unsigned long arg)
+{
+  DEBUGPRINT(1, "virtual_special_ioctl_handler unk: %u\n", ioctl_cmd);
+  return VCAN_STAT_NOT_IMPLEMENTED;
+}
 
 //======================================================================
 // Wrapper for common function
@@ -254,7 +259,7 @@ static int virtualSetBusParams (VCanChanData *vChd, VCanBusParams *par)
 {
     virtualChanData *virtualChan = (virtualChanData *)vChd->hwChanData;
 
-    if ((vChd->canFdMode != OPEN_AS_CAN) && ((par->freq_brs == 0) || (par->sjw_brs == 0) || (par->tseg1_brs == 0) ||
+    if ((vChd->openMode != OPEN_AS_CAN) && ((par->freq_brs == 0) || (par->sjw_brs == 0) || (par->tseg1_brs == 0) ||
         (par->tseg2_brs == 0)) ) {
         DEBUGPRINT(1, "virtualSetBusParams(%i, %u, %u, %u)\n", par->freq_brs, par->sjw_brs, par->tseg1_brs, par->tseg2_brs);
       return VCAN_STAT_BAD_PARAMETER;
@@ -515,7 +520,7 @@ static int virtualTransmitMessage (VCanChanData *vChd, CAN_MSG *m)
                 (vCard->chanData[i]->isOnBus)) {
                 // Add error flag if trying to send an FD frame between
                 // channels that are not both opened as FD capable.
-                if ((e.tagData.msg.flags & VCAN_MSG_FLAG_FDF) && (vChd->canFdMode != vCard->chanData[i]->canFdMode)) {
+                if ((e.tagData.msg.flags & VCAN_MSG_FLAG_FDF) && (vChd->openMode != vCard->chanData[i]->openMode)) {
                     e.tagData.msg.flags |= VCAN_MSG_FLAG_ERROR_FRAME;
                 }
                 e.tagData.msg.flags &= ~(VCAN_MSG_FLAG_TXACK | VCAN_MSG_FLAG_TXRQ);

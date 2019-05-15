@@ -53,10 +53,10 @@
 #ifndef DLC_H
 #define DLC_H
 
-#ifdef USER_SPACE
-#include <stdint.h>
-#else
+#ifdef __KERNEL__
 #include <linux/types.h>
+#else
+#include <stdint.h>
 #endif
 
 uint32_t dlc_bytes_to_dlc_fd (uint32_t n_bytes);

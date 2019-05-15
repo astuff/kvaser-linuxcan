@@ -55,10 +55,10 @@
 #ifndef TICKS_H
 #define TICKS_H
 
-#ifdef USER_SPACE
-#include <stdint.h>
-#else
+#ifdef __KERNEL__
 #include <linux/types.h>
+#else
+#include <stdint.h>
 #endif
 
 typedef struct {
