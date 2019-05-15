@@ -164,6 +164,10 @@ Functions</h2></td></tr>
 <tr class="separator:gae5d4a76ffdaa9450615c3c14f11bff95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gab7e1ba2f2df7304d342733a0e275a3cb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__signals.html#gab7e1ba2f2df7304d342733a0e275a3cb">kvaDbGetEnumValue</a> (<a class="el" href="kva_db_lib_8h.html#aaf4013475de89eea3c708e933e552d14">KvaDbEnumValueHnd</a> eh, int *val, char *buf, size_t buflen)</td></tr>
 <tr class="separator:gab7e1ba2f2df7304d342733a0e275a3cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga47e441735aa826b3ef3186cfdbc3e772"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__signals.html#ga47e441735aa826b3ef3186cfdbc3e772">kvaDbGetFirstEnumValuePair</a> (<a class="el" href="kva_db_lib_8h.html#aa41cb518eea5c637f18eda0affa4e011">KvaDbSignalHnd</a> sh, <a class="el" href="kva_db_lib_8h.html#aaf4013475de89eea3c708e933e552d14">KvaDbEnumValueHnd</a> *eh, int *val, char *buf, size_t buflen)</td></tr>
+<tr class="separator:ga47e441735aa826b3ef3186cfdbc3e772"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad2091a2e43cb26d6dcb5839525be279f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__signals.html#gad2091a2e43cb26d6dcb5839525be279f">kvaDbGetNextEnumValuePair</a> (<a class="el" href="kva_db_lib_8h.html#aa41cb518eea5c637f18eda0affa4e011">KvaDbSignalHnd</a> sh, <a class="el" href="kva_db_lib_8h.html#aaf4013475de89eea3c708e933e552d14">KvaDbEnumValueHnd</a> *eh, int *val, char *buf, size_t buflen)</td></tr>
+<tr class="separator:gad2091a2e43cb26d6dcb5839525be279f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac094c8af277fc9d21315bb190d7ae3fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__signals.html#gac094c8af277fc9d21315bb190d7ae3fd">kvaDbAddEnumValue</a> (<a class="el" href="kva_db_lib_8h.html#aa41cb518eea5c637f18eda0affa4e011">KvaDbSignalHnd</a> sh, int val, const char *name)</td></tr>
 <tr class="separator:gac094c8af277fc9d21315bb190d7ae3fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaef7c3535c1edd6709c5c1bc666780bb9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__signals.html#gaef7c3535c1edd6709c5c1bc666780bb9">kvaDbDeleteEnumValue</a> (<a class="el" href="kva_db_lib_8h.html#aa41cb518eea5c637f18eda0affa4e011">KvaDbSignalHnd</a> sh, <a class="el" href="kva_db_lib_8h.html#aaf4013475de89eea3c708e933e552d14">KvaDbEnumValueHnd</a> eh)</td></tr>
@@ -435,6 +439,66 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ga47e441735aa826b3ef3186cfdbc3e772"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga47e441735aa826b3ef3186cfdbc3e772">&#9670;&nbsp;</a></span>kvaDbGetFirstEnumValuePair()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a> kvaDbGetFirstEnumValuePair </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="kva_db_lib_8h.html#aa41cb518eea5c637f18eda0affa4e011">KvaDbSignalHnd</a>&#160;</td>
+          <td class="paramname"><em>sh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="kva_db_lib_8h.html#aaf4013475de89eea3c708e933e552d14">KvaDbEnumValueHnd</a> *&#160;</td>
+          <td class="paramname"><em>eh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>buf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>buflen</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the string and integer from the first enumeration value for a signal.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">sh</td><td>A signal handle. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">eh</td><td>An enumeration value handle </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">val</td><td>The enumeration value </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">buf</td><td>The buffer that will hold the enumeration name </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">buflen</td><td>The length of the buffer</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57ad8a19899af8c1e42208a67afb572b2fc">kvaDbOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="kva_db_lib_8h.html#kvaDbErr_xxx">kvaDbErr_xxx</a> (negative) if failure </dd></dl>
+
+</div>
+</div>
 <a id="gaeec680d3d20bddb57dd09389faacba9e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gaeec680d3d20bddb57dd09389faacba9e">&#9670;&nbsp;</a></span>kvaDbGetFirstSignal()</h2>
 
@@ -513,6 +577,66 @@ Functions</h2></td></tr>
 <dd>
 <a class="el" href="kva_db_lib_8h.html#kvaDbErr_xxx">kvaDbErr_xxx</a> (negative) if failure</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvadb__signals.html#gae5d4a76ffdaa9450615c3c14f11bff95">kvaDbGetNextEnumValue</a> </dd></dl>
+
+</div>
+</div>
+<a id="gad2091a2e43cb26d6dcb5839525be279f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad2091a2e43cb26d6dcb5839525be279f">&#9670;&nbsp;</a></span>kvaDbGetNextEnumValuePair()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a> kvaDbGetNextEnumValuePair </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="kva_db_lib_8h.html#aa41cb518eea5c637f18eda0affa4e011">KvaDbSignalHnd</a>&#160;</td>
+          <td class="paramname"><em>sh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="kva_db_lib_8h.html#aaf4013475de89eea3c708e933e552d14">KvaDbEnumValueHnd</a> *&#160;</td>
+          <td class="paramname"><em>eh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>buf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>buflen</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get the string and integer from the next enumeration value for a signal. Should be called after <a class="el" href="group__kvadb__signals.html#ga47e441735aa826b3ef3186cfdbc3e772">kvaDbGetFirstEnumValuePair()</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">sh</td><td>A signal handle. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">eh</td><td>An enumeration value handle </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">val</td><td>The enumeration value </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">buf</td><td>The buffer that will hold the enumeration name </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">buflen</td><td>The length of the buffer</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57ad8a19899af8c1e42208a67afb572b2fc">kvaDbOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="kva_db_lib_8h.html#kvaDbErr_xxx">kvaDbErr_xxx</a> (negative) if failure </dd></dl>
 
 </div>
 </div>
@@ -759,7 +883,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Sets mux to multiplexer mode value of given signal. See <a class="el" href="kva_db_lib_8h.html#KVADB_MUX_xxx">KVADB_MUX_xxx</a> for special (negative) values of multiplexer mode.</p>
+<p>Gets mux from multiplexer mode value of given signal. See <a class="el" href="kva_db_lib_8h.html#KVADB_MUX_xxx">KVADB_MUX_xxx</a> for special (negative) values of multiplexer mode.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sh</td><td>A signal handle </td></tr>
@@ -2037,7 +2161,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.22) Mon Feb 12 2018</li>
+    <li class="footer"> (canlib 5.23) Sun May 13 2018</li>
   </ul>
 </div>
 </body>

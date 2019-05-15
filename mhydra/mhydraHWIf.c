@@ -79,6 +79,7 @@
 #endif /* KERNEL_VERSION < 4.11.0 */
 
 // Non system headers
+#include "canlib_version.h"
 #include "VCanOsIf.h"
 #include "mhydraHWIf.h"
 #include "hydra_host_cmds.h"
@@ -93,7 +94,6 @@
 #include "dlc.h"
 #include "ticks.h"
 #include "ioctl_handler.h"
-#include "kcany_ioctl.h"
 
 // Get a minor range for your devices from the usb maintainer
 // Use a unique set for each driver
@@ -192,6 +192,7 @@ static int mhydra_memo_put_data(const VCanChanData *chd, int subcmd,
                                 int *stat, int *dstat, int *lstat, unsigned int timeout_ms);
 /* static int mhydra_memo_disk_io(const VCanChanData *chd); */
 /* static int mhydra_memo_disk_io_fast(const VCanChanData *chd); */
+static int mhydra_cleanup_hnd (VCanChanData *vChan);
 
 static VCanDriverData driverData;
 
@@ -242,6 +243,7 @@ static VCanHWInterface hwIf = {
   .memoPutData           = mhydra_memo_put_data,
   /* .memoDiskIo         = mhydra_memo_disk_io, */
   /* .memoDiskIoFast     = mhydra_memo_disk_io_fast, */
+  .cleanUpHnd            = mhydra_cleanup_hnd,
 };
 
 
@@ -278,7 +280,6 @@ static unsigned long ticks_to_10us (VCanCardData *vCard,
   retval = div_u64 (timestamp + 4999, 10000) - vCard->timestamp_offset;
   return retval;
 }
-
 
 //======================================================================
 // Prototypes
@@ -499,6 +500,10 @@ void print_reply(uint32_t cmd)
       DEBUGPRINT(4, (TXT("CMD_MEMO_PUT_DATA - Ignore\n")));
       break;
 
+    case CMD_TRANSPORT_RESP:
+      DEBUGPRINT(4, (TXT("CMD_TRANSPORT_RESP - Ignore\n")));
+      break;
+
     default:
       DEBUGPRINT(4, (TXT("There is no description for this command. %d\n"), cmd));
       break;
@@ -670,6 +675,11 @@ static int mhydra_rx_thread (void *context)
 #endif
                        );
 
+    if (vCard->cardPresent == 0) {
+      result = -ENODEV;
+      break;
+    }
+    
     if (ret) {
       DEBUGPRINT(2, (TXT ("usb_bulk_msg error (%d)\n"), ret));
 
@@ -1068,10 +1078,11 @@ static size_t mhydra_cmd_size(hydraHostCmd *cmd)
 {
   size_t ret;
 
-  if (cmd->cmdNo == CMD_EXTENDED)
+  if (cmd->cmdNo == CMD_EXTENDED) {
     ret = ((hydraHostCmdExt *)cmd)->cmdLen;
-  else
+  } else {
     ret = HYDRA_CMD_SIZE;
+  }
 
   return ret;
 }
@@ -1168,22 +1179,21 @@ static void mhydra_handle_cmd_tx_acknowledge(hydraHostCmd *cmd, VCanCardData *vC
                      chan, mhydraChan->outstanding_tx));
       queue_work(dev->txTaskQ, &dev->txWork);
     }
-
     // Check if we should *wake* canwritesync
     else if ((mhydraChan->outstanding_tx == 0) && txQEmpty(vChan) &&
              test_and_clear_bit(0, &vChan->waitEmpty)) {
       spin_unlock(&mhydraChan->outTxLock);
       wake_up_interruptible(&vChan->flushQ);
       DEBUGPRINT(6, (TXT("W%d\n"), chan));
-    }
-    else {
+    } else {
 #if DEBUG
-      if (mhydraChan->outstanding_tx < 4)
+      if (mhydraChan->outstanding_tx < 4) {
         DEBUGPRINT(6, (TXT("o%d ql%d we%d s%d\n"),
                        mhydraChan->outstanding_tx,
                        queue_length(&vChan->txChanQueue),
                        constant_test_bit(0, &vChan->waitEmpty),
                        dev->max_outstanding_tx));
+      }
 #endif
       spin_unlock(&mhydraChan->outTxLock);
     }
@@ -1737,13 +1747,11 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
 
       DEBUGPRINT(4, (TXT("CMD_EXTENDED\n")));
 
-      if (chan < vCard->nrChannels)
-      {
+      if (chan < vCard->nrChannels) {
         VCanChanData *vChan = vCard->chanData[chan];
 
         mhydra_handle_extended_command ((hydraHostCmdExt *)cmd, vCard, vChan);
-      }
-      else {
+      } else {
         DEBUGPRINT(2, (TXT("[%s,%d] ERROR: chan(%d) >= nrChannels(%d)\n"), __FILE__, __LINE__, chan, vCard->nrChannels));
       }
       break;
@@ -1831,6 +1839,7 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
     case CMD_GET_FILE_COUNT_RESP:
     case CMD_SCRIPT_CTRL_RESP:
     case CMD_KDI:
+    case CMD_TRANSPORT_RESP:
       print_reply(cmd->cmdNo);
       break;
 
@@ -2359,8 +2368,9 @@ static int device_request_firmware_info (VCanCardData* vCard)
 
   ret = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
                                    CMD_GET_CARD_INFO_RESP, 0, SKIP_ERROR_EVENT);
-  if (ret != VCAN_STAT_OK)
+  if (ret != VCAN_STAT_OK) {
     goto error_exit;
+  }
 
   //
   // CMD_GET_SOFTWARE_INFO_REQ
@@ -2370,8 +2380,9 @@ static int device_request_firmware_info (VCanCardData* vCard)
 
   ret = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
                                    CMD_GET_SOFTWARE_INFO_RESP, 0, SKIP_ERROR_EVENT);
-  if (ret != VCAN_STAT_OK)
+  if (ret != VCAN_STAT_OK) {
     goto error_exit;
+  }
 
   //
   // CMD_GET_SOFTWARE_DETAILS_REQ
@@ -2382,8 +2393,9 @@ static int device_request_firmware_info (VCanCardData* vCard)
 
   ret = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
                                    CMD_GET_SOFTWARE_DETAILS_RESP, 0, SKIP_ERROR_EVENT);
-  if (ret != VCAN_STAT_OK)
+  if (ret != VCAN_STAT_OK) {
     goto error_exit;
+  }
 
   vCard->firmwareVersionMajor = reply.getSoftwareDetailsResp.swVersion >> 24;
   vCard->firmwareVersionMinor = (reply.getSoftwareDetailsResp.swVersion >> 16) & 0xFF;
@@ -2400,9 +2412,9 @@ static int device_request_firmware_info (VCanCardData* vCard)
 
     ret = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
                                      CMD_AUTO_TX_BUFFER_RESP, 0, SKIP_ERROR_EVENT);
-    if (ret != VCAN_STAT_OK)
+    if (ret != VCAN_STAT_OK) {
       goto error_exit;
-
+    }
   }
 
   ret = VCAN_STAT_OK;
@@ -2901,8 +2913,9 @@ static int mhydra_start (VCanCardData *vCard)
   kthread_run(mhydra_rx_thread, vCard, "Kvaser kernel thread");
   mhydra_map_channels(vCard);
   ret = device_request_firmware_info(vCard);
-  if (ret != VCAN_STAT_OK)
+  if (ret != VCAN_STAT_OK) {
     goto error_exit;
+  }
 
   vCard->driverData = &driverData;
   vCanInitData(vCard);
@@ -2912,31 +2925,55 @@ static int mhydra_start (VCanCardData *vCard)
 
     // silently fail, beacuse this isn't a fatal error
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_SILENTMODE);
-    if (stat != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_SILENTMODE\n")));
+    if (stat != VCAN_STAT_OK) {
+      DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_SILENTMODE\n")));
+    }
 
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES);
-    if (stat != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES\n")));
+    if (stat != VCAN_STAT_OK) {
+      DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES\n")));
+    }
 
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION);
-    if (stat != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION\n")));
+    if (stat != VCAN_STAT_OK) {
+      DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION\n")));
+    }
 
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_ERROR_COUNTERS);
-    if (stat != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_ERROR_COUNTERS\n")));
+    if (stat != VCAN_STAT_OK) {
+      DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_ERROR_COUNTERS\n")));
+    }
 
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_SINGLE_SHOT);
-    if (stat != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_SINGLE_SHOT\n")));
+    if (stat != VCAN_STAT_OK) {
+      DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_SINGLE_SHOT\n")));
+    }
 
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_LIN_HYBRID);
-    if (stat != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_LIN_HYBRID\n")));
+    if (stat != VCAN_STAT_OK) {
+      DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_LIN_HYBRID\n")));
+    }
 
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_HAS_LOGGER);
-    if (stat != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_HAS_LOGGER\n")));
+    if (stat != VCAN_STAT_OK) {
+      DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_HAS_LOGGER\n")));
+    }
 
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_HAS_REMOTE);
-    if (stat != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_HAS_REMOTE\n")));
+    if (stat != VCAN_STAT_OK) {
+      DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_HAS_REMOTE\n")));
+    }
 
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_HAS_SCRIPT);
-    if (stat != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_HAS_SCRIPT\n")));
+    if (stat != VCAN_STAT_OK) {
+      DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_HAS_SCRIPT\n")));
+    }
+
+    stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_DIAGNOSTICS);
+    if (stat != VCAN_STAT_OK) {
+      DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_DIAGNOSTICS\n")));
+    }
+
   }
 
   set_capability_value (vCard,
@@ -2960,13 +2997,17 @@ static int mhydra_start (VCanCardData *vCard)
     cmd.setDrivermodeReq.driverMode = DRIVERMODE_NORMAL;
 
     r = mhydra_queue_cmd(vCard, &cmd, 50);
-    if (r != VCAN_STAT_OK) return r;
+    if (r != VCAN_STAT_OK) {
+      return r;
+    }
   }
 
 
   vCard->enable_softsync = 1;
   ret = mhydra_softsync_onoff(vCard, vCard->enable_softsync);
-  if (ret != VCAN_STAT_OK) goto error_exit;
+  if (ret != VCAN_STAT_OK) {
+    goto error_exit;
+  }
 
   return ret;
 
@@ -3706,7 +3747,6 @@ static int mhydra_bus_off (VCanChanData *vChan)
   int     ret;
 
   DEBUGPRINT(3, (TXT("mhydra: _bus_off\n")));
-
   cmd.cmdNo = CMD_STOP_CHIP_REQ;
   cmd.heAddress = ILLEGAL_HE;
   setDST(&cmd, dev->channel2he[vChan->channel]);
@@ -3825,8 +3865,9 @@ static int mhydra_get_tx_err (VCanChanData *vChan)
   DEBUGPRINT(3, (TXT("mhydra: _get_tx_err\n")));
 
   ret = mhydra_get_chipstate(vChan);
-  if (ret != VCAN_STAT_OK)
+  if (ret != VCAN_STAT_OK) {
     return ret;
+  }
 
   return vChan->chipState.txerr;
   //return vChan->txErrorCounter;
@@ -3843,8 +3884,9 @@ static int mhydra_get_rx_err (VCanChanData *vChan)
   DEBUGPRINT(3, (TXT("mhydra: _get_rx_err\n")));
 
   ret = mhydra_get_chipstate(vChan);
-  if (ret != VCAN_STAT_OK)
+  if (ret != VCAN_STAT_OK) {
     return ret;
+  }
 
   return vChan->chipState.rxerr;
   //return vChan->rxErrorCounter;
@@ -4496,13 +4538,12 @@ static int mhydra_tx_interval (VCanChanData *chd, unsigned int *interval) {
   cmd.txInterval.channel = (unsigned char)chd->channel;
   r = mhydra_send_and_wait_reply(vCard, &cmd, &reply,
                                  CMD_HYDRA_TX_INTERVAL_RESP, 0, SKIP_ERROR_EVENT);
-
-  if (r != VCAN_STAT_OK)
+  if (r != VCAN_STAT_OK) {
     return r;
-
-  if (reply.txInterval.status != VCAN_STAT_OK)
+  }
+  if (reply.txInterval.status != VCAN_STAT_OK) {
     return VCAN_STAT_BAD_PARAMETER;
-
+  }
   *interval = reply.txInterval.interval;
   return r;
 }
@@ -4521,7 +4562,9 @@ static int mhydra_get_transceiver_type  (VCanChanData *chd, unsigned int *transc
 
   r = mhydra_send_and_wait_reply(vCard, &cmd, &reply, CMD_GET_TRANSCEIVER_INFO_RESP, 0, SKIP_ERROR_EVENT);
 
-  if (r != VCAN_STAT_OK) return r;
+  if (r != VCAN_STAT_OK) {
+    return r;
+  }
 
   *transceiver_type = reply.getTransceiverInfoResp.transceiverType;
 
@@ -4549,7 +4592,9 @@ static int mhydra_capabilities (VCanCardData *vCard, uint32_t vcan_cmd) {
 
   r = mhydra_send_and_wait_reply(vCard, &cmd, &reply, CMD_GET_CAPABILITIES_RESP, 0, SKIP_ERROR_EVENT);
 
-  if (r != VCAN_STAT_OK) return r;
+  if (r != VCAN_STAT_OK) {
+    return r;
+  }
 
   if (reply.capabilitiesResp.status == CAP_STATUS_OK) {
     switch (reply.capabilitiesResp.subCmdNo)
@@ -4590,6 +4635,10 @@ static int mhydra_capabilities (VCanCardData *vCard, uint32_t vcan_cmd) {
         value = reply.capabilitiesResp.scriptCap.value;
         mask  = reply.capabilitiesResp.scriptCap.mask;
         break;
+      case CAP_SUB_CMD_HAS_KDI:
+        value = reply.capabilitiesResp.kdiCap.value;
+        mask  = reply.capabilitiesResp.kdiCap.mask;
+        break;
       default:
         value = 0;
         mask  = 0;
@@ -4623,8 +4672,9 @@ static int mhydra_get_card_info(VCanCardData *vCard, VCAN_IOCTL_CARD_INFO *ci)
   r = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
                                  CMD_GET_CARD_INFO_RESP, 0,
                                  SKIP_ERROR_EVENT);
-  if (r != VCAN_STAT_OK)
+  if (r != VCAN_STAT_OK) {
     return r;
+  }
 
   // VCard->firmwareVersionMajor?
   // VCard->firmwareVersionMinor?
@@ -4635,18 +4685,18 @@ static int mhydra_get_card_info(VCanCardData *vCard, VCAN_IOCTL_CARD_INFO *ci)
 
   // ci->card_name [MAX_IOCTL_CARD_NAME + 1]
   // ci->hardware_type
-  // ci->driver_version_major
-  // ci->driver_version_minor
-  // ci->driver_version_build
+  ci->driver_version_major = CANLIB_MAJOR_VERSION;
+  ci->driver_version_minor = CANLIB_MINOR_VERSION;
+  ci->driver_version_build = CANLIB_BUILD_VERSION;
   // ci->license_mask1
   // ci->license_mask2
   // ci->card_number
   // ci->timer_rate
   // ci->vendor_name [MAX_IOCTL_VENDOR_NAME + 1]
   // ci->channel_prefix [MAX_IOCTL_CHANNEL_PREFIX +1]
-  // ci->product_version_major
-  // ci->product_version_minor
-  // ci->product_version_minor_letter
+  ci->product_version_major = CANLIB_PRODUCT_MAJOR_VERSION;
+  ci->product_version_minor = CANLIB_MINOR_VERSION;
+  ci->product_version_minor_letter = 0;
 
   ci->serial_number = vCard->serialNumber;
   ci->hardware_rev_major = reply.getCardInfoResp.hwRevision;
@@ -4659,8 +4709,9 @@ static int mhydra_get_card_info(VCanCardData *vCard, VCAN_IOCTL_CARD_INFO *ci)
   r = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
                                  CMD_GET_SOFTWARE_DETAILS_RESP, 0,
                                  SKIP_ERROR_EVENT);
-  if (r != VCAN_STAT_OK)
+  if (r != VCAN_STAT_OK) {
     return r;
+  }
 
   ci->firmware_version_major = reply.getSoftwareDetailsResp.swVersion >> 24;
   ci->firmware_version_minor = (reply.getSoftwareDetailsResp.swVersion >> 16) & 0xFF;
@@ -4785,8 +4836,7 @@ static int mhydra_get_card_info_misc(const VCanChanData *chd, KCAN_IOCTL_MISC_IN
   hydraHostCmd reply;
   MhydraCardData *dev = chd->vCard->hwCardData;
 
-  if (!(chd->vCard->card_flags & DEVHND_CARD_EXTENDED_CAPABILITIES))
-  {
+  if (!(chd->vCard->card_flags & DEVHND_CARD_EXTENDED_CAPABILITIES)) {
     cardInfoMisc->retcode = KCAN_IOCTL_MISC_INFO_NOT_IMPLEMENTED;
     return r;
   }
@@ -4819,12 +4869,9 @@ static int mhydra_get_card_info_misc(const VCanChanData *chd, KCAN_IOCTL_MISC_IN
                              CMD_GET_CAPABILITIES_RESP, 0, SKIP_ERROR_EVENT);
 
   if (r == VCAN_STAT_OK) {
-    if (reply.capabilitiesResp.status == CAP_STATUS_OK)
-    {
+    if (reply.capabilitiesResp.status == CAP_STATUS_OK) {
       cardInfoMisc->retcode = KCAN_IOCTL_MISC_INFO_RETCODE_SUCCESS;
-    }
-    else
-    {
+    } else {
       cardInfoMisc->retcode = KCAN_IOCTL_MISC_INFO_NOT_IMPLEMENTED;
       return r;
     }
@@ -4987,19 +5034,31 @@ static int mhydra_memo_get_data(const VCanChanData *chd,
       }
     }
   } else {
-    if (stat) *stat = reply.memoGetDataResp.status;
+    if (stat) {
+      *stat = reply.memoGetDataResp.status;
+    }
     switch (reply.memoGetDataResp.status) {
       case MEMO_STATUS_SUCCESS:
         // Data has arrived and all is well
-        if (dstat) *dstat = 0;
-        if (lstat) *lstat = 0;
+        if (dstat) {
+          *dstat = 0;
+        }
+        if (lstat) {
+          *lstat = 0;
+        }
         break;
 
       case MEMO_STATUS_FAILED:
         // We got a package telling us what went wrong, pass that info along
-        if (dstat) *dstat = reply.memoGetDataResp.data[0];  // data[0] holds dioStat
-        if (lstat) *lstat = reply.memoGetDataResp.data[1];  // data[1] holds lioStat
-        if (stat) *stat = MEMO_STATUS_SUCCESS;
+        if (dstat) {
+          *dstat = reply.memoGetDataResp.data[0];  // data[0] holds dioStat
+        }
+        if (lstat) {
+          *lstat = reply.memoGetDataResp.data[1];  // data[1] holds lioStat
+        }
+        if (stat) {
+          *stat = MEMO_STATUS_SUCCESS;
+        }
         break;
 
       case MEMO_STATUS_MORE_DATA:
@@ -5083,9 +5142,15 @@ static int mhydra_memo_put_data(const VCanChanData *chd, int subcmd,
         return r;
       }
 
-      if (stat) *stat = reply.memoPutDataResp.status;
-      if (dstat) *dstat = reply.memoPutDataResp.data[0];  // data[0] holds dioStat
-      if (lstat) *lstat = reply.memoPutDataResp.data[1];  // data[1] holds lioStat
+      if (stat) {
+        *stat = reply.memoPutDataResp.status;
+      }
+      if (dstat) {
+        *dstat = reply.memoPutDataResp.data[0];  // data[0] holds dioStat
+      }
+      if (lstat) {
+        *lstat = reply.memoPutDataResp.data[1];  // data[1] holds lioStat
+      }
 
       if (reply.memoGetDataResp.status == MEMO_STATUS_FAILED) {
         // we let the status be success on purpose because MEMO_STATUS_FAILED is not an error in that sense
@@ -5204,14 +5269,24 @@ int32_t device_trp (VCanCardData *vCard, uint32_t dest, uint16_t pipe, uint8_t *
   uint32_t pkt_size;
   int32_t  ret = 0;
 
-  if (vCard == NULL)     return -1;
-  if (buffer == NULL) return -1;
-  if (buflen < 4)     return -1;
-  if (pipe > HYDRA_TRP_PIPE_LAST_ENTRY) return -1;
+  if (vCard == NULL) {
+    return -1;
+  }
+  if (buffer == NULL) {
+    return -1;
+  }
+  if (buflen < 4) {
+    return -1;
+  }
+  if (pipe > HYDRA_TRP_PIPE_LAST_ENTRY) {
+    return -1;
+  }
 
   if (dest == TRP_DEST_CANHE) {
     MhydraCardData *dev = vCard->hwCardData;
-    if (!dev) return -6;
+    if (!dev) {
+      return -6;
+    }
     he_addr = dev->channel2he[0];
   }
   else {
@@ -5371,3 +5446,10 @@ static int mhydra_send_and_wait_reply_memo (VCanCardData  *vCard,
 
   return mhydra_send_and_wait_reply_common (vCard, cmd, replyPtr, replyCmdNo, transId, &waitNode, resp_timeout_ms);
 } // _send_and_wait_reply_memo
+
+
+static int mhydra_cleanup_hnd (VCanChanData *vChan)
+{
+  (void)vChan;
+  return VCAN_STAT_OK;
+}

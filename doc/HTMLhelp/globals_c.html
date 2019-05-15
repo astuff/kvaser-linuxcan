@@ -122,13 +122,16 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 : <a class="el" href="canlib_8h.html#a6657cafcf7b244917cc6e84a895e9bc9">canlib.h</a>
 </li>
 <li>canCHANNEL_CAP_CAN_DIAGNOSTICS
-: <a class="el" href="canlib_8h.html#a4867d2b7df8711010dd7f9441cbafa88">canlib.h</a>
+: <a class="el" href="obsolete_8h.html#a4867d2b7df8711010dd7f9441cbafa88">obsolete.h</a>
 </li>
 <li>canCHANNEL_CAP_CAN_FD
 : <a class="el" href="canlib_8h.html#af46aa24f177eabf4355d89a00fc0ffe4">canlib.h</a>
 </li>
 <li>canCHANNEL_CAP_CAN_FD_NONISO
 : <a class="el" href="canlib_8h.html#a45e356713bd5b6f87d15966045a19f1c">canlib.h</a>
+</li>
+<li>canCHANNEL_CAP_DIAGNOSTICS
+: <a class="el" href="canlib_8h.html#a0651695dbca39a7c1ed81c96079551ad">canlib.h</a>
 </li>
 <li>canCHANNEL_CAP_ERROR_COUNTERS
 : <a class="el" href="canlib_8h.html#a759fbc45e4c750b1753b1426526ebd4f">canlib.h</a>
@@ -142,6 +145,9 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 <li>canCHANNEL_CAP_GENERATE_OVERLOAD
 : <a class="el" href="canlib_8h.html#a5139cc32d451a7f63c5a92692044396d">canlib.h</a>
 </li>
+<li>canCHANNEL_CAP_LIN_HYBRID
+: <a class="el" href="canlib_8h.html#a5db0cb246c1e9c485f6863ceed9bb39a">canlib.h</a>
+</li>
 <li>canCHANNEL_CAP_LOGGER
 : <a class="el" href="canlib_8h.html#a79b87625040f4762b83954245b139a96">canlib.h</a>
 </li>
@@ -153,6 +159,9 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 </li>
 <li>canCHANNEL_CAP_RESERVED_1
 : <a class="el" href="canlib_8h.html#ad171fc2715be577d685c665b4c808809">canlib.h</a>
+</li>
+<li>canCHANNEL_CAP_RESERVED_2
+: <a class="el" href="canlib_8h.html#a168efe9404165ade0e25455d39327d06">canlib.h</a>
 </li>
 <li>canCHANNEL_CAP_SCRIPT
 : <a class="el" href="canlib_8h.html#a1c3c68d592ead785f1bbb5de757ee7a0">canlib.h</a>
@@ -358,6 +367,9 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 <li>canERR__RESERVED
 : <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a7fdb374ab194f07a46dfddd2c57fee5e">canstat.h</a>
 </li>
+<li>canERR_BUFFER_TOO_SMALL
+: <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7afc999ab39dd6545165d8bfd44bf900ec">canstat.h</a>
+</li>
 <li>canERR_CONFIG
 : <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a1ca846c66dea7cf0fdb157e02eca06ef">canstat.h</a>
 </li>
@@ -468,6 +480,12 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 </li>
 <li>canERR_SCRIPT_FAIL
 : <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7aacfd2f891be7d88a9b6c8ca65e369b76">canstat.h</a>
+</li>
+<li>canERR_SCRIPT_TXE_CONTAINER_FORMAT
+: <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a58c38bbd185bd93144a10f22f12ca8fd">canstat.h</a>
+</li>
+<li>canERR_SCRIPT_TXE_CONTAINER_VERSION
+: <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7aea19c70918f0993acd55691d28748914">canstat.h</a>
 </li>
 <li>canERR_SCRIPT_WRONG_VERSION
 : <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7ae88fe7d696e1e4411612e083bc45188b">canstat.h</a>
@@ -582,6 +600,9 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 </li>
 <li>canGetVersion()
 : <a class="el" href="group__can__general.html#gafb5688859c56ecb6f8d85705d3ec2f14">canlib.h</a>
+</li>
+<li>canGetVersionEx()
+: <a class="el" href="group__can__general.html#ga0803bc56e8695150563a48df2c14db5f">canlib.h</a>
 </li>
 <li>canHandle
 : <a class="el" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canlib.h</a>
@@ -715,14 +736,32 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 <li>canIOCTL_FLUSH_TX_BUFFER
 : <a class="el" href="canlib_8h.html#af3e37bd778bfba0891046c4e279aea99">canlib.h</a>
 </li>
+<li>canIOCTL_GET_BUS_TYPE
+: <a class="el" href="canlib_8h.html#a3a7d1321569e25fd9f8798a246f8c045">canlib.h</a>
+</li>
+<li>canIOCTL_GET_CHANNEL_QUALITY
+: <a class="el" href="canlib_8h.html#a80906450c80c1923c521d5aa1f313516">canlib.h</a>
+</li>
+<li>canIOCTL_GET_DEVNAME_ASCII
+: <a class="el" href="canlib_8h.html#a002d3ee531afda8bb6469485e80f6479">canlib.h</a>
+</li>
 <li>canIOCTL_GET_DRIVERHANDLE
 : <a class="el" href="canlib_8h.html#a020462350aa8b0bf6c512d6b0f923985">canlib.h</a>
 </li>
 <li>canIOCTL_GET_REPORT_ACCESS_ERRORS
 : <a class="el" href="canlib_8h.html#a0effe8765a40fc65834070424d08b3bf">canlib.h</a>
 </li>
+<li>canIOCTL_GET_ROUNDTRIP_TIME
+: <a class="el" href="canlib_8h.html#a1c011e1e34730e6516dcfb59d8fb0297">canlib.h</a>
+</li>
 <li>canIOCTL_GET_RX_BUFFER_LEVEL
 : <a class="el" href="canlib_8h.html#a5369778cdee4852848b7ef8fe0127284">canlib.h</a>
+</li>
+<li>canIOCTL_GET_THROTTLE_SCALED
+: <a class="el" href="canlib_8h.html#a668aff1bb8e1ff96d50c8bded8706d48">canlib.h</a>
+</li>
+<li>canIOCTL_GET_TIME_SINCE_LAST_SEEN
+: <a class="el" href="canlib_8h.html#a3e6419a7ec6700deb7ee246e08884be3">canlib.h</a>
 </li>
 <li>canIOCTL_GET_TIMER_SCALE
 : <a class="el" href="canlib_8h.html#a5052370b3c33a17a51ece86549336043">canlib.h</a>
@@ -772,6 +811,9 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 <li>canIOCTL_SET_BYPASS_MODE
 : <a class="el" href="canlib_8h.html#aaa53d1ad423e8fb9bbb994de94add573">canlib.h</a>
 </li>
+<li>canIOCTL_SET_ERROR_FRAMES_REPORTING
+: <a class="el" href="canlib_8h.html#aa901680264aad0aec28d9f66e8487b2a">canlib.h</a>
+</li>
 <li>canIOCTL_SET_LOCAL_TXECHO
 : <a class="el" href="canlib_8h.html#a86f7ce6c809f30983b69ead49d793689">canlib.h</a>
 </li>
@@ -780,6 +822,9 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 </li>
 <li>canIOCTL_SET_RX_QUEUE_SIZE
 : <a class="el" href="canlib_8h.html#aa158229cbf277a6fb82bc4533e3281d7">canlib.h</a>
+</li>
+<li>canIOCTL_SET_THROTTLE_SCALED
+: <a class="el" href="canlib_8h.html#a209b1bfbe11114d7b1b72d447672bcb4">canlib.h</a>
 </li>
 <li>canIOCTL_SET_TIMER_SCALE
 : <a class="el" href="canlib_8h.html#a5b5d43fc8968aa77e48ef8c8d3036c36">canlib.h</a>
@@ -995,7 +1040,7 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 : <a class="el" href="group___c_a_n.html#ga4b21a0e2547c1435c378d13e6803acef">canlib.h</a>
 </li>
 <li>canReadTimer()
-: <a class="el" href="group___c_a_n.html#ga04c2f80a23b992bf17591749192e8d48">canlib.h</a>
+: <a class="el" href="canlib_8h.html#a04c2f80a23b992bf17591749192e8d48">canlib.h</a>
 </li>
 <li>canReadWait()
 : <a class="el" href="group___c_a_n.html#gac01f98e282609b5f6aaf2b1eabfb83ec">canlib.h</a>
@@ -1219,6 +1264,18 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 <li>canUnloadLibrary()
 : <a class="el" href="group__can__general.html#ga0d1c0e54ea20c3e3b328a32eb10c7b47">canlib.h</a>
 </li>
+<li>canVERSION_CANLIB32_BETA
+: <a class="el" href="canlib_8h.html#a31271de29b51d610db6242e43e5a71f0">canlib.h</a>
+</li>
+<li>canVERSION_CANLIB32_PRODVER
+: <a class="el" href="canlib_8h.html#a8d72028015110e384b36efab7f847542">canlib.h</a>
+</li>
+<li>canVERSION_CANLIB32_PRODVER32
+: <a class="el" href="canlib_8h.html#a2e46819ec0b677fe61858d1f8c30346b">canlib.h</a>
+</li>
+<li>canVERSION_CANLIB32_VERSION
+: <a class="el" href="canlib_8h.html#a2dbc899a772f7c463864e7d53cb33164">canlib.h</a>
+</li>
 <li>canWANT_EXCLUSIVE
 : <a class="el" href="canlib_8h.html#a48cd7c2e8ed2e7bf39d3524f7a4294d6">canlib.h</a>
 </li>
@@ -1244,7 +1301,7 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.22) Mon Feb 12 2018</li>
+    <li class="footer"> (canlib 5.23) Sun May 13 2018</li>
   </ul>
 </div>
 </body>

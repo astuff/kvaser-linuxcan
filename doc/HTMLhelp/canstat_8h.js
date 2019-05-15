@@ -142,6 +142,9 @@ var canstat_8h =
       [ "canERR_MEMO_FAIL", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7afc8651b75676e525058c4289d823a12f", null ],
       [ "canERR_SCRIPT_FAIL", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7aacfd2f891be7d88a9b6c8ca65e369b76", null ],
       [ "canERR_SCRIPT_WRONG_VERSION", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7ae88fe7d696e1e4411612e083bc45188b", null ],
+      [ "canERR_SCRIPT_TXE_CONTAINER_VERSION", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7aea19c70918f0993acd55691d28748914", null ],
+      [ "canERR_SCRIPT_TXE_CONTAINER_FORMAT", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a58c38bbd185bd93144a10f22f12ca8fd", null ],
+      [ "canERR_BUFFER_TOO_SMALL", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7afc999ab39dd6545165d8bfd44bf900ec", null ],
       [ "canERR__RESERVED", "canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a7fdb374ab194f07a46dfddd2c57fee5e", null ]
     ] ]
 ];

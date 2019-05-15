@@ -190,6 +190,9 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 <li>kvaDb_Unsigned
 : <a class="el" href="kva_db_lib_8h.html#aca4f6042ed5df050dab2ff4278fc7270af1ca5045071de9e05d80d2c7b2975ae0">kvaDbLib.h</a>
 </li>
+<li>kvaDbAddAttribute()
+: <a class="el" href="group__kvadb__attributes.html#ga260cd9cb2cccec515596389e51556f5b">kvaDbLib.h</a>
+</li>
 <li>kvaDbAddAttributeDefinition()
 : <a class="el" href="group__kvadb__attributes.html#gabbc2f38c6b7c0f437d1d679be2158d7f">kvaDbLib.h</a>
 </li>
@@ -243,6 +246,12 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 </li>
 <li>kvaDbCreate()
 : <a class="el" href="group__kvadb__database.html#ga0da72bb21d2664d6443f7b3349ec9df5">kvaDbLib.h</a>
+</li>
+<li>kvaDbDeleteAttribute()
+: <a class="el" href="group__kvadb__attributes.html#gaa43ebaec0d07b20058225ffd05b7ce1d">kvaDbLib.h</a>
+</li>
+<li>kvaDbDeleteAttributeDefinitionEnum()
+: <a class="el" href="group__kvadb__attributes.html#gad32397697c2d9566e6287c1d33ae9376">kvaDbLib.h</a>
 </li>
 <li>kvaDbDeleteEnumValue()
 : <a class="el" href="group__kvadb__signals.html#gaef7c3535c1edd6709c5c1bc666780bb9">kvaDbLib.h</a>
@@ -304,14 +313,23 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 <li>kvaDbErr_WrongOwner
 : <a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57a0d58c63614683ccc7085893224806db6">kvaDbLib.h</a>
 </li>
+<li>kvaDbGetAttributeByName()
+: <a class="el" href="group__kvadb__attributes.html#ga7897e073fee5259ec0d4ab2f60835ff6">kvaDbLib.h</a>
+</li>
 <li>kvaDbGetAttributeDefinitionByName()
 : <a class="el" href="group__kvadb__attributes.html#ga8c510183f27c531345a8753cbd8d95cc">kvaDbLib.h</a>
 </li>
 <li>kvaDbGetAttributeDefinitionEnumeration()
 : <a class="el" href="group__kvadb__attributes.html#ga6f1a812eee5818210df7d3e1c1bca0af">kvaDbLib.h</a>
 </li>
+<li>kvaDbGetAttributeDefinitionEnumFirst()
+: <a class="el" href="group__kvadb__attributes.html#ga51d2eb4d0b188dcbed8a906752ee4f23">kvaDbLib.h</a>
+</li>
 <li>kvaDbGetAttributeDefinitionEnumNameByValue()
 : <a class="el" href="group__kvadb__attributes.html#gad7be3170d6c22ff78c5bedcb5038535a">kvaDbLib.h</a>
+</li>
+<li>kvaDbGetAttributeDefinitionEnumNext()
+: <a class="el" href="group__kvadb__attributes.html#ga102b009090edf989a30d7cc41ce40970">kvaDbLib.h</a>
 </li>
 <li>kvaDbGetAttributeDefinitionEnumValueByName()
 : <a class="el" href="group__kvadb__attributes.html#ga2245c1872e83380b5b602e39ae32cc12">kvaDbLib.h</a>
@@ -361,11 +379,17 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 <li>kvaDbGetErrorText()
 : <a class="el" href="group__kvadb__database.html#gaef428f2f4f23c81ada89b8317683c276">kvaDbLib.h</a>
 </li>
+<li>kvaDbGetFirstAttribute()
+: <a class="el" href="group__kvadb__attributes.html#gacfeae57c11cbcbf32ef962eed9790e77">kvaDbLib.h</a>
+</li>
 <li>kvaDbGetFirstAttributeDefinition()
 : <a class="el" href="group__kvadb__attributes.html#gae00e9a1fcede7194c455b563ef9b88a6">kvaDbLib.h</a>
 </li>
 <li>kvaDbGetFirstEnumValue()
 : <a class="el" href="group__kvadb__signals.html#ga1e321c34b9cf82c1a5d0df60f3764b9b">kvaDbLib.h</a>
+</li>
+<li>kvaDbGetFirstEnumValuePair()
+: <a class="el" href="group__kvadb__signals.html#ga47e441735aa826b3ef3186cfdbc3e772">kvaDbLib.h</a>
 </li>
 <li>kvaDbGetFirstMsg()
 : <a class="el" href="group__kvadb__messages.html#ga860fbe484bbe5722c5141e8d73d51b81">kvaDbLib.h</a>
@@ -413,7 +437,7 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 : <a class="el" href="group__kvadb__messages.html#ga5041eeeb8c35df302ace87a2bab3b283">kvaDbLib.h</a>
 </li>
 <li>kvaDbGetMsgMux()
-: <a class="el" href="group__kvadb__messages.html#ga038b6cd47cd5aa6f3d7e8e26808943a1">kvaDbLib.h</a>
+: <a class="el" href="group__kvadb__messages.html#ga292a85bce6c50e66ccc23f80d1c25a0e">kvaDbLib.h</a>
 </li>
 <li>kvaDbGetMsgName()
 : <a class="el" href="group__kvadb__messages.html#ga194badc7e10d889df38a0f4eb763b5e6">kvaDbLib.h</a>
@@ -432,6 +456,9 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 </li>
 <li>kvaDbGetNextEnumValue()
 : <a class="el" href="group__kvadb__signals.html#gae5d4a76ffdaa9450615c3c14f11bff95">kvaDbLib.h</a>
+</li>
+<li>kvaDbGetNextEnumValuePair()
+: <a class="el" href="group__kvadb__signals.html#gad2091a2e43cb26d6dcb5839525be279f">kvaDbLib.h</a>
 </li>
 <li>kvaDbGetNextMsg()
 : <a class="el" href="group__kvadb__messages.html#ga0146dd4ddf2c39bfdc3b93c29fe85b32">kvaDbLib.h</a>
@@ -1742,7 +1769,7 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.22) Mon Feb 12 2018</li>
+    <li class="footer"> (canlib 5.23) Sun May 13 2018</li>
   </ul>
 </div>
 </body>

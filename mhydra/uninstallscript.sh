@@ -94,6 +94,27 @@ else
   fi
 fi
 
+
+echo Remove SocketCAN Kvaser USB driver from blacklist.
+
+if [ -f /etc/modprobe.conf ] ; then
+  # CentOS/Redhat/RHEL/Fedora Linux...
+  CONF=/etc/modprobe.conf
+  BLACKLIST="alias     kvaser_usb   /dev/null"
+else
+  # Debian/Ubuntu Linux
+  CONF=/etc/modprobe.d/kvaser.conf
+  BLACKLIST="blacklist kvaser_usb"
+  if [ ! -f $CONF ] ; then
+    touch $CONF
+  fi
+fi
+
+grep -v "^${BLACKLIST}" < $CONF                          > newconf
+
+cat newconf > $CONF
+rm newconf
+
 $DEPMOD -a
 if [ "$?" -ne 0 ] ; then
   echo Failed to execute $DEPMOD -a

@@ -66,7 +66,7 @@
 CC ?= gcc
 CFLAGS = -Wall -Wextra -Werror -O2  -D_REENTRANT $(XTRA_CFLAGS) -I../../include
 LDFLAGS = -L..
-LDLIBS = -lcanlib -lpthread
+LDLIBS = -lcanlib -lpthread -lm
 OBJS =\
 	busparms\
 	cancount\

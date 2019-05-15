@@ -50,7 +50,8 @@ var page_user_guide =
       [ "Driver installation", "page_user_guide_install.html#section_user_guide_build_installation_driver_installation", null ],
       [ "Hardware installation", "page_user_guide_install.html#section_user_guide_build_installation_hardware", [
         [ "Hardware installation PCI Cards", "page_user_guide_install.html#section_user_guide_build_installation_hardware_1", null ]
-      ] ]
+      ] ],
+      [ "Version Checking", "page_user_guide_install.html#section_user_guide_build_driver_version", null ]
     ] ],
     [ "Compiling and Linking", "page_user_guide_build.html", [
       [ "Compiling and Linking Your Code", "page_user_guide_build.html#section_user_guide_build_compiling_linking", null ]

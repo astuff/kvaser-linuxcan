@@ -86,7 +86,7 @@ $(document).ready(function(){initNavTree('page_linlib.html','');});
 </div>
 <div class="textblock"><h1><a class="anchor" id="section_user_guide_lin_intro"></a>
 Using the LIN Bus</h1>
-<p>Using the LIN bus requires special hardware and is presently supported on LAPcan, LAPcan II, Kvaser LIN Leaf and Kvaser Hybrid.</p>
+<p>Using the LIN bus requires special hardware, e.g. Kvaser Leaf Professional LIN, Kvaser Hybrid 2xCAN/LIN or Kvaser Hybrid Pro 2xCAN/LIN.</p>
 <p>The CAN API calls are not directly suitable for the LIN bus. Instead, a new API is provided that enables you to use the LIN bus as easily as you use the CAN bus. The function calls in the LIN API all have names starting with lin, e.g <a class="el" href="group___l_i_n.html#gaca2d874c870f16c11a4e8e158817d8bf">linReadMessage()</a>.</p>
 <p>You will need to </p><div class="fragment"><div class="line"><span class="preprocessor">#include linlib.h</span></div></div><!-- fragment --><p>in your programs, and link with linlib.dll (which, in turn, uses canlib32.dll).<br />
  On Linux, the files are called liblinlib.so and libcanlib.so respectively. </p>
@@ -96,7 +96,7 @@ Using the LIN Bus</h1>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.22) Mon Feb 12 2018</li>
+    <li class="footer"> (canlib 5.23) Sun May 13 2018</li>
   </ul>
 </div>
 </body>

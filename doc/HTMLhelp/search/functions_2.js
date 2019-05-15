@@ -8,6 +8,7 @@ var searchData=
   ['lingetchanneldata',['linGetChannelData',['../group__lin__general.html#gac5c5dadc7ca9d70c627058a9b2b06231',1,'linlib.h']]],
   ['lingetfirmwareversion',['linGetFirmwareVersion',['../group__lin__general.html#gafa260028be850e70a99c1b0706679583',1,'linlib.h']]],
   ['lingettransceiverdata',['linGetTransceiverData',['../group___l_i_n.html#ga95408cd6c8639514b4be8e188bd7b38a',1,'linlib.h']]],
+  ['lingetversion',['linGetVersion',['../group__lin__general.html#ga6a182f2608e54e273f80f27770afa9dc',1,'linlib.h']]],
   ['lininitializelibrary',['linInitializeLibrary',['../group__lin__general.html#gaf47a1f1078f6b3919e2b2d9dfd559d8b',1,'linlib.h']]],
   ['linopenchannel',['linOpenChannel',['../group___l_i_n.html#ga040336f8176a10cb9578b47c42baef6b',1,'linlib.h']]],
   ['linreadmessage',['linReadMessage',['../group___l_i_n.html#gaca2d874c870f16c11a4e8e158817d8bf',1,'linlib.h']]],

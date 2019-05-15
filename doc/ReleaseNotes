@@ -1,5 +1,5 @@
 /*
-**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**            Copyright 2017-2018 by Kvaser AB, Molndal, Sweden
 **                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -62,7 +62,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.22  
+Release notes for linuxcan V5.23  
 ================================================================
 
 These release notes apply to both CANLIB SDK and the Linux drivers.
@@ -158,6 +158,24 @@ Known problems
      hardware, the same is not true for auto tx. The latter is only
      available if there is firmware support in the device.
      (This is the same as under Windows.)
+
+   * There is a limitation in kvadblib which requires the attribute definition
+     enumeration members to be defined in a strictly increasing value order. If
+     an attribute definition enumeration member is defined to have a value of
+     x, all previously defined members with values greater than x are removed.
+
+
+New Features and Fixed Problems in V5.23   (13-MAY-2018)
+===========================================================================
+
+* Fixed bug in PCIcan driver, limiting number of channels on card to two.
+
+* Implemented canCHANNELDATA_CHANNEL_FLAGS
+
+* Added support for canGetVersionEx() and canGetChannelData() using
+  canCHANNELDATA_DLL_FILE_VERSION, canCHANNELDATA_DLL_PRODUCT_VERSION,
+  canCHANNELDATA_DRIVER_FILE_VERSION and canCHANNELDATA_DRIVER_PRODUCT_VERSION
+  Setting the define CANLIB_BETA to '1' marks the build as beta.
 
 
 New Features and Fixed Problems in V5.22   (12-FEB-2018)

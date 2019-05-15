@@ -268,9 +268,23 @@ typedef enum {
    */
     canERR_SCRIPT_WRONG_VERSION = -40,
 
+  /**
+   * <b>The compiled t script container file format is of a version which is not supported by this version of canlib.</b>;
+   */
+    canERR_SCRIPT_TXE_CONTAINER_VERSION = -41,
+
+  /**
+   * <b>An error occured while trying to parse the compiled t script file.</b>;
+   */
+    canERR_SCRIPT_TXE_CONTAINER_FORMAT = -42,
+
+  /**
+   * <b>The buffer provided was not large enough to contain the requested data.</b>;
+   */
+    canERR_BUFFER_TOO_SMALL = -43,
 
   // The last entry - a dummy so we know where NOT to place a comma.
-    canERR__RESERVED       = -41    ///< Reserved
+    canERR__RESERVED       = -44    ///< Reserved
 } canStatus;
 /** @} */
 
@@ -311,7 +325,7 @@ typedef enum {
 #define canNOTIFY_TX            0x0002      ///< CAN message transmission notification
 #define canNOTIFY_ERROR         0x0004      ///< CAN bus error notification
 #define canNOTIFY_STATUS        0x0008      ///< CAN chip status change
-#define canNOTIFY_ENVVAR        0x0010      ///< An environment variable was changed by a script
+#define canNOTIFY_ENVVAR        0x0010      ///< An environment variable was changed by a script. Note that you will not be notified when an environment variable is updated from the Canlib API.
 /** @} */
 
 
@@ -428,8 +442,8 @@ typedef enum {
  */
 #define canMSGERR_MASK          0xff00      ///< Used to mask the non-error bits
 // 0x0100 reserved
-#define canMSGERR_HW_OVERRUN    0x0200      ///< HW buffer overrun
-#define canMSGERR_SW_OVERRUN    0x0400      ///< SW buffer overrun
+#define canMSGERR_HW_OVERRUN    0x0200      ///< HW buffer overrun. \sa \ref section_user_guide_send_recv_overruns
+#define canMSGERR_SW_OVERRUN    0x0400      ///< SW buffer overrun. \sa \ref section_user_guide_send_recv_overruns
 #define canMSGERR_STUFF         0x0800      ///< Stuff error
 #define canMSGERR_FORM          0x1000      ///< Form error
 #define canMSGERR_CRC           0x2000      ///< CRC error
@@ -437,7 +451,7 @@ typedef enum {
 #define canMSGERR_BIT1          0x8000      ///< Sent rec, read dom
 
 // Convenience values for the message error flags.
-#define canMSGERR_OVERRUN       0x0600      ///< Any overrun condition.
+#define canMSGERR_OVERRUN       0x0600      ///< Any overrun condition. \sa \ref section_user_guide_send_recv_overruns
 #define canMSGERR_BIT           0xC000      ///< Any bit error.
 #define canMSGERR_BUSERR        0xF800      ///< Any RX error
 

@@ -4,6 +4,7 @@ var group__can__general =
     [ "canGetErrorText", "group__can__general.html#ga01a7a415c95c579750bcdd95a1d245c4", null ],
     [ "canGetNumberOfChannels", "group__can__general.html#ga65169ca633cd30aa92b8a80e28a5378b", null ],
     [ "canGetVersion", "group__can__general.html#gafb5688859c56ecb6f8d85705d3ec2f14", null ],
+    [ "canGetVersionEx", "group__can__general.html#ga0803bc56e8695150563a48df2c14db5f", null ],
     [ "canInitializeLibrary", "group__can__general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1", null ],
     [ "canIoCtl", "group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12", null ],
     [ "canUnloadLibrary", "group__can__general.html#ga0d1c0e54ea20c3e3b328a32eb10c7b47", null ],

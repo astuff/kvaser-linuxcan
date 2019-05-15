@@ -78,6 +78,7 @@
 #endif /* KERNEL_VERSION < 4.11.0 */
 
 // Non system headers
+#include "canlib_version.h"
 #include "VCanOsIf.h"
 #include "leafHWIf.h"
 #include "filo_cmds.h"
@@ -3720,6 +3721,14 @@ static int leaf_get_card_info(VCanCardData *vCard, VCAN_IOCTL_CARD_INFO *ci)
 
   ci->serial_number = vCard->serialNumber;
   ci->channel_count = vCard->nrChannels;
+
+  ci->driver_version_major = CANLIB_MAJOR_VERSION;
+  ci->driver_version_minor = CANLIB_MINOR_VERSION;
+  ci->driver_version_build = CANLIB_BUILD_VERSION;
+  ci->product_version_major = CANLIB_PRODUCT_MAJOR_VERSION;
+  ci->product_version_minor = CANLIB_MINOR_VERSION;
+  ci->product_version_minor_letter = 0;
+
   strncpy(ci->driver_name, vCard->driverData->deviceName, MAX_IOCTL_DRIVER_NAME);
 
   return 0;

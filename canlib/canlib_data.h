@@ -208,5 +208,4 @@ typedef struct CANOps
   canStatus (*getCardInfo2)(HandleData *hData, KCAN_IOCTL_CARD_INFO_2 *ci2);
 } CANOps;
 
-
 #endif

@@ -71,6 +71,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include "compilerassert.h"
+#include "canlib_version.h"
 
 #  include <pthread.h>
 
@@ -557,6 +558,21 @@ LinStatus LINLIBAPI linClose(LinHandle h)
   lh->inUse = 0;
   LeaveCriticalSection(&crit);
   return r;
+}
+
+
+//===========================================================================
+LinStatus LINLIBAPI linGetVersion(int *major, int *minor, int *build)
+{
+  if (major == NULL || minor == NULL || build == NULL) {
+    return linERR_PARAM;
+  }
+
+  *major = CANLIB_MAJOR_VERSION;
+  *minor = CANLIB_MINOR_VERSION;
+  *build = 0;
+
+  return linOK;
 }
 
 
@@ -1434,16 +1450,26 @@ static LinStatus check_for_lin_refpower(LinHandleInt lh)
 */
 static LinStatus check_for_lin_cable_leaf(LinHandleInt lh)
 {
-  unsigned long retry_count = 3;
+  int           retry_count = 3;
   LinStatus     r;
 
   while (retry_count-- > 0) {
     r = lin_command(lh, COMMAND_START_BOOTLOADER,
                     command_counter++,
                     0,0,0,0,0,0, NULL, 0);
+
     if (r) {
       return r;
     }
+
+    // Make sure the reset command is transmitted ...
+    r = canWriteSync(lh->ch, 1000);
+    if (r) {
+      return r;
+    }
+
+    // ... and wait a bit longer
+    Sleep(50);
 
     r = waitForBootMsg(lh);
 

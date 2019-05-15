@@ -90,6 +90,7 @@ $(document).ready(function(){initNavTree('page_user_guide_install.html','');});
 <li class="level1"><a href="#section_user_guide_build_installation_hardware">Hardware installation</a><ul><li class="level2"><a href="#section_user_guide_build_installation_hardware_1">Hardware installation PCI Cards</a></li>
 </ul>
 </li>
+<li class="level1"><a href="#section_user_guide_build_driver_version">Version Checking</a></li>
 </ul>
 </div>
 <div class="textblock"><h1><a class="anchor" id="section_user_guide_build_installation_supported_systems"></a>
@@ -115,7 +116,22 @@ Hardware installation PCI Cards</h2>
 <li>Install the card in a free PCI slot. <b>Be sure it is firmly seated</b>.</li>
 <li>Start the computer.</li>
 </ol>
-<dl class="section attention"><dt>Attention</dt><dd>The PCI cards contain devices sensitive to ESD. Be sure to follow common-sense ESD guidelines, e.g. wear a wrist strap, and avoid touching the electronic components on the board. </dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>The PCI cards contain devices sensitive to ESD. Be sure to follow common-sense ESD guidelines, e.g. wear a wrist strap, and avoid touching the electronic components on the board.</dd></dl>
+<h1><a class="anchor" id="section_user_guide_build_driver_version"></a>
+Version Checking</h1>
+<p>CANlib versions are denoted by two numbers, the "major version" and the "minor
+  version". Usually the version is presented as these two numbers separated by a period. For example, CANlib 3.6 has major version 3 and minor version 6.</p>
+<p>You may want to make your application determine which version of CANlib is installed on the computer it is running on. There are several ways of obtaining version information.</p>
+<p>First, it is necessary to observe that CANlib consists of several files, each one with a version number. Your application must check all these version numbers to be certain that</p>
+<p>As a rule, files in CANlib has two version numbers:</p>
+<ol type="1">
+<li>The <b>file version</b> number. This consists of a major version number, a minor version number, and a build number. The file version number uniquely identifies a particular file but doesn't say much about which version of CANlib is installed on the computer.</li>
+<li>The file <b>product number</b>. This number uniquely identifies the version of CANlib that the file belongs to.</li>
+</ol>
+<p>Use <a class="el" href="group__can__general.html#ga0803bc56e8695150563a48df2c14db5f">canGetVersionEx()</a> to get the version of the CANlib API DLL. This function allows you to get both the file and the product version number of the API DLL.</p>
+<p>Use <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a> to get the version numbers of the second-level DLL and the driver file. This information may vary from channel to channel.</p>
+<p>You can also use <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a> to obtain information about the firmware revision for a particular channel.</p>
+<dl class="section note"><dt>Note</dt><dd>When testing the version numbers, it is good practice to allow a later version to be installed. That is, don't check for equality with a specific version number. Instead, check that the major version number of the installed version is greater than or equal to the desired version, and if it is equal, check that the minor version number of the installed version is greater than or equal to the desired version. </dd></dl>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
@@ -123,7 +139,7 @@ Hardware installation PCI Cards</h2>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li><li class="navelem"><a class="el" href="page_user_guide.html">CANlib User&#39;s Guide</a></li>
-    <li class="footer"> (canlib 5.22) Mon Feb 12 2018</li>
+    <li class="footer"> (canlib 5.23) Sun May 13 2018</li>
   </ul>
 </div>
 </body>

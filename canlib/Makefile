@@ -71,7 +71,6 @@ SONAME  := $(LIBNAME).$(MAJOR)
 
 CFLAGS  += -Wall -Werror -Wextra -DCANLIB_NAME_STRING=\"$(LIBRARY)\" -O2 -fomit-frame-pointer \
 	$(XTRA_CFLAGS) -pthread
-CFLAGS  += -DLINUX=1
 CFLAGS  += $(ccflags-y)
 CFLAGS  += -I. -I../include
 

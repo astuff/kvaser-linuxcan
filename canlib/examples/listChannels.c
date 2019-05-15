@@ -1,5 +1,5 @@
 /*
-**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**             Copyright 2017-2018 by Kvaser AB, Molndal, Sweden
 **                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -86,20 +86,31 @@ int main(int argc, char* argv[])
   int chanCount = 0;
   canStatus stat;
   int i;
+  int beta;
+  char betaString[10];
   char name[256];
+  char driverName[256];
   char custChanName[40];
   unsigned int ean[2], fw[2], serial[2];
-  unsigned short canlibVersion;
+  unsigned int canlibVersion;
+  uint16_t fileVersion[4];
 
   (void)argc; // Unused.
   (void)argv; // Unused.
 
   canInitializeLibrary();
 
-  canlibVersion = canGetVersion();
-  printf("Canlib version %d.%d\n",
-         (canlibVersion >> 8),
-         (canlibVersion & 0xff));
+  beta = canGetVersionEx(canVERSION_CANLIB32_BETA);
+  if (beta) {
+    sprintf(betaString, "BETA");
+  } else {
+    betaString[0] = '\0';
+  }
+  canlibVersion = canGetVersionEx(canVERSION_CANLIB32_PRODVER);
+  printf("CANlib version %d.%d %s\n",
+         canlibVersion >> 8,
+         canlibVersion & 0xff,
+         betaString);
 
   memset(name, 0, sizeof(name));
   memset(custChanName, 0, sizeof(custChanName));
@@ -116,6 +127,19 @@ int main(int argc, char* argv[])
 
   for (i = 0; i < chanCount; i++) {
 
+    stat = canGetChannelData(i, canCHANNELDATA_DRIVER_NAME,
+                             &driverName, sizeof(driverName));
+    if (stat != canOK) {
+      check("canGetChannelData: DRIVER_NAME", stat);
+      exit(1);
+    }
+
+    stat = canGetChannelData(i, canCHANNELDATA_DLL_FILE_VERSION,
+                             &fileVersion, sizeof(fileVersion));
+    if (stat != canOK) {
+      check("canGetChannelData: DLL_FILE_VERSION", stat);
+      exit(1);
+    }
     stat = canGetChannelData(i, canCHANNELDATA_DEVDESCR_ASCII,
                              &name, sizeof(name));
     if (stat != canOK) {
@@ -156,13 +180,14 @@ int main(int argc, char* argv[])
     (void) canGetChannelData(i, canCHANNELDATA_CUST_CHANNEL_NAME,
                              custChanName, sizeof(custChanName));
 
-    printf("channel %2.1d = %s,\t%x-%05x-%05x-%x, %u, %u.%u.%u.%u %s\n",
+    printf("ch %2.1d: %-22s\t%x-%05x-%05x-%x, s/n %u, v%u.%u.%u.%u %s (%s v%d.%d.%d)\n",
            i, name,
            (ean[1] >> 12), ((ean[1] & 0xfff) << 8) | ((ean[0] >> 24) & 0xff),
            (ean[0] >> 4) & 0xfffff, (ean[0] & 0x0f),
            serial[0],
            fw[1] >> 16, fw[1] & 0xffff, fw[0] >> 16, fw[0] & 0xffff,
-           custChanName);
+           custChanName,
+           driverName, fileVersion[3], fileVersion[2], fileVersion[1]);
   }
 
   stat = canUnloadLibrary();

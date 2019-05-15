@@ -34,6 +34,10 @@
  * Author Aaron Ferrucci, adapted from code originally written by PRR.         *
  *                                                                             *
  ******************************************************************************/
+#include <linux/errno.h>
+#include <linux/kernel.h>
+#include <linux/string.h>
+
 #include "inc/io.h"
 
 #include "HAL/inc/altera_avalon_epcs_flash_controller.h"

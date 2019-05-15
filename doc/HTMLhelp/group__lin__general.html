@@ -92,6 +92,8 @@ Functions</h2></td></tr>
 <tr class="separator:gaf47a1f1078f6b3919e2b2d9dfd559d8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3b6bd0017ef68891ac1843a5921f81da"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__lin__general.html#ga3b6bd0017ef68891ac1843a5921f81da">linUnloadLibrary</a> (void)</td></tr>
 <tr class="separator:ga3b6bd0017ef68891ac1843a5921f81da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6a182f2608e54e273f80f27770afa9dc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__lin__status__codes.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__lin__general.html#ga6a182f2608e54e273f80f27770afa9dc">linGetVersion</a> (int *major, int *minor, int *build)</td></tr>
+<tr class="separator:ga6a182f2608e54e273f80f27770afa9dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gafa260028be850e70a99c1b0706679583"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__lin__status__codes.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__lin__general.html#gafa260028be850e70a99c1b0706679583">linGetFirmwareVersion</a> (<a class="el" href="linlib_8h.html#a759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, unsigned char *bootVerMajor, unsigned char *bootVerMinor, unsigned char *bootVerBuild, unsigned char *appVerMajor, unsigned char *appVerMinor, unsigned char *appVerBuild)</td></tr>
 <tr class="separator:gafa260028be850e70a99c1b0706679583"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac5c5dadc7ca9d70c627058a9b2b06231"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__lin__status__codes.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__lin__general.html#gac5c5dadc7ca9d70c627058a9b2b06231">linGetChannelData</a> (int channel, int item, void *buffer, size_t bufsize)</td></tr>
@@ -238,6 +240,52 @@ Version numbers are, since the precambric era, divided into a major version numb
 
 </div>
 </div>
+<a id="ga6a182f2608e54e273f80f27770afa9dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6a182f2608e54e273f80f27770afa9dc">&#9670;&nbsp;</a></span>linGetVersion()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="group__lin__status__codes.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> linGetVersion </td>
+          <td>(</td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>major</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>minor</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>build</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This function retrieves the LIBLIB library version.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">major</td><td>A pointer to an int where the major version number of the library is stored. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">minor</td><td>A pointer to an int where the minor version number of the library is stored. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">build</td><td>A pointer to an int where the bulid number of the library is stored.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="group__lin__status__codes.html#gga7a5ecfd2846ddd76cd49fb4edec7fc14a548e5df5738051c1e7ab0a3dcb8aa7b1">linOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="group__lin__status__codes.html#linERR_xxx">linERR_xxx</a> (negative) if failure </dd></dl>
+
+</div>
+</div>
 <a id="gaf47a1f1078f6b3919e2b2d9dfd559d8b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gaf47a1f1078f6b3919e2b2d9dfd559d8b">&#9670;&nbsp;</a></span>linInitializeLibrary()</h2>
 
@@ -310,7 +358,7 @@ Version numbers are, since the precambric era, divided into a major version numb
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.22) Mon Feb 12 2018</li>
+    <li class="footer"> (canlib 5.23) Sun May 13 2018</li>
   </ul>
 </div>
 </body>

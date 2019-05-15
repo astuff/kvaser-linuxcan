@@ -90,7 +90,7 @@ Time Measurement</h1>
 <p>CAN messages are time stamped as they arrive. This time stamping is, depending on your hardware platform, done either by the CAN interface hardware or by CANlib.</p>
 <p>In the former case, the <b>accuracy</b> is pretty good, in the order of 1 - 10 microseconds; when CANlib does the job, the accuracy is more like 100 microseconds to 10 milliseconds and you may experience a rather large jitter. This is because Windows is not a real-time operating system.</p>
 <p>The <b>resolution</b> of the time stamps is, by default, 1 ms. It can be changed to a better resolution if desired.</p>
-<p>Use <a class="el" href="group___c_a_n.html#ga04c2f80a23b992bf17591749192e8d48">canReadTimer()</a> to read the current time. You must pass the handle of an open channel to this API call; the return value is the current time using the clock of that channel.</p>
+<p>Use <a class="el" href="canlib_8h.html#a04c2f80a23b992bf17591749192e8d48">canReadTimer()</a> to read the current time. You must pass the handle of an open channel to this API call; the return value is the current time using the clock of that channel.</p>
 <p>Use <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a> with a function code of <a class="el" href="canlib_8h.html#a5b5d43fc8968aa77e48ef8c8d3036c36">canIOCTL_SET_TIMER_SCALE</a> to change the resolution of the time stamps, if desired. This will not affect the accuracy of the time stamps.</p>
 <h1><a class="anchor" id="section_user_guide_time_accuracy_and_resolution"></a>
 Time Stamping Accuracy and Resolution</h1>
@@ -123,7 +123,7 @@ Time Stamping Accuracy and Resolution</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li><li class="navelem"><a class="el" href="page_user_guide.html">CANlib User&#39;s Guide</a></li>
-    <li class="footer"> (canlib 5.22) Mon Feb 12 2018</li>
+    <li class="footer"> (canlib 5.23) Sun May 13 2018</li>
   </ul>
 </div>
 </body>

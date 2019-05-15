@@ -76,7 +76,7 @@
 //#define TRY_RT_QUEUE
 
 #define DEVICE_NAME_STRING "pcican"
-#define MAX_CARD_CHANNELS 2
+#define MAX_CARD_CHANNELS 4
 #define MAX_DRIVER_CHANNELS 128
 #define PCICAN_VENDOR  0x10e8
 #define PCICAN_ID 0x8406

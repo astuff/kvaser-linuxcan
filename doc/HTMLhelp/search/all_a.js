@@ -55,6 +55,7 @@ var searchData=
   ['lingetchanneldata',['linGetChannelData',['../group__lin__general.html#gac5c5dadc7ca9d70c627058a9b2b06231',1,'linlib.h']]],
   ['lingetfirmwareversion',['linGetFirmwareVersion',['../group__lin__general.html#gafa260028be850e70a99c1b0706679583',1,'linlib.h']]],
   ['lingettransceiverdata',['linGetTransceiverData',['../group___l_i_n.html#ga95408cd6c8639514b4be8e188bd7b38a',1,'linlib.h']]],
+  ['lingetversion',['linGetVersion',['../group__lin__general.html#ga6a182f2608e54e273f80f27770afa9dc',1,'linlib.h']]],
   ['linhandle',['LinHandle',['../linlib_8h.html#a759b2696d97bd97008d8df007d9ac44a',1,'linlib.h']]],
   ['lininitializelibrary',['linInitializeLibrary',['../group__lin__general.html#gaf47a1f1078f6b3919e2b2d9dfd559d8b',1,'linlib.h']]],
   ['lininvalid_5fhandle',['linINVALID_HANDLE',['../linlib_8h.html#af080de594ae6f3a531e9b530577e9ebe',1,'linlib.h']]],

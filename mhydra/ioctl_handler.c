@@ -64,7 +64,7 @@
 #include <linux/slab.h>
 #include "ioctl_handler.h"
 #include "debug.h"
-#include "kcany_ioctl.h"
+#include "kcan_ioctl.h"
 #include "mhydraHWIf.h"
 
 #include <linux/slab.h>
@@ -89,9 +89,13 @@ int mhydra_special_ioctl_handler(VCanOpenFileNode *fileNodePtr, unsigned int ioc
   VCanCardData   *ccd   = chd->vCard;
   MhydraCardData *hwdata;
 
-  if ((chd == NULL) || (ccd == NULL)) return VCAN_STAT_BAD_PARAMETER;
+  if ((chd == NULL) || (ccd == NULL)) {
+    return VCAN_STAT_BAD_PARAMETER;
+  }
   hwdata = (MhydraCardData*) ccd->hwCardData;
-  if (hwdata == NULL) return VCAN_STAT_BAD_PARAMETER;
+  if (hwdata == NULL) {
+    return VCAN_STAT_BAD_PARAMETER;
+  }
 
   DEBUGPRINT(3, ("mhydra_special_ioctl_handler (%u)\n", ioctl_cmd));
   switch (ioctl_cmd) {

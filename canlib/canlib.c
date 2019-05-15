@@ -1,5 +1,5 @@
 /*
-**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**            Copyright 2017-2018 by Kvaser AB, Molndal, Sweden
 **                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -64,7 +64,7 @@
 /* Kvaser Linux Canlib */
 
 #include "canlib.h"
-
+#include "canlib_version.h"
 #include "canIfData.h"
 #include "canlib_data.h"
 
@@ -73,6 +73,7 @@
 
 #include "VCanFunctions.h"
 #include "debug.h"
+
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -478,6 +479,7 @@ int CANLIBAPI canClose (const CanHandle hnd)
   if (stat != canOK) {
     return stat;
   }
+
 
   hData = removeHandle(hnd);
   if (hData == NULL) {
@@ -1102,6 +1104,18 @@ canIoCtl (const CanHandle hnd, unsigned int func,
     return canERR_INVHANDLE;
   }
 
+  switch (func) {
+  case canIOCTL_SET_ERROR_FRAMES_REPORTING:
+  case canIOCTL_GET_CHANNEL_QUALITY:
+  case canIOCTL_GET_ROUNDTRIP_TIME:
+  case canIOCTL_GET_BUS_TYPE:
+  case canIOCTL_GET_DEVNAME_ASCII:
+  case canIOCTL_GET_TIME_SINCE_LAST_SEEN:
+  case canIOCTL_SET_THROTTLE_SCALED:
+  case canIOCTL_GET_THROTTLE_SCALED:
+    return canERR_NOT_IMPLEMENTED;
+  }
+
   return hData->canOps->ioCtl(hData, func, buf, buflen);
 }
 
@@ -1320,7 +1334,37 @@ unsigned short CANLIBAPI canGetVersion (void)
   return (CANLIB_MAJOR_VERSION << 8) + CANLIB_MINOR_VERSION;
 }
 
+unsigned int CANLIBAPI canGetVersionEx(unsigned int itemCode)
+{
+  unsigned int prod_letter = 0;
+  int beta = 0;
 
+#ifdef PRODUCT_MINOR_LETTER
+  prod_letter = PRODUCT_MINOR_LETTER;
+#endif
+
+  switch (itemCode) {
+      case canVERSION_CANLIB32_VERSION:
+          return (CANLIB_MAJOR_VERSION << 8) + CANLIB_MINOR_VERSION;
+
+      case canVERSION_CANLIB32_PRODVER:
+          return (CANLIB_PRODUCT_MAJOR_VERSION << 8) + CANLIB_MINOR_VERSION;
+
+      case canVERSION_CANLIB32_PRODVER32:
+          return (CANLIB_MAJOR_VERSION << 16) +
+                 (CANLIB_MINOR_VERSION << 8) +
+                 prod_letter;
+
+      case canVERSION_CANLIB32_BETA:
+#ifdef CANLIB_BETA
+          beta = CANLIB_BETA;
+#endif
+          return beta;
+
+      default:
+          return 0;
+    }
+}
 //******************************************************
 // Get the total number of channels
 //******************************************************
@@ -1445,18 +1489,40 @@ getHandleData (HandleData *hData, int item, void *buffer, const size_t bufsize)
     strncpy(buffer, MFGNAME_ASCII, bufsize - 1);
     return canOK;
 
+  case canCHANNELDATA_DLL_FILE_VERSION:
+    {
+      unsigned short *p = (unsigned short *)buffer;
+      if (bufsize < 8) return canERR_PARAM;
+      *p++ = 0;
+      *p++ = CANLIB_BUILD_VERSION;
+      *p++ = CANLIB_MINOR_VERSION;
+      *p++ = CANLIB_MAJOR_VERSION;
+      return canOK;
+    }
+
+  case canCHANNELDATA_DLL_PRODUCT_VERSION:
+    {
+      unsigned short *p = (unsigned short *)buffer;
+      if (bufsize < 8) return canERR_PARAM;
+      *p++ = 0;
+#ifdef PRODUCT_MINOR_LETTER
+      *p++ = (PRODUCT_MINOR_LETTER != '0' ? PRODUCT_MINOR_LETTER : 0);
+#else
+      *p++ = 0;
+#endif
+      *p++ = CANLIB_MINOR_VERSION;
+      *p++ = CANLIB_PRODUCT_MAJOR_VERSION;
+      return canOK;
+    }
+
+
   case canCHANNELDATA_TRANS_CAP:
-  case canCHANNELDATA_CHANNEL_FLAGS:
   case canCHANNELDATA_TRANS_SERIAL_NO:
   case canCHANNELDATA_TRANS_UPC_NO:
-  case canCHANNELDATA_DLL_FILE_VERSION:
-  case canCHANNELDATA_DLL_PRODUCT_VERSION:
   case canCHANNELDATA_DLL_FILETYPE:
   case canCHANNELDATA_DEVICE_PHYSICAL_POSITION:
   case canCHANNELDATA_UI_NUMBER:
   case canCHANNELDATA_TIMESYNC_ENABLED:
-  case canCHANNELDATA_DRIVER_FILE_VERSION:
-  case canCHANNELDATA_DRIVER_PRODUCT_VERSION:
   case canCHANNELDATA_MFGNAME_UNICODE:
   case canCHANNELDATA_DEVDESCR_UNICODE:
   case canCHANNELDATA_CHANNEL_QUALITY:
@@ -2359,6 +2425,8 @@ kvStatus  kvTimeDomainGetData (kvTimeDomain domain,
   LIST_ENTRY *lGroup, *pdLink, *lCard;
 
   PRINTF_TIMEDOMAIN(("kvTimeDomainGetData: Entered\n"));
+
+  if (!Initialized) return canERR_NOTINITIALIZED;
   if (!domain || !data || bufsiz != sizeof(kvTimeDomainData)) {
     return canERR_PARAM;
   }
@@ -2413,6 +2481,7 @@ kvStatus  kvTimeDomainAddHandle (kvTimeDomain domain, int handle)
   uint64_t ean;
   int err;
 
+  if (!Initialized) return canERR_NOTINITIALIZED;
   if (!domain || (findHandle(handle) == NULL)) {
     return canERR_PARAM;
   }
@@ -2553,6 +2622,7 @@ kvStatus  kvTimeDomainRemoveHandle (kvTimeDomain domain, int handle)
   VALIDATE_AND_DETHREAD(handle, (kvStatus));
 #endif
 
+  if (!Initialized) return canERR_NOTINITIALIZED;
   if (!domain || (findHandle(handle) == NULL)) {
     return canERR_PARAM;
   }

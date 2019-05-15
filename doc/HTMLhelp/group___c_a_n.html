@@ -134,8 +134,6 @@ Functions</h2></td></tr>
 <tr class="separator:gaa1229ae7635c051a8f7fe545d9d8007a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaf38b95fce4930347d9986887ec046e13"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#gaf38b95fce4930347d9986887ec046e13">canTranslateBaud</a> (long *const freq, unsigned int *const tseg1, unsigned int *const tseg2, unsigned int *const sjw, unsigned int *const nosamp, unsigned int *const syncMode)</td></tr>
 <tr class="separator:gaf38b95fce4930347d9986887ec046e13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga04c2f80a23b992bf17591749192e8d48"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga04c2f80a23b992bf17591749192e8d48">canReadTimer</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned long *time)</td></tr>
-<tr class="separator:ga04c2f80a23b992bf17591749192e8d48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac377d182232fb4ec2fed881c2b9ab300"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel</a> (int channel, int flags)</td></tr>
 <tr class="separator:gac377d182232fb4ec2fed881c2b9ab300"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac34c1577cae55385250e7412513c8cbd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#gac34c1577cae55385250e7412513c8cbd">canSetBusParamsC200</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned char btr0, unsigned char btr1)</td></tr>
@@ -1220,51 +1218,6 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
 
 </div>
 </div>
-<a id="ga04c2f80a23b992bf17591749192e8d48"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga04c2f80a23b992bf17591749192e8d48">&#9670;&nbsp;</a></span>canReadTimer()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> canReadTimer </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a>&#160;</td>
-          <td class="paramname"><em>hnd</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">unsigned long *&#160;</td>
-          <td class="paramname"><em>time</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Reads the current time from the clock used to timestamp the messages for the indicated circuit.</p>
-<p>This API may return <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a9335388ba5edd2cedeb61d6febeff505">canERR_INVHANDLE</a> and/or <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a87887ebf2a17b06d82d83e33acf06df8">canERR_NOTINITIALIZED</a>! This happens if <em>hnd</em> is invalid, or if the library was not initialized.</p>
-<dl class="section note"><dt>Note</dt><dd>The clock used to timestamp the messages may not be available for direct reading on all platforms. In such cases, the PC's clock is used to return an approximation of the current time. Note that clock drift might occur in this case.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>A handle to an open circuit. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">time</td><td>The current time, with the prevailing time resolution.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
-<dd>
-<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_time.html#section_user_guide_time_accuracy_and_resolution">Time Stamping Accuracy and Resolution</a> </dd>
-<dd>
-<a class="el" href="group__can__general.html#ga0671078a6184ab2b73287946a49763f2">kvReadTimer()</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="read_timer_test_8c-example.html#a4">readTimerTest.c</a>.</dd>
-</dl>
-</div>
-</div>
 <a id="gac01f98e282609b5f6aaf2b1eabfb83ec"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gac01f98e282609b5f6aaf2b1eabfb83ec">&#9670;&nbsp;</a></span>canReadWait()</h2>
 
@@ -2123,7 +2076,7 @@ Not implemented in linux.</dd></dl>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.22) Mon Feb 12 2018</li>
+    <li class="footer"> (canlib 5.23) Sun May 13 2018</li>
   </ul>
 </div>
 </body>

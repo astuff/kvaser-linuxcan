@@ -11,7 +11,7 @@ var group__kvadb__messages =
     [ "kvaDbGetMsgFlags", "group__kvadb__messages.html#ga894f00aefc3b13615917a7db64d3c1e6", null ],
     [ "kvaDbGetMsgId", "group__kvadb__messages.html#gad38351a6992901219de951400c681974", null ],
     [ "kvaDbGetMsgIdEx", "group__kvadb__messages.html#ga5041eeeb8c35df302ace87a2bab3b283", null ],
-    [ "kvaDbGetMsgMux", "group__kvadb__messages.html#ga038b6cd47cd5aa6f3d7e8e26808943a1", null ],
+    [ "kvaDbGetMsgMux", "group__kvadb__messages.html#ga292a85bce6c50e66ccc23f80d1c25a0e", null ],
     [ "kvaDbGetMsgName", "group__kvadb__messages.html#ga194badc7e10d889df38a0f4eb763b5e6", null ],
     [ "kvaDbGetMsgQualifiedName", "group__kvadb__messages.html#gad34b31d9be199e8b7ac2d7d3dcab8f1e", null ],
     [ "kvaDbGetMsgSendNode", "group__kvadb__messages.html#gac400592a259f0db28e713aab2b8b4055", null ],

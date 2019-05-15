@@ -188,12 +188,13 @@ A12
     /etc/udev/rules.d/10-kvaser.rules. Similarly the module is unloaded when the
     last inteface using the module is unplugged.
 
-    For PCI(E) based interfaces the modules needs to be loaded/unloaded manually
-    with modprobe/rmmod. Whenever a module is loaded/unloaded a script is
-    executed. This is configured in /etc/modprobe.d/kvaser.conf. It is also
-    possible to have the modules loaded at boot. To achieve this execute
-    'sudo make load' instead of 'sudo make install', when you install linuxcan.
-    This will create the file /etc/modules-load.d/kvaser.conf.
+    For PCI(E) based interfaces and virtual devices, the modules needs to be
+    loaded/unloaded manually with modprobe/rmmod. Whenever a module is
+    loaded/unloaded a script is executed. This is configured in
+    /etc/modprobe.d/kvaser.conf. It is also possible to have the modules loaded
+    at boot. To achieve this execute 'sudo make load' instead of
+    'sudo make install', when you install linuxcan. This will create the file
+    /etc/modules-load.d/kvaser.conf.
 
 --------------------------------------------------------------------------------
 Q13

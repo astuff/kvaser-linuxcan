@@ -21,7 +21,6 @@ var group___c_a_n =
     [ "canReadStatus", "group___c_a_n.html#gaca3da209fe673b3838a50a3abe831855", null ],
     [ "canReadSync", "group___c_a_n.html#ga16356f4d646240ff2e640773d21f4d76", null ],
     [ "canReadSyncSpecific", "group___c_a_n.html#ga4b21a0e2547c1435c378d13e6803acef", null ],
-    [ "canReadTimer", "group___c_a_n.html#ga04c2f80a23b992bf17591749192e8d48", null ],
     [ "canReadWait", "group___c_a_n.html#gac01f98e282609b5f6aaf2b1eabfb83ec", null ],
     [ "canRequestBusStatistics", "group___c_a_n.html#gaf7358e5ef5143e39c10b46d9cb592485", null ],
     [ "canRequestChipStatus", "group___c_a_n.html#gaba3573e69435d87047c190520efdf5e5", null ],

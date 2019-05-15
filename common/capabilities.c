@@ -111,7 +111,19 @@ uint8_t convert_vcan_to_hydra_cmd (uint32_t vcan_cmd) {
     case VCAN_CHANNEL_CAP_HAS_LOGGER:          return CAP_SUB_CMD_HAS_LOGGER; break;
     case VCAN_CHANNEL_CAP_HAS_REMOTE:          return CAP_SUB_CMD_HAS_REMOTE; break;
     case VCAN_CHANNEL_CAP_HAS_SCRIPT:          return CAP_SUB_CMD_HAS_SCRIPT; break;
+    case VCAN_CHANNEL_CAP_DIAGNOSTICS:         return CAP_SUB_CMD_HAS_KDI; break;
     default: return 0; break;
   }
 }
 EXPORT_SYMBOL(convert_vcan_to_hydra_cmd);
+
+int card_has_capability (VCanCardData *vCard, uint32_t cap, uint32_t n_channels_max)
+{
+  uint32_t i;
+  for (i = 0; i < n_channels_max; i++) {
+    VCanChanData *vChd = vCard->chanData[i];
+    if (vChd->capabilities & cap) return 1;
+  }
+  return 0;
+}
+EXPORT_SYMBOL(card_has_capability);

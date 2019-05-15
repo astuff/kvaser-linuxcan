@@ -353,6 +353,9 @@ static int newMatchedPair (SOFTSYNC_DATA *p,
     PRINTF_SOFTSYNC(("%s: SoftSync member 0x%p dropped matched pair because"
                      " diff=abs(%ld) >= %d\n",
                      HWNAME, p->ci, (long) diff, SOFTSYNC_DIFF_ALLOWED));
+
+    p->nMatched = 0; //try to sync again
+
     return MATCH_DROPPED;
   }
 }

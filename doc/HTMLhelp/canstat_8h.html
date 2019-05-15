@@ -141,7 +141,7 @@ Macros</h2></td></tr>
 <tr class="memdesc:ae04b14c6acacd116cceaf78abc8b02c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">CAN chip status change.  <a href="#ae04b14c6acacd116cceaf78abc8b02c0">More...</a><br /></td></tr>
 <tr class="separator:ae04b14c6acacd116cceaf78abc8b02c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab69dc959890826b245c422966c4bf627"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ab69dc959890826b245c422966c4bf627">canNOTIFY_ENVVAR</a>&#160;&#160;&#160;0x0010</td></tr>
-<tr class="memdesc:ab69dc959890826b245c422966c4bf627"><td class="mdescLeft">&#160;</td><td class="mdescRight">An environment variable was changed by a script.  <a href="#ab69dc959890826b245c422966c4bf627">More...</a><br /></td></tr>
+<tr class="memdesc:ab69dc959890826b245c422966c4bf627"><td class="mdescLeft">&#160;</td><td class="mdescRight">An environment variable was changed by a script. Note that you will not be notified when an environment variable is updated from the Canlib API.  <a href="#ab69dc959890826b245c422966c4bf627">More...</a><br /></td></tr>
 <tr class="separator:ab69dc959890826b245c422966c4bf627"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canSTAT_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canSTAT_xxx"></a> The following circuit status flags are returned by <a class="el" href="group___c_a_n.html#gaca3da209fe673b3838a50a3abe831855">canReadStatus()</a>. Note that more than one flag might be set at any one time.</p>
@@ -502,7 +502,13 @@ Enumerations</h2></td></tr>
 <br />
 &#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7ae88fe7d696e1e4411612e083bc45188b">canERR_SCRIPT_WRONG_VERSION</a> = -40, 
 <br />
-&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a7fdb374ab194f07a46dfddd2c57fee5e">canERR__RESERVED</a> = -41
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7aea19c70918f0993acd55691d28748914">canERR_SCRIPT_TXE_CONTAINER_VERSION</a> = -41, 
+<br />
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a58c38bbd185bd93144a10f22f12ca8fd">canERR_SCRIPT_TXE_CONTAINER_FORMAT</a> = -42, 
+<br />
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7afc999ab39dd6545165d8bfd44bf900ec">canERR_BUFFER_TOO_SMALL</a> = -43, 
+<br />
+&#160;&#160;<a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a7fdb374ab194f07a46dfddd2c57fee5e">canERR__RESERVED</a> = -44
 <br />
  }</td></tr>
 <tr class="separator:a52b5e5c71832b0bd3c6a5b1fd48583e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1009,6 +1015,7 @@ Enumerations</h2></td></tr>
 </div><div class="memdoc">
 
 <p>HW buffer overrun. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_overruns">Overruns</a> </dd></dl>
 
 </div>
 </div>
@@ -1041,6 +1048,7 @@ Enumerations</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Any overrun condition. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_overruns">Overruns</a> </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a15">cancount.c</a>.</dd>
 </dl>
 </div>
@@ -1074,6 +1082,7 @@ Enumerations</h2></td></tr>
 </div><div class="memdoc">
 
 <p>SW buffer overrun. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_overruns">Overruns</a> </dd></dl>
 
 </div>
 </div>
@@ -1089,7 +1098,7 @@ Enumerations</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>An environment variable was changed by a script. </p>
+<p>An environment variable was changed by a script. Note that you will not be notified when an environment variable is updated from the Canlib API. </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="canmonitor_8c-example.html#a20">canmonitor.c</a>, and <a class="el" href="simplewrite_8c-example.html#a22">simplewrite.c</a>.</dd>
 </dl>
 </div>
@@ -2240,6 +2249,12 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="a52b5e5c71832b0bd3c6a5b1fd48583e7ae88fe7d696e1e4411612e083bc45188b"></a>canERR_SCRIPT_WRONG_VERSION&#160;</td><td class="fielddoc"><p><b>The t script version dosen't match the version(s) that the device firmware supports.</b>; </p>
 </td></tr>
+<tr><td class="fieldname"><a id="a52b5e5c71832b0bd3c6a5b1fd48583e7aea19c70918f0993acd55691d28748914"></a>canERR_SCRIPT_TXE_CONTAINER_VERSION&#160;</td><td class="fielddoc"><p><b>The compiled t script container file format is of a version which is not supported by this version of canlib.</b>; </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a52b5e5c71832b0bd3c6a5b1fd48583e7a58c38bbd185bd93144a10f22f12ca8fd"></a>canERR_SCRIPT_TXE_CONTAINER_FORMAT&#160;</td><td class="fielddoc"><p><b>An error occured while trying to parse the compiled t script file.</b>; </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a52b5e5c71832b0bd3c6a5b1fd48583e7afc999ab39dd6545165d8bfd44bf900ec"></a>canERR_BUFFER_TOO_SMALL&#160;</td><td class="fielddoc"><p><b>The buffer provided was not large enough to contain the requested data.</b>; </p>
+</td></tr>
 <tr><td class="fieldname"><a id="a52b5e5c71832b0bd3c6a5b1fd48583e7a7fdb374ab194f07a46dfddd2c57fee5e"></a>canERR__RESERVED&#160;</td><td class="fielddoc"><p>Reserved. </p>
 </td></tr>
 </table>
@@ -2253,7 +2268,7 @@ Enumerations</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="canstat_8h.html">canstat.h</a></li>
-    <li class="footer"> (canlib 5.22) Mon Feb 12 2018</li>
+    <li class="footer"> (canlib 5.23) Sun May 13 2018</li>
   </ul>
 </div>
 </body>

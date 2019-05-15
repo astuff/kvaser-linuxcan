@@ -69,7 +69,6 @@ LIBRARY := $(LIBNAME).$(MAJOR).$(MINOR).$(BUILD)
 SONAME  := $(LIBNAME).$(MAJOR)
 
 CFLAGS  += -Wall -DLINLIB_NAME_STRING=\"$(LIBRARY)\" -O2 -fomit-frame-pointer $(XTRA_CFLAGS) -pthread
-CFLAGS  += -DLINUX=1 # maybe remove in time
 CFLAGS  += -I. -I../include
 
 # Flags for  reentrant, position independent code

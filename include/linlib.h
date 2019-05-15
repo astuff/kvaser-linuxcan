@@ -353,9 +353,7 @@ LinStatus LINLIBAPI linGetTransceiverData(int channel, unsigned char eanNo[8],
  * \ingroup LIN
  * Open a channel to a LIN interface.
  *
- * \note For DRV Lin: The cable must be powered and connected to a LAPcan channel.
- *
- * \note For Kvaser LIN Leaf: The Leaf must be powered from the LIN side.
+ * \note The device must be powered from the LIN side.
  *
  * \param[in] channel  The number of the channel. Channel numbering is hardware
  *                     dependent.
@@ -400,6 +398,24 @@ LinHandle LINLIBAPI linOpenChannel(int channel, int flags);
  * \sa \ref linOpenChannel()
  */
 LinStatus LINLIBAPI linClose(LinHandle h);
+
+
+/**
+ * \ingroup lin_general
+ * This function retrieves the LIBLIB library version.
+ *
+ * \param[out] major  A pointer to an int where the major version number
+ *                    of the library is stored.
+ * \param[out] minor  A pointer to an int where the minor version number
+ *                    of the library is stored.
+ * \param[out] build  A pointer to an int where the bulid number of the
+ *                    library is stored.
+ *
+ * \return \ref linOK (zero) if success
+ * \return \ref linERR_xxx (negative) if failure
+ */
+LinStatus LINLIBAPI linGetVersion(int *major, int *minor, int *build);
+
 
 /**
  * \ingroup lin_general
@@ -866,8 +882,9 @@ LinStatus LINLIBAPI linGetCanHandle(LinHandle h, unsigned int *canHandle);
 *
 * \section section_user_guide_lin_intro Using the LIN Bus
 *
-*   Using the LIN bus requires special hardware and is presently supported on
-*   LAPcan, LAPcan II, Kvaser LIN Leaf and Kvaser Hybrid.
+*   Using the LIN bus requires special hardware, e.g.
+*   Kvaser Leaf Professional LIN, Kvaser Hybrid 2xCAN/LIN or
+*   Kvaser Hybrid Pro 2xCAN/LIN.
 *
 *   The CAN API calls are not directly suitable for the LIN bus. Instead, a new
 *   API is provided that enables you to use the LIN bus as easily as you use the

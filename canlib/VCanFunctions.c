@@ -122,7 +122,8 @@ static uint32_t capabilities_table[][2] = {
   {VCAN_CHANNEL_CAP_HAS_LOGGER,          canCHANNEL_CAP_LOGGER},
   {VCAN_CHANNEL_CAP_HAS_REMOTE,          canCHANNEL_CAP_REMOTE_ACCESS},
   {VCAN_CHANNEL_CAP_HAS_SCRIPT,          canCHANNEL_CAP_SCRIPT},
-  {VCAN_CHANNEL_CAP_LIN_HYBRID,          canCHANNEL_CAP_LIN_HYBRID}
+  {VCAN_CHANNEL_CAP_LIN_HYBRID,          canCHANNEL_CAP_LIN_HYBRID},
+  {VCAN_CHANNEL_CAP_DIAGNOSTICS,         canCHANNEL_CAP_DIAGNOSTICS}
 };
 
 
@@ -142,6 +143,7 @@ static pthread_mutex_t handleMutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
 #endif
 
 static uint32_t get_capabilities (uint32_t cap);
+static uint32_t convert_channel_info_flags (uint32_t vflags);
 
 #define ERROR_WHEN_NEQ 0
 #define ERROR_WHEN_LT  1
@@ -408,6 +410,26 @@ static canStatus vCanSetNotify (HandleData *hData,
       goto error_ioc;
     }
 
+    {
+      VCanInitAccess my_arg;
+      my_arg.retval = 0;
+      
+      my_arg.require_init_access = 0;
+      my_arg.wants_init_access   = 1;
+      
+      ret = ioctl(hData->notifyFd, VCAN_IOC_OPEN_INIT_ACCESS, &my_arg);
+      
+      if (ret) {
+        close(hData->fd);
+        goto error_ioc;
+      }
+      
+      if (my_arg.retval == VCANINITACCESS_FAIL) {
+        close(hData->fd);
+        goto error_ioc;
+      }
+    }
+
     ret = ioctl(hData->notifyFd, VCAN_IOC_BUS_ON, NULL);
     if (ret != 0) {
       goto error_ioc;
@@ -620,6 +642,8 @@ static canStatus vCanSetBusParams (HandleData *hData,
   int              ret;
 
   (void)syncmode; // Unused.
+  my_arg.retval = 0;
+
   my_arg.retval = 0;
 
   my_arg.bp.freq    = (signed long)freq;
@@ -932,6 +956,8 @@ static canStatus vCanSetBusOutputControl (HandleData   *hData,
 {
   VCanSetBusOutputControl my_arg;
   int                     ret;
+  my_arg.retval = 0;
+
   my_arg.retval = 0;
 
   switch (drivertype) {
@@ -1521,6 +1547,10 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
     break;
 
   case canCHANNELDATA_CARD_SERIAL_NO:
+    if (bufsize < 8){
+      close(fd);
+      return canERR_PARAM;
+    }
     err = ioctl(fd, VCAN_IOC_GET_SERIAL, buffer);
     break;
 
@@ -1551,6 +1581,13 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
     err = ioctl(fd, VCAN_IOC_GET_CHAN_CAP_MASK, buffer);
     if (!err) {
       *(uint32_t *)buffer = get_capabilities (*(uint32_t *)buffer);
+    }
+    break;
+
+  case canCHANNELDATA_CHANNEL_FLAGS:
+    err = ioctl(fd, VCAN_IOC_GET_CHANNEL_INFO, buffer);
+    if (!err) {
+      *(uint32_t *)buffer =  convert_channel_info_flags(*(uint32_t *)buffer);
     }
     break;
 
@@ -1595,11 +1632,50 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
     }
     break;
 
+  case canCHANNELDATA_DRIVER_FILE_VERSION:
+    {
+      VCAN_IOCTL_CARD_INFO ci;
+      unsigned short *p = (unsigned short *)buffer;
+
+      if (bufsize < 8){
+        close(fd);
+        return canERR_PARAM;
+      }
+      err = ioctl(fd, VCAN_IOCTL_GET_CARD_INFO, &ci);
+      if (!err) {
+        *p++ = 0;
+        *p++ = ci.driver_version_build;
+        *p++ = ci.driver_version_minor;
+        *p++ = ci.driver_version_major;
+      }
+      break;
+    }
+
+  case canCHANNELDATA_DRIVER_PRODUCT_VERSION:
+    {
+      VCAN_IOCTL_CARD_INFO ci;
+      unsigned short *p = (unsigned short *)buffer;
+
+      if (bufsize < 8){
+        close(fd);
+        return canERR_PARAM;
+      }
+      err = ioctl(fd, VCAN_IOCTL_GET_CARD_INFO, &ci);
+      if (!err) {
+        *p++ = 0;
+        *p++ = 0; // (unsigned short) ci.driver_version_minor_letter;
+        *p++ = (unsigned short) ci.product_version_minor;
+        *p++ = (unsigned short) ci.product_version_major;
+      }
+      break;
+    }
+
   case canCHANNELDATA_IS_REMOTE:
     // No remote devices for Linux so far
     {
       if (bufsize < 4 /*"32-bit unsigned int"*/|| !buffer) {
-         return canERR_PARAM;
+        close(fd);
+        return canERR_PARAM;
       }
       *(uint32_t*)buffer = 0;
     }
@@ -1855,6 +1931,31 @@ static canStatus vCanIoCtl(HandleData *hData, unsigned int func,
     hData->report_access_errors = *(unsigned char*)buf;
     break;
 
+  // canIOCTL_LIN_MODE is used by LINlib to set LIN mode to MASTER or LIN
+  // this LIN mode can later be retrieved via canCHANNELDATA_CHANNEL_FLAGS
+  case canIOCTL_LIN_MODE:
+    {
+      uint32_t c_flags;
+      uint32_t v_flags = 0;
+
+      if (check_args (buf, buflen, sizeof (uint32_t), ERROR_WHEN_LT)) {
+        return canERR_PARAM;
+      }
+
+      c_flags = *(uint32_t *)buf;
+      if (c_flags & canCHANNEL_IS_LIN_MASTER) {
+        v_flags |= VCAN_CHANNEL_STATUS_LIN_MASTER;
+      }
+      if (c_flags & canCHANNEL_IS_LIN_SLAVE) {
+        v_flags |= VCAN_CHANNEL_STATUS_LIN_SLAVE;
+      }
+
+      if (ioctl(hData->fd, KCAN_IOCTL_LIN_MODE, &v_flags)) {
+        return errnoToCanStatus(errno);
+      }
+      break;
+    }
+
   default:
     return canERR_PARAM;
   }
@@ -2098,6 +2199,30 @@ static canStatus kCanObjbufDisable (HandleData *hData, int idx)
   }
 
   return canOK;
+}
+
+static uint32_t convert_channel_info_flags (uint32_t vflags) {
+  uint32_t retval = 0;
+
+  if (vflags & VCAN_CHANNEL_STATUS_ON_BUS) {
+    retval |= canCHANNEL_IS_OPEN;
+  }
+  if (vflags & VCAN_CHANNEL_STATUS_EXCLUSIVE) {
+    retval |= canCHANNEL_IS_EXCLUSIVE;  // Currently not working but added for completeness
+  }
+  if (vflags & VCAN_CHANNEL_STATUS_CANFD) {
+    retval |= canCHANNEL_IS_CANFD;
+  }
+  if (vflags & VCAN_CHANNEL_STATUS_LIN) {
+    retval |= canCHANNEL_IS_LIN;
+  }
+  if (vflags & VCAN_CHANNEL_STATUS_LIN_MASTER) {
+    retval |= canCHANNEL_IS_LIN_MASTER;
+  }
+  if (vflags & VCAN_CHANNEL_STATUS_LIN_SLAVE) {
+    retval |= canCHANNEL_IS_LIN_SLAVE;
+  }
+  return retval;
 }
 
 static uint32_t get_capabilities (uint32_t cap) {
