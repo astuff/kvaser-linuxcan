@@ -162,6 +162,42 @@ jobs:
           command: |
             make install
 
+  ubuntu-xenial:
+    docker:
+      - image: ubuntu:xenial
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: |
+            make
+      - run:
+          name: Test
+          command: |
+            make check
+      - run:
+          name: Install
+          command: |
+            make install
+
+  ubuntu-bionic:
+    docker:
+      - image: ubuntu:bionic
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: |
+            make
+      - run:
+          name: Test
+          command: |
+            make check
+      - run:
+          name: Install
+          command: |
+            make install
+
 workflows:
   version: 2
   ros_build:
@@ -175,3 +211,5 @@ workflows:
       - gcc-8.2
       - gcc-8.3
       - gcc-9.1
+      - ubuntu-xenial
+      - ubuntu-bionic
