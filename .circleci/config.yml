@@ -8,7 +8,7 @@ jobs:
       - run:
           name: Set Up Container
           command: |
-            apt update -qq && apt install -y gcc make
+            apt update -qq && apt install -y gcc make linux-headers-generic
       - run:
           name: Build
           command: |
@@ -30,7 +30,7 @@ jobs:
       - run:
           name: Set Up Container
           command: |
-            apt update -qq && apt install -y build-essential
+            apt update -qq && apt install -y gcc make linux-headers-generic
       - run:
           name: Build
           command: |
