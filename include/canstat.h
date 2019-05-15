@@ -355,6 +355,7 @@ typedef enum {
  *
  * \ref canMSG_RTR, \ref canMSG_STD, \ref canMSG_EXT, \ref canMSG_WAKEUP and
  * \ref canMSG_ERROR_FRAME are meaningful also for transmitted messages.
+ * \ref canMSG_SINGLE_SHOT is only for transmission. 
  *
  * Note that \ref canMSG_RTR cannot be set for CAN FD messages.
  *
@@ -390,6 +391,12 @@ typedef enum {
 #define canMSG_TXRQ             0x0080      ///< Message is a TX REQUEST (msg is transfered to the chip)
 #define canMSG_DELAY_MSG        0x0100      ///< Message is NOT sent on the bus. The transmission of messages are delayed. The dlc specifies the delay in milliseconds (1..1000).  
 
+// single shot flags: 
+#define canMSG_SINGLE_SHOT      0x1000000      ///< Message is Single Shot, try to send once, no retransmission. This flag can only be used with transmitted messages.
+#define canMSG_TXNACK           0x2000000      ///< Message is a failed Single Shot, message was not sent. This flag is only used with received messages.
+#define canMSG_ABL              0x4000000      ///< Only together with canMSG_TXNACK, Single shot message was not sent because arbitration was lost. This flag is only used with received messages.
+
+
 /**
  * \name canFDMSG_xxx
  * \anchor canFDMSG_xxx
@@ -409,7 +416,7 @@ typedef enum {
 /** @} */
 
 /**
- * \name Message error flags, >= 0x0100
+ * \name Message error flags
  * \anchor canMSGERR_xxx
  *
  * \note Not all hardware platforms can detect the difference between hardware
@@ -433,10 +440,6 @@ typedef enum {
 #define canMSGERR_BIT           0xC000      ///< Any bit error.
 #define canMSGERR_BUSERR        0xF800      ///< Any RX error
 
-// single shot flags: 
-#define canMSG_SINGLE_SHOT      0x1000000      ///< Message is Single Shot, try to send once, no retransmission (only tx)
-#define canMSG_TXNACK           0x2000000      ///< Message is a failed Single Shot, message was not sent (only rx)
-#define canMSG_ABL              0x4000000      ///< Only together with canMSG_TXNACK, Single shot message was not sent because arbitration was lost (only rx)
 /** @} */
 
 /**

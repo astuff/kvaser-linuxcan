@@ -252,6 +252,13 @@ extern "C" {
  */
 void LINLIBAPI linInitializeLibrary(void);
 
+/** 
+ * This function de-initializes the LIN library. After this function is called /ref linInitializeLibrary must be called before any other 
+ * LIN function is called. 
+ *
+ */
+void LINLIBAPI linUnloadLibrary(void);
+
 
 /** 
  * Retrieves the transceiver information for a CAN channel. The application 

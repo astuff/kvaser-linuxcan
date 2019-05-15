@@ -184,89 +184,91 @@ function toggleVisibility(linkObj) {
 <a name="l00198"></a>00198 <span class="preprocessor"></span>
 <a name="l00206"></a>00206 <span class="keywordtype">void</span> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#gaf47a1f1078f6b3919e2b2d9dfd559d8b">linInitializeLibrary</a>(<span class="keywordtype">void</span>);
 <a name="l00207"></a>00207 
-<a name="l00208"></a>00208 
-<a name="l00242"></a>00242 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga95408cd6c8639514b4be8e188bd7b38a">linGetTransceiverData</a>(<span class="keywordtype">int</span> channel, <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> eanNo[8],
-<a name="l00243"></a>00243                                           <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> serNo[8], <span class="keywordtype">int</span> *ttype);
-<a name="l00244"></a>00244 
-<a name="l00266"></a>00266 <a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga040336f8176a10cb9578b47c42baef6b">linOpenChannel</a>(<span class="keywordtype">int</span> channel, <span class="keywordtype">int</span> flags);
-<a name="l00267"></a>00267 
-<a name="l00268"></a>00268 
-<a name="l00273"></a><a class="code" href="group___l_i_n.html#gaddf7881b12723497542ff0f66222c46e">00273</a> <span class="preprocessor">#define LIN_MASTER 1 ///&lt; The LIN interface will be a LIN master</span>
-<a name="l00274"></a><a class="code" href="group___l_i_n.html#ga9b19af88006130b3220a4ecb57cd4e0b">00274</a> <span class="preprocessor"></span><span class="preprocessor">#define LIN_SLAVE 2  ///&lt; The LIN interface will be a LIN slave</span>
-<a name="l00275"></a>00275 <span class="preprocessor"></span>
-<a name="l00289"></a>00289 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga5d8cb59baccdefc9e772ad34c01c596f">linClose</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h);
-<a name="l00290"></a>00290 
-<a name="l00322"></a>00322 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#gafa260028be850e70a99c1b0706679583">linGetFirmwareVersion</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h,
-<a name="l00323"></a>00323                                           <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *bootVerMajor,
-<a name="l00324"></a>00324                                           <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *bootVerMinor,
-<a name="l00325"></a>00325                                           <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *bootVerBuild,
-<a name="l00326"></a>00326                                           <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *appVerMajor,
-<a name="l00327"></a>00327                                           <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *appVerMinor,
-<a name="l00328"></a>00328                                           <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *appVerBuild);
-<a name="l00329"></a>00329 
-<a name="l00344"></a>00344 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga77e1463234ee6c67a71a2ab57f578b7f">linSetBitrate</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> bps);
-<a name="l00345"></a>00345 
-<a name="l00358"></a>00358 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga79ab73655c1749ad9fe2b784885e2dd9">linBusOn</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h);
-<a name="l00359"></a>00359 
-<a name="l00371"></a>00371 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga051ffc0c24d6322825cbc8ff21e50744">linBusOff</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h);
-<a name="l00372"></a>00372 
-<a name="l00384"></a>00384 <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga8af35ecbb1aca56baed27990f3d43d4b">linReadTimer</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h);
-<a name="l00385"></a>00385 
-<a name="l00405"></a>00405 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#gac012f34a621bc885bd582398c3d5d175">linWriteMessage</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span>, <span class="keyword">const</span> <span class="keywordtype">void</span> *msg,
-<a name="l00406"></a>00406                                     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> dlc);
-<a name="l00407"></a>00407 
-<a name="l00420"></a>00420 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga068419b8b624d8918720a8907c4f9274">linRequestMessage</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span>);
-<a name="l00421"></a>00421 
-<a name="l00447"></a>00447 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#gaca2d874c870f16c11a4e8e158817d8bf">linReadMessage</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *<span class="keywordtype">id</span>, <span class="keywordtype">void</span> *msg,
-<a name="l00448"></a>00448                                    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *dlc, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *flags,
-<a name="l00449"></a>00449                                    <a class="code" href="struct_lin_message_info.html">LinMessageInfo</a> *msgInfo);
-<a name="l00450"></a>00450 
-<a name="l00479"></a>00479 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#gaa2f729a931bf644ce62b373ab7414250">linReadMessageWait</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *<span class="keywordtype">id</span>, <span class="keywordtype">void</span> *msg,
-<a name="l00480"></a>00480                                        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *dlc, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *flags,
-<a name="l00481"></a>00481                                        <a class="code" href="struct_lin_message_info.html">LinMessageInfo</a> *msgInfo, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> timeout);
-<a name="l00482"></a>00482 
-<a name="l00500"></a>00500 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga5bf84820248e95fde2718fa46304a5a5">linUpdateMessage</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span>, <span class="keyword">const</span> <span class="keywordtype">void</span> *msg,
-<a name="l00501"></a>00501                                      <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> dlc);
-<a name="l00502"></a>00502 
-<a name="l00503"></a>00503 
-<a name="l00526"></a>00526 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga1c89e03300af644cee54861f92ae567e">linSetupIllegalMessage</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span>,
-<a name="l00527"></a>00527                                            <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> cFlags, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> delay);
-<a name="l00528"></a>00528                                            
-<a name="l00537"></a><a class="code" href="group___l_i_n.html#ga479885d0466fcaff2cb80dedd09a7805">00537</a> <span class="preprocessor">#define LIN_MSG_DISTURB_CSUM   1</span>
-<a name="l00538"></a>00538 <span class="preprocessor"></span>
-<a name="l00542"></a><a class="code" href="group___l_i_n.html#gad4e1ec16e25ca05d694d1faff1ebf147">00542</a> <span class="preprocessor">#define LIN_MSG_DISTURB_PARITY 2</span>
-<a name="l00543"></a>00543 <span class="preprocessor"></span>
-<a name="l00554"></a><a class="code" href="group___l_i_n.html#ga88ace2b1c8f8f6ed08714fc8725a03f8">00554</a> <span class="preprocessor">#define LIN_MSG_USE_STANDARD_PARITY 0x04</span>
-<a name="l00555"></a>00555 <span class="preprocessor"></span>
-<a name="l00558"></a><a class="code" href="group___l_i_n.html#ga8c2ab5dd117f814cef07f6b072aaafc9">00558</a> <span class="preprocessor">#define LIN_MSG_USE_ENHANCED_PARITY 0x08 </span>
-<a name="l00559"></a>00559 <span class="preprocessor"></span>
-<a name="l00592"></a>00592 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga911287175a2ca5574a50d17b698b6d9d">linSetupLIN</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> lFlags, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> bps);
-<a name="l00593"></a>00593 
-<a name="l00594"></a>00594 
-<a name="l00607"></a><a class="code" href="group___l_i_n.html#ga937225a25c3c24efabf7c8438ccecd09">00607</a> <span class="preprocessor">#define LIN_ENHANCED_CHECKSUM  1</span>
-<a name="l00608"></a>00608 <span class="preprocessor"></span>
-<a name="l00614"></a><a class="code" href="group___l_i_n.html#ga2edd31e15abb5f7cb8dd213fd707dfff">00614</a> <span class="preprocessor">#define LIN_VARIABLE_DLC       2</span>
+<a name="l00213"></a>00213 <span class="keywordtype">void</span> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga3b6bd0017ef68891ac1843a5921f81da">linUnloadLibrary</a>(<span class="keywordtype">void</span>);
+<a name="l00214"></a>00214 
+<a name="l00215"></a>00215 
+<a name="l00249"></a>00249 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga95408cd6c8639514b4be8e188bd7b38a">linGetTransceiverData</a>(<span class="keywordtype">int</span> channel, <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> eanNo[8],
+<a name="l00250"></a>00250                                           <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> serNo[8], <span class="keywordtype">int</span> *ttype);
+<a name="l00251"></a>00251 
+<a name="l00273"></a>00273 <a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga040336f8176a10cb9578b47c42baef6b">linOpenChannel</a>(<span class="keywordtype">int</span> channel, <span class="keywordtype">int</span> flags);
+<a name="l00274"></a>00274 
+<a name="l00275"></a>00275 
+<a name="l00280"></a><a class="code" href="group___l_i_n.html#gaddf7881b12723497542ff0f66222c46e">00280</a> <span class="preprocessor">#define LIN_MASTER 1 ///&lt; The LIN interface will be a LIN master</span>
+<a name="l00281"></a><a class="code" href="group___l_i_n.html#ga9b19af88006130b3220a4ecb57cd4e0b">00281</a> <span class="preprocessor"></span><span class="preprocessor">#define LIN_SLAVE 2  ///&lt; The LIN interface will be a LIN slave</span>
+<a name="l00282"></a>00282 <span class="preprocessor"></span>
+<a name="l00296"></a>00296 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga5d8cb59baccdefc9e772ad34c01c596f">linClose</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h);
+<a name="l00297"></a>00297 
+<a name="l00329"></a>00329 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#gafa260028be850e70a99c1b0706679583">linGetFirmwareVersion</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h,
+<a name="l00330"></a>00330                                           <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *bootVerMajor,
+<a name="l00331"></a>00331                                           <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *bootVerMinor,
+<a name="l00332"></a>00332                                           <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *bootVerBuild,
+<a name="l00333"></a>00333                                           <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *appVerMajor,
+<a name="l00334"></a>00334                                           <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *appVerMinor,
+<a name="l00335"></a>00335                                           <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> *appVerBuild);
+<a name="l00336"></a>00336 
+<a name="l00351"></a>00351 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga77e1463234ee6c67a71a2ab57f578b7f">linSetBitrate</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> bps);
+<a name="l00352"></a>00352 
+<a name="l00365"></a>00365 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga79ab73655c1749ad9fe2b784885e2dd9">linBusOn</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h);
+<a name="l00366"></a>00366 
+<a name="l00378"></a>00378 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga051ffc0c24d6322825cbc8ff21e50744">linBusOff</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h);
+<a name="l00379"></a>00379 
+<a name="l00391"></a>00391 <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga8af35ecbb1aca56baed27990f3d43d4b">linReadTimer</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h);
+<a name="l00392"></a>00392 
+<a name="l00412"></a>00412 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#gac012f34a621bc885bd582398c3d5d175">linWriteMessage</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span>, <span class="keyword">const</span> <span class="keywordtype">void</span> *msg,
+<a name="l00413"></a>00413                                     <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> dlc);
+<a name="l00414"></a>00414 
+<a name="l00427"></a>00427 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga068419b8b624d8918720a8907c4f9274">linRequestMessage</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span>);
+<a name="l00428"></a>00428 
+<a name="l00454"></a>00454 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#gaca2d874c870f16c11a4e8e158817d8bf">linReadMessage</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *<span class="keywordtype">id</span>, <span class="keywordtype">void</span> *msg,
+<a name="l00455"></a>00455                                    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *dlc, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *flags,
+<a name="l00456"></a>00456                                    <a class="code" href="struct_lin_message_info.html">LinMessageInfo</a> *msgInfo);
+<a name="l00457"></a>00457 
+<a name="l00486"></a>00486 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#gaa2f729a931bf644ce62b373ab7414250">linReadMessageWait</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *<span class="keywordtype">id</span>, <span class="keywordtype">void</span> *msg,
+<a name="l00487"></a>00487                                        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *dlc, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *flags,
+<a name="l00488"></a>00488                                        <a class="code" href="struct_lin_message_info.html">LinMessageInfo</a> *msgInfo, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> timeout);
+<a name="l00489"></a>00489 
+<a name="l00507"></a>00507 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga5bf84820248e95fde2718fa46304a5a5">linUpdateMessage</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span>, <span class="keyword">const</span> <span class="keywordtype">void</span> *msg,
+<a name="l00508"></a>00508                                      <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> dlc);
+<a name="l00509"></a>00509 
+<a name="l00510"></a>00510 
+<a name="l00533"></a>00533 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga1c89e03300af644cee54861f92ae567e">linSetupIllegalMessage</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span>,
+<a name="l00534"></a>00534                                            <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> cFlags, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> delay);
+<a name="l00535"></a>00535                                            
+<a name="l00544"></a><a class="code" href="group___l_i_n.html#ga479885d0466fcaff2cb80dedd09a7805">00544</a> <span class="preprocessor">#define LIN_MSG_DISTURB_CSUM   1</span>
+<a name="l00545"></a>00545 <span class="preprocessor"></span>
+<a name="l00549"></a><a class="code" href="group___l_i_n.html#gad4e1ec16e25ca05d694d1faff1ebf147">00549</a> <span class="preprocessor">#define LIN_MSG_DISTURB_PARITY 2</span>
+<a name="l00550"></a>00550 <span class="preprocessor"></span>
+<a name="l00561"></a><a class="code" href="group___l_i_n.html#ga88ace2b1c8f8f6ed08714fc8725a03f8">00561</a> <span class="preprocessor">#define LIN_MSG_USE_STANDARD_PARITY 0x04</span>
+<a name="l00562"></a>00562 <span class="preprocessor"></span>
+<a name="l00565"></a><a class="code" href="group___l_i_n.html#ga8c2ab5dd117f814cef07f6b072aaafc9">00565</a> <span class="preprocessor">#define LIN_MSG_USE_ENHANCED_PARITY 0x08 </span>
+<a name="l00566"></a>00566 <span class="preprocessor"></span>
+<a name="l00599"></a>00599 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga911287175a2ca5574a50d17b698b6d9d">linSetupLIN</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> lFlags, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> bps);
+<a name="l00600"></a>00600 
+<a name="l00601"></a>00601 
+<a name="l00614"></a><a class="code" href="group___l_i_n.html#ga937225a25c3c24efabf7c8438ccecd09">00614</a> <span class="preprocessor">#define LIN_ENHANCED_CHECKSUM  1</span>
 <a name="l00615"></a>00615 <span class="preprocessor"></span>
-<a name="l00633"></a>00633 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga4ba0a5256a785f3cc67a5e661837223e">linWriteWakeup</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> count,
-<a name="l00634"></a>00634                                    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> interval);
-<a name="l00635"></a>00635 
-<a name="l00636"></a>00636 
-<a name="l00648"></a>00648 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga905647480dd89a7225e4b8ae0d82cb92">linClearMessage</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span>);
-<a name="l00649"></a>00649 
-<a name="l00691"></a>00691 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga1bd437b46f5923f05905c43cd4a1617a">linWriteSync</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> timeout);
-<a name="l00692"></a>00692 
-<a name="l00703"></a>00703 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#gadf904a2ba0101ac6dc622b6035cf0f5f">linGetCanHandle</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *<a class="code" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canHandle</a>);
-<a name="l00704"></a>00704 
-<a name="l00705"></a>00705 <span class="preprocessor">#ifdef __cplusplus</span>
-<a name="l00706"></a>00706 <span class="preprocessor"></span>}
-<a name="l00707"></a>00707 <span class="preprocessor">#endif</span>
-<a name="l00708"></a>00708 <span class="preprocessor"></span>
-<a name="l00711"></a>00711 <span class="preprocessor">#endif // __LINLIB_H</span>
+<a name="l00621"></a><a class="code" href="group___l_i_n.html#ga2edd31e15abb5f7cb8dd213fd707dfff">00621</a> <span class="preprocessor">#define LIN_VARIABLE_DLC       2</span>
+<a name="l00622"></a>00622 <span class="preprocessor"></span>
+<a name="l00640"></a>00640 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga4ba0a5256a785f3cc67a5e661837223e">linWriteWakeup</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> count,
+<a name="l00641"></a>00641                                    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> interval);
+<a name="l00642"></a>00642 
+<a name="l00643"></a>00643 
+<a name="l00655"></a>00655 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga905647480dd89a7225e4b8ae0d82cb92">linClearMessage</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> <span class="keywordtype">id</span>);
+<a name="l00656"></a>00656 
+<a name="l00698"></a>00698 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#ga1bd437b46f5923f05905c43cd4a1617a">linWriteSync</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> timeout);
+<a name="l00699"></a>00699 
+<a name="l00710"></a>00710 <a class="code" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a> <a class="code" href="group___l_i_n.html#ga4817ac11ca69f5237588c0a3f422bcdb">LINLIBAPI</a> <a class="code" href="group___l_i_n.html#gadf904a2ba0101ac6dc622b6035cf0f5f">linGetCanHandle</a>(<a class="code" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> *<a class="code" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canHandle</a>);
+<a name="l00711"></a>00711 
+<a name="l00712"></a>00712 <span class="preprocessor">#ifdef __cplusplus</span>
+<a name="l00713"></a>00713 <span class="preprocessor"></span>}
+<a name="l00714"></a>00714 <span class="preprocessor">#endif</span>
+<a name="l00715"></a>00715 <span class="preprocessor"></span>
+<a name="l00718"></a>00718 <span class="preprocessor">#endif // __LINLIB_H</span>
 </pre></div></div>
 </div>
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser CANLIB (canlib 5.17) - Generated on Thu Sep 15 2016</small>
+<small>Kvaser CANLIB (canlib 5.19) - Generated on Wed Feb 15 2017</small>
 </address>
 </body>
 </html>

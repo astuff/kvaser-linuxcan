@@ -1,3 +1,3 @@
 module=canlib
-version=5_17_582
-hgid=61f781798f94 tip
+version=5_19_735
+hgid=6983c896230f tip

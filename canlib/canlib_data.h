@@ -57,24 +57,21 @@
 
 
 #include "linkedlist.h"
-
-#include "osif_user.h"
-
-
 #include "vcanevt.h"
-
-#define N_O_CHANNELS 2
-
-typedef LinkedList HandleList;
+#include "kcan_ioctl.h"
 
 #include <canlib.h>
 #include <canlib_version.h>
 
-#define LAPCAN_TICKS_PER_MS 125
 
 #define OPEN_AS_CAN          0
 #define OPEN_AS_CANFD_ISO    1
 #define OPEN_AS_CANFD_NONISO 2
+
+#define DEVICE_NAME_LEN 32
+
+
+typedef LinkedList HandleList;
 
 struct CANops;
 
@@ -82,19 +79,16 @@ struct CANops;
 // returned by canOpenChannel
 typedef struct HandleData
 {
-  OS_IF_FILE_HANDLE fd;
+  int                fd;
   char               deviceName[DEVICE_NAME_LEN];
   char               deviceOfficialName[150];
   int                channelNr; // Absolute ch nr i.e. it can be >2 for lapcan
-  canHandle          handle;
+  CanHandle          handle;
   unsigned char      isExtended;
   unsigned char      fdMode;
   unsigned char      acceptLargeDlc;
   unsigned char      wantExclusive;
   unsigned char      acceptVirtual;
-  unsigned char      readIsBlock;
-  unsigned char      writeIsBlock;
-  long               readTimeout;
   long               writeTimeout;
   unsigned long      currentTime;
   uint32_t           timerResolution;
@@ -102,16 +96,10 @@ typedef struct HandleData
   void               (*callback)(canNotifyData *);
   void               (*callback2)(CanHandle hnd, void* ctx, unsigned int event);
   canNotifyData      notifyData;
-  OS_IF_FILE_HANDLE  notifyFd;
+  int                notifyFd;
   pthread_t          notifyThread;
   unsigned int       notifyFlags;
   struct CANOps      *canOps;
-  unsigned char      syncPressent;
-  long               syncId;
-  unsigned char      syncMsg[MAX_MSG_LEN];
-  unsigned int       syncDlc;
-  unsigned int       syncFlag;
-  unsigned long      syncTime;
   int                valid;
   uint32_t           capabilities;
 } HandleData;
@@ -143,8 +131,12 @@ typedef struct CANOps
   canStatus (*getBusStats) (HandleData *hData, canBusStatistics *stat);
   canStatus (*read)(HandleData *, long *, void *, unsigned int *,
                     unsigned int *, unsigned long *);
+
+  canStatus (*readSync)(HandleData *, unsigned long);
+
   canStatus (*readWait)(HandleData *, long *, void *, unsigned int *,
                         unsigned int *, unsigned long *, long);
+
   canStatus (*readSpecific)(HandleData *, long, void *, unsigned int *,
                         unsigned int *, unsigned long *);
   canStatus (*readSpecificSkip)(HandleData *, long, void *, unsigned int *,
@@ -159,9 +151,12 @@ typedef struct CANOps
   canStatus (*writeSync)(HandleData *, unsigned long);
   canStatus (*getNumberOfChannels)(HandleData *, int *);
   canStatus (*readTimer)(HandleData *, unsigned long *);
+  canStatus (*kvReadTimer)(HandleData *, unsigned int *);
+  canStatus (*kvReadTimer64)(HandleData *, uint64_t *);
   canStatus (*readErrorCounters)(HandleData *, unsigned int *,
                                  unsigned int *, unsigned int *);
   canStatus (*readStatus)(HandleData *, unsigned long *);
+  canStatus (*kvFlashLeds)(HandleData *, int action, int timeout);
   canStatus (*requestChipStatus)(HandleData *);
   canStatus (*getChannelData)(char *, int, void *, size_t);
   canStatus (*ioCtl)(HandleData * , unsigned int, void *, size_t);
@@ -178,6 +173,8 @@ typedef struct CANOps
   canStatus (*objbufSendBurst)(HandleData *hData, int idx, unsigned int burstLen);
   canStatus (*objbufEnable)(HandleData *hData, int idx);
   canStatus (*objbufDisable)(HandleData *hData, int idx);
+  canStatus (*getCardInfo)(HandleData *hData, VCAN_IOCTL_CARD_INFO *ci);
+  canStatus (*getCardInfo2)(HandleData *hData, KCAN_IOCTL_CARD_INFO_2 *ci2);
 } CANOps;
 
 

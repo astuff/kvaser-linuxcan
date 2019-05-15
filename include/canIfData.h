@@ -143,21 +143,7 @@ typedef struct s_kcan_ioctl_card_info {
                         product_version_minor_letter;
           unsigned long max_bitrate;
           unsigned int  reserved [43];
-        } VCanCardInfo;
-
-typedef struct s_kcan_ioctl_card_info_2 {
-    unsigned char   ean[8];
-    unsigned long   hardware_address;
-    unsigned long   ui_number;
-    unsigned long   usb_speed;            // KCAN_USBSPEED_xxx
-    unsigned long   card_flags;           // KCAN_CARDFLAG_xxx
-    unsigned long   driver_flags;         // KCAN_DRVFLAG_xxx
-    char            pcb_id[32];           // e.g. P023B002V1-2 (see doc Q023-059)
-    unsigned long   mfgdate;              // Seconds since 1970-01-01
-    unsigned long   usb_host_id;          // Checksum of USB host controller
-    unsigned int    usb_throttle;         // Enforced delay between transmission of commands.
-    unsigned char   reserved[40];
-} VCanCardInfo2;
+} VCAN_IOCTL_CARD_INFO;
 
 typedef struct {
   __u32 buffer_number;
@@ -184,11 +170,48 @@ typedef struct {
 #define READ_SPECIFIC_SKIP_MATCHING    1
 #define READ_SPECIFIC_SKIP_PRECEEDING  2
 
-typedef struct
-{
+typedef struct {
   long          id;
   unsigned long timeout;
   unsigned char skip;
 }VCanReadSpecific;
+
+//data structure for read functions
+typedef struct {
+  unsigned long timeout;
+}VCanRead;
+
+typedef struct {
+  unsigned char busStatus;
+  unsigned char txErrorCounter;
+  unsigned char rxErrorCounter;
+}VCanRequestChipStatus; 
+
+typedef struct {
+  uint32_t sw;
+  uint32_t hw;
+}VCanOverrun;
+
+typedef struct {
+  int action;
+  int timeout;
+}VCanFlashLeds;
+
+typedef struct {
+  int timeout;
+}VCanMemoConfigMode;
+
+// Other missing driver stuff
+//===========================================================================
+
+typedef struct {
+  unsigned char   second;
+  unsigned char   minute;
+  unsigned char   hour;
+  unsigned char   day;
+  unsigned char   month;
+  unsigned char   year;
+} KCANY_MEMO_INFO_RTC;
+
 
 #endif /* _CANIF_DATA_H_ */

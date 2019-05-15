@@ -1,12 +1,12 @@
-# Kvaser Linux linlib library Makefile 
-# 
+# Kvaser Linux linlib library Makefile
+#
 #                 Copyright 2012 by Kvaser AB, Mölndal, Sweden
 #                         http://www.kvaser.com
-# 
+#
 #  This software is dual licensed under the following two licenses:
 #  BSD-new and GPLv2. You may use either one. See the included
 #  COPYING file for details.
-# 
+#
 #  License: BSD-new
 #  ===============================================================================
 #  Redistribution and use in source and binary forms, with or without
@@ -19,7 +19,7 @@
 #      * Neither the name of the <organization> nor the
 #        names of its contributors may be used to endorse or promote products
 #        derived from this software without specific prior written permission.
-# 
+#
 #  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 #  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 #  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -30,26 +30,26 @@
 #  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
+#
+#
 #  License: GPLv2
 #  ===============================================================================
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU General Public License
 #  as published by the Free Software Foundation; either version 2
 #  of the License, or (at your option) any later version.
-# 
+#
 #  This program is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-# 
+#
 #  ---------------------------------------------------------------------------
-# 
+#
 
 LIBNAME = liblinlib.so
 LIBRARY = $(LIBNAME).1.1.0
@@ -61,10 +61,10 @@ CFLAGS  += -I. -I../include
 
 # Flags for  reentrant, position independent code
 LIBCFLAGS = $(CFLAGS) -D_REENTRANT -fPIC
-LDFLAGS = -lc -pthread
+LDFLAGS = -lc -pthread -L../canlib -lcanlib
 
 #SRCS := $(wildcard *.c)
-SRCS := linlib.c 
+SRCS := linlib.c
 #SRCS += ../common/osif_functions_user.c
 
 OBJS := $(patsubst %.c, %.o, $(SRCS))
@@ -73,7 +73,7 @@ DEPS := $(patsubst %.c, %.d, $(SRCS))
 
 
 ifeq ($(KV_DEBUG_ON),1)
-  KV_XTRA_CFLAGS_DEBUG= -D_DEBUG=1 -DDEBUG=1 
+  KV_XTRA_CFLAGS_DEBUG= -D_DEBUG=1 -DDEBUG=1
   IS_DEBUG=Debug: $(KV_XTRA_CFLAGS_DEBUG)
   CFLAGS += $(KV_XTRA_CFLAGS_DEBUG)
 else
@@ -102,18 +102,18 @@ $(LIBRARY): $(DEPS) $(OTHERDEPS) $(OBJS)
 #	$(MAKE) -C examples KV_DEBUG_ON=$(KV_DEBUG_ON) sub
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(LIBCFLAGS)  -c -o $@ $< 
+	$(CC) $(CFLAGS) $(LIBCFLAGS)  -c -o $@ $<
 
 %.d: %.c
-	$(CC) -M $(CFLAGS) $< > $@ 
-	$(CC) -M $(CFLAGS) $< | sed s/\\.o/.d/> $@ 
+	$(CC) -M $(CFLAGS) $< > $@
+	$(CC) -M $(CFLAGS) $< | sed s/\\.o/.d/> $@
 
 #install: linlib examples
 #	$(MAKE) -C examples install
 install: linlib
 	rm -f /usr/lib/$(LIBNAME)
 	rm -f /usr/lib/$(SONAME)
-	install  -m 755 $(LIBRARY) /usr/lib/
+	install  -m 644 $(LIBRARY) /usr/lib/
 	ln -sf $(LIBRARY) /usr/lib/$(LIBNAME)
 	ln -sf $(LIBRARY) /usr/lib/$(SONAME)
 	/sbin/ldconfig
@@ -127,10 +127,10 @@ uninstall:
 	      /usr/lib/$(LIBRARY)   \
 	      /usr/include/linlib.h
 
-clean:	
+clean:
 	rm -f $(OBJS) $(LIBRARY) $(DEPS) $(LIBNAME) $(LIBRARY) $(SONAME) $(TARBALL) *~
 #	$(MAKE) -C examples clean
 
 depend: $(DEPS)
 
--include $DEPS	 
+-include $DEPS

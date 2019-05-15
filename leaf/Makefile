@@ -63,7 +63,7 @@ KV_MODULE_NAME = leaf
 INCLUDES := $(src)/../include/
 
 # source files
-SRCS :=           leafHWIf.c ticks.c
+SRCS := leafHWIf.c
 
 ifneq ($(KERNELRELEASE),)
 	RUNDIR := $(src)
@@ -74,8 +74,3 @@ endif
 CHECK_SUPPRESS = suppressions.txt
 
 include $(RUNDIR)/../config.mak
-
-common: ticks.c
-
-ticks.c: ../common/ticks.c
-	cp -p ../common/ticks.c .

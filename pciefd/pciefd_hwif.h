@@ -58,7 +58,6 @@
 #define _PCIEFD_HWIF_H_
 
 #include "VCanOsIf.h"
-#include "osif_kernel.h"
 
 // Common includes for Altera design
 #include "inc/altera.h"
@@ -173,14 +172,14 @@ typedef struct PciCanChanData
   void __iomem       *canControllerBase;
 
   unsigned long tx_irq_msk;
-  OS_IF_SEMAPHORE busOnMutex; // Used to make sure that multiple bus on commands in a row is not executed.
+  struct  completion busOnCompletion; // Used to make sure that multiple bus on commands in a row is not executed.
 
-  OS_IF_LOCK lock;
+  spinlock_t lock;
 #if !defined(TRY_RT_QUEUE)
-  OS_IF_TASK_QUEUE_HANDLE txTaskQ;
+  struct work_struct txTaskQ;
 #else
-  OS_IF_WQUEUE *txTaskQ;
-  OS_IF_TASK_QUEUE_HANDLE txWork;
+  struct workqueue_struct *txTaskQ;
+  struct work_struct txWork;
 #endif
 
   pciefd_packet_t packet;
@@ -243,7 +242,7 @@ typedef struct PciCanChanData
 
   struct timer_list errorDisableTimer;
 
-  OS_IF_WAITQUEUE_HEAD hwFlushWaitQ;
+  wait_queue_head_t hwFlushWaitQ;
 
   struct {
     unsigned valid;
@@ -285,7 +284,7 @@ typedef struct PciCanCardData {
   alt_flash_epcs_dev epcsFlashDev;
   struct list_head   replyWaitList;
   rwlock_t           replyWaitListLock;
-  OS_IF_LOCK         lock;
+  spinlock_t         lock;
   uint64_t           last_ts;
 
   struct timer_list  interruptDisableTimer;

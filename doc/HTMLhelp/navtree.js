@@ -76,6 +76,10 @@ var NAVTREE =
           [ "canGetVersion", "group___general.html#gafb5688859c56ecb6f8d85705d3ec2f14", null ],
           [ "canInitializeLibrary", "group___general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1", null ],
           [ "canIoCtl", "group___general.html#gaeaa24db97af22478ca51d48636c7bb12", null ],
+          [ "canUnloadLibrary", "group___general.html#ga0d1c0e54ea20c3e3b328a32eb10c7b47", null ],
+          [ "kvFlashLeds", "group___general.html#gad3d0fc1bf752047f6e24020c478aeffd", null ],
+          [ "kvReadTimer", "group___general.html#ga0671078a6184ab2b73287946a49763f2", null ],
+          [ "kvReadTimer64", "group___general.html#gafa060c0f78d459498d1f6236e2d0b5ae", null ],
           [ "kvSetNotifyCallback", "group___general.html#ga99976c5b8e2c534b27bf9ec2e715d8d3", null ]
         ] ]
       ] ],
@@ -190,6 +194,7 @@ var NAVTREE =
           [ "linSetBitrate", "group___l_i_n.html#ga77e1463234ee6c67a71a2ab57f578b7f", null ],
           [ "linSetupIllegalMessage", "group___l_i_n.html#ga1c89e03300af644cee54861f92ae567e", null ],
           [ "linSetupLIN", "group___l_i_n.html#ga911287175a2ca5574a50d17b698b6d9d", null ],
+          [ "linUnloadLibrary", "group___l_i_n.html#ga3b6bd0017ef68891ac1843a5921f81da", null ],
           [ "linUpdateMessage", "group___l_i_n.html#ga5bf84820248e95fde2718fa46304a5a5", null ],
           [ "linWriteMessage", "group___l_i_n.html#gac012f34a621bc885bd582398c3d5d175", null ],
           [ "linWriteSync", "group___l_i_n.html#ga1bd437b46f5923f05905c43cd4a1617a", null ],

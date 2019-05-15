@@ -59,3 +59,4 @@ extern CANOps vCanOps;
 HandleData * findHandle (CanHandle hnd);
 HandleData * removeHandle (CanHandle hnd);
 CanHandle insertHandle (HandleData *hData);
+void foreachHandle (int (*func)(const CanHandle));

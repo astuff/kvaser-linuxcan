@@ -72,9 +72,15 @@ int main(int argc, char* argv[])
   char name[256];
   char custChanName[40];
   unsigned int ean[2], fw[2], serial[2];
+  unsigned short canlibVersion;
 
   (void)argc; // Unused.
   (void)argv; // Unused.
+
+  canlibVersion = canGetVersion();
+  printf("Canlib version %d.%d\n",
+         (canlibVersion >> 8),
+         (canlibVersion & 0xff));
 
   memset(name, 0, sizeof(name));
   memset(custChanName, 0, sizeof(custChanName));

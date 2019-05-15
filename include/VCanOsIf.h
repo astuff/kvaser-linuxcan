@@ -61,16 +61,16 @@
 #define _VCAN_OS_IF_H_
 
 
-#   include <linux/poll.h>
-#   include <asm/atomic.h>
-#   include <linux/types.h>
+#include <linux/poll.h>
+#include <asm/atomic.h>
+#include <linux/types.h>
+#include <linux/tty.h>
 
 #include "canIfData.h"
+#include "kcan_ioctl.h"
 #include "vcanevt.h"
 #include "objbuf.h"
 
-#include "osif_common.h"
-#include "osif_kernel.h"
 #include "queue.h"
 
 #include "softsync.h"
@@ -110,21 +110,21 @@
 /*****************************************************************************/
 
 #define put_user_ret(x,ptr,ret)              \
-  { if (os_if_set_int(x,ptr)) return ret; }
+  { if (put_user(x,ptr)) return ret; }
 #define get_user_int_ret(x,ptr,ret)          \
-  { if (os_if_get_int(x,ptr)) return ret; }
+  { if (get_user(x,ptr)) return ret; }
 #define get_user_long_ret(x,ptr,ret)         \
-  { if (os_if_get_long(x,ptr)) return ret; }
+  { if (get_user(x,ptr)) return ret; }
 #define copy_to_user_ret(to,from,n,retval)   \
-  { if (os_if_get_user_data(to,from,n)) return retval; }
+  { if (copy_to_user(to,from,n)) return retval; }
 #define copy_from_user_ret(to,from,n,retval) \
-  { if (os_if_set_user_data(to,from,n)) return retval; }
+  { if (copy_from_user(to,from,n)) return retval; }
 
 #define ArgPtrIn(s)
 #define ArgPtrOut(s)
 #define ArgIntIn     do {                                   \
                        int argh;                            \
-                       get_user_int_ret(&argh, (int *)arg,  \
+                       get_user_int_ret(argh, (int *)arg,   \
                                         -EFAULT);           \
                        arg = argh;                          \
                      } while (0)
@@ -189,25 +189,26 @@ typedef struct VCanChanData
 
     /* Transmit buffer */
     CAN_MSG                  txChanBuffer[TX_CHAN_BUF_SIZE];
-    CAN_MSG                 *currentTxMsg;
     Queue                    txChanQueue;
 
     /* Processes waiting for all messages to be sent */
-    OS_IF_WAITQUEUE_HEAD     flushQ;
+    wait_queue_head_t        flushQ;
 
     atomic_t                 fileOpenCount;
+    unsigned int             busOnCount;
     struct VCanOpenFileNode *openFileList;
 
+    struct completion       busOnCountCompletion;
 
-    OS_IF_LOCK              openLock;
+    spinlock_t              openLock;
     void                   *hwChanData;
-    OS_IF_ATOMIC_BIT        waitEmpty;
+    unsigned long           waitEmpty;
 
     unsigned int            capabilities;
     unsigned int            capabilities_mask;
-    
+
     VCanBusStatistics       busStats;
-    
+
     struct VCanCardData    *vCard;
 } VCanChanData;
 
@@ -234,7 +235,7 @@ typedef struct VCanDriverData
     char                   *deviceName;
     struct VCanHWInterface *hwIf;
     struct VCanCardData    *canCards;
-    OS_IF_LOCK              canCardsLock;
+    spinlock_t              canCardsLock;
     struct cdev             cdev;
 } VCanDriverData;
 
@@ -262,9 +263,7 @@ typedef struct VCanCardData
     void                   *hwCardData;
     VCanDriverData         *driverData;
 
-    OS_IF_SEMAPHORE         open;
-
-    unsigned long           timestamp_offset;
+    uint64_t                timestamp_offset;
     ticks_class             ticks;
     uint32_t                default_max_bitrate;
     uint32_t                current_max_bitrate;
@@ -275,7 +274,7 @@ typedef struct VCanCardData
 
 typedef struct
 {
-    OS_IF_LOCK              rcvLock;
+    spinlock_t              rcvLock;
     int                     bufHead;
     int                     bufTail;
 #if DEBUG
@@ -285,33 +284,33 @@ typedef struct
     VCAN_EVENT              fileRcvBuffer[FILE_RCV_BUF_SIZE];
     uint8_t                 valid[FILE_RCV_BUF_SIZE];
     int                     size;
-    OS_IF_WAITQUEUE_HEAD    rxWaitQ;
+    wait_queue_head_t       rxWaitQ;
 } VCanReceiveData;
 
 /* File pointer specific data */
 typedef struct VCanOpenFileNode {
-    OS_IF_SEMAPHORE         ioctl_mutex;
+    struct completion       ioctl_completion;
     VCanReceiveData         rcv;
     unsigned char           transId;
     struct file            *filp;
     struct VCanChanData    *chanData;
     int                     chanNr;
-    unsigned char           writeIsBlock;
-    unsigned char           readIsBlock;
     unsigned char           modeTx;
     unsigned char           modeTxRq;
     unsigned char           modeNoTxEcho;
     unsigned char           channelOpen;
     unsigned char           channelLocked;
+    VCanRequestChipStatus   chip_status;     
     long                    writeTimeout;
-    long                    readTimeout;
     VCanMsgFilter           filter;
-    OS_IF_TASK_QUEUE_HANDLE objbufWork;
-    OS_IF_WQUEUE            *objbufTaskQ;
+    struct work_struct      objbufWork;
+    struct workqueue_struct *objbufTaskQ;
     OBJECT_BUFFER           *objbuf;
     atomic_t                objbufActive;
-    uint32_t                overruns;
+    VCanOverrun             overrun;
+    uint8_t                 isBusOn;
     VCanReadSpecific        read_specific;
+    VCanRead                read;
     struct VCanOpenFileNode *next;
 } VCanOpenFileNode;
 
@@ -329,7 +328,7 @@ typedef struct VCanHWInterface {
     int (*txAvailable)          (VCanChanData *chd);
     int (*procRead)             (struct seq_file* m, void* v);
     int (*closeAllDevices)      (void);
-    int (*getTime)              (VCanCardData*, unsigned long *time);
+    int (*getTime)              (VCanCardData*, uint64_t *time);
     int (*flushSendBuffer)      (VCanChanData*);
     int (*getRxErr)             (VCanChanData*);
     int (*getTxErr)             (VCanChanData*);
@@ -354,11 +353,28 @@ typedef struct VCanHWInterface {
                                  int count);
     int (*objbufSendBurst)      (VCanChanData *chd, int bufType, int bufNo,
                                  int burstLen);
+
+    int (*getCardInfo)          (VCanCardData *vCard, VCAN_IOCTL_CARD_INFO *ci);
+    int (*getCardInfo2)         (VCanCardData *vCard, KCAN_IOCTL_CARD_INFO_2 *ci2);
     int (*tx_interval)          (VCanChanData *chd, unsigned int *interval);
-    int (*getCustChannelName)   (const VCanChanData * const chd, 
-                                 unsigned char * const data, 
+    int (*getCustChannelName)   (const VCanChanData * const chd,
+                                 unsigned char * const data,
                                  const unsigned int data_size,
                                  unsigned int *status);
+    int (*getCardInfoMisc)      (const VCanChanData *chd, int *value, int type);
+    int (*flashLeds)            (const VCanChanData *chd, int action, int timeout);
+    int (*memoConfigMode)       (const VCanChanData *chd, int interval);
+    int (*memoGetData)          (const VCanChanData *chd, int subcmd,
+                                void *buf, int bufsiz,
+                                unsigned long data1, unsigned short data2,
+                                int *stat, int *dstat, int *lstat
+                                );
+    int (*memoPutData)          (const VCanChanData *chd, int subcmd,
+                                 void *buf, int bufsiz,
+                                 unsigned long data1, unsigned short data2,
+                                 int *stat, int *dstat, int *lstat);
+    int (*memoDiskIo)           (const VCanChanData *chd);
+    int (*memoDiskIoFast)       (const VCanChanData *chd);
 } VCanHWInterface;
 
 #define SKIP_ERROR_EVENT 0
@@ -367,13 +383,14 @@ typedef struct VCanHWInterface {
 
 typedef struct WaitNode {
   struct list_head list;
-  OS_IF_SEMAPHORE  waitSemaphore;
+  struct completion waitCompletion;
   void             *replyPtr;
   unsigned char    cmdNr;
   unsigned char    transId;
   unsigned char    timedOut;
   unsigned char    check_trans_id; //when not 0, check that transid matches
   unsigned char    error_event;    //used to detect that we have got an "CMD_ERROR_EVENT"
+  unsigned int     data_count;     //number of received bytes, used with multiple CMD_MEMO_GET_DATA responses
 } WaitNode;
 
 
@@ -395,7 +412,7 @@ extern struct file_operations fops;
 
 /* Functions */
 int             vCanInitData(VCanCardData *chd);
-int             vCanTime(VCanCardData *vCard, unsigned long *time);
+int             vCanTime(VCanCardData *vCard, uint64_t *time);
 int             vCanDispatchEvent(VCanChanData *chd, VCAN_EVENT *e);
 int             vCanFlushSendBuffer(VCanChanData *chd);
 unsigned long   getQLen(unsigned long head, unsigned long tail, unsigned long size);

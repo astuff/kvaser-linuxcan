@@ -59,7 +59,6 @@
 
 
 
-#include "osif_kernel.h"
 #include "helios_cmds.h"
 #include "objbuf.h"
 
@@ -69,7 +68,7 @@
 
 #define DEVICE_NAME_STRING              "usbcanII"
 #define MAX_CARD_CHANNELS                        2
-#define MAX_DRIVER_CHANNELS                    128 
+#define MAX_DRIVER_CHANNELS                    128
 #define KV_USBCAN_MAIN_RCV_BUF_SIZE             16
 #define KV_USBCAN_TX_CMD_BUF_SIZE               16
 #define USBCAN_CMD_RESP_WAIT_TIME             1000
@@ -97,7 +96,7 @@ typedef struct UsbcanChanData
 {
   /* These are the number of outgoing packets residing in the device */
   unsigned int outstanding_tx;
-  OS_IF_LOCK   outTxLock;
+  spinlock_t   outTxLock;
 
   OBJECT_BUFFER *objbufs;
 
@@ -114,14 +113,14 @@ typedef struct UsbcanCardData {
   int              autoTxBufferCount;
   int              autoTxBufferResolution;
 
-  OS_IF_LOCK       timeHi_lock;
+  spinlock_t       timeHi_lock;
 
-  OS_IF_LOCK       replyWaitListLock;
+  spinlock_t       replyWaitListLock;
   struct list_head replyWaitList;
 
   /* Structure to hold all of our device specific stuff */
-  OS_IF_WQUEUE                *txTaskQ;
-  OS_IF_TASK_QUEUE_HANDLE     txWork;
+  struct workqueue_struct  *txTaskQ;
+  struct work_struct       txWork;
 
   heliosCmd          txCmdBuffer[KV_USBCAN_TX_CMD_BUF_SIZE]; /* Control messages */
   Queue              txCmdQueue;
@@ -148,10 +147,9 @@ typedef struct UsbcanCardData {
   struct urb *            write_urb;           // the urb used to send data
   struct urb *            read_urb;            // the urb used to receive data
   __u8                    bulk_out_endpointAddr;//the address of the bulk out endpoint
-  OS_IF_SEMAPHORE         write_finished;       // wait for the write to finish
+  struct completion       write_finished;       // wait for the write to finish
 
   volatile int            present;              // if the device is not disconnected
-  OS_IF_SEMAPHORE         sem;                  // locks this structure
 
   VCanCardData           *vCard;
 } UsbcanCardData;

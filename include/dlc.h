@@ -65,9 +65,8 @@ uint32_t dlc_dlc_to_bytes_fd (uint32_t dlc);
 /*
   use this function when you want to create and check a tx-frame.
   returns 1 if dlc is ok.
-  not. arg. dlc can be affected when large dlc's isn't accepted
 */
-uint32_t dlc_is_dlc_ok (uint32_t accept_large_dlc, uint32_t is_fd, uint32_t* dlc);
+uint32_t dlc_is_dlc_ok (uint32_t accept_large_dlc, uint32_t is_fd, uint32_t dlc);
 
 uint32_t dlc_dlc_to_bytes_classic (uint32_t dlc);
 #endif

@@ -57,11 +57,6 @@
 //********************************************
 #include "linkedlist.h"
 
-#if !defined(OS_IF_INLINE)
-# define OS_IF_INLINE
-#endif
-
-
 //======================================================================
 // listInsertFirst
 //======================================================================
@@ -127,7 +122,7 @@ void *listFind (LinkedList **listPtrPtr, void *elem,
 //======================================================================
 // listSize
 //======================================================================
-OS_IF_INLINE int listSize (LinkedList **listPtrPtr)
+inline int listSize (LinkedList **listPtrPtr)
 {
   int n;
   for (n = 0; *listPtrPtr != NULL; listPtrPtr = &((*listPtrPtr)->next)) {

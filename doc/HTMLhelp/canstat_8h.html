@@ -148,7 +148,7 @@ Defines</h2></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canMSG_xxx"></a></p>
 <p>The following flags can be returned from <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> et al, or passed to <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>.</p>
 <p>All flags and/or combinations of them are meaningful for received messages.</p>
-<p><a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3">canMSG_RTR</a>, <a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>, <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a>, <a class="el" href="canstat_8h.html#a616183e2ed8ca81976463914e47b35e1">canMSG_WAKEUP</a> and <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a> are meaningful also for transmitted messages.</p>
+<p><a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3">canMSG_RTR</a>, <a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>, <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a>, <a class="el" href="canstat_8h.html#a616183e2ed8ca81976463914e47b35e1">canMSG_WAKEUP</a> and <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a> are meaningful also for transmitted messages. <a class="el" href="canstat_8h.html#a2a882491f16d0c536a34ac65f847d35e">canMSG_SINGLE_SHOT</a> is only for transmission.</p>
 <p>Note that <a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3">canMSG_RTR</a> cannot be set for CAN FD messages. </p>
 </div></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a9ea137b68594f47f0cc3fb112b569b7c">canMSG_MASK</a>&#160;&#160;&#160;0x00ff</td></tr>
@@ -161,6 +161,9 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a5ef7ad2e558debdbf85921440961efcb">canMSG_TXACK</a>&#160;&#160;&#160;0x0040</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#aa73e5649dc11a61acbf41935bebe97bd">canMSG_TXRQ</a>&#160;&#160;&#160;0x0080</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ace754df19009a6eeff09d866d68a3a27">canMSG_DELAY_MSG</a>&#160;&#160;&#160;0x0100</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a2a882491f16d0c536a34ac65f847d35e">canMSG_SINGLE_SHOT</a>&#160;&#160;&#160;0x1000000</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a08370af600f840a5022c0e74cc3cf1b3">canMSG_TXNACK</a>&#160;&#160;&#160;0x2000000</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a26fbe7a0c3bccdd61a1b8f5875547ab0">canMSG_ABL</a>&#160;&#160;&#160;0x4000000</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canFDMSG_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canFDMSG_xxx"></a></p>
 <p>Flags used in the CAN FD protocol. Set <a class="el" href="canlib_8h.html#a10aad075bfb9891aa98cf3c131977dc3">canOPEN_CAN_FD</a> in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> to enable the CAN FD protocol. </p>
@@ -170,7 +173,7 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#adb943d749cf5d08a964ed00dc8df8435">canFDMSG_FDF</a>&#160;&#160;&#160;0x010000</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a20c4f6ae319558189eb85d10036e9eea">canFDMSG_BRS</a>&#160;&#160;&#160;0x020000</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#aa50c93236b2b28677bcae0f7c1ab3860">canFDMSG_ESI</a>&#160;&#160;&#160;0x040000</td></tr>
-<tr><td colspan="2"><div class="groupHeader">Message error flags, &gt;= 0x0100</div></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Message error flags</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canMSGERR_xxx"></a></p>
 <dl class="note"><dt><b>Note:</b></dt><dd>Not all hardware platforms can detect the difference between hardware overruns and software overruns, so your application should test for both conditions. You can use the symbol <a class="el" href="canstat_8h.html#adf0d578c7b25ede29a9733da44f08ab3">canMSGERR_OVERRUN</a> for this purpose. </dd></dl>
 </div></td></tr>
@@ -185,9 +188,6 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#adf0d578c7b25ede29a9733da44f08ab3">canMSGERR_OVERRUN</a>&#160;&#160;&#160;0x0600</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a1c3c24e5ee42096b25701503daf87b14">canMSGERR_BIT</a>&#160;&#160;&#160;0xC000</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ae853e0ee140775839d8943a44dc27b61">canMSGERR_BUSERR</a>&#160;&#160;&#160;0xF800</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a2a882491f16d0c536a34ac65f847d35e">canMSG_SINGLE_SHOT</a>&#160;&#160;&#160;0x1000000</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a08370af600f840a5022c0e74cc3cf1b3">canMSG_TXNACK</a>&#160;&#160;&#160;0x2000000</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a26fbe7a0c3bccdd61a1b8f5875547ab0">canMSG_ABL</a>&#160;&#160;&#160;0x4000000</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canTRANSCEIVER_LINEMODE_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canTRANSCEIVER_LINEMODE_xxx"></a></p>
 <p>The following values can be usedto set different driver (i.e. transceiver) modes.</p>
@@ -502,7 +502,7 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Only together with canMSG_TXNACK, Single shot message was not sent because arbitration was lost (only rx) </p>
+<p>Only together with canMSG_TXNACK, Single shot message was not sent because arbitration was lost. This flag is only used with received messages. </p>
 
 </div>
 </div>
@@ -622,7 +622,7 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Message is Single Shot, try to send once, no retransmission (only tx) </p>
+<p>Message is Single Shot, try to send once, no retransmission. This flag can only be used with transmitted messages. </p>
 
 </div>
 </div>
@@ -668,7 +668,7 @@ Enumerations</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Message is a failed Single Shot, message was not sent (only rx) </p>
+<p>Message is a failed Single Shot, message was not sent. This flag is only used with received messages. </p>
 
 </div>
 </div>
@@ -2005,7 +2005,7 @@ Enumerations</h2></td></tr>
       <li class="navelem"><a class="el" href="canstat_8h.html">canstat.h</a>      </li>
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.17) - Generated on Thu Sep 15 2016</small>
+<small>Kvaser Linux CANLIB (canlib 5.19) - Generated on Wed Feb 15 2017</small>
 </address>
 </body>
 </html>

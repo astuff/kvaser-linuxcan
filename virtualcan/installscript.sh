@@ -53,8 +53,14 @@
 MODNAME=kvvirtualcan
 DEPMOD=`which depmod`
 
-install -m 600 $MODNAME.ko /lib/modules/`uname -r`/kernel/drivers/char/
-install -m 700 virtualcan.sh /usr/sbin/
+install -m 644 $MODNAME.ko /lib/modules/`uname -r`/kernel/drivers/char/
+if [ "$?" -ne 0 ] ; then
+  exit 1
+fi
+install -m 755 virtualcan.sh /usr/sbin/
+if [ "$?" -ne 0 ] ; then
+  exit 1
+fi
 /usr/sbin/virtualcan.sh stop 2>/dev/null
 
 if [ -f /etc/modprobe.conf ] ; then
@@ -84,7 +90,7 @@ fi
 # For Debian/Ubuntu
 MODCONF=/etc/modules-load.d/kvaser.conf
 
-if [ "$#" -gt 0 ] && [ $1 = "load" ]] ; then
+if [ "$#" -gt 0 ] && [ $1 = "load" ] ; then
   /usr/sbin/virtualcan.sh start
   touch $MODCONF
   if [ -f $MODCONF ] ; then

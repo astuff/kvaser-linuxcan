@@ -51,7 +51,7 @@
 **/
 
 
-#  include <linux/version.h>
+#include <linux/version.h>
 
 #include "debug.h"
 #include "vcanevt.h"
@@ -61,13 +61,13 @@
 
 // Returns bitmap with matching buffers, or 0 if no match.
 // "id" is assumed to have bit 31 set if it's extended.
-// 
+//
 unsigned int objbuf_filter_match (OBJECT_BUFFER *buf, unsigned int id,
                                   unsigned int flags)
 {
   unsigned int result = 0;
   int i;
-  
+
   if (!buf) {
     return 0;
   }
@@ -79,7 +79,7 @@ unsigned int objbuf_filter_match (OBJECT_BUFFER *buf, unsigned int id,
           continue;
         }
       }
-  
+
       if ((id & buf[i].acc_mask) == buf[i].acc_code) {
         result |= 1 << i;
       }
@@ -87,21 +87,21 @@ unsigned int objbuf_filter_match (OBJECT_BUFFER *buf, unsigned int id,
   }
 
   DEBUGOUT(2, (TXT("objbuf_filter_match = %04x\n"), result));
-  
+
   return result;
 }
 
 
-# if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20)
-#  define USE_CONTEXT 1
-# else
-#  define USE_CONTEXT 0
-# endif
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20)
+# define USE_CONTEXT 1
+#else
+# define USE_CONTEXT 0
+#endif
 
 #if USE_CONTEXT
 static void objbuf_write_all (void *context)
 #else
-static void objbuf_write_all (OS_IF_TASK_QUEUE_HANDLE *work)
+static void objbuf_write_all (struct work_struct *work)
 #endif
 {
   unsigned int     i;
@@ -126,18 +126,18 @@ static void objbuf_write_all (OS_IF_TASK_QUEUE_HANDLE *work)
 
   // Use semaphore to enforce mutual exclusion
   // for a specific file descriptor.
-  os_if_down_sema(&fileNodePtr->ioctl_mutex);
+  wait_for_completion(&fileNodePtr->ioctl_completion);
 
   if (!fileNodePtr->objbuf) {
     // The device was unplugged before the file was released
     // We cannot deallocate here, it is too early and handled elsewhere
-    os_if_up_sema(&fileNodePtr->ioctl_mutex);
+    complete(&fileNodePtr->ioctl_completion);
     return;
   }
 
   active_mask = atomic_read (&fileNodePtr->objbufActive);
   if (!active_mask) {
-    os_if_up_sema(&fileNodePtr->ioctl_mutex);
+    complete(&fileNodePtr->ioctl_completion);
     return;
   }
 
@@ -188,7 +188,7 @@ static void objbuf_write_all (OS_IF_TASK_QUEUE_HANDLE *work)
   if (active_mask != done_mask) {
     // Give ourselves a little extra work in case all the sends could not
     // be handled this time.
-    os_if_queue_task_not_default_queue(fileNodePtr->objbufTaskQ,
+    queue_work(fileNodePtr->objbufTaskQ,
                                        &fileNodePtr->objbufWork);
   }
 
@@ -196,7 +196,7 @@ static void objbuf_write_all (OS_IF_TASK_QUEUE_HANDLE *work)
     vChan->vCard->driverData->hwIf->requestSend(vCard, vChan); // Ok to fail ;-)
   }
 
-  os_if_up_sema(&fileNodePtr->ioctl_mutex);
+  complete(&fileNodePtr->ioctl_completion);
 
   DEBUGOUT(2, (TXT("objbuf_write_all: %04x/%04x\n"), done_mask, active_mask));
 }
@@ -204,13 +204,16 @@ static void objbuf_write_all (OS_IF_TASK_QUEUE_HANDLE *work)
 
 void objbuf_init (VCanOpenFileNode *fileNodePtr)
 {
-  os_if_init_task(&fileNodePtr->objbufWork, objbuf_write_all, fileNodePtr);
-  fileNodePtr->objbufTaskQ = os_if_declare_task("objbuf",
-                                                &fileNodePtr->objbufWork);
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20))
+  INIT_WORK(&fileNodePtr->objbufWork, objbuf_write_all, fileNodePtr);
+#else
+ INIT_WORK(&fileNodePtr->objbufWork, objbuf_write_all);
+#endif
+  fileNodePtr->objbufTaskQ = create_workqueue("objbuf");
 }
 
 
 void objbuf_shutdown (VCanOpenFileNode *fileNodePtr)
 {
-  os_if_destroy_task(fileNodePtr->objbufTaskQ);
+  destroy_workqueue(fileNodePtr->objbufTaskQ);
 }

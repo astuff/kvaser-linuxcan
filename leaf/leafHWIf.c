@@ -54,16 +54,16 @@
 // Linux Leaf driver
 //
 
-#  include <linux/version.h>
-#  include <linux/usb.h>
-#  include <linux/types.h>
-#  include <linux/seq_file.h>
-#  include <linux/math64.h>
-
+#include <linux/version.h>
+#include <linux/usb.h>
+#include <linux/types.h>
+#include <linux/seq_file.h>
+#include <linux/math64.h>
+#include <linux/module.h>
+#include <linux/slab.h>
+#include <linux/kthread.h>
 
 // Non system headers
-#include "osif_kernel.h"
-#include "osif_functions_kernel.h"
 #include "VCanOsIf.h"
 #include "leafHWIf.h"
 #include "filo_cmds.h"
@@ -71,6 +71,7 @@
 #include "debug.h"
 #include "hwnames.h"
 #include "vcan_ioctl.h"
+#include "kcan_ioctl.h"
 #include "util.h"
 #include "capabilities.h"
 #include "ticks.h"
@@ -79,9 +80,9 @@
 // Use a unique set for each driver
 #define USB_LEAF_MINOR_BASE   80
 
-    MODULE_LICENSE("Dual BSD/GPL");
-    MODULE_AUTHOR("KVASER");
-    MODULE_DESCRIPTION("Leaf CAN module.");
+MODULE_LICENSE("Dual BSD/GPL");
+MODULE_AUTHOR("KVASER");
+MODULE_DESCRIPTION("Leaf CAN module.");
 
 
 //----------------------------------------------------------------------------
@@ -90,21 +91,25 @@
 // be present but disabled -- but it can then be enabled for specific
 // modules at load time with a 'pc_debug=#' option to insmod.
 //
-#  ifdef LEAF_DEBUG
-      static int pc_debug = LEAF_DEBUG;
-      MODULE_PARM_DESC(pc_debug, "Leaf debug level");
-      module_param(pc_debug, int, 0644);
-#     define DEBUGPRINT(n, arg)     if (pc_debug >= (n)) { DEBUGOUT(n, arg); }
-#  else
-#     define DEBUGPRINT(n, arg)     if ((n) == 1) { DEBUGOUT(n, arg); }
-#  endif
+#ifdef LEAF_DEBUG
+    static int pc_debug = LEAF_DEBUG;
+    MODULE_PARM_DESC(pc_debug, "Leaf debug level");
+    module_param(pc_debug, int, 0644);
+#   define DEBUGPRINT(n, arg)     if (pc_debug >= (n)) { DEBUGOUT(n, arg); }
+#else
+#   define DEBUGPRINT(n, arg)     if ((n) == 1) { DEBUGOUT(n, arg); }
+#endif
 //----------------------------------------------------------------------------
+
+#ifndef THIS_MODULE
+#define THIS_MODULE 0
+#endif
 
 //======================================================================
 // HW function pointers
 //======================================================================
 
-static int INIT leaf_init_driver(void);
+static int leaf_init_driver(void);
 static int leaf_set_busparams(VCanChanData *vChd, VCanBusParams *par);
 static int leaf_get_busparams(VCanChanData *vChd, VCanBusParams *par);
 static int leaf_set_silent(VCanChanData *vChd, int silent);
@@ -115,10 +120,10 @@ static int leaf_req_bus_stats(VCanChanData *vChd);
 static int leaf_get_tx_err(VCanChanData *vChd);
 static int leaf_get_rx_err(VCanChanData *vChd);
 static int leaf_outstanding_sync(VCanChanData *vChan);
-static int EXIT leaf_close_all(void);
+static int leaf_close_all(void);
 static int leaf_proc_read(struct seq_file* m, void* v);
 static int leaf_get_chipstate(VCanChanData *vChd);
-static int leaf_get_time(VCanCardData *vCard, unsigned long *time);
+static int leaf_get_time(VCanCardData *vCard, uint64_t *time);
 static int leaf_flush_tx_buffer(VCanChanData *vChan);
 static void leaf_schedule_send(VCanCardData *vCard, VCanChanData *vChan);
 static unsigned long leaf_get_hw_tx_q_len(VCanChanData *vChan);
@@ -146,6 +151,8 @@ static int leaf_get_cust_channel_name(const VCanChanData * const vChan,
                                       unsigned char * const data,
                                       const unsigned int data_size,
                                       unsigned int * const status);
+static int leaf_get_card_info_misc(const VCanChanData *chd, int *value, int type);
+static int leaf_flash_leds(const VCanChanData *chd, int action, int timeout);
 
 static VCanDriverData driverData;
 
@@ -180,6 +187,8 @@ static VCanHWInterface hwIf = {
   .objbufSendBurst    = leaf_objbuf_send_burst,
   .tx_interval        = leaf_tx_interval,
   .getCustChannelName = leaf_get_cust_channel_name,
+  .getCardInfoMisc    = leaf_get_card_info_misc,
+  .flashLeds          = leaf_flash_leds,
 };
 
 
@@ -314,7 +323,7 @@ static struct usb_device_id leaf_table [] = {
   { USB_DEVICE(KVASER_VENDOR_ID, USB_MINI_PCI_EXPRESS_2HS_PRODUCT_ID) },
   { USB_DEVICE(KVASER_VENDOR_ID, USB_USBCAN_R_V2_PRODUCT_ID) },
   { USB_DEVICE(KVASER_VENDOR_ID, USB_LEAF_LITE_R_V2_PRODUCT_ID) },
-  { }  // Terminating entry
+  { 0 }  // Terminating entry
 };
 
 MODULE_DEVICE_TABLE(usb, leaf_table);
@@ -371,7 +380,7 @@ static void leaf_write_bulk_callback (struct urb *urb)
   }
 
   // Notify anyone waiting that the write has finished
-  os_if_up_sema(&dev->write_finished);
+  complete(&dev->write_finished);
 }
 
 
@@ -418,11 +427,11 @@ static int leaf_rx_thread (void *context)
                        usb_rcvbulkpipe(dev->udev, dev->bulk_in_endpointAddr),
                        dev->bulk_in_buffer, dev->bulk_in_size, &len,
 // Timeout changed from jiffies to milliseconds in 2.6.12.
-# if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 12))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 12))
                        HZ * 30);
-# else
+#else
                        30000);
-# endif
+#endif
 
     if (ret) {
       if (ret != -ETIMEDOUT) {
@@ -487,7 +496,8 @@ static int leaf_rx_thread (void *context)
 
   DEBUGPRINT(3, (TXT("rx thread Ended - finalised\n")));
 
-  os_if_exit_thread(THIS_MODULE, result);
+  module_put(THIS_MODULE);
+  do_exit(result);
 
   return result;
 } // _rx_thread
@@ -1136,7 +1146,7 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
           vCanDispatchEvent(vChan, e);
         }
 
-        os_if_spin_lock(&leafChan->outTxLock);
+        spin_lock(&leafChan->outTxLock);
         // If we have cleared the transmit queue, we might get a TX_ACK
         // that should not be counted.
         if (leafChan->outstanding_tx) {
@@ -1145,17 +1155,17 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
 
         // Outstanding are changing from *full* to at least one open slot?
         if (leafChan->outstanding_tx >= (dev->max_outstanding_tx - 1)) {
-          os_if_spin_unlock(&leafChan->outTxLock);
+          spin_unlock(&leafChan->outTxLock);
           DEBUGPRINT(6, (TXT("Buffer in chan %d not full (%d) anymore\n"),
                          cmd->txAck.channel, leafChan->outstanding_tx));
-          os_if_queue_task_not_default_queue(dev->txTaskQ, &dev->txWork);
+          queue_work(dev->txTaskQ, &dev->txWork);
         }
 
         // Check if we should *wake* canwritesync
         else if ((leafChan->outstanding_tx == 0) && txQEmpty(vChan) &&
                  test_and_clear_bit(0, &vChan->waitEmpty)) {
-          os_if_spin_unlock(&leafChan->outTxLock);
-          os_if_wake_up_interruptible(&vChan->flushQ);
+          spin_unlock(&leafChan->outTxLock);
+          wake_up_interruptible(&vChan->flushQ);
           DEBUGPRINT(6, (TXT("W%d\n"), cmd->txAck.channel));
         }
         else {
@@ -1167,7 +1177,7 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
                            constant_test_bit(0, &vChan->waitEmpty),
                            dev->max_outstanding_tx));
 #endif
-          os_if_spin_unlock(&leafChan->outTxLock);
+          spin_unlock(&leafChan->outTxLock);
         }
 
         DEBUGPRINT(6, (TXT("X%d\n"), cmd->txAck.channel));
@@ -1349,7 +1359,7 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
   // Wake up those who are waiting for a resp
   //
 
-  os_if_spin_lock_irqsave(&dev->replyWaitListLock, &irqFlags);
+  spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
   list_for_each_safe(currHead, tmpHead, &dev->replyWaitList)
   {
     currNode = list_entry(currHead, WaitNode, list);
@@ -1361,10 +1371,10 @@ static void leaf_handle_command (filoCmd *cmd, VCanCardData *vCard)
                      TXT2("_get_trans_id(%d) == cN->transId(%d)\n"),
                      currNode->cmdNr, cmd->head.cmdNo,
                      leaf_get_trans_id(cmd), currNode->transId));
-      os_if_up_sema(&currNode->waitSemaphore);
+      complete(&currNode->waitCompletion);
     }
   }
-  os_if_spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
+  spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
 } // _handle_command
 
 
@@ -1387,16 +1397,16 @@ static int leaf_get_trans_id (filoCmd *cmd)
 //============================================================================
 // _send
 //
-# if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20)
-#  define USE_CONTEXT 1
-# else
-#  define USE_CONTEXT 0
-# endif
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20)
+# define USE_CONTEXT 1
+#else
+# define USE_CONTEXT 0
+#endif
 
 #if USE_CONTEXT
 static void leaf_send (void *context)
 #else
-static void leaf_send (OS_IF_TASK_QUEUE_HANDLE *work)
+static void leaf_send (struct work_struct *work)
 #endif
 {
   unsigned int     i;
@@ -1418,12 +1428,12 @@ static void leaf_send (OS_IF_TASK_QUEUE_HANDLE *work)
     return;
   }
 
-  os_if_down_sema(&dev->write_finished);
+  wait_for_completion(&dev->write_finished);
 
   if (!dev->present) {
     // The device was unplugged before the file was released
     // We cannot deallocate here it is to early and handled elsewhere
-    os_if_up_sema(&dev->write_finished);
+    complete(&dev->write_finished);
     return;
   }
 
@@ -1459,7 +1469,7 @@ static void leaf_send (OS_IF_TASK_QUEUE_HANDLE *work)
 
     if ((result = leaf_transmit(vCard)) <= 0) {
       // The transmission failed - mark write as finished
-      os_if_up_sema(&dev->write_finished);
+      complete(&dev->write_finished);
     }
 
     // Wake up those who are waiting to send a cmd or msg
@@ -1478,11 +1488,11 @@ static void leaf_send (OS_IF_TASK_QUEUE_HANDLE *work)
     if (result) {
       // Give ourselves a little extra work in case all the queues could not
       // be emptied this time.
-      os_if_queue_task_not_default_queue(dev->txTaskQ, &dev->txWork);
+      queue_work(dev->txTaskQ, &dev->txWork);
     }
   }
   else {
-    os_if_up_sema(&dev->write_finished);
+    complete(&dev->write_finished);
   }
 
   return;
@@ -1684,9 +1694,9 @@ static int leaf_fill_usb_buffer (VCanCardData *vCard, unsigned char *buffer,
       }
 
       // Have to be here (after all the breaks and continues)
-      os_if_spin_lock(&leafChan->outTxLock);
+      spin_lock(&leafChan->outTxLock);
       leafChan->outstanding_tx++;
-      os_if_spin_unlock(&leafChan->outTxLock);
+      spin_unlock(&leafChan->outTxLock);
 
       DEBUGPRINT(5, (TXT("t leaf, chan %d, out %d\n"),
                      j, leafChan->outstanding_tx));
@@ -1797,7 +1807,7 @@ static void leaf_response_timer (unsigned long voidWaitNode)
 {
   WaitNode *waitNode = (WaitNode *)voidWaitNode;
   waitNode->timedOut = 1;
-  os_if_up_sema(&waitNode->waitSemaphore);
+  complete(&waitNode->waitCompletion);
 } // response_timeout
 
 
@@ -1825,7 +1835,7 @@ static int leaf_send_and_wait_reply (VCanCardData *vCard, filoCmd *cmd,
     return VCAN_STAT_NO_DEVICE;
   }
 
-  os_if_init_sema(&waitNode.waitSemaphore);
+  init_completion(&waitNode.waitCompletion);
   waitNode.replyPtr      = replyPtr;
   waitNode.cmdNr         = cmdNr;
   waitNode.transId       = transId;
@@ -1834,15 +1844,15 @@ static int leaf_send_and_wait_reply (VCanCardData *vCard, filoCmd *cmd,
   waitNode.timedOut  = 0;
 
   // Add to card's list of expected responses
-  os_if_spin_lock_irqsave(&dev->replyWaitListLock, &irqFlags);
+  spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
   list_add(&waitNode.list, &dev->replyWaitList);
-  os_if_spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
+  spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
 
   ret = leaf_queue_cmd(vCard, cmd, LEAF_Q_CMD_WAIT_TIME);
   if (ret != 0) {
-    os_if_spin_lock_irqsave(&dev->replyWaitListLock, &irqFlags);
+    spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
     list_del(&waitNode.list);
-    os_if_spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
+    spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
     return ret;
   }
 
@@ -1853,11 +1863,11 @@ static int leaf_send_and_wait_reply (VCanCardData *vCard, filoCmd *cmd,
   waitTimer.expires   = jiffies + msecs_to_jiffies(LEAF_CMD_RESP_WAIT_TIME);
   add_timer(&waitTimer);
 
-  os_if_down_sema(&waitNode.waitSemaphore);
+  wait_for_completion(&waitNode.waitCompletion);
   // Now we either got a response or a timeout
-  os_if_spin_lock_irqsave(&dev->replyWaitListLock, &irqFlags);
+  spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
   list_del(&waitNode.list);
-  os_if_spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
+  spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
   del_timer_sync(&waitTimer);
 
   DEBUGPRINT(5, (TXT("after del timer\n")));
@@ -1885,9 +1895,9 @@ static int leaf_queue_cmd (VCanCardData *vCard, filoCmd *cmd,
   LeafCardData *dev  = (LeafCardData *)vCard->hwCardData;
   int queuePos;
   // Using an unrolled sleep
-  OS_IF_WAITQUEUE wait;
+  wait_queue_t wait;
 
-  os_if_init_waitqueue_entry(&wait);
+  init_waitqueue_entry(&wait, current);
   queue_add_wait_for_space(&dev->txCmdQueue, &wait);
 
   // Sleep when buffer is full and timeout > 0
@@ -1895,7 +1905,7 @@ static int leaf_queue_cmd (VCanCardData *vCard, filoCmd *cmd,
     // We are indicated as interruptible
     DEBUGPRINT(5, (TXT("queue cmd len: %d\n"), queue_length(&dev->txCmdQueue)));
 
-    os_if_set_task_interruptible();
+    set_current_state(TASK_INTERRUPTIBLE);
 
     queuePos = queue_back(&dev->txCmdQueue);
     if (queuePos >= 0) {   // Did we actually find space in the queue?
@@ -1906,12 +1916,12 @@ static int leaf_queue_cmd (VCanCardData *vCard, filoCmd *cmd,
     // Do we want a timeout?
     if (timeout == 0) {
       // We shouldn't wait and thus we must be active
-      os_if_set_task_running();
+      set_current_state(TASK_RUNNING);
       queue_remove_wait_for_space(&dev->txCmdQueue, &wait);
       DEBUGPRINT(2, (TXT("ERROR 1 NO_RESOURCES\n")));
       return VCAN_STAT_NO_RESOURCES;
     } else {
-      if (os_if_wait_for_event_timeout(timeout, &wait) == 0) {
+      if (schedule_timeout(msecs_to_jiffies(timeout) + 1) == 0) {
         // Sleep was interrupted by timer
         queue_remove_wait_for_space(&dev->txCmdQueue, &wait);
         DEBUGPRINT(2, (TXT("ERROR 2 NO_RESOURCES\n")));
@@ -1920,14 +1930,14 @@ static int leaf_queue_cmd (VCanCardData *vCard, filoCmd *cmd,
     }
 
     // Are we interrupted by a signal?
-    if (os_if_signal_pending()) {
+    if (signal_pending(current)) {
       queue_remove_wait_for_space(&dev->txCmdQueue, &wait);
       DEBUGPRINT(2, (TXT("ERROR 3 SIGNALED\n")));
       return VCAN_STAT_SIGNALED;
     }
   }
 
-  os_if_set_task_running();
+  set_current_state(TASK_RUNNING);
   queue_remove_wait_for_space(&dev->txCmdQueue, &wait);
 
   // Get a pointer to the right bufferspace
@@ -1936,7 +1946,7 @@ static int leaf_queue_cmd (VCanCardData *vCard, filoCmd *cmd,
   queue_push(&dev->txCmdQueue);
 
   // Wake up the tx-thread
-  os_if_queue_task_not_default_queue(dev->txTaskQ, &dev->txWork);
+  queue_work(dev->txTaskQ, &dev->txWork);
 
   return VCAN_STAT_OK;
 } // _queue_cmd
@@ -2167,7 +2177,6 @@ static int leaf_plugin (struct usb_interface *interface,
   }
 
   dev = vCard->hwCardData;
-  os_if_init_sema(&((LeafCardData *)vCard->hwCardData)->sem);
   dev->udev = udev;
   dev->interface = interface;
   ticks_init (&vCard->ticks);
@@ -2187,7 +2196,7 @@ static int leaf_plugin (struct usb_interface *interface,
       buffer_size                = MAX_PACKET_IN;
       dev->bulk_in_size          = buffer_size;
       dev->bulk_in_endpointAddr  = endpoint->bEndpointAddress;
-      dev->bulk_in_buffer        = os_if_kernel_malloc(buffer_size);
+      dev->bulk_in_buffer        = kmalloc(buffer_size, GFP_KERNEL);
       dev->bulk_in_MaxPacketSize = le16_to_cpu(endpoint->wMaxPacketSize);
       DEBUGPRINT(2, (TXT("MaxPacketSize in = %d\n"),
                      dev->bulk_in_MaxPacketSize));
@@ -2303,13 +2312,13 @@ error:
 static int leaf_start (VCanCardData *vCard)
 {
   LeafCardData *dev = (LeafCardData *)vCard->hwCardData;
-  OS_IF_THREAD rx_thread;
+  struct task_struct* rx_thread;
   unsigned int i;
 
   DEBUGPRINT(3, (TXT("leaf: _start\n")));
 
   // Initialize queues/waitlists for commands
-  os_if_spin_lock_init(&dev->replyWaitListLock);
+  spin_lock_init(&dev->replyWaitListLock);
 
   INIT_LIST_HEAD(&dev->replyWaitList);
   queue_init(&dev->txCmdQueue, KV_LEAF_TX_CMD_BUF_SIZE);
@@ -2318,16 +2327,20 @@ static int leaf_start (VCanCardData *vCard)
   for (i = 0; i < MAX_CARD_CHANNELS; i++) {
     VCanChanData  *vChd     = vCard->chanData[i];
     LeafChanData  *leafChan = vChd->hwChanData;
-    os_if_spin_lock_init(&leafChan->outTxLock);
+    spin_lock_init(&leafChan->outTxLock);
   }
 
-  os_if_init_sema(&dev->write_finished);
-  os_if_up_sema(&dev->write_finished);
+  init_completion(&dev->write_finished);
+  complete(&dev->write_finished);
 
-  os_if_init_task(&dev->txWork, &leaf_send, vCard);
-  dev->txTaskQ = os_if_declare_task("leaf_tx", &dev->txWork);
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20))
+  INIT_WORK(&dev->txWork, leaf_send, vCard);
+#else
+  INIT_WORK(&dev->txWork, leaf_send);
+#endif
+  dev->txTaskQ = create_workqueue("leaf_tx");
 
-  rx_thread = os_if_kernel_thread(leaf_rx_thread, vCard);
+  rx_thread = kthread_run(leaf_rx_thread, vCard, "Kvaser kernel thread");
 
   // Gather some card info
   leaf_get_card_info_dummy(vCard);
@@ -2345,16 +2358,19 @@ static int leaf_start (VCanCardData *vCard)
   if (vCard->card_flags & DEVHND_CARD_EXTENDED_CAPABILITIES) {
     int r;
     r = leaf_capabilities (vCard, VCAN_CHANNEL_CAP_SILENTMODE);
-    if (r != VCAN_STAT_OK) return r;
+    if (r != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_SILENTMODE\n")));
 
     r = leaf_capabilities (vCard, VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES);
-    if (r != VCAN_STAT_OK) return r;
+    if (r != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES\n")));
 
     r = leaf_capabilities (vCard, VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION);
-    if (r != VCAN_STAT_OK) return r;
+    if (r != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION\n")));
 
     r = leaf_capabilities (vCard, VCAN_CHANNEL_CAP_ERROR_COUNTERS);
-    if (r != VCAN_STAT_OK) return r;
+    if (r != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_ERROR_COUNTERS\n")));
+
+    r = leaf_capabilities (vCard, VCAN_CHANNEL_CAP_SYNC_TX_FLUSH);
+    if (r != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_SYNC_TX_FLUSH\n")));
   }
 
   set_capability_value (vCard,
@@ -2366,7 +2382,7 @@ static int leaf_start (VCanCardData *vCard)
                         MAX_CARD_CHANNELS);
 
   // Set all channels in normal mode.
-  for (i = 0; i < MAX_CARD_CHANNELS; i++) {
+  for (i = 0; i < vCard->nrChannels; i++) {
     int r;
     filoCmd cmd;
 
@@ -2404,7 +2420,7 @@ static int leaf_allocate (VCanCardData **in_vCard)
   DEBUGPRINT(3, (TXT("leaf: _allocate\n")));
 
   // Allocate data area for this card
-  vCard = os_if_kernel_malloc(sizeof(VCanCardData) + sizeof(LeafCardData));
+  vCard = kmalloc(sizeof(VCanCardData) + sizeof(LeafCardData), GFP_KERNEL);
   DEBUGPRINT(2, (TXT("MALLOC _allocate\n")));
   if (!vCard) {
     DEBUGPRINT(1, (TXT("alloc error\n")));
@@ -2416,7 +2432,7 @@ static int leaf_allocate (VCanCardData **in_vCard)
   vCard->hwCardData = vCard + 1;
 
   // Allocate memory for n channels
-  chs = os_if_kernel_malloc(sizeof(ChanHelperStruct));
+  chs = kmalloc(sizeof(ChanHelperStruct), GFP_KERNEL);
   DEBUGPRINT(2, (TXT("MALLOC _alloc helperstruct\n")));
   if (!chs) {
     DEBUGPRINT(1, (TXT("chan alloc error\n")));
@@ -2433,18 +2449,18 @@ static int leaf_allocate (VCanCardData **in_vCard)
   }
   vCard->chanData = chs->dataPtrArray;
 
-  os_if_spin_lock(&driverData.canCardsLock);
+  spin_lock(&driverData.canCardsLock);
   // Insert into list of cards
   vCard->next = driverData.canCards;
   driverData.canCards = vCard;
-  os_if_spin_unlock(&driverData.canCardsLock);
+  spin_unlock(&driverData.canCardsLock);
 
   *in_vCard = vCard;
 
   return VCAN_STAT_OK;
 
 chan_alloc_err:
-  os_if_kernel_free(vCard);
+  kfree(vCard);
 
 card_alloc_err:
 
@@ -2467,22 +2483,22 @@ static void leaf_deallocate (VCanCardData *vCard)
   //flush_workqueue(&dev->txTaskQ);
 
   if (dev->bulk_in_buffer != NULL) {
-    os_if_kernel_free(dev->bulk_in_buffer);
+    kfree(dev->bulk_in_buffer);
     DEBUGPRINT(2, (TXT("Free bulk_in_buffer\n")));
     dev->bulk_in_buffer = NULL;
   }
-#  if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 35))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 35))
   usb_buffer_free(dev->udev, dev->bulk_out_size,
                   dev->bulk_out_buffer,
                   dev->write_urb->transfer_dma);
-#  else
+#else
   usb_free_coherent(dev->udev, dev->bulk_out_size,
                     dev->bulk_out_buffer,
                     dev->write_urb->transfer_dma);
-#  endif
+#endif
   usb_free_urb(dev->write_urb);
 
-  os_if_spin_lock(&driverData.canCardsLock);
+  spin_lock(&driverData.canCardsLock);
 
   local_vCard = driverData.canCards;
 
@@ -2510,35 +2526,35 @@ static void leaf_deallocate (VCanCardData *vCard)
     }
   }
 
-  os_if_spin_unlock(&driverData.canCardsLock);
+  spin_unlock(&driverData.canCardsLock);
 
   for(i = 0; i < MAX_CARD_CHANNELS; i++) {
     VCanChanData *vChd     = vCard->chanData[i];
     LeafChanData *leafChan = vChd->hwChanData;
     if (leafChan->objbufs) {
       DEBUGPRINT(2, (TXT("Free vCard->chanData[i]->hwChanData->objbufs[%d]\n"), i));
-      os_if_kernel_free(leafChan->objbufs);
+      kfree(leafChan->objbufs);
       leafChan->objbufs = NULL;
     }
   }
   if (vCard->chanData != NULL) {
     DEBUGPRINT(2, (TXT("Free vCard->chanData\n")));
-    os_if_kernel_free(vCard->chanData);
+    kfree(vCard->chanData);
     vCard->chanData = NULL;
   }
   if (vCard != NULL) {
     DEBUGPRINT(2, (TXT("Free vCard\n")));
-    os_if_kernel_free(vCard);    // Also frees hwCardData (allocated together)
+    kfree(vCard);    // Also frees hwCardData (allocated together)
     vCard = NULL;
   }
 } // _deallocate
 
 
-#  if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 8))
-#    define USB_KILL_URB(x) usb_unlink_urb(x)
-#  else
-#    define USB_KILL_URB(x) usb_kill_urb(x)
-#  endif
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 8))
+# define USB_KILL_URB(x) usb_unlink_urb(x)
+#else
+# define USB_KILL_URB(x) usb_kill_urb(x)
+#endif
 
 //============================================================================
 //     leaf_remove
@@ -2574,8 +2590,8 @@ static void leaf_remove (struct usb_interface *interface)
     vChan = vCard->chanData[i];
     DEBUGPRINT(3, (TXT("Waiting for all closed on minor %d\n"), vChan->minorNr));
     while (atomic_read(&vChan->fileOpenCount) > 0) {
-      os_if_set_task_uninterruptible ();
-      os_if_wait_for_event_timeout_simple(10);
+      set_current_state(TASK_UNINTERRUPTIBLE);
+      schedule_timeout(msecs_to_jiffies(10));
     }
   }
 
@@ -2587,21 +2603,11 @@ static void leaf_remove (struct usb_interface *interface)
   DEBUGPRINT(6, (TXT("Ongoing write terminated\n")));
   USB_KILL_URB(dev->write_urb);
   DEBUGPRINT(6, (TXT("Unlinking urb\n")));
-  os_if_down_sema(&dev->write_finished);
-
-  // Remove spin locks
-  for (i = 0; i < MAX_CARD_CHANNELS; i++) {
-    VCanChanData   *vChd     = vCard->chanData[i];
-    LeafChanData   *leafChan = vChd->hwChanData;
-    os_if_spin_lock_remove(&leafChan->outTxLock);
-  }
+  wait_for_completion(&dev->write_finished);
 
   // Flush and destroy tx workqueue
   DEBUGPRINT(2, (TXT("destroy_workqueue\n")));
-  os_if_destroy_task(dev->txTaskQ);
-
-  os_if_delete_sema(&dev->write_finished);
-  os_if_spin_lock_remove(&dev->replyWaitListLock);
+  destroy_workqueue(dev->txTaskQ);
 
   driverData.noOfDevices -= vCard->nrChannels;
 
@@ -2638,14 +2644,14 @@ static int leaf_set_busparams (VCanChanData *vChan, VCanBusParams *par)
   // Check bus parameters
   tmp = par->freq * (par->tseg1 + par->tseg2 + 1);
   if (tmp == 0) {
-    DEBUGPRINT(1, (TXT("leaf: _set_busparams() tmp == 0!\n")));
+    DEBUGPRINT(2, (TXT("leaf: _set_busparams() tmp == 0!\n")));
     return VCAN_STAT_BAD_PARAMETER;
   }
 
   PScl = 16000000UL / tmp;
 
   if (PScl <= 1 || PScl > 256) {
-    DEBUGPRINT(1, (TXT("%s: hwif_set_chip_param() prescaler wrong (%d)\n"),
+    DEBUGPRINT(2, (TXT("%s: hwif_set_chip_param() prescaler wrong (%d)\n"),
                    driverData.deviceName, PScl & 1 /* even */));
     return VCAN_STAT_BAD_PARAMETER;
   }
@@ -2793,9 +2799,9 @@ static int leaf_bus_on (VCanChanData *vChan)
 
   memset(((LeafChanData *)vChan->hwChanData)->current_tx_message, 0, sizeof(((LeafChanData *)vChan->hwChanData)->current_tx_message));
   atomic_set(&vChan->transId, 1);
-  os_if_spin_lock(&leafChan->outTxLock);
+  spin_lock(&leafChan->outTxLock);
   leafChan->outstanding_tx = 0;
-  os_if_spin_unlock(&leafChan->outTxLock);
+  spin_unlock(&leafChan->outTxLock);
 
   cmd.head.cmdNo            = CMD_START_CHIP_REQ;
   cmd.startChipReq.cmdLen   = sizeof(cmdStartChipReq);
@@ -2848,14 +2854,14 @@ static int leaf_bus_off (VCanChanData *vChan)
     vChan->chipState.state = CHIPSTAT_BUSOFF;
     memset(leafChan->current_tx_message, 0, sizeof(leafChan->current_tx_message));
 
-    os_if_spin_lock(&leafChan->outTxLock);
+    spin_lock(&leafChan->outTxLock);
     leafChan->outstanding_tx = 0;
-    os_if_spin_unlock(&leafChan->outTxLock);
+    spin_unlock(&leafChan->outTxLock);
 
     atomic_set(&vChan->transId, 1);
   }
 
-  return ret;
+  return vCanFlushSendBuffer (vChan);
 } // _bus_off
 
 
@@ -2900,19 +2906,24 @@ static int leaf_flush_tx_buffer (VCanChanData *vChan)
   // a message from the queue, increasing outstanding_tx after our clear.
   // With a cleared queue, the transmit code will not be doing anything.
   queue_reinit(&vChan->txChanQueue);
-  os_if_spin_lock(&leafChan->outTxLock);
+  spin_lock(&leafChan->outTxLock);
   leafChan->outstanding_tx = 0;
-  os_if_spin_unlock(&leafChan->outTxLock);
+  spin_unlock(&leafChan->outTxLock);
 
-  ret = leaf_queue_cmd(vChan->vCard, &cmd, 5 /* There is no response */);
+  if (vChan->capabilities & VCAN_CHANNEL_CAP_SYNC_TX_FLUSH) {
+    filoCmd reply;
+    ret = leaf_send_and_wait_reply(vChan->vCard, &cmd, &reply, CMD_FILO_FLUSH_QUEUE_RESP, 0, 0);
+  } else {
+    ret = leaf_queue_cmd(vChan->vCard, &cmd, 5 /* There is no response */);
+  }
 
   if (ret == VCAN_STAT_OK) {
     atomic_set(&vChan->transId, 1);
     // Do this once more, for good measure.
     queue_reinit(&vChan->txChanQueue);
-    os_if_spin_lock(&leafChan->outTxLock);
+    spin_lock(&leafChan->outTxLock);
     leafChan->outstanding_tx = 0;
-    os_if_spin_unlock(&leafChan->outTxLock);
+    spin_unlock(&leafChan->outTxLock);
   }
 
   return ret;
@@ -2930,7 +2941,7 @@ static void leaf_schedule_send (VCanCardData *vCard, VCanChanData *vChan)
   DEBUGPRINT(3, (TXT("leaf: _schedule_send\n")));
 
   if (leaf_tx_available(vChan) && dev->present) {
-    os_if_queue_task_not_default_queue(dev->txTaskQ, &dev->txWork);
+    queue_work(dev->txTaskQ, &dev->txWork);
   }
 #if DEBUG
   else {
@@ -2980,9 +2991,9 @@ static unsigned long leaf_get_hw_tx_q_len (VCanChanData *vChan)
 
   DEBUGPRINT(3, (TXT("leaf: _get_hw_tx_q_len\n")));
 
-  os_if_spin_lock(&hChd->outTxLock);
+  spin_lock(&hChd->outTxLock);
   res = hChd->outstanding_tx;
-  os_if_spin_unlock(&hChd->outTxLock);
+  spin_unlock(&hChd->outTxLock);
 
   return res;
 } // _get_hw_tx_q_len
@@ -2995,7 +3006,7 @@ static unsigned long leaf_get_hw_tx_q_len (VCanChanData *vChan)
 //
 // Run when driver is loaded
 //
-static int INIT leaf_init_driver (void)
+static int leaf_init_driver (void)
 {
   int result;
 
@@ -3019,7 +3030,7 @@ static int INIT leaf_init_driver (void)
 //======================================================================
 // Run when driver is unloaded
 //
-static int EXIT leaf_close_all (void)
+static int leaf_close_all (void)
 {
   DEBUGPRINT(2, (TXT("leaf: _close_all (deregister driver..)\n")));
   usb_deregister(&leaf_driver);
@@ -3064,9 +3075,9 @@ static int leaf_tx_available (VCanChanData *vChan)
   DEBUGPRINT(3, (TXT("leaf: _tx_available %d (%d)!\n"),
                  leafChan->outstanding_tx, dev->max_outstanding_tx));
 
-  os_if_spin_lock(&leafChan->outTxLock);
+  spin_lock(&leafChan->outTxLock);
   res = leafChan->outstanding_tx;
-  os_if_spin_unlock(&leafChan->outTxLock);
+  spin_unlock(&leafChan->outTxLock);
 
   return (res < dev->max_outstanding_tx);
 } // _tx_available
@@ -3083,9 +3094,9 @@ static int leaf_outstanding_sync (VCanChanData *vChan)
   DEBUGPRINT(3, (TXT("leaf: _outstanding_sync (%d)\n"),
                  leafChan->outstanding_tx));
 
-  os_if_spin_lock(&leafChan->outTxLock);
+  spin_lock(&leafChan->outTxLock);
   res = leafChan->outstanding_tx;
-  os_if_spin_unlock(&leafChan->outTxLock);
+  spin_unlock(&leafChan->outTxLock);
 
   return (res == 0);
 } // _outstanding_sync
@@ -3095,7 +3106,7 @@ static int leaf_outstanding_sync (VCanChanData *vChan)
 //======================================================================
 // Get time
 //
- static int leaf_get_time (VCanCardData *vCard, unsigned long *time)
+ static int leaf_get_time (VCanCardData *vCard, uint64_t *time)
 {
   filoCmd cmd;
   filoCmd reply;
@@ -3112,7 +3123,13 @@ static int leaf_outstanding_sync (VCanChanData *vChan)
   ret = leaf_send_and_wait_reply(vCard, (filoCmd *)&cmd, &reply,
                                  CMD_READ_CLOCK_RESP, 0, 1);
   if (ret == VCAN_STAT_OK) {
-    *time = ticks_to_10us(vCard, *(uint64_t*)reply.readClockResp.time);
+    uint64_t ticks;
+    ticks = reply.readClockResp.time[2];
+    ticks <<= 16;
+    ticks += reply.readClockResp.time[1];
+    ticks <<= 16;
+    ticks += reply.readClockResp.time[0];
+    *time = ticks_to_10us(vCard, ticks);
   }
 
   return ret;
@@ -3193,7 +3210,7 @@ static int leaf_objbuf_alloc (VCanChanData *chd, int bufType, int *bufNo)
 
   if (!leafChan->objbufs) {
     DEBUGPRINT(4, (TXT("Allocating leafChan->objbufs[]\n")));
-    leafChan->objbufs = os_if_kernel_malloc(sizeof(OBJECT_BUFFER) * dev->autoTxBufferCount);
+    leafChan->objbufs = kmalloc(sizeof(OBJECT_BUFFER) * dev->autoTxBufferCount, GFP_KERNEL);
     if (!leafChan->objbufs) {
       return VCAN_STAT_NO_MEMORY;
     }
@@ -3617,6 +3634,10 @@ static int leaf_capabilities (VCanCardData *vCard, uint32_t vcan_cmd) {
       value = reply.capabilitiesResp.errcountCap.value;
       mask  = reply.capabilitiesResp.errcountCap.mask;
       break;
+    case CAP_SUB_CMD_SYNC_TX_FLUSH:
+      value = reply.capabilitiesResp.syncTxFlushCap.value;
+      mask  = reply.capabilitiesResp.syncTxFlushCap.mask;
+      break;
     default: return VCAN_STAT_BAD_PARAMETER; break;
   }
 
@@ -3666,6 +3687,67 @@ int leaf_read_user_parameter(const VCanChanData * const vChan,
     *status = reply.readUserParameter.status;
   }
 
+  return r;
+}
+
+/***************************************************************************/
+static int leaf_get_card_info_misc(const VCanChanData *chd, int *value, int type)
+{
+  int r = 0;
+  filoCmd cmd;
+  filoCmd reply;
+  
+  memset(&cmd, 0, sizeof(cmd));
+  
+  cmd.head.cmdNo = CMD_GET_CAPABILITIES_REQ;
+  cmd.head.cmdLen = sizeof(cmdCapabilitiesReq);
+  cmd.capabilitiesReq.subData.channel = (uint16_t)chd->channel;
+  
+  switch (type) {
+    case KCAN_IOCTL_MISC_INFO_WEBSERVER_TYPE:    
+    case KCAN_IOCTL_MISC_INFO_REMOTE_TYPE:
+      cmd.capabilitiesReq.subCmdNo = CAP_SUB_CMD_REMOTE_INFO;
+      break;
+    case KCAN_IOCTL_MISC_INFO_LOGGER_TYPE:
+      cmd.capabilitiesReq.subCmdNo = CAP_SUB_CMD_GET_LOGGER_INFO;
+      break;
+    default:
+      r = -1;
+  }
+  
+  if (r != 0) {
+    r = leaf_send_and_wait_reply(chd->vCard, &cmd, &reply,
+                               CMD_GET_CAPABILITIES_RESP, (unsigned char)chd->channel, 0);
+    if (r == VCAN_STAT_OK) {
+      switch (type) {
+        case KCAN_IOCTL_MISC_INFO_WEBSERVER_TYPE:
+          *value = cmd.capabilitiesResp.remoteInfo.webServer != 0 ? 
+             KCAN_IOCTL_MISC_INFO_REMOTE_WEBSERVER_V1: 
+             KCAN_IOCTL_MISC_INFO_NOT_IMPLEMENTED;
+        break;
+        case KCAN_IOCTL_MISC_INFO_REMOTE_TYPE:
+          *value = cmd.capabilitiesResp.remoteInfo.remoteType;
+      }
+    }
+  }
+  
+  
+  return r;
+}
+
+/***************************************************************************/
+static int leaf_flash_leds(const VCanChanData *chd, int action, int timeout)
+{
+  filoCmd cmd, reply;
+  int r;
+
+  cmd.ledActionReq.cmdNo = CMD_LED_ACTION_REQ;
+  cmd.ledActionReq.cmdLen = sizeof(cmdLedActionReq);
+  cmd.ledActionReq.subCmd = action;
+  cmd.ledActionReq.timeout = timeout;
+  r = leaf_send_and_wait_reply(chd->vCard, &cmd, &reply,
+                               CMD_LED_ACTION_RESP,
+                               cmd.getBusparamsReq.transId, 1);
   return r;
 }
 
@@ -3720,13 +3802,13 @@ static int leaf_get_cust_channel_name(const VCanChanData * const vChan,
 }
 
 
-INIT int init_module (void)
+int init_module (void)
 {
   driverData.hwIf = &hwIf;
   return vCanInit (&driverData, MAX_DRIVER_CHANNELS);
 }
 
-EXIT void cleanup_module (void)
+void cleanup_module (void)
 {
   vCanCleanup (&driverData);
 }

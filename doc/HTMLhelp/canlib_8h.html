@@ -104,6 +104,7 @@ function toggleVisibility(linkObj) {
 <div class="textblock"><code>#include &lt;stdlib.h&gt;</code><br/>
 <code>#include &lt;stdint.h&gt;</code><br/>
 <code>#include &quot;<a class="el" href="canstat_8h.html">canstat.h</a>&quot;</code><br/>
+<code>#include &quot;obsolete.h&quot;</code><br/>
 </div><table class="memberdecls">
 <tr><td colspan="2"><h2><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
@@ -114,6 +115,7 @@ Data Structures</h2></td></tr>
 <tr><td colspan="2"><h2><a name="define-members"></a>
 Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a679396227d380d9c074b2b5f55c9f448">CANLIB_DECLARE_ALL</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ad1f2b460c7780224a9dbc0f8f8a4918a">canINVALID_HANDLE</a>&#160;&#160;&#160;(-1)</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canOPEN_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canOPEN_xxx"></a></p>
 <p>These defines are used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>. </p>
@@ -174,6 +176,20 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a125320cac09469f1a1ac719a0d0092cf">BAUD_62K</a>&#160;&#160;&#160;(-6)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a00d3a118d0760f0cdbc6a7298beb4f3a">BAUD_50K</a>&#160;&#160;&#160;(-7)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a9df1779b295a72d5b4cc3a100c191dbf">BAUD_83K</a>&#160;&#160;&#160;(-8)</td></tr>
+<tr><td colspan="2"><div class="groupHeader">kvREMOTE_TYPExxx</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="kvREMOTE_TYPExxx"></a></p>
+<p>Remote type, returned when using <a class="el" href="canlib_8h.html#aad05c95b1ca22a5ccdf0ed713f0b1e2d">canCHANNELDATA_REMOTE_TYPE</a> </p>
+</div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aac349c170d66e1444433255a28965e66">kvREMOTE_TYPE_NOT_REMOTE</a>&#160;&#160;&#160;0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ac028a381284b8bbc385d0f001b689d01">kvREMOTE_TYPE_WLAN</a>&#160;&#160;&#160;1</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a49e66a5c81f27f51ffbacc4eeec703fb">kvREMOTE_TYPE_LAN</a>&#160;&#160;&#160;2</td></tr>
+<tr><td colspan="2"><div class="groupHeader">kvLOGGER_TYPE_xxx</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="kvLOGGER_TYPE_xxx"></a></p>
+<p>Logger type, returned when using <a class="el" href="canlib_8h.html#a64775deac940ee65fc3a4f4035f2c550">canCHANNELDATA_LOGGER_TYPE</a> </p>
+</div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aae32c1c57419eeb4ae5b5009fd2936d2">kvLOGGER_TYPE_NOT_A_LOGGER</a>&#160;&#160;&#160;0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a90386e1c2b4a8b83685f230753411759">kvLOGGER_TYPE_V1</a>&#160;&#160;&#160;1</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aac5e7b3f0081eed9bdf5f5d50ff8aab4">kvLOGGER_TYPE_V2</a>&#160;&#160;&#160;2</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canCHANNELDATA_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canCHANNELDATA_xxx"></a></p>
 <p>These defines are used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>. </p>
@@ -216,6 +232,9 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a2777677d94f63434f83da6e587a9db17">canCHANNELDATA_REMOTE_MAC</a>&#160;&#160;&#160;36</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a3cc31ba6fd77280ecd11aea7a4089472">canCHANNELDATA_MAX_BITRATE</a>&#160;&#160;&#160;37</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a810b2e8dc8153bac191b645a74c36ad9">canCHANNELDATA_CHANNEL_CAP_MASK</a>&#160;&#160;&#160;38</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a928b5c304c08ff8f834511733fd73e5c">canCHANNELDATA_IS_REMOTE</a>&#160;&#160;&#160;40</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aad05c95b1ca22a5ccdf0ed713f0b1e2d">canCHANNELDATA_REMOTE_TYPE</a>&#160;&#160;&#160;41</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a64775deac940ee65fc3a4f4035f2c550">canCHANNELDATA_LOGGER_TYPE</a>&#160;&#160;&#160;42</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a0e91dd0d999b3043c6da5cb911dd83d8">canCHANNELDATA_CUST_CHANNEL_NAME</a>&#160;&#160;&#160;39</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canCHANNEL_IS_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canCHANNEL_IS_xxx"></a></p>
@@ -276,11 +295,14 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a46307333df823ca35cf18a582a2fedb0">canCHANNEL_CAP_TXACKNOWLEDGE</a>&#160;&#160;&#160;0x00000080L</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a79e88cce2d07e78b482070824583e059">canCHANNEL_CAP_VIRTUAL</a>&#160;&#160;&#160;0x00010000L</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a62edfa89566e668ea94fe669f3bedb74">canCHANNEL_CAP_SIMULATED</a>&#160;&#160;&#160;0x00020000L</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a7748990724fd22b9be3cd02265358755">canCHANNEL_CAP_REMOTE</a>&#160;&#160;&#160;0x00040000L</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ad171fc2715be577d685c665b4c808809">canCHANNEL_CAP_RESERVED_1</a>&#160;&#160;&#160;0x00040000L</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#af46aa24f177eabf4355d89a00fc0ffe4">canCHANNEL_CAP_CAN_FD</a>&#160;&#160;&#160;0x00080000L</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a45e356713bd5b6f87d15966045a19f1c">canCHANNEL_CAP_CAN_FD_NONISO</a>&#160;&#160;&#160;0x00100000L</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#af685c865f8ee78b5a2e5285bb57bd335">canCHANNEL_CAP_SILENT_MODE</a>&#160;&#160;&#160;0x00200000L</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a80b4c1cf5b60fbed64a5ba220a5007ea">canCHANNEL_CAP_SINGLE_SHOT</a>&#160;&#160;&#160;0x00400000L</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a79b87625040f4762b83954245b139a96">canCHANNEL_CAP_LOGGER</a>&#160;&#160;&#160;0x00800000L</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a4f59a672fed4cbe5482b32d1bd948222">canCHANNEL_CAP_REMOTE_ACCESS</a>&#160;&#160;&#160;0x01000000L</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a1c3c68d592ead785f1bbb5de757ee7a0">canCHANNEL_CAP_SCRIPT</a>&#160;&#160;&#160;0x02000000L</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canDRIVER_CAP_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canDRIVER_CAP_xxx"></a></p>
 <p>Driver (transceiver) capabilities. </p>
@@ -334,6 +356,36 @@ Defines</h2></td></tr>
 <p>These defines are used in <a class="el" href="group___object_buffers.html#ga9369c2f47886d9f815fe5513d6f5b60b">canObjBufSetFlags()</a>. </p>
 </div></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a34e06679517c19e76c5ff9b43d501b95">canOBJBUF_AUTO_RESPONSE_RTR_ONLY</a>&#160;&#160;&#160;0x01</td></tr>
+<tr><td colspan="2"><div class="groupHeader">kvLED_ACTION_xxx</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="kvLED_ACTION_xxx"></a></p>
+<p>The following constants can be used together with the <a class="el" href="group___general.html#gad3d0fc1bf752047f6e24020c478aeffd">kvFlashLeds()</a> function. </p>
+</div></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aa536be83f7b5a7344f842f4e00c2fb3b">kvLED_ACTION_ALL_LEDS_ON</a>&#160;&#160;&#160;0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a904471b2f2e1417f37415a0caec61914">kvLED_ACTION_ALL_LEDS_OFF</a>&#160;&#160;&#160;1</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ab39368460724f24ed1eb2cb6c34935cb">kvLED_ACTION_LED_0_ON</a>&#160;&#160;&#160;2</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a371cd996830a3cc2d8e16816d45c533f">kvLED_ACTION_LED_0_OFF</a>&#160;&#160;&#160;3</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aa0e977e7d0d3cf1f8baff1772499c687">kvLED_ACTION_LED_1_ON</a>&#160;&#160;&#160;4</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a01cecea1168caf1270daadd77ac48a5e">kvLED_ACTION_LED_1_OFF</a>&#160;&#160;&#160;5</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a5e7a24da540f26e12e5b64bf0d10bddb">kvLED_ACTION_LED_2_ON</a>&#160;&#160;&#160;6</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aac278f39fad8dad872fe1c1dee6b657f">kvLED_ACTION_LED_2_OFF</a>&#160;&#160;&#160;7</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a93c905bcddd9f093896f65dab271c8fb">kvLED_ACTION_LED_3_ON</a>&#160;&#160;&#160;8</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aca71b7d4e443066c532f79550a92dd75">kvLED_ACTION_LED_3_OFF</a>&#160;&#160;&#160;9</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aeebb61dd8b3a9498a77440c51e0b552b">kvLED_ACTION_LED_4_ON</a>&#160;&#160;&#160;10</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a9da57686fbcc320073a7c2ca5cd5b834">kvLED_ACTION_LED_4_OFF</a>&#160;&#160;&#160;11</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#af3d9dc8bbf45f5655221d962ed603fbe">kvLED_ACTION_LED_5_ON</a>&#160;&#160;&#160;12</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ab44e6f831510fc2aca86a82e384133c3">kvLED_ACTION_LED_5_OFF</a>&#160;&#160;&#160;13</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ad99da937e44ad12b6dc7d9cec5e5ef66">kvLED_ACTION_LED_6_ON</a>&#160;&#160;&#160;14</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a118e729399bc46287bbd2e3c95c9f259">kvLED_ACTION_LED_6_OFF</a>&#160;&#160;&#160;15</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a922b3da033111dd5aad4e2fb0dc8a349">kvLED_ACTION_LED_7_ON</a>&#160;&#160;&#160;16</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aed4a6e8969e12b42e79d992e28de9dd5">kvLED_ACTION_LED_7_OFF</a>&#160;&#160;&#160;17</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a72e67e7d4744bf6dfe29de2e2636c464">kvLED_ACTION_LED_8_ON</a>&#160;&#160;&#160;18</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a2cf0c2f9192e951099a83331b160cf2e">kvLED_ACTION_LED_8_OFF</a>&#160;&#160;&#160;19</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#af647c4329071c3e37305ece1acac0240">kvLED_ACTION_LED_9_ON</a>&#160;&#160;&#160;20</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a5c63fc98f15f14d212d98a3336763ef6">kvLED_ACTION_LED_9_OFF</a>&#160;&#160;&#160;21</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a5db20baf9bc66c918756a010058d68b7">kvLED_ACTION_LED_10_ON</a>&#160;&#160;&#160;22</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a2f3e147cf8c2497adb8cfb29d2d5f3e2">kvLED_ACTION_LED_10_OFF</a>&#160;&#160;&#160;23</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a282277fd1ee13eb2fa5cfe04b8cbc88f">kvLED_ACTION_LED_11_ON</a>&#160;&#160;&#160;24</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#abd2d501800e3dbfca7c687644210defa">kvLED_ACTION_LED_11_OFF</a>&#160;&#160;&#160;25</td></tr>
 <tr><td colspan="2"><h2><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canHandle</a></td></tr>
@@ -390,8 +442,10 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___object_buffers.html#gae3e27cd339700f26897648895e1b37a0">canObjBufSendBurst</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, int idx, unsigned int burstlen)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#gaecc8b56e75cf68548af53b2d432079af">canResetBus</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga47d03bfcc31e290284e65211b61f15f3">canWriteWait</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, long id, void *msg, unsigned int dlc, unsigned int flag, unsigned long timeout)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___general.html#ga0d1c0e54ea20c3e3b328a32eb10c7b47">canUnloadLibrary</a> (void)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga7abcf8f512da6ab568850b9faa0bc28b">canFlushReceiveQueue</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga52a17bb8012bf025d127b4d29e5f3aa8">canFlushTransmitQueue</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___general.html#gad3d0fc1bf752047f6e24020c478aeffd">kvFlashLeds</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, int action, int timeout)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#gaba3573e69435d87047c190520efdf5e5">canRequestChipStatus</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#gaf7358e5ef5143e39c10b46d9cb592485">canRequestBusStatistics</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga8d78ccbef4e6038ff63662f06b7cde65">canGetBusStatistics</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, <a class="el" href="structcan_bus_statistics__s.html">canBusStatistics</a> *stat, size_t bufsiz)</td></tr>
@@ -422,6 +476,8 @@ kvCallback_t</h2></td></tr>
 <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a5c617202677d49ba4c7503eed12c8642">kvCallback_t</a> )(<a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, void *context, unsigned int notifyEvent)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___general.html#ga99976c5b8e2c534b27bf9ec2e715d8d3">kvSetNotifyCallback</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, <a class="el" href="canlib_8h.html#a5c617202677d49ba4c7503eed12c8642">kvCallback_t</a> callback, void *context, unsigned int notifyFlags)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___general.html#ga0671078a6184ab2b73287946a49763f2">kvReadTimer</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int *time)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___general.html#gafa060c0f78d459498d1f6236e2d0b5ae">kvReadTimer64</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, uint64_t *time)</td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><h2><a class="anchor" id="LICENSE"></a>
@@ -864,18 +920,63 @@ DESCRIPTION</h2>
 
 </div>
 </div>
-<a class="anchor" id="a7748990724fd22b9be3cd02265358755"></a><!-- doxytag: member="canlib.h::canCHANNEL_CAP_REMOTE" ref="a7748990724fd22b9be3cd02265358755" args="" -->
+<a class="anchor" id="a79b87625040f4762b83954245b139a96"></a><!-- doxytag: member="canlib.h::canCHANNEL_CAP_LOGGER" ref="a79b87625040f4762b83954245b139a96" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define canCHANNEL_CAP_REMOTE&#160;&#160;&#160;0x00040000L</td>
+          <td class="memname">#define canCHANNEL_CAP_LOGGER&#160;&#160;&#160;0x00800000L</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Remote CAN channel (e.g. BlackBird). </p>
+<p>Channel has logger capabilities. </p>
+
+</div>
+</div>
+<a class="anchor" id="a4f59a672fed4cbe5482b32d1bd948222"></a><!-- doxytag: member="canlib.h::canCHANNEL_CAP_REMOTE_ACCESS" ref="a4f59a672fed4cbe5482b32d1bd948222" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canCHANNEL_CAP_REMOTE_ACCESS&#160;&#160;&#160;0x01000000L</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Channel has remote capabilities. </p>
+
+</div>
+</div>
+<a class="anchor" id="ad171fc2715be577d685c665b4c808809"></a><!-- doxytag: member="canlib.h::canCHANNEL_CAP_RESERVED_1" ref="ad171fc2715be577d685c665b4c808809" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canCHANNEL_CAP_RESERVED_1&#160;&#160;&#160;0x00040000L</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Obsolete, use canCHANNEL_CAP_REMOTE_ACCESS or <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a> instead. </p>
+
+</div>
+</div>
+<a class="anchor" id="a1c3c68d592ead785f1bbb5de757ee7a0"></a><!-- doxytag: member="canlib.h::canCHANNEL_CAP_SCRIPT" ref="a1c3c68d592ead785f1bbb5de757ee7a0" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canCHANNEL_CAP_SCRIPT&#160;&#160;&#160;0x02000000L</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Channel has script capabilities. </p>
 
 </div>
 </div>
@@ -1037,7 +1138,7 @@ DESCRIPTION</h2>
 <div class="memdoc">
 <p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to a 64-bit (8 bytes) area which receives the firmware revision number on the card. This number consists of four 16-bit words: the major revision, the minor revision, the release number and the build number, listed in order from the most significant to the least significant. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a7">listChannels.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a8">listChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -1082,7 +1183,7 @@ DESCRIPTION</h2>
 <div class="memdoc">
 <p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to a 64-bit (8 bytes) area which receives the serial number of the card. If the card doesn't have a serial number, 0 is returned. The serial number is an 8-byte unsigned integer. Currently, no products are using all 8 bytes; at most 4 bytes are used. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a6">listChannels.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a7">listChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -1113,7 +1214,7 @@ DESCRIPTION</h2>
 <div class="memdoc">
 <p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to a 8-byte area which receives the UPC (EAN) number for the card. If there is no UPC number, the buffer is filled with zeros. The UPC (EAN) number is coded as a BCD string with the LSB first, so e.g. 733-0130-00122-0 is coded as 0x30001220 0x00073301. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a5">listChannels.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a6">listChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -1173,7 +1274,7 @@ DESCRIPTION</h2>
 </div>
 <div class="memdoc">
 <p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
-<dl class="note"><dt><b>Note:</b></dt><dd>Currently not implemented. </dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>Currently not implemented </dd></dl>
 
 </div>
 </div>
@@ -1190,7 +1291,7 @@ DESCRIPTION</h2>
 <p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to an area which receives a zero-terminated string with a clear-text name of the channel.</p>
 <dl class="note"><dt><b>Note:</b></dt><dd>Use of this item code is no longer recommended. The returned channel name doesn't contain the exact hardware type (it just contains the device family) and uses zero-based channel numbering, which is not user friendly. Instead, use e.g. <a class="el" href="canlib_8h.html#afc7edc82e3d370444c3b83c66a9c6479">canCHANNELDATA_DEVDESCR_ASCII</a> and <a class="el" href="canlib_8h.html#a4e0823a649d26191cde50f2c4fa5a65d">canCHANNELDATA_CHAN_NO_ON_CARD</a> to build your own channel name. </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a4">listChannels.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a5">listChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -1220,7 +1321,7 @@ DESCRIPTION</h2>
 <div class="memdoc">
 <p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> is a user supplied byte array of length 'bufsize' (at least one byte long) to which the null terminated UTF-8 coded channel name will be placed. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a8">listChannels.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a9">listChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -1236,7 +1337,7 @@ DESCRIPTION</h2>
 <div class="memdoc">
 <p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
 <p><em>buffer</em> points to a buffer which receives the product name of the device as a zero-terminated ASCII string. </p>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a3">listChannels.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="list_channels_8c-example.html#a4">listChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -1366,6 +1467,36 @@ DESCRIPTION</h2>
 
 </div>
 </div>
+<a class="anchor" id="a928b5c304c08ff8f834511733fd73e5c"></a><!-- doxytag: member="canlib.h::canCHANNELDATA_IS_REMOTE" ref="a928b5c304c08ff8f834511733fd73e5c" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canCHANNELDATA_IS_REMOTE&#160;&#160;&#160;40</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
+<p><em>buffer</em> points to a 32-bit unsigned integer that is 1 if the channel(device) is currently connected as a remote device. 0 if it is not currenty a remote device. </p>
+
+</div>
+</div>
+<a class="anchor" id="a64775deac940ee65fc3a4f4035f2c550"></a><!-- doxytag: member="canlib.h::canCHANNELDATA_LOGGER_TYPE" ref="a64775deac940ee65fc3a4f4035f2c550" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canCHANNELDATA_LOGGER_TYPE&#160;&#160;&#160;42</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
+<p><em>buffer</em> points to a 32-bit unsigned integer that returns the logger type of the device. See <a class="el" href="canlib_8h.html#kvLOGGER_TYPE_xxx">kvLOGGER_TYPE_xxx</a> for returned values. </p>
+
+</div>
+</div>
 <a class="anchor" id="a3cc31ba6fd77280ecd11aea7a4089472"></a><!-- doxytag: member="canlib.h::canCHANNELDATA_MAX_BITRATE" ref="a3cc31ba6fd77280ecd11aea7a4089472" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -1463,6 +1594,21 @@ DESCRIPTION</h2>
 </div>
 <div class="memdoc">
 <p>Not implemented. </p>
+
+</div>
+</div>
+<a class="anchor" id="aad05c95b1ca22a5ccdf0ed713f0b1e2d"></a><!-- doxytag: member="canlib.h::canCHANNELDATA_REMOTE_TYPE" ref="aad05c95b1ca22a5ccdf0ed713f0b1e2d" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canCHANNELDATA_REMOTE_TYPE&#160;&#160;&#160;41</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
+<p><em>buffer</em> points to a 32-bit unsigned integer that returns the type of remote connection. in mHz. See <a class="el" href="canlib_8h.html#kvREMOTE_TYPExxx">kvREMOTE_TYPExxx</a> for returned values. </p>
 
 </div>
 </div>
@@ -2314,6 +2460,19 @@ DESCRIPTION</h2>
 
 </div>
 </div>
+<a class="anchor" id="ad1f2b460c7780224a9dbc0f8f8a4918a"></a><!-- doxytag: member="canlib.h::canINVALID_HANDLE" ref="ad1f2b460c7780224a9dbc0f8f8a4918a" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canINVALID_HANDLE&#160;&#160;&#160;(-1)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a313cdb4388e60d7ff769313694a153de"></a><!-- doxytag: member="canlib.h::canIOCTL_CONNECT_TO_VIRTUAL_BUS" ref="a313cdb4388e60d7ff769313694a153de" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -3059,6 +3218,474 @@ You can't use this function code when the channel is on bus. </dd></dl>
 
 </div>
 </div>
+<a class="anchor" id="a904471b2f2e1417f37415a0caec61914"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_ALL_LEDS_OFF" ref="a904471b2f2e1417f37415a0caec61914" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_ALL_LEDS_OFF&#160;&#160;&#160;1</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn all LEDs off. </p>
+
+</div>
+</div>
+<a class="anchor" id="aa536be83f7b5a7344f842f4e00c2fb3b"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_ALL_LEDS_ON" ref="aa536be83f7b5a7344f842f4e00c2fb3b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_ALL_LEDS_ON&#160;&#160;&#160;0</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn all LEDs on. </p>
+
+</div>
+</div>
+<a class="anchor" id="a371cd996830a3cc2d8e16816d45c533f"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_0_OFF" ref="a371cd996830a3cc2d8e16816d45c533f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_0_OFF&#160;&#160;&#160;3</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 0 off. </p>
+
+</div>
+</div>
+<a class="anchor" id="ab39368460724f24ed1eb2cb6c34935cb"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_0_ON" ref="ab39368460724f24ed1eb2cb6c34935cb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_0_ON&#160;&#160;&#160;2</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 0 on. </p>
+
+</div>
+</div>
+<a class="anchor" id="a2f3e147cf8c2497adb8cfb29d2d5f3e2"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_10_OFF" ref="a2f3e147cf8c2497adb8cfb29d2d5f3e2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_10_OFF&#160;&#160;&#160;23</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 10 off. </p>
+
+</div>
+</div>
+<a class="anchor" id="a5db20baf9bc66c918756a010058d68b7"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_10_ON" ref="a5db20baf9bc66c918756a010058d68b7" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_10_ON&#160;&#160;&#160;22</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 10 on. </p>
+
+</div>
+</div>
+<a class="anchor" id="abd2d501800e3dbfca7c687644210defa"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_11_OFF" ref="abd2d501800e3dbfca7c687644210defa" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_11_OFF&#160;&#160;&#160;25</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 11 off. </p>
+
+</div>
+</div>
+<a class="anchor" id="a282277fd1ee13eb2fa5cfe04b8cbc88f"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_11_ON" ref="a282277fd1ee13eb2fa5cfe04b8cbc88f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_11_ON&#160;&#160;&#160;24</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 11 on. </p>
+
+</div>
+</div>
+<a class="anchor" id="a01cecea1168caf1270daadd77ac48a5e"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_1_OFF" ref="a01cecea1168caf1270daadd77ac48a5e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_1_OFF&#160;&#160;&#160;5</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 1 off. </p>
+
+</div>
+</div>
+<a class="anchor" id="aa0e977e7d0d3cf1f8baff1772499c687"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_1_ON" ref="aa0e977e7d0d3cf1f8baff1772499c687" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_1_ON&#160;&#160;&#160;4</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 1 on. </p>
+
+</div>
+</div>
+<a class="anchor" id="aac278f39fad8dad872fe1c1dee6b657f"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_2_OFF" ref="aac278f39fad8dad872fe1c1dee6b657f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_2_OFF&#160;&#160;&#160;7</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 2 off. </p>
+
+</div>
+</div>
+<a class="anchor" id="a5e7a24da540f26e12e5b64bf0d10bddb"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_2_ON" ref="a5e7a24da540f26e12e5b64bf0d10bddb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_2_ON&#160;&#160;&#160;6</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 2 on. </p>
+
+</div>
+</div>
+<a class="anchor" id="aca71b7d4e443066c532f79550a92dd75"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_3_OFF" ref="aca71b7d4e443066c532f79550a92dd75" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_3_OFF&#160;&#160;&#160;9</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 3 off. </p>
+
+</div>
+</div>
+<a class="anchor" id="a93c905bcddd9f093896f65dab271c8fb"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_3_ON" ref="a93c905bcddd9f093896f65dab271c8fb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_3_ON&#160;&#160;&#160;8</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 3 on. </p>
+
+</div>
+</div>
+<a class="anchor" id="a9da57686fbcc320073a7c2ca5cd5b834"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_4_OFF" ref="a9da57686fbcc320073a7c2ca5cd5b834" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_4_OFF&#160;&#160;&#160;11</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 4 off. </p>
+
+</div>
+</div>
+<a class="anchor" id="aeebb61dd8b3a9498a77440c51e0b552b"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_4_ON" ref="aeebb61dd8b3a9498a77440c51e0b552b" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_4_ON&#160;&#160;&#160;10</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 4 on. </p>
+
+</div>
+</div>
+<a class="anchor" id="ab44e6f831510fc2aca86a82e384133c3"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_5_OFF" ref="ab44e6f831510fc2aca86a82e384133c3" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_5_OFF&#160;&#160;&#160;13</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 5 off. </p>
+
+</div>
+</div>
+<a class="anchor" id="af3d9dc8bbf45f5655221d962ed603fbe"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_5_ON" ref="af3d9dc8bbf45f5655221d962ed603fbe" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_5_ON&#160;&#160;&#160;12</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 5 on. </p>
+
+</div>
+</div>
+<a class="anchor" id="a118e729399bc46287bbd2e3c95c9f259"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_6_OFF" ref="a118e729399bc46287bbd2e3c95c9f259" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_6_OFF&#160;&#160;&#160;15</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 6 off. </p>
+
+</div>
+</div>
+<a class="anchor" id="ad99da937e44ad12b6dc7d9cec5e5ef66"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_6_ON" ref="ad99da937e44ad12b6dc7d9cec5e5ef66" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_6_ON&#160;&#160;&#160;14</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 6 on. </p>
+
+</div>
+</div>
+<a class="anchor" id="aed4a6e8969e12b42e79d992e28de9dd5"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_7_OFF" ref="aed4a6e8969e12b42e79d992e28de9dd5" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_7_OFF&#160;&#160;&#160;17</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 7 off. </p>
+
+</div>
+</div>
+<a class="anchor" id="a922b3da033111dd5aad4e2fb0dc8a349"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_7_ON" ref="a922b3da033111dd5aad4e2fb0dc8a349" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_7_ON&#160;&#160;&#160;16</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 7 on. </p>
+
+</div>
+</div>
+<a class="anchor" id="a2cf0c2f9192e951099a83331b160cf2e"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_8_OFF" ref="a2cf0c2f9192e951099a83331b160cf2e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_8_OFF&#160;&#160;&#160;19</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 8 off. </p>
+
+</div>
+</div>
+<a class="anchor" id="a72e67e7d4744bf6dfe29de2e2636c464"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_8_ON" ref="a72e67e7d4744bf6dfe29de2e2636c464" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_8_ON&#160;&#160;&#160;18</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 8 on. </p>
+
+</div>
+</div>
+<a class="anchor" id="a5c63fc98f15f14d212d98a3336763ef6"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_9_OFF" ref="a5c63fc98f15f14d212d98a3336763ef6" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_9_OFF&#160;&#160;&#160;21</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 9 off. </p>
+
+</div>
+</div>
+<a class="anchor" id="af647c4329071c3e37305ece1acac0240"></a><!-- doxytag: member="canlib.h::kvLED_ACTION_LED_9_ON" ref="af647c4329071c3e37305ece1acac0240" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLED_ACTION_LED_9_ON&#160;&#160;&#160;20</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Turn LED 9 on. </p>
+
+</div>
+</div>
+<a class="anchor" id="aae32c1c57419eeb4ae5b5009fd2936d2"></a><!-- doxytag: member="canlib.h::kvLOGGER_TYPE_NOT_A_LOGGER" ref="aae32c1c57419eeb4ae5b5009fd2936d2" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLOGGER_TYPE_NOT_A_LOGGER&#160;&#160;&#160;0</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a90386e1c2b4a8b83685f230753411759"></a><!-- doxytag: member="canlib.h::kvLOGGER_TYPE_V1" ref="a90386e1c2b4a8b83685f230753411759" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLOGGER_TYPE_V1&#160;&#160;&#160;1</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aac5e7b3f0081eed9bdf5f5d50ff8aab4"></a><!-- doxytag: member="canlib.h::kvLOGGER_TYPE_V2" ref="aac5e7b3f0081eed9bdf5f5d50ff8aab4" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvLOGGER_TYPE_V2&#160;&#160;&#160;2</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a49e66a5c81f27f51ffbacc4eeec703fb"></a><!-- doxytag: member="canlib.h::kvREMOTE_TYPE_LAN" ref="a49e66a5c81f27f51ffbacc4eeec703fb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvREMOTE_TYPE_LAN&#160;&#160;&#160;2</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aac349c170d66e1444433255a28965e66"></a><!-- doxytag: member="canlib.h::kvREMOTE_TYPE_NOT_REMOTE" ref="aac349c170d66e1444433255a28965e66" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvREMOTE_TYPE_NOT_REMOTE&#160;&#160;&#160;0</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ac028a381284b8bbc385d0f001b689d01"></a><!-- doxytag: member="canlib.h::kvREMOTE_TYPE_WLAN" ref="ac028a381284b8bbc385d0f001b689d01" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvREMOTE_TYPE_WLAN&#160;&#160;&#160;1</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
 <hr/><h2>Typedef Documentation</h2>
 <a class="anchor" id="ae3d1b041d62207d5336f93c089cd5b65"></a><!-- doxytag: member="canlib.h::canHandle" ref="ae3d1b041d62207d5336f93c089cd5b65" args="" -->
 <div class="memitem">
@@ -3395,7 +4022,7 @@ You can't use this function code when the channel is on bus. </dd></dl>
       <li class="navelem"><a class="el" href="canlib_8h.html">canlib.h</a>      </li>
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.17) - Generated on Thu Sep 15 2016</small>
+<small>Kvaser Linux CANLIB (canlib 5.19) - Generated on Wed Feb 15 2017</small>
 </address>
 </body>
 </html>

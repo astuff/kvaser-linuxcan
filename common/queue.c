@@ -67,8 +67,8 @@
 #include "module_versioning.h"
 //--------------------------------------------------
 
-#include "osif_functions_kernel.h"
-#include "osif_kernel.h"
+#include <linux/sched.h>
+
 #include "VCanOsIf.h"
 #include "queue.h"
 
@@ -139,13 +139,13 @@
          queue->lock_type, __LINE__));                  \
   switch (queue->lock_type) {                           \
   case Irq_lock:                                        \
-    os_if_spin_lock_irqsave(&queue->lock, flags_ptr);   \
+    spin_lock_irqsave(&queue->lock, flags_ptr);   \
     break;                                              \
   case Softirq_lock:                                    \
-    os_if_spin_lock_softirq(&queue->lock);              \
+    spin_lock_bh(&queue->lock);              \
     break;                                              \
   default:                                              \
-    os_if_spin_lock(&queue->lock);                      \
+    spin_lock(&queue->lock);                      \
     break;                                              \
   }                                                     \
   queue->locked = 1;   /* After acquiring */
@@ -156,24 +156,24 @@
   queue->locked = 0;   /* Before releasing */           \
   switch (queue->lock_type) {                           \
   case Irq_lock:                                        \
-    os_if_spin_unlock_irqrestore(&queue->lock, flags);  \
+    spin_unlock_irqrestore(&queue->lock, flags);  \
     break;                                              \
   case Softirq_lock:                                    \
-    os_if_spin_unlock_softirq(&queue->lock);            \
+    spin_unlock_bh(&queue->lock);            \
     break;                                              \
   default:                                              \
-    os_if_spin_lock(&queue->lock);                      \
+    spin_lock(&queue->lock);                      \
     break;                                              \
   }
 
 
 void queue_reinit (Queue *queue)
 {
-  unsigned long flags;
+  unsigned long flags = 0;
 
   QUEUE_DEBUG;
   QUEUE_DEBUG_LOCK;
-  LOCKQ(queue, &flags);
+  LOCKQ(queue, flags);
 
   queue->head = 0;
   queue->tail = 0;
@@ -189,9 +189,9 @@ EXPORT_SYMBOL(queue_reinit);
 void queue_init (Queue *queue, int size)
 {
   queue->lock_type = LOCK_TYPE;
-  os_if_spin_lock_init(&queue->lock);
+  spin_lock_init(&queue->lock);
   queue->size = size;
-  os_if_init_waitqueue_head(&queue->space_event);
+  init_waitqueue_head(&queue->space_event);
   queue->locked = 0;
   queue_reinit(queue);
 }
@@ -213,7 +213,7 @@ int queue_length (Queue *queue)
 
   QUEUE_DEBUG_RET(0);
   QUEUE_DEBUG_LOCK_RET(0);
-  LOCKQ(queue, &flags);
+  LOCKQ(queue, flags);
 
   length = queue->head - queue->tail;
   if (length < 0)
@@ -255,11 +255,11 @@ EXPORT_SYMBOL(queue_empty);
 int queue_back (Queue *queue)
 {
   int back;
-  unsigned long flags;
+  unsigned long flags = 0;
 
   QUEUE_DEBUG_RET(0);
   QUEUE_DEBUG_LOCK_RET(0);
-  LOCKQ(queue, &flags);
+  LOCKQ(queue, flags);
 
   back = queue->head;
   // Is there actually any space in the queue?
@@ -309,11 +309,11 @@ EXPORT_SYMBOL(queue_push);
 int queue_front (Queue *queue)
 {
   int front;
-  unsigned long flags;
+  unsigned long flags = 0;
 
   QUEUE_DEBUG_RET(0);
   QUEUE_DEBUG_LOCK_RET(0);
-  LOCKQ(queue, &flags);
+  LOCKQ(queue, flags);
 
   front = queue->tail;
   // Is there actually anything in the queue?
@@ -342,7 +342,7 @@ void queue_pop (Queue *queue)
 
   queue->tail++;
   if (queue->tail >= queue->size)
-    queue->tail = 0;  
+    queue->tail = 0;
 
   atomic_dec(&queue->length);
 
@@ -363,20 +363,20 @@ void queue_release (Queue *queue)
 EXPORT_SYMBOL(queue_release);
 
 
-void queue_add_wait_for_space (Queue *queue, OS_IF_WAITQUEUE *waiter)
+void queue_add_wait_for_space (Queue *queue, wait_queue_t *waiter)
 {
   QUEUE_DEBUG;
 
-  os_if_add_wait_queue(&queue->space_event, waiter);
+  add_wait_queue(&queue->space_event, waiter);
 }
 EXPORT_SYMBOL(queue_add_wait_for_space);
 
 
-void queue_remove_wait_for_space (Queue *queue, OS_IF_WAITQUEUE *waiter)
+void queue_remove_wait_for_space (Queue *queue, wait_queue_t *waiter)
 {
   QUEUE_DEBUG;
 
-  os_if_remove_wait_queue(&queue->space_event, waiter);
+  remove_wait_queue(&queue->space_event, waiter);
 }
 EXPORT_SYMBOL(queue_remove_wait_for_space);
 
@@ -387,12 +387,12 @@ void queue_wakeup_on_space (Queue *queue)
 {
   QUEUE_DEBUG;
 
-  os_if_wake_up_interruptible(&queue->space_event);
+  wake_up_interruptible(&queue->space_event);
 }
 EXPORT_SYMBOL(queue_wakeup_on_space);
 
 
-OS_IF_WAITQUEUE_HEAD *queue_space_event (Queue *queue)
+wait_queue_head_t *queue_space_event (Queue *queue)
 {
   QUEUE_DEBUG_RET(0);
 

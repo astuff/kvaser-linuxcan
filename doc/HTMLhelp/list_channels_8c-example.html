@@ -164,9 +164,15 @@ function toggleVisibility(linkObj) {
   <span class="keywordtype">char</span> name[256];
   <span class="keywordtype">char</span> custChanName[40];
   <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> ean[2], fw[2], serial[2];
+  <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> canlibVersion;
 
   (void)argc; <span class="comment">// Unused.</span>
   (void)argv; <span class="comment">// Unused.</span>
+
+  canlibVersion = <a name="a0"></a><a class="code" href="group___general.html#gafb5688859c56ecb6f8d85705d3ec2f14">canGetVersion</a>();
+  printf(<span class="stringliteral">&quot;Canlib version %d.%d\n&quot;</span>,
+         (canlibVersion &gt;&gt; 8),
+         (canlibVersion &amp; 0xff));
 
   memset(name, 0, <span class="keyword">sizeof</span>(name));
   memset(custChanName, 0, <span class="keyword">sizeof</span>(custChanName));
@@ -174,8 +180,8 @@ function toggleVisibility(linkObj) {
   memset(fw, 0, <span class="keyword">sizeof</span>(fw));
   memset(serial, 0, <span class="keyword">sizeof</span>(serial));
 
-  stat = <a name="a0"></a><a class="code" href="group___general.html#ga65169ca633cd30aa92b8a80e28a5378b">canGetNumberOfChannels</a>(&amp;chanCount);
-  <span class="keywordflow">if</span> (stat != <a name="a1"></a><a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a>) {
+  stat = <a name="a1"></a><a class="code" href="group___general.html#ga65169ca633cd30aa92b8a80e28a5378b">canGetNumberOfChannels</a>(&amp;chanCount);
+  <span class="keywordflow">if</span> (stat != <a name="a2"></a><a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a>) {
     printf(<span class="stringliteral">&quot;Error in canGetNumberOfChannels\n&quot;</span>);
     exit(1);
   }
@@ -183,7 +189,7 @@ function toggleVisibility(linkObj) {
 
   <span class="keywordflow">for</span> (i = 0; i &lt; chanCount; i++) {
 
-    stat = <a name="a2"></a><a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a3"></a><a class="code" href="canlib_8h.html#afc7edc82e3d370444c3b83c66a9c6479">canCHANNELDATA_DEVDESCR_ASCII</a>,
+    stat = <a name="a3"></a><a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a4"></a><a class="code" href="canlib_8h.html#afc7edc82e3d370444c3b83c66a9c6479">canCHANNELDATA_DEVDESCR_ASCII</a>,
                              &amp;name, <span class="keyword">sizeof</span>(name));
     <span class="keywordflow">if</span> (stat != <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a>) {
       printf(<span class="stringliteral">&quot;Error in canGetChannelData - DEVDESCR_ASCII\n&quot;</span>);
@@ -191,7 +197,7 @@ function toggleVisibility(linkObj) {
     }
 
     <span class="keywordflow">if</span> (strcmp(name, <span class="stringliteral">&quot;Kvaser Unknown&quot;</span>) == 0) {
-      stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a4"></a><a class="code" href="canlib_8h.html#aa4fc3066c84e718b90e870103837259b">canCHANNELDATA_CHANNEL_NAME</a>,
+      stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a5"></a><a class="code" href="canlib_8h.html#aa4fc3066c84e718b90e870103837259b">canCHANNELDATA_CHANNEL_NAME</a>,
                                &amp;name, <span class="keyword">sizeof</span>(name));
       <span class="keywordflow">if</span> (stat != <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a>) {
         printf(<span class="stringliteral">&quot;Error in canGetChannelData - CHANNEL_NAME\n&quot;</span>);
@@ -199,28 +205,28 @@ function toggleVisibility(linkObj) {
       }
     }
 
-    stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a5"></a><a class="code" href="canlib_8h.html#a9062beaa59d9787667bac6cbbc6b4e20">canCHANNELDATA_CARD_UPC_NO</a>,
+    stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a6"></a><a class="code" href="canlib_8h.html#a9062beaa59d9787667bac6cbbc6b4e20">canCHANNELDATA_CARD_UPC_NO</a>,
                              &amp;ean, <span class="keyword">sizeof</span>(ean));
     <span class="keywordflow">if</span> (stat != <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a>) {
       printf(<span class="stringliteral">&quot;Error in canGetChannelData - CARD_UPC_NO\n&quot;</span>);
       exit(1);
     }
 
-    stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a6"></a><a class="code" href="canlib_8h.html#a8b3b4903a766565c95afd7c90f76d994">canCHANNELDATA_CARD_SERIAL_NO</a>,
+    stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a7"></a><a class="code" href="canlib_8h.html#a8b3b4903a766565c95afd7c90f76d994">canCHANNELDATA_CARD_SERIAL_NO</a>,
                              &amp;serial, <span class="keyword">sizeof</span>(serial));
     <span class="keywordflow">if</span> (stat != <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a>) {
       printf(<span class="stringliteral">&quot;Error in canGetChannelData - CARD_SERIAL_NO\n&quot;</span>);
       exit(1);
     }
 
-    stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a7"></a><a class="code" href="canlib_8h.html#a1ab7e59c0771f2f9850e8fe1d2d58ff1">canCHANNELDATA_CARD_FIRMWARE_REV</a>,
+    stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a8"></a><a class="code" href="canlib_8h.html#a1ab7e59c0771f2f9850e8fe1d2d58ff1">canCHANNELDATA_CARD_FIRMWARE_REV</a>,
                              &amp;fw, <span class="keyword">sizeof</span>(fw));
     <span class="keywordflow">if</span> (stat != <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a>) {
       printf(<span class="stringliteral">&quot;Error in canGetChannelData - CARD_FIRMWARE_REV\n&quot;</span>);
       exit(1);
     }
 
-    (void) <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a8"></a><a class="code" href="canlib_8h.html#a0e91dd0d999b3043c6da5cb911dd83d8">canCHANNELDATA_CUST_CHANNEL_NAME</a>,
+    (void) <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a9"></a><a class="code" href="canlib_8h.html#a0e91dd0d999b3043c6da5cb911dd83d8">canCHANNELDATA_CUST_CHANNEL_NAME</a>,
                              custChanName, <span class="keyword">sizeof</span>(custChanName));
 
     printf(<span class="stringliteral">&quot;channel %2.1d = %s,\t%x-%05x-%05x-%x, %u, %u.%u.%u.%u %s\n&quot;</span>,
@@ -241,7 +247,7 @@ function toggleVisibility(linkObj) {
     <ul>
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.17) - Generated on Thu Sep 15 2016</small>
+<small>Kvaser Linux CANLIB (canlib 5.19) - Generated on Wed Feb 15 2017</small>
 </address>
 </body>
 </html>

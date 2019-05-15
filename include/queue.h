@@ -65,9 +65,6 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#include "osif_functions_kernel.h"
-#include "osif_kernel.h"
-
 
 typedef enum {Normal_lock, Softirq_lock, Irq_lock} Lock_type;
 typedef struct {
@@ -76,9 +73,9 @@ typedef struct {
   int tail;
   atomic_t length;      // For length queries without locking
   unsigned int flags;   // Only used when holding the lock (Sparc incompatible)!
-  OS_IF_WAITQUEUE_HEAD space_event;
+  wait_queue_head_t space_event;
   Lock_type lock_type;
-  OS_IF_LOCK lock;
+  spinlock_t lock;
   int locked;           // For debugging
   int line;             // For debugging
 } Queue;
@@ -101,11 +98,11 @@ extern int  queue_front(Queue *queue);
 extern void queue_pop(Queue *queue);
 extern void queue_release(Queue *queue);
 
-extern void queue_add_wait_for_space(Queue *queue, OS_IF_WAITQUEUE *waiter);
-extern void queue_remove_wait_for_space(Queue *queue, OS_IF_WAITQUEUE *waiter);
-extern void queue_add_wait_for_data(Queue *queue, OS_IF_WAITQUEUE *waiter);
+extern void queue_add_wait_for_space(Queue *queue, wait_queue_t *waiter);
+extern void queue_remove_wait_for_space(Queue *queue, wait_queue_t *waiter);
+extern void queue_add_wait_for_data(Queue *queue, wait_queue_t *waiter);
 extern void queue_wakeup_on_space(Queue *queue);
 extern void queue_wakeup_on_data(Queue *queue);
-extern OS_IF_WAITQUEUE_HEAD *queue_space_event(Queue *queue);
+extern wait_queue_head_t *queue_space_event(Queue *queue);
 
 #endif

@@ -72,6 +72,9 @@
 
 /** Handle to an opened circuit. */
 typedef int canHandle;
+
+# define canINVALID_HANDLE      (-1)
+
 /** Handle to an opened circuit. */
    typedef canHandle CanHandle;
 
@@ -1420,6 +1423,32 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags);
  */
 canStatus CANLIBAPI canGetNumberOfChannels (int *channelCount);
 
+
+/**
+ * \name kvREMOTE_TYPExxx
+ * \anchor kvREMOTE_TYPExxx
+ *
+ * Remote type, returned when using \ref canCHANNELDATA_REMOTE_TYPE
+ * @{
+ */
+#define kvREMOTE_TYPE_NOT_REMOTE  0 ///< 
+#define kvREMOTE_TYPE_WLAN        1 ///< 
+#define kvREMOTE_TYPE_LAN         2 ///< 
+/** @} */
+
+/**
+ * \name kvLOGGER_TYPE_xxx
+ * \anchor kvLOGGER_TYPE_xxx
+ *
+ * Logger type, returned when using \ref canCHANNELDATA_LOGGER_TYPE
+ * @{
+ */
+#define kvLOGGER_TYPE_NOT_A_LOGGER  0 ///< 
+#define kvLOGGER_TYPE_V1            1 ///< 
+#define kvLOGGER_TYPE_V2            2 ///< 
+/** @} */
+
+
 /**
  * \ingroup General
  *
@@ -1493,7 +1522,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
-   * \note Currently not implemented.
+   * \note Currently not implemented
    */
 #define canCHANNELDATA_CHANNEL_FLAGS              3   // available, etc
 
@@ -2046,7 +2075,35 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * to support/not support at the moment, see \ref canCHANNEL_CAP_xxx
    * for info about flags.
    */
-#define canCHANNELDATA_CHANNEL_CAP_MASK  38
+#  define canCHANNELDATA_CHANNEL_CAP_MASK  38
+
+  /**
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to a 32-bit unsigned integer that is 1 if 
+   * the channel(device) is currently connected as a remote device. 0 if it is not 
+   * currenty a remote device.    */
+#  define canCHANNELDATA_IS_REMOTE  40
+
+  /**
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to a 32-bit unsigned integer that returns the type of remote connection. 
+   * in mHz. See \ref kvREMOTE_TYPExxx for returned values. 
+   */
+#  define canCHANNELDATA_REMOTE_TYPE  41
+
+  /**
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer points to a 32-bit unsigned integer that returns the logger type of the device.  
+   * See \ref kvLOGGER_TYPE_xxx for returned values. 
+   */
+#  define canCHANNELDATA_LOGGER_TYPE  42
+
 
 
 
@@ -2158,11 +2215,14 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canCHANNEL_CAP_TXACKNOWLEDGE     0x00000080L ///< Can report when a CAN messages has been transmitted
 #define canCHANNEL_CAP_VIRTUAL           0x00010000L ///< Virtual CAN channel
 #define canCHANNEL_CAP_SIMULATED         0x00020000L ///< Simulated CAN channel
-#define canCHANNEL_CAP_REMOTE            0x00040000L ///< Remote CAN channel (e.g. BlackBird).
+#define canCHANNEL_CAP_RESERVED_1        0x00040000L ///< Obsolete, use canCHANNEL_CAP_REMOTE_ACCESS or \ref canGetChannelData() instead. 
 #define canCHANNEL_CAP_CAN_FD            0x00080000L ///< CAN-FD ISO compliant channel
 #define canCHANNEL_CAP_CAN_FD_NONISO     0x00100000L ///< CAN-FD NON-ISO compliant channel
 #define canCHANNEL_CAP_SILENT_MODE       0x00200000L ///< Channel supports Silent mode
 #define canCHANNEL_CAP_SINGLE_SHOT       0x00400000L ///< Channel supports Single Shot messages
+#define canCHANNEL_CAP_LOGGER            0x00800000L ///< Channel has logger capabilities. 
+#define canCHANNEL_CAP_REMOTE_ACCESS     0x01000000L ///< Channel has remote capabilities
+#define canCHANNEL_CAP_SCRIPT            0x02000000L ///< Channel has script capabilities. 
 
 /** @} */
 
@@ -3007,6 +3067,32 @@ canStatus CANLIBAPI canWriteWait (const CanHandle hnd,
 #if defined(CANLIB_DECLARE_ALL)
 
 /**
+ * \ingroup General
+ *
+ * \source_cs       <b>static Canlib.canStatus canUnloadLibrary();</b>
+ *
+ * \source_delphi   <b>function canUnloadLibrary: Integer;     </b>
+ * \source_end
+ *
+ * \win_start
+ * Use this function if you are loading CANLIB32.DLL dynamically (that is,
+ * using the Win32 API \c LoadLibrary) and need to unload it using the Win32
+ * API \c FreeLibrary. \ref canUnloadLibrary() will free allocated memory, unload
+ * the DLLs canlib32.dll has loaded and de-initialize data structures. You must
+ * call \ref canInitializeLibrary() again to use the API functions in canlib32.dll.
+ * \win_end
+ * \linux_start
+ * \ref canUnloadLibrary() will close all open handles and free allocated memory.
+ * \linux_end
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref canInitializeLibrary()
+ */
+canStatus CANLIBAPI canUnloadLibrary (void);
+
+/**
  * \ingroup CAN
  *
  * \source_cs       <b>static Canlib.canStatus canFlushReceiveQueue(int hnd);</b>
@@ -3056,6 +3142,67 @@ canStatus CANLIBAPI canFlushReceiveQueue (const CanHandle hnd);
  * \sa \ref canFlushReceiveQueue()
  */
 canStatus CANLIBAPI canFlushTransmitQueue (const CanHandle hnd);
+
+
+  /**
+   * \anchor kvLED_ACTION_xxx
+   * \name kvLED_ACTION_xxx
+   *
+   * The following constants can be used together with the \ref kvFlashLeds() function.
+   *
+   * @{
+   */
+#define kvLED_ACTION_ALL_LEDS_ON    0 ///< Turn all LEDs on.
+#define kvLED_ACTION_ALL_LEDS_OFF   1 ///< Turn all LEDs off.
+#define kvLED_ACTION_LED_0_ON       2 ///< Turn LED 0 on.
+#define kvLED_ACTION_LED_0_OFF      3 ///< Turn LED 0 off.
+#define kvLED_ACTION_LED_1_ON       4 ///< Turn LED 1 on.
+#define kvLED_ACTION_LED_1_OFF      5 ///< Turn LED 1 off.
+#define kvLED_ACTION_LED_2_ON       6 ///< Turn LED 2 on.
+#define kvLED_ACTION_LED_2_OFF      7 ///< Turn LED 2 off.
+#define kvLED_ACTION_LED_3_ON       8 ///< Turn LED 3 on.
+#define kvLED_ACTION_LED_3_OFF      9 ///< Turn LED 3 off.
+#define kvLED_ACTION_LED_4_ON      10 ///< Turn LED 4 on.
+#define kvLED_ACTION_LED_4_OFF     11 ///< Turn LED 4 off.
+#define kvLED_ACTION_LED_5_ON      12 ///< Turn LED 5 on.
+#define kvLED_ACTION_LED_5_OFF     13 ///< Turn LED 5 off.
+#define kvLED_ACTION_LED_6_ON      14 ///< Turn LED 6 on.
+#define kvLED_ACTION_LED_6_OFF     15 ///< Turn LED 6 off.
+#define kvLED_ACTION_LED_7_ON      16 ///< Turn LED 7 on.
+#define kvLED_ACTION_LED_7_OFF     17 ///< Turn LED 7 off.
+#define kvLED_ACTION_LED_8_ON      18 ///< Turn LED 8 on.
+#define kvLED_ACTION_LED_8_OFF     19 ///< Turn LED 8 off.
+#define kvLED_ACTION_LED_9_ON      20 ///< Turn LED 9 on.
+#define kvLED_ACTION_LED_9_OFF     21 ///< Turn LED 9 off.
+#define kvLED_ACTION_LED_10_ON     22 ///< Turn LED 10 on.
+#define kvLED_ACTION_LED_10_OFF    23 ///< Turn LED 10 off.
+#define kvLED_ACTION_LED_11_ON     24 ///< Turn LED 11 on.
+#define kvLED_ACTION_LED_11_OFF    25 ///< Turn LED 11 off.
+
+  /** @} */
+
+/**
+ * \ingroup General
+ *
+ * \source_cs       <b>static Canlib.canStatus kvFlashLeds(int hnd, int action, int timeout);</b>
+ *
+ * \source_delphi   <b>function kvFlashLeds(handle: canHandle; action: Integer; timeout: Integer): canStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvFlashLeds function will turn the LEDs on the device on or off.
+ *
+ * \param[in] hnd
+ * \param[in] action   One of the \ref kvLED_ACTION_xxx constants, defining
+ *                     which LED to turn on or off.
+ * \param[in] timeout  Specifies the time, in milliseconds, during which the
+ *                     action is to be carried out. When the timeout expires,
+ *                     the LED(s) will return to its ordinary function.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ */
+canStatus CANLIBAPI kvFlashLeds (const CanHandle hnd, int action, int timeout);
 
 /**
  * \ingroup CAN
@@ -3434,6 +3581,60 @@ kvStatus CANLIBAPI kvSetNotifyCallback (const CanHandle hnd,
                                         void* context,
                                         unsigned int notifyFlags);
 
+/**
+ * \ingroup General
+ *
+ * \source_cs       <b>static Canlib.canStatus kvReadTimer(int hnd, out int time);</b>
+ *
+ * \source_delphi   <b>function kvReadTimer(handle: canHandle; var time: Cardinal): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvReadTimer reads the hardware clock on the specified device and returns
+ * the value.
+ *
+ * When the call to \ref kvReadTimer() returns, the time value is already
+ * obsolete. The time required for the device firmware, any intermediary buses
+ * (like USB,) and the operating system to return the time value is not
+ * defined.
+ *
+ * This call should be used instead of \ref canReadTimer() because it can return an
+ * error code if it fails.
+ *
+ * \param[in]  hnd   An open handle to a CAN channel.
+ * \param[out] time  A pointer to a 32-bit unsigned integer that will receive
+ *                   the time value.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref canReadTimer(), \ref kvReadTimer64()
+ */
+kvStatus CANLIBAPI kvReadTimer (const CanHandle hnd, unsigned int *time);
+
+/**
+ * \ingroup General
+ *
+ * The \ref kvReadTimer64 reads the hardware clock on the specified device and
+ * returns the value.
+ *
+ * When the call to \ref kvReadTimer64() returns, the time value is already
+ * obsolete. The time required for the device firmware, any intermediary buses
+ * (like USB,) and the operating system to return the time value is not
+ * defined.
+ *
+ * This call should be used instead of \ref canReadTimer() because it can return an
+ * error code if it fails.
+ *
+ * \param[in]  hnd   An open handle to a CAN channel.
+ * \param[out] time  A pointer to a 64-bit unsigned integer that will receive the
+ *                   time value.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref kvReadTimer(), \ref canReadTimer()
+ */
+kvStatus CANLIBAPI kvReadTimer64 (const CanHandle hnd, uint64_t *time);
 /** @} */
 #endif
 
@@ -3441,6 +3642,7 @@ kvStatus CANLIBAPI kvSetNotifyCallback (const CanHandle hnd,
 }
 #endif
 
+# include "obsolete.h"
 
 
 #endif

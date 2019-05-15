@@ -61,9 +61,6 @@
 #include <linux/delay.h>
 #include <linux/types.h>
 #include <asm/io.h>
-// new
-#include "osif_functions_kernel.h"
-//
 #include "dallas.h"
 #include "util.h"
 
@@ -76,7 +73,7 @@
 
 /*****************************************************************************/
 // new
-static OS_IF_LOCK dallas_lock;
+static spinlock_t dallas_lock;
 static int dallas_lock_initialized = 0;
 //
 static void dallas_set_bit (DALLAS_CONTEXT *dc)
@@ -109,8 +106,8 @@ static void ds_write_bit (DALLAS_CONTEXT *dc, int value)
 {
   unsigned long irqFlags;
 
-  os_if_spin_lock_irqsave(&dallas_lock, &irqFlags);
-  
+  spin_lock_irqsave(&dallas_lock, irqFlags);
+
   //REPT
   dallas_clr_bit(dc);
 
@@ -119,14 +116,14 @@ static void ds_write_bit (DALLAS_CONTEXT *dc, int value)
     /* DS2431: A "one" is a low level; 5us < t < 15 us. */
     udelay(5);
     dallas_set_bit(dc);
-    os_if_spin_unlock_irqrestore(&dallas_lock, irqFlags);
+    spin_unlock_irqrestore(&dallas_lock, irqFlags);
     udelay(T_SLOT);
   }
   else {
     /* A "zero" is a low level; 60us < t < 120 us. */
     udelay(T_WR_SAMPLE);
     dallas_set_bit(dc);
-    os_if_spin_unlock_irqrestore(&dallas_lock, irqFlags);
+    spin_unlock_irqrestore(&dallas_lock, irqFlags);
     udelay(T_SLOT - T_WR_SAMPLE);
   }
 } /* ds_write_bit */
@@ -140,7 +137,7 @@ static int ds_read_bit (DALLAS_CONTEXT *dc)
   int b;
   unsigned long irqFlags;
 
-  os_if_spin_lock_irqsave(&dallas_lock, &irqFlags);
+  spin_lock_irqsave(&dallas_lock, irqFlags);
 
   //REPT
   dallas_clr_bit(dc);
@@ -149,7 +146,7 @@ static int ds_read_bit (DALLAS_CONTEXT *dc)
   udelay(1);
   b = dallas_bit_value(dc);
 
-  os_if_spin_unlock_irqrestore(&dallas_lock, irqFlags);
+  spin_unlock_irqrestore(&dallas_lock, irqFlags);
 
   udelay(T_SLOT);
 
@@ -163,7 +160,7 @@ static int ds_read_bit (DALLAS_CONTEXT *dc)
 dsStatus ds_init (DALLAS_CONTEXT *dc)
 {
   if (!dallas_lock_initialized) {
-    os_if_spin_lock_init(&dallas_lock);
+    spin_lock_init(&dallas_lock);
     dallas_lock_initialized = 1;
   }
   if (!dc->in_mask) {
@@ -178,7 +175,6 @@ dsStatus ds_init (DALLAS_CONTEXT *dc)
 void ds_shutdown (DALLAS_CONTEXT *dc)
 {
   if (dallas_lock_initialized) {
-    os_if_spin_lock_remove(&dallas_lock);
     dallas_lock_initialized = 0;
   }
 }
@@ -439,8 +435,8 @@ dsStatus ds_read_memory (unsigned char memory_type,
     }
     // If we are repeating, sleep for a millisecond or two.
     if (repeatCount > 1) {
-      os_if_set_task_uninterruptible ();
-      os_if_wait_for_event_timeout_simple(2);
+      set_current_state(TASK_UNINTERRUPTIBLE);
+      schedule_timeout(msecs_to_jiffies(2));
     }
   }
 

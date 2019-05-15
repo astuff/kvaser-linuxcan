@@ -62,6 +62,7 @@ DRIVERS   += leaf
 DRIVERS   += mhydra
 DRIVERS   += usbcanII
 DRIVERS   += virtualcan
+# KV_NO_PCI should be set on targets that do not have PCI, such as RaspberryPi.
 ifndef KV_NO_PCI
 DRIVERS   += pcican
 DRIVERS   += pcican2
@@ -80,7 +81,7 @@ reverse=$(if $(1),$(call reverse,$(wordlist 2,$(words $(1)),$(1)))) $(firstword 
 
 #---------------------------------------------------------------------------
 # RULES
-.PHONY: debug canlib linlib common leaf mhydra pcican pcican2 usbcanII virtualcan pciefd install uninstall clean check load
+.PHONY: canlib linlib common leaf mhydra pcican pcican2 usbcanII virtualcan pciefd install uninstall clean check load
 
 all:  $(SUBDIRS)
 
@@ -103,10 +104,10 @@ usbcanII:
 	@cd ./usbcanII; $(MAKE) kv_module
 
 leaf:
-	@cd ./leaf; $(MAKE) common; $(MAKE) kv_module
+	@cd ./leaf; $(MAKE) kv_module
 
 mhydra:
-	@cd ./mhydra; $(MAKE) common; $(MAKE) kv_module
+	@cd ./mhydra; $(MAKE) kv_module
 
 virtualcan:
 	@cd ./virtualcan; $(MAKE) kv_module
@@ -114,7 +115,7 @@ virtualcan:
 pciefd:
 	@cd ./pciefd; $(MAKE) kv_module
 
-install: $(DRIVERS)
+install:
 	@for dir in $(DRIVERS) ; do cd $$dir; echo Installing $$dir;./installscript.sh || exit 1; cd ..; done
 	$(MAKE) -C canlib install
 	$(MAKE) -C linlib install
@@ -126,7 +127,7 @@ uninstall:
 	rm -f /etc/udev/rules.d/10-kvaser.rules
 	rm -f /etc/modules-load.d/kvaser.conf
 
-load: $(DRIVERS)
+load:
 	@for dir in $(DRIVERS) ; do cd $$dir; echo Installing $$dir;./installscript.sh load || exit 1; cd ..; done
 	$(MAKE) -C canlib install
 	$(MAKE) -C linlib install

@@ -129,6 +129,12 @@ Circuit status flags, retained for compatibility</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___obsolete.html#gad994912c4536903f28970014eee3c5f2">canCIRCSTAT_BUS_OFF</a>&#160;&#160;&#160;0x0002</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___obsolete.html#ga7c565661a9acce72058a7b719eb3ac6a">canCIRCSTAT_ERROR_WARNING</a>&#160;&#160;&#160;0x0004</td></tr>
 <tr><td colspan="2"><h2><a name="member-group"></a>
+retained for compatibility</h2></td></tr>
+<tr><td colspan="2"><a class="anchor" id="amgrp486bf1b4d08bb347bef31633f4ac764d"></a> </p>
+<dl class="warning"><dt><b>Warning:</b></dt><dd>Obsolete! </dd></dl>
+<br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___obsolete.html#ga7748990724fd22b9be3cd02265358755">canCHANNEL_CAP_REMOTE</a>&#160;&#160;&#160;canCHANNEL_CAP_RESERVED_1</td></tr>
+<tr><td colspan="2"><h2><a name="member-group"></a>
 Sticky status flags</h2></td></tr>
 <tr><td colspan="2"><a class="anchor" id="amgrp6f404d8ff0d691a65a73b0f584004989"></a> </p>
 <dl class="warning"><dt><b>Warning:</b></dt><dd>Obsolete! </dd></dl>
@@ -357,6 +363,22 @@ These were never implemented.</h2></td></tr>
 <p>Any channel will do. </p>
 <dl class="warning"><dt><b>Warning:</b></dt><dd>Obsolete! </dd></dl>
 
+</div>
+</div>
+<a class="anchor" id="ga7748990724fd22b9be3cd02265358755"></a><!-- doxytag: member="obsolete.h::canCHANNEL_CAP_REMOTE" ref="ga7748990724fd22b9be3cd02265358755" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canCHANNEL_CAP_REMOTE&#160;&#160;&#160;canCHANNEL_CAP_RESERVED_1</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Obsolete, use <a class="el" href="canlib_8h.html#a4f59a672fed4cbe5482b32d1bd948222">canCHANNEL_CAP_REMOTE_ACCESS</a> or <a class="el" href="canlib_8h.html#a928b5c304c08ff8f834511733fd73e5c">canCHANNELDATA_IS_REMOTE</a>. </p>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="channeldata_8c-example.html#a16">channeldata.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="gad994912c4536903f28970014eee3c5f2"></a><!-- doxytag: member="obsolete.h::canCIRCSTAT_BUS_OFF" ref="gad994912c4536903f28970014eee3c5f2" args="" -->
@@ -1382,7 +1404,7 @@ These were never implemented.</h2></td></tr>
 </div>
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser CANLIB (canlib 5.17) - Generated on Thu Sep 15 2016</small>
+<small>Kvaser CANLIB (canlib 5.19) - Generated on Wed Feb 15 2017</small>
 </address>
 </body>
 </html>

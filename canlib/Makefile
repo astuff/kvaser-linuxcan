@@ -1,11 +1,11 @@
 
 #              Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 #                         http://www.kvaser.com
-# 
+#
 #  This software is dual licensed under the following two licenses:
 #  BSD-new and GPLv2. You may use either one. See the included
 #  COPYING file for details.
-# 
+#
 #  License: BSD-new
 #  ===============================================================================
 #  Redistribution and use in source and binary forms, with or without
@@ -18,7 +18,7 @@
 #      * Neither the name of the <organization> nor the
 #        names of its contributors may be used to endorse or promote products
 #        derived from this software without specific prior written permission.
-# 
+#
 #  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 #  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 #  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -29,24 +29,24 @@
 #  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
+#
+#
 #  License: GPLv2
 #  ===============================================================================
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU General Public License
 #  as published by the Free Software Foundation; either version 2
 #  of the License, or (at your option) any later version.
-# 
+#
 #  This program is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-# 
+#
 #  ---------------------------------------------------------------------------
 
 # Kvaser Linux Canlib library Makefile
@@ -57,9 +57,7 @@ LIBNAME = libcanlib.so
 LIBRARY = $(LIBNAME).1.1.0
 SONAME  = $(LIBNAME).1
 
-ARCH := $(shell getconf LONG_BIT)
-
-CFLAGS  += -Wall -Werror -Wextra  -DCPU=$(ARCH) -DCANLIB_NAME_STRING=\"$(LIBRARY)\" -O2 -fomit-frame-pointer \
+CFLAGS  += -Wall -Werror -Wextra -DCANLIB_NAME_STRING=\"$(LIBRARY)\" -O2 -fomit-frame-pointer \
 	$(XTRA_CFLAGS) -pthread #-DPCMCIA_DEBUG=0
 CFLAGS  += -DSPLIT -DLINUX=1 -D_LINUX=1 # maybe remove in time
 CFLAGS  += $(ccflags-y)
@@ -70,11 +68,9 @@ CFLAGS  += -DUSER_SPACE
 LIBCFLAGS = $(CFLAGS) -D_REENTRANT -fPIC
 LDFLAGS = -lc -pthread
 
-#SRCS := $(wildcard *.c)
-SRCS := canlib.c 
-SRCS += linkedlist.c 
+SRCS := canlib.c
+SRCS += linkedlist.c
 SRCS += VCanFunctions.c
-SRCS += ../common/osif_functions_user.c
 SRCS += dlc.c
 
 OBJS := $(patsubst %.c, %.o, $(SRCS))
@@ -83,7 +79,7 @@ DEPS := $(patsubst %.c, %.d, $(SRCS))
 
 
 ifeq ($(KV_DEBUG_ON),1)
-  KV_XTRA_CFLAGS_DEBUG= -D_DEBUG=1 -DDEBUG=1 
+  KV_XTRA_CFLAGS_DEBUG= -D_DEBUG=1 -DDEBUG=1
   IS_DEBUG=Debug: $(KV_XTRA_CFLAGS_DEBUG)
   CFLAGS += $(KV_XTRA_CFLAGS_DEBUG)
 else
@@ -94,12 +90,9 @@ endif
 CHECKLOG_FILE = checklog.txt
 
 
-.PHONY:	all tarball rpm uninstall clean examples depend canlib check
+.PHONY:	all uninstall clean examples depend canlib check
 
 all: $(LIBRARY) examples
-
-dlc.c: ../common/dlc.c
-	cp -p ../common/dlc.c .
 
 canlib: $(LIBRARY)
 
@@ -121,16 +114,17 @@ examples: canlib
 %.d: %.c
 	$(CC) $(CFLAGS) $(LIBCFLAGS) -MM $< > $@
 
-install: canlib examples
+install:
 	$(MAKE) -C examples install
 	rm -f /usr/lib/$(LIBNAME)
 	rm -f /usr/lib/$(SONAME)
-	install  -m 755 $(LIBRARY) /usr/lib/
+	install  -m 644 $(LIBRARY) /usr/lib/
 	ln -sf $(LIBRARY) /usr/lib/$(LIBNAME)
 	ln -sf $(LIBRARY) /usr/lib/$(SONAME)
 	/sbin/ldconfig
 	install -m 644 ../include/canlib.h /usr/include
 	install -m 644 ../include/canstat.h /usr/include
+	install -m 644 ../include/obsolete.h /usr/include
 	mkdir -p /usr/doc/canlib
 	cp -r ../doc/HTMLhelp /usr/doc/canlib
 
@@ -138,10 +132,10 @@ uninstall:
 	$(MAKE) -C examples uninstall
 	rm -f /usr/lib/$(LIBNAME) /usr/lib/$(SONAME) /usr/lib/$(LIBRARY)
 	/sbin/ldconfig
-	rm -f /usr/include/canlib.h /usr/include/canstat.h
+	rm -f /usr/include/canlib.h /usr/include/canstat.h /usr/include/obsolete.h
 	rm -rf /usr/doc/canlib
 
-clean:	
+clean:
 	rm -f $(OBJS) $(LIBRARY) $(DEPS) $(LIBNAME) $(LIBRARY) $(SONAME) $(TARBALL) *~
 	$(MAKE) -C examples clean
 

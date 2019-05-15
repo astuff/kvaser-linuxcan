@@ -63,7 +63,7 @@ KV_MODULE_NAME = mhydra
 INCLUDES := $(src)/../include/
 
 # source files
-SRCS :=           mhydraHWIf.c dlc.c ticks.c
+SRCS := mhydraHWIf.c
 
 ifneq ($(KERNELRELEASE),)
 	RUNDIR := $(src)
@@ -74,11 +74,3 @@ endif
 CHECK_SUPPRESS = suppressions.txt
 
 include $(RUNDIR)/../config.mak
-
-common: dlc.c ticks.c
-
-dlc.c: ../common/dlc.c
-	cp -p ../common/dlc.c .
-
-ticks.c: ../common/ticks.c
-	cp -p ../common/ticks.c .

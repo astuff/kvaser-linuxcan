@@ -66,7 +66,10 @@ if [ $? -eq 0 ] ; then
   echo "***********************************************************************"
 fi
 
-install -D -m 700 $MODNAME.ko /lib/modules/`uname -r`/kernel/drivers/usb/misc
+install -D -m 644 $MODNAME.ko /lib/modules/`uname -r`/kernel/drivers/usb/misc
+if [ "$?" -ne 0 ] ; then
+  exit 1
+fi
 
 $DEPMOD -a
 if [ "$?" -ne 0 ] ; then

@@ -56,17 +56,17 @@
 // Linux Mhydra driver
 //
 
-#  include <linux/version.h>
-#  include <linux/usb.h>
-#  include <linux/types.h>
-#  include <linux/seq_file.h>
-#  include <linux/math64.h>
-#  include <linux/string.h>
-
+#include <linux/version.h>
+#include <linux/usb.h>
+#include <linux/types.h>
+#include <linux/seq_file.h>
+#include <linux/math64.h>
+#include <linux/string.h>
+#include <linux/module.h>
+#include <linux/slab.h>
+#include <linux/kthread.h>
 
 // Non system headers
-#include "osif_kernel.h"
-#include "osif_functions_kernel.h"
 #include "VCanOsIf.h"
 #include "mhydraHWIf.h"
 #include "hydra_host_cmds.h"
@@ -74,6 +74,7 @@
 #include "debug.h"
 #include "hwnames.h"
 #include "vcan_ioctl.h"
+#include "kcan_ioctl.h"
 #include "fpgacan_packet_defs.h"
 #include "util.h"
 #include "capabilities.h"
@@ -84,9 +85,9 @@
 // Use a unique set for each driver
 #define USB_MHYDRA_MINOR_BASE   80
 
-    MODULE_LICENSE("Dual BSD/GPL");
-    MODULE_AUTHOR("KVASER");
-    MODULE_DESCRIPTION("Mhydra CAN module.");
+MODULE_LICENSE("Dual BSD/GPL");
+MODULE_AUTHOR("KVASER");
+MODULE_DESCRIPTION("Mhydra CAN module.");
 
 //----------------------------------------------------------------------------
 // If you do not define MHYDRA_DEBUG at all, all the debug code will be
@@ -94,22 +95,25 @@
 // be present but disabled -- but it can then be enabled for specific
 // modules at load time with a 'pc_debug=#' option to insmod.
 //
-#  ifdef MHYDRA_DEBUG
-      static int pc_debug = MHYDRA_DEBUG;
-      MODULE_PARM_DESC(pc_debug, "Mhydra debug level");
-      module_param(pc_debug, int, 0644);
-#     define DEBUGPRINT(n, arg)     if (pc_debug >= (n)) { DEBUGOUT(n, arg); }
-#  else
-#     define DEBUGPRINT(n, arg)     if ((n) == 1) { DEBUGOUT(n, arg); }
-#  endif
+#ifdef MHYDRA_DEBUG
+    static int pc_debug = MHYDRA_DEBUG;
+    MODULE_PARM_DESC(pc_debug, "Mhydra debug level");
+    module_param(pc_debug, int, 0644);
+#   define DEBUGPRINT(n, arg)     if (pc_debug >= (n)) { DEBUGOUT(n, arg); }
+#else
+#   define DEBUGPRINT(n, arg)     if ((n) == 1) { DEBUGOUT(n, arg); }
+#endif
 //----------------------------------------------------------------------------
 
+#ifndef THIS_MODULE
+#define THIS_MODULE 0
+#endif
 
 //======================================================================
 // HW function pointers
 //======================================================================
 
-static int INIT mhydra_init_driver(void);
+static int mhydra_init_driver(void);
 static int mhydra_set_busparams(VCanChanData *vChd, VCanBusParams *par);
 static int mhydra_get_busparams(VCanChanData *vChd, VCanBusParams *par);
 static int mhydra_set_silent(VCanChanData *vChd, int silent);
@@ -120,10 +124,10 @@ static int mhydra_req_bus_stats(VCanChanData *vChd);
 static int mhydra_get_tx_err(VCanChanData *vChd);
 static int mhydra_get_rx_err(VCanChanData *vChd);
 static int mhydra_outstanding_sync(VCanChanData *vChan);
-static int EXIT mhydra_close_all(void);
+static int mhydra_close_all(void);
 static int mhydra_proc_read(struct seq_file* m, void* v);
 static int mhydra_get_chipstate(VCanChanData *vChd);
-static int mhydra_get_time(VCanCardData *vCard, unsigned long *time);
+static int mhydra_get_time(VCanCardData *vCard, uint64_t *time);
 static int mhydra_flush_tx_buffer(VCanChanData *vChan);
 static void mhydra_schedule_send(VCanCardData *vCard, VCanChanData *vChan);
 static unsigned long mhydra_get_hw_tx_q_len(VCanChanData *vChan);
@@ -144,6 +148,8 @@ static int mhydra_objbuf_set_msg_count(VCanChanData *chd, int bufType, int bufNo
                                      int count);
 static int mhydra_objbuf_send_burst(VCanChanData *chd, int bufType, int bufNo,
                                   int burstLen);
+static int mhydra_get_card_info(VCanCardData *vCard, VCAN_IOCTL_CARD_INFO *ci);
+static int mhydra_get_card_info_2(VCanCardData *vCard, KCAN_IOCTL_CARD_INFO_2 *ci);
 
 static int mhydra_tx_interval (VCanChanData *chd, unsigned int *interval);
 static int mhydra_capabilities (VCanCardData *vCard, uint32_t vcan_cmd);
@@ -151,6 +157,20 @@ static int mhydra_get_cust_channel_name(const VCanChanData * const vChan,
                                         unsigned char * const data,
                                         const unsigned int data_size,
                                         unsigned int * const status);
+static int mhydra_get_card_info_misc(const VCanChanData *chd, int *value, int type);
+static int mhydra_flash_leds(const VCanChanData *chd, int action, int timeout);
+static int mhydra_memo_config_mode(const VCanChanData *chd, int interval);
+static int mhydra_memo_get_data(const VCanChanData *chd, int subcmd,
+                                void *buf, int bufsiz,
+                                unsigned long data1, unsigned short data2,
+                                int *stat, int *dstat, int *lstat
+                                );
+static int mhydra_memo_put_data(const VCanChanData *chd, int subcmd,
+                                void *buf, int bufsiz,
+                                unsigned long data1, unsigned short data2,
+                                int *stat, int *dstat, int *lstat);
+/* static int mhydra_memo_disk_io(const VCanChanData *chd); */
+/* static int mhydra_memo_disk_io_fast(const VCanChanData *chd); */
 
 static VCanDriverData driverData;
 
@@ -183,8 +203,17 @@ static VCanHWInterface hwIf = {
   .objbufSetPeriod   = mhydra_objbuf_set_period,
   .objbufSetMsgCount = mhydra_objbuf_set_msg_count,
   .objbufSendBurst   = mhydra_objbuf_send_burst,
+  .getCardInfo       = mhydra_get_card_info,
+  .getCardInfo2      = mhydra_get_card_info_2,
   .tx_interval       = mhydra_tx_interval,
   .getCustChannelName = mhydra_get_cust_channel_name,
+  .getCardInfoMisc    = mhydra_get_card_info_misc,
+  .flashLeds          = mhydra_flash_leds,
+  .memoConfigMode     = mhydra_memo_config_mode,
+  .memoGetData        = mhydra_memo_get_data,
+  .memoPutData        = mhydra_memo_put_data,
+  /* .memoDiskIo         = mhydra_memo_disk_io, */
+  /* .memoDiskIoFast     = mhydra_memo_disk_io_fast, */
 };
 
 
@@ -233,7 +262,7 @@ static int    mhydra_tx_available(VCanChanData *vChan);
 static int    mhydra_transmit(VCanCardData *vCard);
 static int    mhydra_send_and_wait_reply (VCanCardData *vCard, hydraHostCmd *cmd,
                                           hydraHostCmd *replyPtr,
-                                          unsigned char cmdNr,
+                                          unsigned char replyCmdNo,
                                           unsigned char transId,
                                           unsigned char error_event);
 
@@ -281,7 +310,7 @@ static struct usb_device_id mhydra_table [] = {
   { USB_DEVICE(KVASER_VENDOR_ID, USB_USBCAN_PRO_2HS_V2_PRODUCT_ID)},
   { USB_DEVICE(KVASER_VENDOR_ID, USB_MEMO_2HS_PRODUCT_ID)},
   { USB_DEVICE(KVASER_VENDOR_ID, USB_MEMO_PRO_2HS_V2_PRODUCT_ID)},
-  { }  // Terminating entry
+  { 0 }  // Terminating entry
 };
 
 MODULE_DEVICE_TABLE(usb, mhydra_table);
@@ -306,8 +335,108 @@ static struct usb_driver mhydra_driver = {
 
 //============================================================================
 
+void print_reply(uint32_t cmd) 
+{
+  switch (cmd) {
+    case CMD_GET_DRIVERMODE_RESP:
+      DEBUGPRINT(4, (TXT("CMD_GET_DRIVERMODE_RESP - Ignored\n")));
+      break;
 
+    case CMD_START_CHIP_RESP:
+      DEBUGPRINT(4, (TXT("CMD_START_CHIP_RESP - Ignored\n")));
+      break;
 
+    case CMD_STOP_CHIP_RESP:
+      DEBUGPRINT(4, (TXT("CMD_STOP_CHIP_RESP - Ignored\n")));
+      break;
+
+    case CMD_READ_CLOCK_RESP:
+      DEBUGPRINT(4, (TXT("CMD_READ_CLOCK_RESP - Ignored\n")));
+      break;
+
+    case CMD_GET_CARD_INFO_2:
+      DEBUGPRINT(4, (TXT("CMD_GET_CARD_INFO_2 - Ignored\n")));
+      break;
+
+    case CMD_GET_INTERFACE_INFO_RESP:
+      DEBUGPRINT(4, (TXT("CMD_GET_INTERFACE_INFO_RESP - Ignored\n")));
+      break;
+
+    case CMD_RESET_STATISTICS:
+      DEBUGPRINT(4, (TXT("CMD_RESET_STATISTICS - Ignored\n")));
+      break;
+
+    case CMD_ERROR_EVENT:
+      DEBUGPRINT(4, (TXT("CMD_ERROR_EVENT - Ignored\n")));
+      break;
+
+    case CMD_RESET_ERROR_COUNTER:
+      DEBUGPRINT(4, (TXT("CMD_RESET_ERROR_COUNTER - Ignored\n")));
+      break;
+      
+    case CMD_FLUSH_QUEUE_RESP:
+      DEBUGPRINT(4, (TXT("CMD_FLUSH_QUEUE_RESP - Ignored\n")));
+      break;
+
+    case CMD_USB_THROTTLE:
+      DEBUGPRINT(4, (TXT("CMD_USB_THROTTLE - Ignored\n")));
+      break;
+
+    case CMD_CHECK_LICENSE_RESP:
+      DEBUGPRINT(4, (TXT("CMD_CHECK_LICENCE_RESP - Ignore\n")));
+      break;
+
+    case CMD_GET_TRANSCEIVER_INFO_RESP:
+      DEBUGPRINT(4, (TXT("CMD_GET_TRANSCEIVER_INFO_RESP - Ignore\n")));
+      break;
+
+    case CMD_SELF_TEST_RESP:
+      DEBUGPRINT(4, (TXT("CMD_SELF_TEST_RESP - Ignore\n")));
+      break;
+
+    case CMD_LED_ACTION_RESP:
+      DEBUGPRINT(4, (TXT("CMD_LED_ACTION_RESP - Ignore\n")));
+      break;
+
+    case CMD_GET_IO_PORTS_RESP:
+      DEBUGPRINT(4, (TXT("CMD_GET_IO_PORTS_RESP - Ignore\n")));
+      break;
+
+    case CMD_HEARTBEAT_RESP:
+      DEBUGPRINT(4, (TXT("CMD_HEARTBEAT_RESP - Ignore\n")));
+      break;
+      
+    case CMD_SET_BUSPARAMS_RESP:
+      DEBUGPRINT(4, (TXT("CMD_SET_BUSPARAMS_RESP - Ignore\n")));
+      break;
+
+    case CMD_SET_BUSPARAMS_FD_RESP:
+      DEBUGPRINT(4, (TXT("CMD_SET_BUSPARAMS_FD_RESP - Ignore\n")));
+      break;
+
+    case CMD_GET_CAPABILITIES_RESP:
+      DEBUGPRINT(4, (TXT("CMD_GET_CAPABILITIES_RESP - Ignore\n")));
+      break;
+
+    case CMD_PARAMETER_READ: 
+      DEBUGPRINT(4, (TXT("CMD_PARAMETER_READ - Ignore\n")));    
+      break;
+
+    case CMD_HYDRA_TX_INTERVAL_RESP:
+      DEBUGPRINT(4, (TXT("CMD_HYDRA_TX_INTERVAL_RESP - Ignore\n")));
+      break;
+
+    case CMD_MEMO_PUT_DATA:      
+      // Data in reply is not used, since data is coming through fat pipe instead.
+      DEBUGPRINT(4, (TXT("CMD_MEMO_PUT_DATA - Ignore\n")));
+      break;
+    
+    default: 
+      DEBUGPRINT(4, (TXT("There is no description for this command. %d\n"), cmd));
+      break;
+  }
+}
+//============================================================================
 
 
 //------------------------------------------------------
@@ -338,7 +467,7 @@ static void mhydra_write_bulk_callback (struct urb *urb)
   }
 
   // Notify anyone waiting that the write has finished
-  os_if_up_sema(&dev->write_finished);
+  complete(&dev->write_finished);
 }
 
 
@@ -349,6 +478,110 @@ static void mhydra_write_bulk_callback (struct urb *urb)
 //    ---- THREADS ----
 //
 //----------------------------------------------------------------------------
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20)
+# define USE_CONTEXT 1
+#else
+# define USE_CONTEXT 0
+#endif
+
+#if USE_CONTEXT
+static void mhydra_memo_bulk (void *context)
+#else
+  static void mhydra_memo_bulk (struct work_struct *work)
+#endif
+{
+#if USE_CONTEXT
+  VCanCardData *vCard   = context;
+  MhydraCardData *dev   = vCard->hwCardData;
+#else
+  MhydraCardData  *dev  = container_of(work, MhydraCardData, memoBulkWork);
+  //VCanCardData  *vCard  = dev->vCard;
+#endif
+
+  int ret;
+  int len;
+
+  if (!dev->present) {
+    // The device was unplugged before the file was released
+    // We cannot deallocate here, it is too early and handled elsewhere
+    DEBUGPRINT(2, (TXT("Device unplugged (bulk thread), bail out)\n")));
+    return;
+  }
+
+  // bulk_in[1] is the "fat pipe"
+  if (!dev->bulk_in[1].buffer) {
+    // Someone has deallocated our buffer, bail out
+    DEBUGPRINT(2, (TXT("Someone has deallocated our buffer (bulk thread), bail out)\n")));
+    return;
+    }
+
+  len = 0;
+  // Do a blocking bulk read to get data from the device
+  // Timeout after 30 seconds
+  ret = usb_bulk_msg(dev->udev,
+                     usb_rcvbulkpipe(dev->udev, dev->bulk_in[1].endpointAddr),
+                     dev->bulk_in[1].buffer, dev->bulk_in[1].size, &len,
+  // Timeout changed from jiffies to milliseconds in 2.6.12.
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 12))
+                     HZ * 30
+#else
+                     30000
+#endif
+                     );
+  if (ret) {
+    DEBUGPRINT(1, (TXT ("usb_bulk_msg_memo error (%d)\n"), ret));
+    if (ret != -ETIMEDOUT) {
+      // Save if runaway
+      if (ret == -EILSEQ || ret == -ESHUTDOWN || ret == -EINVAL) {
+        DEBUGPRINT(1, (TXT ("usb_bulk_msg memo error (%d) - Device probably ")
+                       TXT2("removed, closing down\n"), ret));
+        dev->present = 0;
+        return;
+      }
+    }
+  } 
+
+  if (!ret && !len) {
+    // Zero length packet recieved; read again
+
+    // Do a blocking bulk read to get data from the device
+    // Timeout after 30 seconds
+    ret = usb_bulk_msg(dev->udev,
+                        usb_rcvbulkpipe(dev->udev, dev->bulk_in[1].endpointAddr),
+                        dev->bulk_in[1].buffer, dev->bulk_in[1].size, &len,
+                       // Timeout changed from jiffies to milliseconds in 2.6.12.
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 12))
+                       HZ * 30
+#else
+                      30000
+#endif
+                       );
+    if (ret) {
+      DEBUGPRINT(1, (TXT ("usb_bulk_msg_memo error (%d)\n"), ret));
+      if (ret != -ETIMEDOUT) {
+        // Save if runaway
+        if (ret == -EILSEQ || ret == -ESHUTDOWN || ret == -EINVAL) {
+          DEBUGPRINT(1, (TXT ("usb_bulk_msg memo error (%d) - Device probably ")
+                        TXT2("removed, closing down\n"), ret));
+          dev->present = 0;
+          return;
+        }
+      }
+    } 
+  }
+
+
+  if (!ret) {
+    // Signal that we've got data
+    complete(&dev->bulk_in_1_data_valid);
+    if (dev->bulk_in[1].size != len) {
+      DEBUGPRINT(1, (TXT("We did not get all data we expected in memo bulk thread, got %d expected %zu)\n"),
+                    len, dev->bulk_in[1].size));
+    }
+  }
+  DEBUGPRINT(3, (TXT("rx bulk thread Ended - finalised\n")));
+
+} // mhydra_memo_bulk
 
 
 //============================================================================
@@ -379,19 +612,21 @@ static int mhydra_rx_thread (void *context)
 
     len = 0;
     // Do a blocking bulk read to get data from the device
+    // dev->bulk_in[0].buffer is the first "normal" pipe
     // Timeout after 30 seconds
     ret = usb_bulk_msg(dev->udev,
-                       usb_rcvbulkpipe(dev->udev, dev->bulk_in_endpointAddr),
-                       dev->bulk_in_buffer, dev->bulk_in_size, &len,
+                       usb_rcvbulkpipe(dev->udev, dev->bulk_in[0].endpointAddr),
+                       dev->bulk_in[0].buffer, dev->bulk_in[0].size, &len,
 // Timeout changed from jiffies to milliseconds in 2.6.12.
-# if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 12))
-                       HZ * 30);
-# else
-                       30000);
-# endif
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 12))
+                       HZ * 30
+#else
+                       30000
+#endif
+                       );
 
     if (ret) {
-      DEBUGPRINT(2, (TXT ("usb_bulk_msg error (%d)"), ret));
+      DEBUGPRINT(2, (TXT ("usb_bulk_msg error (%d)\n"), ret));
 
       if (ret != -ETIMEDOUT) {
         // Save if runaway
@@ -417,7 +652,7 @@ static int mhydra_rx_thread (void *context)
       //
       // We got a bunch of bytes. Now interpret them.
       //
-      unsigned char  *buffer     = (unsigned char *)dev->bulk_in_buffer;
+      unsigned char  *buffer     = (unsigned char *)dev->bulk_in[0].buffer;
       int            loopCounter = 1000;
       unsigned int   count       = 0;
 
@@ -476,7 +711,8 @@ static int mhydra_rx_thread (void *context)
 
   DEBUGPRINT(3, (TXT("rx thread Ended - finalised\n")));
 
-  os_if_exit_thread(THIS_MODULE, result);
+  module_put(THIS_MODULE);
+  do_exit(result);
 
   return result;
 } // _rx_thread
@@ -872,7 +1108,7 @@ static void mhydra_handle_cmd_tx_acknowledge(hydraHostCmd *cmd, VCanCardData *vC
       vCanDispatchEvent(vChan, &e);
     }
 
-    os_if_spin_lock(&mhydraChan->outTxLock);
+    spin_lock(&mhydraChan->outTxLock);
     // If we have cleared the transmit queue, we might get a TX_ACK
     // that should not be counted.
     if (mhydraChan->outstanding_tx) {
@@ -881,17 +1117,17 @@ static void mhydra_handle_cmd_tx_acknowledge(hydraHostCmd *cmd, VCanCardData *vC
 
     // Outstanding are changing from *full* to at least one open slot?
     if (mhydraChan->outstanding_tx >= (dev->max_outstanding_tx - 1)) {
-      os_if_spin_unlock(&mhydraChan->outTxLock);
+      spin_unlock(&mhydraChan->outTxLock);
       DEBUGPRINT(6, (TXT("Buffer in chan %d not full (%d) anymore\n"),
                      chan, mhydraChan->outstanding_tx));
-      os_if_queue_task_not_default_queue(dev->txTaskQ, &dev->txWork);
+      queue_work(dev->txTaskQ, &dev->txWork);
     }
 
     // Check if we should *wake* canwritesync
     else if ((mhydraChan->outstanding_tx == 0) && txQEmpty(vChan) &&
              test_and_clear_bit(0, &vChan->waitEmpty)) {
-      os_if_spin_unlock(&mhydraChan->outTxLock);
-      os_if_wake_up_interruptible(&vChan->flushQ);
+      spin_unlock(&mhydraChan->outTxLock);
+      wake_up_interruptible(&vChan->flushQ);
       DEBUGPRINT(6, (TXT("W%d\n"), chan));
     }
     else {
@@ -903,7 +1139,7 @@ static void mhydra_handle_cmd_tx_acknowledge(hydraHostCmd *cmd, VCanCardData *vC
                        constant_test_bit(0, &vChan->waitEmpty),
                        dev->max_outstanding_tx));
 #endif
-      os_if_spin_unlock(&mhydraChan->outTxLock);
+      spin_unlock(&mhydraChan->outTxLock);
     }
 
     DEBUGPRINT(6, (TXT("X%d\n"), chan));
@@ -934,27 +1170,26 @@ static void mhydra_handle_cmd_tx_acknowledge_fd(hydraHostCmdExt *cmdExt, VCanCar
 //
 static void mhydra_handle_cmd_rx_message_fd(hydraHostCmdExt *extCmd, VCanCardData *vCard, VCanChanData *vChan)
 {
-  VCAN_EVENT vEvent = { 0 };
-  int isExtFdMsg = ((extCmd->rxCanMessageFd.flags & MSGFLAG_FDF) != 0);
-  uint8_t length = 0;
+  VCAN_EVENT vEvent;
+  uint8_t    length;
 
   DEBUGPRINT(4, (TXT("CMD_RX_MESSAGE_FD\n")));
 
-  vEvent.tag = V_RECEIVE_MSG;
-  vEvent.timeStamp = ticks_to_10us (vCard, extCmd->rxCanMessageFd.fpga_timestamp);
+  vEvent.tagData.msg.flags = 0;
+  vEvent.tag               = V_RECEIVE_MSG;
+  vEvent.timeStamp         = ticks_to_10us (vCard, extCmd->rxCanMessageFd.fpga_timestamp);
 
   if (extCmd->rxCanMessageFd.flags & MSGFLAG_ERROR_FRAME) {
-    vEvent.tagData.msg.id = VCAN_MSG_ID_UNDEF;
+    vEvent.tagData.msg.id     = VCAN_MSG_ID_UNDEF;
     vEvent.tagData.msg.flags |= VCAN_MSG_FLAG_ERROR_FRAME;
-    vEvent.tagData.msg.dlc = 0;
+    vEvent.tagData.msg.dlc    = 0;
 
     length = sizeof(hcanErrorFrameData_t);
-  }
-  else {
+  } else {
     uint32_t dlc = RTPACKET_DLC_GET(extCmd->rxCanMessageFd.fpga_control);
-
+    
     vEvent.tagData.msg.id = extCmd->rxCanMessageFd.id;
-
+    
     if (extCmd->rxCanMessageFd.flags & MSGFLAG_EXTENDED_ID) {
       vEvent.tagData.msg.id |= VCAN_EXT_MSG_ID;
     }
@@ -962,36 +1197,41 @@ static void mhydra_handle_cmd_rx_message_fd(hydraHostCmdExt *extCmd, VCanCardDat
     if (extCmd->rxCanMessageFd.flags & MSGFLAG_OVERRUN) {
       vEvent.tagData.msg.flags |= VCAN_MSG_FLAG_OVERRUN;
     }
+
     if (extCmd->rxCanMessageFd.flags & MSGFLAG_NERR) {
       vEvent.tagData.msg.flags |= VCAN_MSG_FLAG_NERR;
     }
+
     if (extCmd->rxCanMessageFd.flags & MSGFLAG_WAKEUP) {
       vEvent.tagData.msg.flags |= VCAN_MSG_FLAG_WAKEUP;
     }
+
     if (extCmd->rxCanMessageFd.flags & MSGFLAG_REMOTE_FRAME) {
       vEvent.tagData.msg.flags |= VCAN_MSG_FLAG_REMOTE_FRAME;
     }
 
     if (extCmd->rxCanMessageFd.flags & MSGFLAG_TX) {
       vEvent.tagData.msg.flags |= VCAN_MSG_FLAG_TXACK;
-    }
-    else if (extCmd->rxCanMessageFd.flags & MSGFLAG_TXRQ) {
+    } else if (extCmd->rxCanMessageFd.flags & MSGFLAG_TXRQ) {
       vEvent.tagData.msg.flags |= VCAN_MSG_FLAG_TXRQ;
     }
-
-    if (isExtFdMsg) {
+    
+    if (extCmd->rxCanMessageFd.flags & MSGFLAG_FDF) {
       vEvent.tagData.msg.flags |= VCAN_MSG_FLAG_FDF;
+
       if (extCmd->rxCanMessageFd.flags & MSGFLAG_BRS) {
         vEvent.tagData.msg.flags |= VCAN_MSG_FLAG_BRS;
       }
+
       if (extCmd->rxCanMessageFd.flags & MSGFLAG_ESI) {
         vEvent.tagData.msg.flags |= VCAN_MSG_FLAG_ESI;
       }
-      length = dlc_dlc_to_bytes_fd(dlc);
+
+      length                 = dlc_dlc_to_bytes_fd(dlc);
       vEvent.tagData.msg.dlc = (uint8_t)dlc;
     }
     else {
-      length = dlc_dlc_to_bytes_classic(dlc);
+      length                 = dlc_dlc_to_bytes_classic(dlc);
       vEvent.tagData.msg.dlc = (uint8_t)dlc;
     }
   }
@@ -1130,22 +1370,6 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
       break;
     }
 
-    case CMD_GET_DRIVERMODE_RESP:
-      DEBUGPRINT(4, (TXT("CMD_GET_DRIVERMODE_RESP - Ignored\n")));
-      break;
-
-    case CMD_START_CHIP_RESP:
-      DEBUGPRINT(4, (TXT("CMD_START_CHIP_RESP - Ignored\n")));
-      break;
-
-    case CMD_STOP_CHIP_RESP:
-      DEBUGPRINT(4, (TXT("CMD_STOP_CHIP_RESP - Ignored\n")));
-      break;
-
-    case CMD_READ_CLOCK_RESP:
-      DEBUGPRINT(4, (TXT("CMD_READ_CLOCK_RESP - Ignored\n")));
-      break;
-
     case CMD_GET_CARD_INFO_RESP:
       DEBUGPRINT(4, (TXT("CMD_GET_CARD_INFO_RESP\n")));
 
@@ -1160,14 +1384,6 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
 
       DEBUGPRINT(4, (TXT("CMD_GET_CARD_INFO_RESP vCard->nrChannels (%d)\n"), vCard->nrChannels));
 
-      break;
-
-    case CMD_GET_CARD_INFO_2:
-      DEBUGPRINT(4, (TXT("CMD_GET_CARD_INFO_2 - Ignored\n")));
-      break;
-
-    case CMD_GET_INTERFACE_INFO_RESP:
-      DEBUGPRINT(4, (TXT("CMD_GET_INTERFACE_INFO_RESP - Ignored\n")));
       break;
 
     case CMD_GET_SOFTWARE_INFO_RESP:
@@ -1205,18 +1421,6 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
           vChd->busStats.busLoad = 10000;
         }
       }
-      break;
-
-    case CMD_RESET_STATISTICS:
-      DEBUGPRINT(4, (TXT("CMD_RESET_STATISTICS - Ignored\n")));
-      break;
-
-    case CMD_ERROR_EVENT:
-      DEBUGPRINT(4, (TXT("CMD_ERROR_EVENT - Ignored\n")));
-      break;
-
-    case CMD_RESET_ERROR_COUNTER:
-      DEBUGPRINT(4, (TXT("CMD_RESET_ERROR_COUNTER - Ignored\n")));
       break;
 
       // Send a TxRequest back to the application. This is a
@@ -1344,14 +1548,6 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
       break;
     }
 
-    case CMD_FLUSH_QUEUE_RESP:
-        DEBUGPRINT(4, (TXT("CMD_FLUSH_QUEUE_RESP - Ignored\n")));
-        break;
-
-    case CMD_USB_THROTTLE:
-      DEBUGPRINT(4, (TXT("CMD_USB_THROTTLE - Ignored\n")));
-      break;
-
     case CMD_TREF_SOFNR:
       DEBUGPRINT(4, (TXT("CMD_TREF_SOFNR - Ignored\n")));
       break;
@@ -1380,41 +1576,8 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
       break;
     }
 
-    case CMD_CHECK_LICENSE_RESP:
-      DEBUGPRINT(4, (TXT("CMD_CHECK_LICENCE_RESP - Ignore\n")));
-      break;
-
-    case CMD_GET_TRANSCEIVER_INFO_RESP:
-      DEBUGPRINT(4, (TXT("CMD_GET_TRANSCEIVER_INFO_RESP - Ignore\n")));
-      break;
-
-    case CMD_SELF_TEST_RESP:
-      DEBUGPRINT(4, (TXT("CMD_SELF_TEST_RESP - Ignore\n")));
-      break;
-
-    case CMD_LED_ACTION_RESP:
-      DEBUGPRINT(4, (TXT("CMD_LED_ACTION_RESP - Ignore\n")));
-      break;
-
-    case CMD_GET_IO_PORTS_RESP:
-      DEBUGPRINT(4, (TXT("CMD_GET_IO_PORTS_RESP - Ignore\n")));
-      break;
-
-    case CMD_HEARTBEAT_RESP:
-      DEBUGPRINT(4, (TXT("CMD_HEARTBEAT_RESP - Ignore\n")));
-      break;
-
     case CMD_SOFTSYNC_ONOFF:
       DEBUGPRINT(4, (TXT("CMD_SOFTSYNC_ONOFF - Ignore\n")));
-      break;
-
-
-    case CMD_SET_BUSPARAMS_RESP:
-      DEBUGPRINT(4, (TXT("CMD_SET_BUSPARAMS_RESP - Ignore\n")));
-      break;
-
-    case CMD_SET_BUSPARAMS_FD_RESP:
-      DEBUGPRINT(4, (TXT("CMD_SET_BUSPARAMS_FD_RESP - Ignore\n")));
       break;
 
     case CMD_MAP_CHANNEL_RESP:
@@ -1510,10 +1673,6 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
       break;
     }
 
-    case CMD_GET_CAPABILITIES_RESP:
-      // this is handled below, waking those who are waiting.
-      break;
-
     case CMD_EXTENDED:
     {
       unsigned int  chan = dev->he2channel[srcHE];
@@ -1532,12 +1691,44 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
       break;
     }
 
-    case CMD_PARAMETER_READ:
-      DEBUGPRINT(4, (TXT("CMD_PARAMETER_READ - Ignore\n")));
+    case CMD_MEMO_GET_DATA:
+      if ((cmd->memoGetDataResp.status == MEMO_STATUS_SUCCESS) ||
+          (cmd->memoGetDataResp.status == MEMO_STATUS_MORE_DATA)) {
+        size_t num_data = cmd->memoGetDataResp.dataLen;
+
+        if (num_data > sizeof(cmd->memoGetDataResp.data)) {
+          DEBUGPRINT(1, (TXT("ERROR CMD_MEMO_GET_DATA: dataLen > sizeof(data) (%zu > %zu)\n"),
+                         num_data, sizeof(cmd->memoGetDataResp.data)));
+          num_data = sizeof(cmd->memoGetDataResp.data);
+        }
+        if (cmd->memoGetDataResp.subCmd == MEMO_SUBCMD_FASTREAD_LOGICAL_SECTOR ||
+            cmd->memoGetDataResp.subCmd == MEMO_SUBCMD_FASTREAD_PHYSICAL_SECTOR) {
+          // Data in reply is not used, since data is coming through fat pipe instead.
+          DEBUGPRINT(4, (TXT("CMD_MEMO_GET_DATA: subcmd: %d, data is coming through fat pipe\n"),
+                         cmd->memoGetDataResp.subCmd));
+        } else {
+          spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
+          list_for_each_safe(currHead, tmpHead, &dev->replyWaitList)
+            {
+              currNode = list_entry(currHead, WaitNode, list);
+              memcpy(dev->bulk_in[1].buffer + currNode->data_count, cmd->memoGetDataResp.data, num_data);
+              currNode->data_count += num_data;
+              dev->bulk_in[1].size = currNode->data_count;
+            }
+          spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
+          if (cmd->memoGetDataResp.status == MEMO_STATUS_MORE_DATA) {
+            return;
+          }
+        }
+      }
+      break;
+
+    case CMD_MEMO_CONFIG_MODE:
+      DEBUGPRINT(4, (TXT("CMD_MEMO_CONFIG_MODE - Ignore\n")));
       break;
 
     case CMD_UNKNOWN_COMMAND:
-      DEBUGPRINT(2, (TXT("[%s,%d] CMD_UNKNOWN_COMMAND - %d\n"), __FILE__, __LINE__, cmd->unknownCommandResp.unknownCmd));
+      DEBUGPRINT(1, (TXT("[%s,%d] CMD_UNKNOWN_COMMAND - %d\n"), __FILE__, __LINE__, cmd->unknownCommandResp.unknownCmd));
       {
         uint8_t* buf_p = (uint8_t*)cmd;
         unsigned mm;
@@ -1548,8 +1739,35 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
       }
       break;
 
+    // these replys are not handled, the waking up is handled below. 
+    case CMD_GET_DRIVERMODE_RESP:
+    case CMD_START_CHIP_RESP:
+    case CMD_STOP_CHIP_RESP:
+    case CMD_READ_CLOCK_RESP:
+    case CMD_GET_CARD_INFO_2:
+    case CMD_GET_INTERFACE_INFO_RESP:
+    case CMD_RESET_STATISTICS:
+    case CMD_ERROR_EVENT:
+    case CMD_RESET_ERROR_COUNTER:
+    case CMD_FLUSH_QUEUE_RESP:
+    case CMD_USB_THROTTLE:
+    case CMD_CHECK_LICENSE_RESP:
+    case CMD_GET_TRANSCEIVER_INFO_RESP:
+    case CMD_SELF_TEST_RESP:
+    case CMD_LED_ACTION_RESP:
+    case CMD_GET_IO_PORTS_RESP:
+    case CMD_HEARTBEAT_RESP:
+    case CMD_SET_BUSPARAMS_RESP:
+    case CMD_SET_BUSPARAMS_FD_RESP:
+    case CMD_GET_CAPABILITIES_RESP:
+    case CMD_PARAMETER_READ:      
+    case CMD_HYDRA_TX_INTERVAL_RESP:
+    case CMD_MEMO_PUT_DATA:      
+      print_reply(cmd->cmdNo);
+      break;      
+      
     default:
-      DEBUGPRINT(2, (TXT("[%s,%d] UNKNOWN COMMAND - %d\n"), __FILE__, __LINE__, cmd->cmdNo));
+      DEBUGPRINT(1, (TXT("[%s,%d] UNKNOWN COMMAND - %d\n"), __FILE__, __LINE__, cmd->cmdNo));
       {
         uint8_t* buf_p = (uint8_t*)cmd;
         unsigned mm;
@@ -1565,23 +1783,23 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
   // Wake up those who are waiting for a resp
   //
 
-  os_if_spin_lock_irqsave(&dev->replyWaitListLock, &irqFlags);
+  spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
   list_for_each_safe(currHead, tmpHead, &dev->replyWaitList)
   {
     currNode = list_entry(currHead, WaitNode, list);
     if (mhydra_get_trans_id(cmd) == (currNode->transId & SEQ_MASK)) {
       if (currNode->cmdNr == cmd->cmdNo) {
         memcpy(currNode->replyPtr, cmd, mhydra_cmd_size(cmd));
-        os_if_up_sema(&currNode->waitSemaphore);
+        complete(&currNode->waitCompletion);
       } else if (cmd->cmdNo == CMD_ERROR_EVENT) {
         if (currNode->error_event == DETECT_ERROR_EVENT) {
           currNode->error_event = ERROR_EVENT_DETECTED;
-          os_if_up_sema(&currNode->waitSemaphore);
+          complete(&currNode->waitCompletion);
         }
       }
     }
   }
-  os_if_spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
+  spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
 } // _handle_command
 
 
@@ -1597,16 +1815,11 @@ static unsigned short mhydra_get_trans_id (hydraHostCmd *cmd)
 //============================================================================
 // _send
 //
-# if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20)
-#  define USE_CONTEXT 1
-# else
-#  define USE_CONTEXT 0
-# endif
 
 #if USE_CONTEXT
 static void mhydra_send (void *context)
 #else
-static void mhydra_send (OS_IF_TASK_QUEUE_HANDLE *work)
+static void mhydra_send (struct work_struct *work)
 #endif
 {
   unsigned int     i;
@@ -1630,17 +1843,17 @@ static void mhydra_send (OS_IF_TASK_QUEUE_HANDLE *work)
 
   // Wait for a previous write to finish up; we don't use a timeout
   // and so a nonresponsive device can delay us indefinitely.
-  os_if_down_sema(&dev->write_finished);
+  wait_for_completion(&dev->write_finished);
 
   if (!dev->present) {
     // The device was unplugged before the file was released
     // We cannot deallocate here it is to early and handled elsewhere
-    os_if_up_sema(&dev->write_finished);
+    complete(&dev->write_finished);
     return;
   }
 
   // Do we have any cmd to send
-  DEBUGPRINT(5, (TXT("cmd queue length: %d)\n"), queue_length(&dev->txCmdQueue)));
+  DEBUGPRINT(5, (TXT("cmd queue length: %d\n"), queue_length(&dev->txCmdQueue)));
 
   if (!queue_empty(&dev->txCmdQueue)) {
     tx_needed = 1;
@@ -1671,7 +1884,7 @@ static void mhydra_send (OS_IF_TASK_QUEUE_HANDLE *work)
 
     if ((result = mhydra_transmit(vCard)) <= 0) {
       // The transmission failed - mark write as finished
-      os_if_up_sema(&dev->write_finished);
+      complete(&dev->write_finished);
     }
 
     // Wake up those who are waiting to send a cmd or msg
@@ -1690,11 +1903,11 @@ static void mhydra_send (OS_IF_TASK_QUEUE_HANDLE *work)
     if (result) {
       // Give ourselves a little extra work in case all the queues could not
       // be emptied this time.
-      os_if_queue_task_not_default_queue(dev->txTaskQ, &dev->txWork);
+      queue_work(dev->txTaskQ, &dev->txWork);
     }
   }
   else {
-    os_if_up_sema(&dev->write_finished);
+    complete(&dev->write_finished);
   }
 
   return;
@@ -1939,9 +2152,9 @@ static int mhydra_fill_usb_buffer (VCanCardData *vCard, unsigned char *buffer,
       }
 
       // Have to be here (after all the breaks and continues)
-      os_if_spin_lock(&mhydraChan->outTxLock);
+      spin_lock(&mhydraChan->outTxLock);
       mhydraChan->outstanding_tx++;
-      os_if_spin_unlock(&mhydraChan->outTxLock);
+      spin_unlock(&mhydraChan->outTxLock);
 
       DEBUGPRINT(5, (TXT("t mhydra, chan %d, out %d\n"),
                      j, mhydraChan->outstanding_tx));
@@ -2064,14 +2277,12 @@ static int mhydra_map_channels (VCanCardData* vCard) {
 //============================================================================
 // _get_card_info
 //
-static int mhydra_get_card_info_dummy (VCanCardData* vCard)
+static int device_request_firmware_info (VCanCardData* vCard)
 {
   MhydraCardData *dev = vCard->hwCardData;
   hydraHostCmd cmd;
   hydraHostCmd reply;
   int ret = VCAN_STAT_FAIL;
-
-  DEBUGPRINT(3, (TXT("mhydra: mhydra_get_card_info\n")));
 
   memset(&cmd, 0, sizeof(cmd));
   memset(&reply, 0, sizeof(reply));
@@ -2091,9 +2302,7 @@ static int mhydra_get_card_info_dummy (VCanCardData* vCard)
   // CMD_GET_SOFTWARE_INFO_REQ
   //
   cmd.cmdNo = CMD_GET_SOFTWARE_INFO_REQ;
-  // Enable extended format.
-  cmd.getSoftwareDetailsReq.useHydraExt = 1;
-
+  cmd.getSoftwareDetailsReq.useHydraExt = 1;     // Enable extended format.
   setDST(&cmd, ILLEGAL_HE);
 
   ret = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
@@ -2111,6 +2320,10 @@ static int mhydra_get_card_info_dummy (VCanCardData* vCard)
                                    CMD_GET_SOFTWARE_DETAILS_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
   if (ret != VCAN_STAT_OK)
     goto error_exit;
+
+  vCard->firmwareVersionMajor = reply.getSoftwareDetailsResp.swVersion >> 24;
+  vCard->firmwareVersionMinor = (reply.getSoftwareDetailsResp.swVersion >> 16) & 0xFF;
+  vCard->firmwareVersionBuild = reply.getSoftwareDetailsResp.swVersion & 0xFFFF;
 
   if (vCard->card_flags & DEVHND_CARD_AUTO_TX_OBJBUFS) {
     //
@@ -2143,17 +2356,19 @@ static void mhydra_response_timer (unsigned long voidWaitNode)
 {
   WaitNode *waitNode = (WaitNode *)voidWaitNode;
   waitNode->timedOut = 1;
-  os_if_up_sema(&waitNode->waitSemaphore);
+  complete(&waitNode->waitCompletion);
 } // response_timeout
 
 
 //============================================================================
 //  mhydra_send_and_wait_reply
-//  Send a hydraHostCmd and wait for the mhydra to answer.
+//  Send a hydraHostCmd and wait for the mhydra to answer with replyCmdNo.
 //
 static int mhydra_send_and_wait_reply (VCanCardData *vCard, hydraHostCmd *cmd,
-                                     hydraHostCmd *replyPtr, unsigned char cmdNr,
-                                       unsigned char transId, unsigned char error_event)
+                                       hydraHostCmd *replyPtr,
+                                       unsigned char replyCmdNo,
+                                       unsigned char transId,
+                                       unsigned char error_event)
 {
   MhydraCardData     *dev;
   struct timer_list  waitTimer;
@@ -2173,24 +2388,29 @@ static int mhydra_send_and_wait_reply (VCanCardData *vCard, hydraHostCmd *cmd,
     return VCAN_STAT_NO_DEVICE;
   }
 
-  os_if_init_sema(&waitNode.waitSemaphore);
+  init_completion(&waitNode.waitCompletion);
   waitNode.replyPtr  = replyPtr;
-  waitNode.cmdNr     = cmdNr;
+  waitNode.cmdNr     = replyCmdNo;
   waitNode.transId   = transId;
 
   waitNode.timedOut    = 0;
   waitNode.error_event = error_event;
 
+  // Reset data_count if we can get multiple packages in return
+  if (cmd->cmdNo == CMD_MEMO_GET_DATA) {
+    waitNode.data_count = 0;
+  }
+
   // Add to card's list of expected responses
-  os_if_spin_lock_irqsave(&dev->replyWaitListLock, &irqFlags);
+  spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
   list_add(&waitNode.list, &dev->replyWaitList);
-  os_if_spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
+  spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
 
   ret = mhydra_queue_cmd(vCard, cmd, MHYDRA_Q_CMD_WAIT_TIME);
   if (ret != 0) {
-    os_if_spin_lock_irqsave(&dev->replyWaitListLock, &irqFlags);
+    spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
     list_del(&waitNode.list);
-    os_if_spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
+    spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
     return ret;
   }
 
@@ -2201,16 +2421,16 @@ static int mhydra_send_and_wait_reply (VCanCardData *vCard, hydraHostCmd *cmd,
   waitTimer.expires   = jiffies + msecs_to_jiffies(MHYDRA_CMD_RESP_WAIT_TIME);
   add_timer(&waitTimer);
 
-  os_if_down_sema(&waitNode.waitSemaphore);
+  wait_for_completion(&waitNode.waitCompletion);
   // Now we either got a response or a timeout
-  os_if_spin_lock_irqsave(&dev->replyWaitListLock, &irqFlags);
+  spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
   list_del(&waitNode.list);
-  os_if_spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
+  spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
   del_timer_sync(&waitTimer);
 
   DEBUGPRINT(5, (TXT("after del timer\n")));
   if (waitNode.timedOut) {
-    DEBUGPRINT(2, (TXT("WARNING: waiting for response(%d) timed out! \n"),
+    DEBUGPRINT(1, (TXT("WARNING: waiting for response(%d) timed out! \n"),
                    waitNode.cmdNr));
     return VCAN_STAT_TIMEOUT;
   } else if (waitNode.error_event == ERROR_EVENT_DETECTED) {
@@ -2235,9 +2455,9 @@ static int mhydra_queue_cmd (VCanCardData *vCard, hydraHostCmd *cmd,
   MhydraCardData *dev  = vCard->hwCardData;
   int queuePos;
   // Using an unrolled sleep
-  OS_IF_WAITQUEUE wait;
+  wait_queue_t wait;
 
-  os_if_init_waitqueue_entry(&wait);
+  init_waitqueue_entry(&wait, current);
   queue_add_wait_for_space(&dev->txCmdQueue, &wait);
 
   // Sleep when buffer is full and timeout > 0
@@ -2245,7 +2465,7 @@ static int mhydra_queue_cmd (VCanCardData *vCard, hydraHostCmd *cmd,
     // We are indicated as interruptible
     DEBUGPRINT(5, (TXT("queue cmd len: %d\n"), queue_length(&dev->txCmdQueue)));
 
-    os_if_set_task_interruptible();
+    set_current_state(TASK_INTERRUPTIBLE);
 
     queuePos = queue_back(&dev->txCmdQueue);
     if (queuePos >= 0) {   // Did we actually find space in the queue?
@@ -2256,12 +2476,12 @@ static int mhydra_queue_cmd (VCanCardData *vCard, hydraHostCmd *cmd,
     // Do we want a timeout?
     if (timeout == 0) {
       // We shouldn't wait and thus we must be active
-      os_if_set_task_running();
+      set_current_state(TASK_RUNNING);
       queue_remove_wait_for_space(&dev->txCmdQueue, &wait);
       DEBUGPRINT(2, (TXT("ERROR 1 NO_RESOURCES\n")));
       return VCAN_STAT_NO_RESOURCES;
     } else {
-      if (os_if_wait_for_event_timeout(timeout, &wait) == 0) {
+      if (schedule_timeout(msecs_to_jiffies(timeout) + 1) == 0) {
         // Sleep was interrupted by timer
         queue_remove_wait_for_space(&dev->txCmdQueue, &wait);
         DEBUGPRINT(2, (TXT("ERROR 2 NO_RESOURCES\n")));
@@ -2270,14 +2490,14 @@ static int mhydra_queue_cmd (VCanCardData *vCard, hydraHostCmd *cmd,
     }
 
     // Are we interrupted by a signal?
-    if (os_if_signal_pending()) {
+    if (signal_pending(current)) {
       queue_remove_wait_for_space(&dev->txCmdQueue, &wait);
       DEBUGPRINT(2, (TXT("ERROR 3 SIGNALED\n")));
       return VCAN_STAT_SIGNALED;
     }
   }
 
-  os_if_set_task_running();
+  set_current_state(TASK_RUNNING);
   queue_remove_wait_for_space(&dev->txCmdQueue, &wait);
 
   // Get a pointer to the right bufferspace
@@ -2287,10 +2507,32 @@ static int mhydra_queue_cmd (VCanCardData *vCard, hydraHostCmd *cmd,
   queue_push(&dev->txCmdQueue);
 
   // Wake up the tx-thread
-  os_if_queue_task_not_default_queue(dev->txTaskQ, &dev->txWork);
+  queue_work(dev->txTaskQ, &dev->txWork);
 
   return VCAN_STAT_OK;
 } // _queue_cmd
+
+
+int setup_bulk_in_endpoint(struct usb_endpoint_descriptor  *endpoint,
+                           MhydraCardData *dev, int pipe_in_id)
+{
+  int stat = 0;
+  size_t buffer_size                = MAX_PACKET_IN;
+
+  dev->bulk_in[pipe_in_id].size          = buffer_size;
+  dev->bulk_in[pipe_in_id].endpointAddr  = endpoint->bEndpointAddress;
+  dev->bulk_in[pipe_in_id].buffer        = kmalloc(buffer_size, GFP_KERNEL);
+  dev->bulk_in[pipe_in_id].maxPacketSize = le16_to_cpu(endpoint->wMaxPacketSize);
+  DEBUGPRINT(2, (TXT("MaxPacketSize in (id:%d)= %d\n"),
+                 pipe_in_id, dev->bulk_in[pipe_in_id].maxPacketSize));
+  DEBUGPRINT(2, (TXT("MALLOC bulk_in_buffer\n")));
+  if (!dev->bulk_in[pipe_in_id].buffer) {
+    DEBUGPRINT(1, (TXT("Couldn't allocate bulk_in_buffer (id:%d)\n"), pipe_in_id));
+    return -1;
+  }
+  memset(dev->bulk_in[pipe_in_id].buffer, 0, buffer_size);
+  return stat;
+}
 
 
 //============================================================================
@@ -2311,6 +2553,8 @@ static int mhydra_plugin (struct usb_interface *interface,
   int                             retval = -ENOMEM;
   VCanCardData                    *vCard;
   MhydraCardData                    *dev;
+  int                             pipe_in_id = 0;
+  int                             stat;
 
   DEBUGPRINT(3, (TXT("mhydra: _plugin\n")));
 
@@ -2390,37 +2634,29 @@ static int mhydra_plugin (struct usb_interface *interface,
   }
 
   dev = vCard->hwCardData;
-  os_if_init_sema(&((MhydraCardData *)vCard->hwCardData)->sem);
   dev->udev = udev;
   dev->interface = interface;
   ticks_init (&vCard->ticks);
 
   // Set up the endpoint information
   // Check out the endpoints
-  // Use only the first bulk-in and bulk-out endpoints
+  // Use only the first NUM_IN_PIPES bulk-in and first bulk-out endpoints
   iface_desc = &interface->altsetting[0];
   for (i = 0; i < iface_desc->desc.bNumEndpoints; ++i) {
     endpoint = &iface_desc->endpoint[i].desc;
-
-    if (!dev->bulk_in_endpointAddr &&
+    if (!dev->bulk_in[pipe_in_id].endpointAddr &&
         (endpoint->bEndpointAddress & USB_DIR_IN) &&
         ((endpoint->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) ==
          USB_ENDPOINT_XFER_BULK)) {
-      // We found a bulk in endpoint
-      buffer_size                = MAX_PACKET_IN;
-      dev->bulk_in_size          = buffer_size;
-      dev->bulk_in_endpointAddr  = endpoint->bEndpointAddress;
-      dev->bulk_in_buffer        = os_if_kernel_malloc(buffer_size);
-      dev->bulk_in_MaxPacketSize = le16_to_cpu(endpoint->wMaxPacketSize);
-      DEBUGPRINT(2, (TXT("MaxPacketSize in = %d\n"),
-                     dev->bulk_in_MaxPacketSize));
-
-      DEBUGPRINT(2, (TXT("MALLOC bulk_in_buffer\n")));
-      if (!dev->bulk_in_buffer) {
-        DEBUGPRINT(1, (TXT("Couldn't allocate bulk_in_buffer\n")));
-        goto error;
+      // We found a bulk-in endpoint
+      if (pipe_in_id < NUM_IN_PIPES) {
+        stat = setup_bulk_in_endpoint(endpoint, dev, pipe_in_id);
+        if (stat != 0) {
+          DEBUGPRINT(1, (TXT("Failed setting up endpoint in, id %d\n"), pipe_in_id));
+          goto error;
+        }
+        pipe_in_id++;
       }
-      memset(dev->bulk_in_buffer, 0, buffer_size);
     }
 
     if (!dev->bulk_out_endpointAddr &&
@@ -2470,11 +2706,17 @@ static int mhydra_plugin (struct usb_interface *interface,
                         mhydra_write_bulk_callback, vCard);
     }
   }
-  if (!(dev->bulk_in_endpointAddr && dev->bulk_out_endpointAddr)) {
-    DEBUGPRINT(1, (TXT("Couldn't find both bulk-in and bulk-out endpoints\n")));
-    goto error;
+  for (i = 0; i < NUM_IN_PIPES; i++) {
+    if (!(dev->bulk_in[i].endpointAddr)) {
+      DEBUGPRINT(1, (TXT("Couldn't find endpoint bulk_in[%d]\n"), i));
+      goto error;
+    }
   }
 
+  if (!(dev->bulk_out_endpointAddr)) {
+    DEBUGPRINT(1, (TXT("Couldn't find bulk-out endpoints\n")));
+    goto error;
+  }
 
   // Allow device read, write and ioctl
   dev->present = 1;
@@ -2541,7 +2783,7 @@ static int mhydra_start (VCanCardData *vCard)
   dev = vCard->hwCardData;
 
   // Initialize queues/waitlists for commands
-  os_if_spin_lock_init(&dev->replyWaitListLock);
+  spin_lock_init(&dev->replyWaitListLock);
 
   INIT_LIST_HEAD(&dev->replyWaitList);
   queue_init(&dev->txCmdQueue, KV_MHYDRA_TX_CMD_BUF_SIZE);
@@ -2550,20 +2792,28 @@ static int mhydra_start (VCanCardData *vCard)
   for (i = 0; i < HYDRA_MAX_CARD_CHANNELS; i++) {
     VCanChanData  *vChd     = vCard->chanData[i];
     MhydraChanData  *mhydraChan = vChd->hwChanData;
-    os_if_spin_lock_init(&mhydraChan->outTxLock);
+    spin_lock_init(&mhydraChan->outTxLock);
   }
 
-  os_if_init_sema(&dev->write_finished);
-  os_if_up_sema(&dev->write_finished);
+  init_completion(&dev->write_finished);
+  complete(&dev->write_finished);
 
-  os_if_init_task(&dev->txWork, &mhydra_send, vCard);
-  dev->txTaskQ = os_if_declare_task("mhydra_tx", &dev->txWork);
+  // init_completion(&dev->bulk_in_1_data_read);
+  init_completion(&dev->bulk_in_1_data_valid);
 
-  os_if_kernel_thread(mhydra_rx_thread, vCard);
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20))
+  INIT_WORK(&dev->txWork, mhydra_send, vCard);
+  INIT_WORK(&dev->memoBulkWork, mhydra_memo_bulk, vCard);
+#else
+ INIT_WORK(&dev->txWork, mhydra_send);
+  INIT_WORK(&dev->memoBulkWork, mhydra_memo_bulk);
+#endif
+  dev->txTaskQ = create_workqueue("mhydra_tx");
+  dev->memoBulkQ = create_workqueue("mhydra_bulk");
 
+  kthread_run(mhydra_rx_thread, vCard, "Kvaser kernel thread");
   mhydra_map_channels(vCard);
-
-  ret = mhydra_get_card_info_dummy(vCard);
+  ret = device_request_firmware_info(vCard);
   if (ret != VCAN_STAT_OK)
     goto error_exit;
 
@@ -2601,7 +2851,7 @@ static int mhydra_start (VCanCardData *vCard)
                         HYDRA_MAX_CARD_CHANNELS);
 
   // Set all channels in normal mode by default.
-  for (i = 0; i < HYDRA_MAX_CARD_CHANNELS; i++) {
+  for (i = 0; i < vCard->nrChannels; i++) {
     int r;
     hydraHostCmd cmd;
 
@@ -2642,7 +2892,7 @@ static int mhydra_allocate (VCanCardData **in_vCard)
   DEBUGPRINT(3, (TXT("mhydra: _allocate\n")));
 
   // Allocate data area for this card
-  vCard = os_if_kernel_malloc(sizeof(VCanCardData) + sizeof(MhydraCardData));
+  vCard = kmalloc(sizeof(VCanCardData) + sizeof(MhydraCardData), GFP_KERNEL);
   DEBUGPRINT(2, (TXT("MALLOC _allocate\n")));
   if (!vCard) {
     DEBUGPRINT(1, (TXT("alloc error\n")));
@@ -2654,7 +2904,7 @@ static int mhydra_allocate (VCanCardData **in_vCard)
   vCard->hwCardData = vCard + 1;
 
   // Allocate memory for n channels
-  chs = os_if_kernel_malloc(sizeof(ChanHelperStruct));
+  chs = kmalloc(sizeof(ChanHelperStruct), GFP_KERNEL);
   DEBUGPRINT(2, (TXT("MALLOC _alloc helperstruct\n")));
   if (!chs) {
     DEBUGPRINT(1, (TXT("chan alloc error\n")));
@@ -2671,18 +2921,18 @@ static int mhydra_allocate (VCanCardData **in_vCard)
   }
   vCard->chanData = chs->dataPtrArray;
 
-  os_if_spin_lock(&driverData.canCardsLock);
+  spin_lock(&driverData.canCardsLock);
   // Insert into list of cards
   vCard->next = driverData.canCards;
   driverData.canCards = vCard;
-  os_if_spin_unlock(&driverData.canCardsLock);
+  spin_unlock(&driverData.canCardsLock);
 
   *in_vCard = vCard;
 
   return VCAN_STAT_OK;
 
 chan_alloc_err:
-  os_if_kernel_free(vCard);
+  kfree(vCard);
 
 card_alloc_err:
 
@@ -2698,29 +2948,34 @@ static void mhydra_deallocate (VCanCardData *vCard)
   MhydraCardData *dev = vCard->hwCardData;
   VCanCardData *local_vCard;
   int i;
+  int pipe_id = 0;
 
   DEBUGPRINT(3, (TXT("mhydra: _deallocate\n")));
 
   // Make sure all workqueues are finished
   //flush_workqueue(&dev->txTaskQ);
-
-  if (dev->bulk_in_buffer != NULL) {
-    os_if_kernel_free(dev->bulk_in_buffer);
-    DEBUGPRINT(2, (TXT("Free bulk_in_buffer\n")));
-    dev->bulk_in_buffer = NULL;
+  for (pipe_id = 0; pipe_id < NUM_IN_PIPES; pipe_id++) {
+    if (dev->bulk_in[pipe_id].buffer != NULL) {
+      kfree(dev->bulk_in[pipe_id].buffer);
+      DEBUGPRINT(2, (TXT("Free bulk_in_buffer[%d]\n"), pipe_id));
+      dev->bulk_in[pipe_id].buffer = NULL;
+    }
   }
-#  if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 35))
+  // Instruct memo bulk thread to exit read loop
+  //complete(&dev->bulk_in_1_data_read);
+
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 35))
   usb_buffer_free(dev->udev, dev->bulk_out_size,
                   dev->bulk_out_buffer,
                   dev->write_urb->transfer_dma);
-#  else
+#else
   usb_free_coherent(dev->udev, dev->bulk_out_size,
                     dev->bulk_out_buffer,
                     dev->write_urb->transfer_dma);
-#  endif
+#endif
   usb_free_urb(dev->write_urb);
 
-  os_if_spin_lock(&driverData.canCardsLock);
+  spin_lock(&driverData.canCardsLock);
 
   local_vCard = driverData.canCards;
 
@@ -2748,32 +3003,32 @@ static void mhydra_deallocate (VCanCardData *vCard)
     }
   }
 
-  os_if_spin_unlock(&driverData.canCardsLock);
+  spin_unlock(&driverData.canCardsLock);
 
   for(i = 0; i < HYDRA_MAX_CARD_CHANNELS; i++) {
     VCanChanData *vChd     = vCard->chanData[i];
     MhydraChanData *mhydraChan = vChd->hwChanData;
     if (mhydraChan->objbufs) {
       DEBUGPRINT(2, (TXT("Free vCard->chanData[i]->hwChanData->objbufs[%d]\n"), i));
-      os_if_kernel_free(mhydraChan->objbufs);
+      kfree(mhydraChan->objbufs);
       mhydraChan->objbufs = NULL;
     }
   }
   if (vCard->chanData != NULL) {
     DEBUGPRINT(2, (TXT("Free vCard->chanData\n")));
-    os_if_kernel_free(vCard->chanData);
+    kfree(vCard->chanData);
     vCard->chanData = NULL;
   }
   DEBUGPRINT(2, (TXT("Free vCard\n")));
-  os_if_kernel_free(vCard);    // Also frees hwCardData (allocated together)
+  kfree(vCard);    // Also frees hwCardData (allocated together)
 } // _deallocate
 
 
-#  if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 8))
-#    define USB_KILL_URB(x) usb_unlink_urb(x)
-#  else
-#    define USB_KILL_URB(x) usb_kill_urb(x)
-#  endif
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 8))
+# define USB_KILL_URB(x) usb_unlink_urb(x)
+#else
+# define USB_KILL_URB(x) usb_kill_urb(x)
+#endif
 
 //============================================================================
 //     mhydra_remove
@@ -2809,8 +3064,8 @@ static void mhydra_remove (struct usb_interface *interface)
     vChan = vCard->chanData[i];
     DEBUGPRINT(3, (TXT("Waiting for all closed on minor %d\n"), vChan->minorNr));
     while (atomic_read(&vChan->fileOpenCount) > 0) {
-      os_if_set_task_uninterruptible ();
-      os_if_wait_for_event_timeout_simple(10);
+      set_current_state(TASK_UNINTERRUPTIBLE);
+      schedule_timeout(msecs_to_jiffies(10));
     }
   }
 
@@ -2822,21 +3077,12 @@ static void mhydra_remove (struct usb_interface *interface)
   DEBUGPRINT(6, (TXT("Ongoing write terminated\n")));
   USB_KILL_URB(dev->write_urb);
   DEBUGPRINT(6, (TXT("Unlinking urb\n")));
-  os_if_down_sema(&dev->write_finished);
-
-  // Remove spin locks
-  for (i = 0; i < HYDRA_MAX_CARD_CHANNELS; i++) {
-    VCanChanData   *vChd     = vCard->chanData[i];
-    MhydraChanData   *mhydraChan = vChd->hwChanData;
-    os_if_spin_lock_remove(&mhydraChan->outTxLock);
-  }
+  wait_for_completion(&dev->write_finished);
 
   // Flush and destroy tx workqueue
   DEBUGPRINT(2, (TXT("destroy_workqueue\n")));
-  os_if_destroy_task(dev->txTaskQ);
-
-  os_if_delete_sema(&dev->write_finished);
-  os_if_spin_lock_remove(&dev->replyWaitListLock);
+  destroy_workqueue(dev->txTaskQ);
+  destroy_workqueue(dev->memoBulkQ);
 
   driverData.noOfDevices -= vCard->nrChannels;
 
@@ -3109,9 +3355,9 @@ static int mhydra_bus_on (VCanChanData *vChan)
 
   memset(((MhydraChanData *)vChan->hwChanData)->current_tx_message, 0, sizeof(((MhydraChanData *)vChan->hwChanData)->current_tx_message));
   atomic_set(&vChan->transId, 1);
-  os_if_spin_lock(&mhydraChan->outTxLock);
+  spin_lock(&mhydraChan->outTxLock);
   mhydraChan->outstanding_tx = 0;
-  os_if_spin_unlock(&mhydraChan->outTxLock);
+  spin_unlock(&mhydraChan->outTxLock);
 
   cmd.cmdNo = CMD_START_CHIP_REQ;
   setDST(&cmd, dev->channel2he[vChan->channel]);
@@ -3162,14 +3408,14 @@ static int mhydra_bus_off (VCanChanData *vChan)
     vChan->chipState.state = CHIPSTAT_BUSOFF;
     memset(mhydraChan->current_tx_message, 0, sizeof(mhydraChan->current_tx_message));
 
-    os_if_spin_lock(&mhydraChan->outTxLock);
+    spin_lock(&mhydraChan->outTxLock);
     mhydraChan->outstanding_tx = 0;
-    os_if_spin_unlock(&mhydraChan->outTxLock);
+    spin_unlock(&mhydraChan->outTxLock);
 
     atomic_set(&vChan->transId, 1);
   }
 
-  return ret;
+  return vCanFlushSendBuffer (vChan);
 } // _bus_off
 
 
@@ -3213,11 +3459,9 @@ static int mhydra_flush_tx_buffer (VCanChanData *vChan)
   // a message from the queue, increasing outstanding_tx after our clear.
   // With a cleared queue, the transmit code will not be doing anything.
   queue_reinit(&vChan->txChanQueue);
-  os_if_spin_lock(&mhydraChan->outTxLock);
+  spin_lock(&mhydraChan->outTxLock);
   mhydraChan->outstanding_tx = 0;
-  os_if_spin_unlock(&mhydraChan->outTxLock);
-
-//  ret = mhydra_queue_cmd(vChan->vCard, &cmd, 5 /* There is no response */);
+  spin_unlock(&mhydraChan->outTxLock);
 
   ret = mhydra_send_and_wait_reply(vChan->vCard, (hydraHostCmd *)&cmd, &reply,
                                    CMD_FLUSH_QUEUE_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
@@ -3227,9 +3471,9 @@ static int mhydra_flush_tx_buffer (VCanChanData *vChan)
     atomic_set(&vChan->transId, 1);
     // Do this once more, for good measure.
     queue_reinit(&vChan->txChanQueue);
-    os_if_spin_lock(&mhydraChan->outTxLock);
+    spin_lock(&mhydraChan->outTxLock);
     mhydraChan->outstanding_tx = 0;
-    os_if_spin_unlock(&mhydraChan->outTxLock);
+    spin_unlock(&mhydraChan->outTxLock);
   }
 
   return ret;
@@ -3247,7 +3491,7 @@ static void mhydra_schedule_send (VCanCardData *vCard, VCanChanData *vChan)
   DEBUGPRINT(3, (TXT("mhydra: _schedule_send\n")));
 
   if (mhydra_tx_available(vChan) && dev->present) {
-    os_if_queue_task_not_default_queue(dev->txTaskQ, &dev->txWork);
+    queue_work(dev->txTaskQ, &dev->txWork);
   }
 #if DEBUG
   else {
@@ -3304,9 +3548,9 @@ static unsigned long mhydra_get_hw_tx_q_len (VCanChanData *vChan)
 
   DEBUGPRINT(3, (TXT("mhydra: _get_hw_tx_q_len\n")));
 
-  os_if_spin_lock(&hChd->outTxLock);
+  spin_lock(&hChd->outTxLock);
   res = hChd->outstanding_tx;
-  os_if_spin_unlock(&hChd->outTxLock);
+  spin_unlock(&hChd->outTxLock);
 
   return res;
 } // _get_hw_tx_q_len
@@ -3319,7 +3563,7 @@ static unsigned long mhydra_get_hw_tx_q_len (VCanChanData *vChan)
 //
 // Run when driver is loaded
 //
-static int INIT mhydra_init_driver (void)
+static int mhydra_init_driver (void)
 {
   int result;
 
@@ -3343,7 +3587,7 @@ static int INIT mhydra_init_driver (void)
 //======================================================================
 // Run when driver is unloaded
 //
-static int EXIT mhydra_close_all (void)
+static int mhydra_close_all (void)
 {
   DEBUGPRINT(2, (TXT("mhydra: _close_all (deregister driver..)\n")));
   usb_deregister(&mhydra_driver);
@@ -3388,9 +3632,9 @@ static int mhydra_tx_available (VCanChanData *vChan)
   DEBUGPRINT(3, (TXT("mhydra: _tx_available %d (%d)!\n"),
                  mhydraChan->outstanding_tx, dev->max_outstanding_tx));
 
-  os_if_spin_lock(&mhydraChan->outTxLock);
+  spin_lock(&mhydraChan->outTxLock);
   res = mhydraChan->outstanding_tx;
-  os_if_spin_unlock(&mhydraChan->outTxLock);
+  spin_unlock(&mhydraChan->outTxLock);
 
   return (res < dev->max_outstanding_tx);
 } // _tx_available
@@ -3407,9 +3651,9 @@ static int mhydra_outstanding_sync (VCanChanData *vChan)
   DEBUGPRINT(3, (TXT("mhydra: _outstanding_sync (%d)\n"),
                  mhydraChan->outstanding_tx));
 
-  os_if_spin_lock(&mhydraChan->outTxLock);
+  spin_lock(&mhydraChan->outTxLock);
   res = mhydraChan->outstanding_tx;
-  os_if_spin_unlock(&mhydraChan->outTxLock);
+  spin_unlock(&mhydraChan->outTxLock);
 
   return (res == 0);
 } // _outstanding_sync
@@ -3419,7 +3663,7 @@ static int mhydra_outstanding_sync (VCanChanData *vChan)
 //======================================================================
 // Get time
 //
-static int mhydra_get_time (VCanCardData *vCard, unsigned long *time)
+static int mhydra_get_time (VCanCardData *vCard, uint64_t *time)
 {
   hydraHostCmd cmd;
   hydraHostCmd reply;
@@ -3437,7 +3681,13 @@ static int mhydra_get_time (VCanCardData *vCard, unsigned long *time)
   ret = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
                                    CMD_READ_CLOCK_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
   if (ret == VCAN_STAT_OK) {
-    *time = ticks_to_10us(vCard, *(uint64_t*)reply.readClockResp.time);
+    uint64_t ticks;
+    ticks = reply.readClockResp.time[2];
+    ticks <<= 16;
+    ticks += reply.readClockResp.time[1];
+    ticks <<= 16;
+    ticks += reply.readClockResp.time[0];
+    *time = ticks_to_10us(vCard, ticks);
   }
 
   return ret;
@@ -3520,7 +3770,7 @@ static int mhydra_objbuf_alloc (VCanChanData *chd, int bufType, int *bufNo)
 
   if (!mhydraChan->objbufs) {
     DEBUGPRINT(4, (TXT("Allocating mhydraChan->objbufs[]\n")));
-    mhydraChan->objbufs = os_if_kernel_malloc(sizeof(OBJECT_BUFFER) * dev->autoTxBufferCount);
+    mhydraChan->objbufs = kmalloc(sizeof(OBJECT_BUFFER) * dev->autoTxBufferCount, GFP_KERNEL);
     if (!mhydraChan->objbufs) {
       return VCAN_STAT_NO_MEMORY;
     }
@@ -4007,6 +4257,105 @@ static int mhydra_capabilities (VCanCardData *vCard, uint32_t vcan_cmd) {
 }
 
 
+static int mhydra_get_card_info(VCanCardData *vCard, VCAN_IOCTL_CARD_INFO *ci)
+{
+  hydraHostCmd cmd;
+  hydraHostCmd reply;
+  int r;
+
+  memset(&cmd, 0, sizeof(cmd));
+  memset(&reply, 0, sizeof(reply));
+
+  // Get EAN and serial number
+  cmd.cmdNo = CMD_GET_CARD_INFO_REQ;
+  setDST(&cmd, ILLEGAL_HE);
+  r = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
+                                 CMD_GET_CARD_INFO_RESP, getSEQ(&cmd),
+                                 SKIP_ERROR_EVENT);
+  if (r != VCAN_STAT_OK)
+    return r;
+
+  // VCard->firmwareVersionMajor?
+  // VCard->firmwareVersionMinor?
+  // VCard->firmwareVersionBuild?
+  // VCard->default_max_bitrate?
+  vCard->serialNumber = reply.getCardInfoResp.serialNumber;
+  memcpy(vCard->ean, reply.getCardInfoResp.EAN, sizeof vCard->ean);
+
+  // ci->card_name [MAX_IOCTL_CARD_NAME + 1]
+  // ci->driver_name [MAX_IOCTL_DRIVER_NAME + 1]
+  // ci->hardware_type
+  // ci->driver_version_major
+  // ci->driver_version_minor
+  // ci->driver_version_build
+  // ci->license_mask1
+  // ci->license_mask2
+  // ci->card_number
+  // ci->timer_rate
+  // ci->vendor_name [MAX_IOCTL_VENDOR_NAME + 1]
+  // ci->channel_prefix [MAX_IOCTL_CHANNEL_PREFIX +1]
+  // ci->product_version_major
+  // ci->product_version_minor
+  // ci->product_version_minor_letter
+
+  ci->serial_number = vCard->serialNumber;
+  ci->hardware_rev_major = reply.getCardInfoResp.hwRevision;
+  ci->hardware_rev_minor = 0;
+  ci->channel_count = reply.getCardInfoResp.channelCount;
+
+  memset(&reply, 0, sizeof(reply));
+  cmd.cmdNo = CMD_GET_SOFTWARE_DETAILS_REQ;
+  setDST(&cmd, ILLEGAL_HE);
+  r = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
+                                 CMD_GET_SOFTWARE_DETAILS_RESP, getSEQ(&cmd),
+                                 SKIP_ERROR_EVENT);
+  if (r != VCAN_STAT_OK)
+    return r;
+
+  ci->firmware_version_major = reply.getSoftwareDetailsResp.swVersion >> 24;
+  ci->firmware_version_minor = (reply.getSoftwareDetailsResp.swVersion >> 16) & 0xFF;
+  ci->firmware_version_build = reply.getSoftwareDetailsResp.swVersion & 0xFFFF;
+  ci->max_bitrate = reply.getSoftwareDetailsResp.maxBitrate;
+  return r;
+}
+
+
+static int mhydra_get_card_info_2(VCanCardData *vCard, KCAN_IOCTL_CARD_INFO_2 *ci)
+{
+  hydraHostCmd cmd;
+  hydraHostCmd reply;
+  int r;
+
+  memset(&cmd, 0, sizeof(cmd));
+  memset(&reply, 0, sizeof(reply));
+  memset(ci, 0 , sizeof(KCAN_IOCTL_CARD_INFO_2));
+
+  cmd.cmdNo = CMD_GET_CARD_INFO_REQ;
+  setDST(&cmd, ILLEGAL_HE);
+  r = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
+                                 CMD_GET_CARD_INFO_RESP, getSEQ(&cmd),
+                                 SKIP_ERROR_EVENT);
+  if (r != VCAN_STAT_OK) {
+    return r;
+  }
+
+  // ci->hardware_address
+  // ci->ui_number
+  // ci->card_flags
+  // ci->driver_flags      // KCAN_DRVFLAG_xxx
+  // ci->pcb_id[32];       // e.g. P023B002V1-2 (see doc Q023-059)
+  // ci->usb_throttle;     // Enforced delay between transmission of commands.
+
+  memcpy(ci->ean, reply.getCardInfoResp.EAN, sizeof(reply.getCardInfoResp.EAN));
+  ci->usb_speed = reply.getCardInfoResp.usbHsMode;
+  DEBUGPRINT(2, (TXT("usb_speed: %d\n"), reply.getCardInfoResp.usbHsMode));
+  ci->mfgdate = reply.getCardInfoResp.mfgDate;
+
+
+  return r;
+}
+
+
 
 /***************************************************************************/
 #define ID_HW                   (unsigned short)0xfff0
@@ -4062,6 +4411,309 @@ static int mhydra_read_parameter(const VCanChanData * const vChan,
 }
 
 /***************************************************************************/
+static int mhydra_get_card_info_misc(const VCanChanData *chd, int *value, int type)
+{
+  int r = 0;
+  hydraHostCmd cmd;
+  hydraHostCmd reply;
+  
+  memset(&cmd, 0, sizeof(cmd));
+  
+  cmd.cmdNo = CMD_GET_CAPABILITIES_REQ;
+  setDST(&cmd, chd->vCard->sysdbg_he);
+  cmd.capabilitiesReq.subData.channel = (uint16_t)chd->channel;
+  
+  switch (type) {
+    case KCAN_IOCTL_MISC_INFO_WEBSERVER_TYPE:    
+    case KCAN_IOCTL_MISC_INFO_REMOTE_TYPE:
+      cmd.capabilitiesReq.subCmdNo = CAP_SUB_CMD_REMOTE_INFO;
+      break;
+    case KCAN_IOCTL_MISC_INFO_LOGGER_TYPE:
+      cmd.capabilitiesReq.subCmdNo = CAP_SUB_CMD_GET_LOGGER_INFO;
+      break;
+    default:
+      r = -1;
+  }
+  
+  if (r != 0) {
+    r = mhydra_send_and_wait_reply(chd->vCard, &cmd, &reply,
+                               CMD_GET_CAPABILITIES_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
+    if (r == VCAN_STAT_OK) {
+      switch (type) {
+        case KCAN_IOCTL_MISC_INFO_WEBSERVER_TYPE:
+          *value = cmd.capabilitiesResp.remoteInfo.webServer != 0 ? 
+             KCAN_IOCTL_MISC_INFO_REMOTE_WEBSERVER_V1: 
+             KCAN_IOCTL_MISC_INFO_NOT_IMPLEMENTED;
+        break;
+        case KCAN_IOCTL_MISC_INFO_REMOTE_TYPE:
+          *value = cmd.capabilitiesResp.remoteInfo.remoteType;
+      }
+    }
+  }
+  
+  
+  return r;
+}
+
+/***************************************************************************/
+static int mhydra_flash_leds(const VCanChanData *chd, int action, int timeout)
+{
+  int r = 0;
+  hydraHostCmd cmd;
+  hydraHostCmd reply;
+
+  memset(&cmd, 0, sizeof(cmd));
+
+  cmd.cmdNo = CMD_LED_ACTION_REQ;
+  setDST(&cmd, chd->vCard->sysdbg_he);
+  cmd.ledActionReq.subCmd = action;
+  cmd.ledActionReq.timeout = timeout;
+  r = mhydra_send_and_wait_reply(chd->vCard, &cmd, &reply,
+                                 CMD_LED_ACTION_RESP,
+                                 getSEQ(&cmd),
+                                 SKIP_ERROR_EVENT);
+  return r;
+}
+
+/***************************************************************************/
+static int mhydra_memo_config_mode(const VCanChanData *chd, int interval)
+{
+  int r = 0;
+  hydraHostCmd cmd;
+  hydraHostCmd reply;
+
+  memset(&cmd, 0, sizeof(cmd));
+
+  cmd.cmdNo = CMD_MEMO_CONFIG_MODE;
+  DEBUGPRINT(4, (TXT("mhydra_memo_config_mode, interval: %d\n"),
+                 interval));
+  setDST(&cmd, ILLEGAL_HE);
+  cmd.memoConfigModeReq.interval = interval;
+  r = mhydra_send_and_wait_reply(chd->vCard, &cmd, &reply,
+                                 CMD_MEMO_CONFIG_MODE,
+                                 getSEQ(&cmd),
+                                 SKIP_ERROR_EVENT);
+  if (r != VCAN_STAT_OK) {
+    return r;
+  }
+
+  // Unused reply from device
+  // *diskStat = reply.memoConfigModeResp.diskStat;
+  // *configMode = reply.memoConfigModeResp.configMode;
+  return r;
+}
+
+size_t minSize(size_t sourceSize, size_t destSize)
+{
+  return (destSize <= sourceSize ? destSize : sourceSize);
+}
+
+/***************************************************************************/
+// From memo_get_data_internal()
+static int mhydra_memo_get_data(const VCanChanData *chd, int subcmd,
+                                void *buf, int bufsiz,
+                                unsigned long data1, unsigned short data2,
+                                int *stat, int *dstat, int *lstat
+                                )
+{
+  VCanCardData    *vCard = chd->vCard;
+  MhydraCardData  *dev = chd->vCard->hwCardData;
+  int r = 0;
+  hydraHostCmd cmd;
+  hydraHostCmd reply;
+  size_t len;
+  int bulk_data_is_arriving = 0;
+  // memo bulk 'fat pipe' uses bulk_in[1]
+
+  // No mutex is needed here since the ioctl call on a higher level is locked
+  DEBUGPRINT(4, (TXT("mhydra_memo_get_data, data1: %lu, data2: %d, bufsiz: %d\n"),
+                 data1, data2, bufsiz));
+
+  if (subcmd == MEMO_SUBCMD_FASTREAD_LOGICAL_SECTOR ||
+      subcmd == MEMO_SUBCMD_FASTREAD_PHYSICAL_SECTOR) {
+    // Let memo bulk thread start reading from USB
+    dev->bulk_in[1].size = bufsiz;
+    DEBUGPRINT(4, (TXT("Expected number of data, dev->bulk_in[1].size: %zu\n"),
+                   dev->bulk_in[1].size));
+    queue_work(dev->memoBulkQ, &dev->memoBulkWork);
+    bulk_data_is_arriving = 1;
+  } else if (data2 > 1) {
+    // When in "slow" mode, the application should never ask for more than a
+    // single sector at a time
+    DEBUGPRINT(1, (TXT("Error: We need multiple data packages and fast was not an option (data2:%d)\n"),
+                   data2));
+  }
+
+  // Request data by sending hydra_command and wait for reply
+  memset(&cmd, 0, sizeof(cmd));
+  cmd.cmdNo = CMD_MEMO_GET_DATA;
+  setDST(&cmd, ILLEGAL_HE);
+  setSEQ(&cmd, (unsigned char)atomic_read(&chd->transId));
+  cmd.memoGetDataReq.subCmd = (unsigned char) subcmd;
+  cmd.memoGetDataReq.data1 = data1;
+  cmd.memoGetDataReq.data2 = data2;
+
+  len = minSize(bufsiz, sizeof(cmd.memoGetDataReq.data));
+  DEBUGPRINT(4, (TXT ("mhydra_memo_get_data subcommand:%d, bufsize:%d, data1:%lu, data2:%d\n"),
+                 subcmd, bufsiz, data1, data2));
+  memcpy(cmd.memoGetDataReq.data, buf, len);
+  r = mhydra_send_and_wait_reply(vCard, &cmd, &reply,
+                                 CMD_MEMO_GET_DATA,
+                                 getSEQ(&cmd),
+                                 SKIP_ERROR_EVENT);
+  if (r != VCAN_STAT_OK) {
+    DEBUGPRINT(1, (TXT("ERROR: mhydra_send_and_wait_reply returned %d\n"), r));
+    return r;
+  }
+
+  if (bulk_data_is_arriving) {
+    unsigned long timeout;
+    unsigned long remaining_time = 10;
+
+    // Wait for valid flag
+    timeout = msecs_to_jiffies(3000);
+    remaining_time = wait_for_completion_timeout(&dev->bulk_in_1_data_valid, timeout);
+    // We have data if no timeout was given
+    if (remaining_time > 0) {
+      int dataSize = dev->bulk_in[1].size < bufsiz ? dev->bulk_in[1].size : bufsiz;
+      memcpy(buf, dev->bulk_in[1].buffer, dataSize);
+    } else {
+      DEBUGPRINT(1, (TXT("ERROR: mhydra_memo_get_data: Timeout waiting for bulk data\n")));
+    }
+  } else {
+    if (stat) *stat = reply.memoGetDataResp.status;
+    switch (reply.memoGetDataResp.status) {
+      case MEMO_STATUS_SUCCESS:
+        // Data has arrived and all is well
+        if (dstat) *dstat = 0;
+        if (lstat) *lstat = 0;
+        {
+          int dataSize = dev->bulk_in[1].size < bufsiz ? dev->bulk_in[1].size : bufsiz;
+          memcpy(buf, dev->bulk_in[1].buffer, dataSize);
+        }
+        break;
+
+      case MEMO_STATUS_FAILED:
+        // We got a package telling us what went wrong, pass that info along
+        if (dstat) *dstat = reply.memoGetDataResp.data[0];  // data[0] holds dioStat
+        if (lstat) *lstat = reply.memoGetDataResp.data[1];  // data[1] holds lioStat
+        if (stat) *stat = MEMO_STATUS_SUCCESS;
+        break;
+
+      case MEMO_STATUS_MORE_DATA:
+        // We somehow missed this when receiving the data...
+        DEBUGPRINT(1, (TXT("ERROR: Unexpected MEMO_STATUS_MORE_DATA in mhydra_memo_get_data\n")));
+        break;
+
+      case MEMO_STATUS_EOF:
+        DEBUGPRINT(1, (TXT("ERROR: mhydra_memo_get_data: MEMO_STATUS_EOF not implemented!\n")));
+        break;
+
+      default:
+        DEBUGPRINT(1, (TXT("ERROR: mhydra_memo_get_data: Unknown reply: %d!\n"),
+                       reply.memoGetDataResp.status));
+        break;
+      }
+  }
+
+  return r;
+}
+/***************************************************************************/
+// From memo_put_data_internal()
+static int mhydra_memo_put_data(const VCanChanData *chd, int subcmd,
+                                void *buf, int bufsiz,
+                                unsigned long data1, unsigned short data2,
+                                int *stat, int *dstat, int *lstat)
+{
+  VCanCardData    *vCard = chd->vCard;
+  int r = 0;
+  unsigned int  offset=0;
+  unsigned char *bufp = buf;
+  unsigned char transId;
+  hydraHostCmd cmd;
+  hydraHostCmd reply;
+  size_t len;
+
+  transId = atomic_read(&chd->transId);
+  if ((data1 != 0) || (data2 != 0)) {
+    // Sending a start command first
+    memset(&cmd, 0, sizeof(cmd));
+    cmd.cmdNo    = CMD_MEMO_PUT_DATA_START;
+    setDST(&cmd, ILLEGAL_HE);
+    setSEQ(&cmd, transId);
+    cmd.memoPutDataStartReq.subCmd = (unsigned char) subcmd;
+    cmd.memoPutDataStartReq.data1 = data1;
+    cmd.memoPutDataStartReq.data2 = data2;
+    r = mhydra_queue_cmd(vCard, &cmd, MHYDRA_Q_CMD_WAIT_TIME);
+    if (r != VCAN_STAT_OK) {
+      DEBUGPRINT(1, (TXT("ERROR: mhydra_queue_cmd PUT_DATA_START returned %d\n"), r));
+      return r;
+    }
+  }
+
+  DEBUGPRINT(4, (TXT ("mhydra_memo_put_data subcommand:%d\n"),
+                 subcmd));
+  while (r == 0 && (offset < (unsigned) bufsiz)) {
+    memset(&cmd, 0, sizeof(cmd));
+    len = min((int) (bufsiz - offset), (int) sizeof(cmd.memoPutDataReq.data));
+    cmd.cmdNo = CMD_MEMO_PUT_DATA;
+    setDST(&cmd, ILLEGAL_HE);
+    setSEQ(&cmd, transId);
+    cmd.memoPutDataReq.subCmd = (unsigned char) subcmd;
+    cmd.memoPutDataReq.dataLen = len;
+    cmd.memoPutDataReq.offset = (unsigned short) offset;
+    
+    DEBUGPRINT(4, (TXT("mhydra_memo_put_data, data1: %lu, data2: %d, bufsiz: %d, len: %zu, offset: %d\n"),
+                 data1, data2, bufsiz, len, offset));
+
+    memcpy(cmd.memoPutDataReq.data, bufp, len);
+    if (offset < (bufsiz - sizeof(cmd.memoPutDataReq.data))) {
+      r = mhydra_queue_cmd(vCard, &cmd, MHYDRA_Q_CMD_WAIT_TIME);
+      if (r != VCAN_STAT_OK) {
+        DEBUGPRINT(1, (TXT("ERROR: mhydra_queue_cmd PUT_DATA returned %d\n"), r));
+        return r;
+      }
+    }
+    else
+    {
+      r = mhydra_send_and_wait_reply(vCard, &cmd, &reply,
+                                   CMD_MEMO_PUT_DATA,
+                                   getSEQ(&cmd),
+                                   SKIP_ERROR_EVENT);
+      if (r != VCAN_STAT_OK) {
+        DEBUGPRINT(1, (TXT("ERROR: mhydra_send_and_wait_reply returned %d\n"), r));
+        return r;
+      }
+
+      if (stat) *stat = reply.memoPutDataResp.status;
+
+      if (reply.memoGetDataResp.status == MEMO_STATUS_SUCCESS) {
+        if (dstat) *dstat = 0;
+        if (lstat) *dstat = 0;
+      } else if (reply.memoGetDataResp.status == MEMO_STATUS_FAILED) {
+        // we let the status be success on purpose because MEMO_STATUS_FAILED is not an error in that sense
+        if (dstat) *dstat = reply.memoPutDataResp.data[0];  // data[0] holds dioStat
+        if (lstat) *lstat = reply.memoPutDataResp.data[1];  // data[1] holds lioStat
+      } else if (reply.memoGetDataResp.status == MEMO_STATUS_EOF) {
+        DEBUGPRINT(1, (TXT("mhydra_memo_get_data: MEMO_STATUS_EOF not implemented!)\n")));
+      } else if (reply.memoGetDataResp.status == MEMO_STATUS_MORE_DATA) {
+        DEBUGPRINT(1, (TXT("mhydra_memo_get_data: MEMO_STATUS_MORE_DATA not implemented!)\n")));
+      } else if (reply.memoGetDataResp.status == MEMO_STATUS_UNKNOWN_COMMAND) {
+        DEBUGPRINT(1, (TXT("mhydra_memo_get_data: MEMO_STATUS_UNKNOWN_COMMAND)\n")));
+      }
+
+      {
+        int dataSize;
+        dataSize = sizeof(reply.memoPutDataResp.data) < bufsiz ? sizeof(reply.memoPutDataResp.data) : bufsiz;
+        memcpy(buf, reply.memoPutDataResp.data, dataSize);
+      }
+    }
+    bufp += len;
+    offset += len;
+  }
+  return r;
+}
+/***************************************************************************/
 #define PARAM_USER_FIRST                (1)
 #define CHANNEL_NAME_NBR_OF_PARAMS      (2)
 #define CHANNEL_NAME_ID                 (199)
@@ -4081,7 +4733,7 @@ static int mhydra_get_cust_channel_name(const VCanChanData * const vChan,
   unsigned int param_index = CHANNEL_NAME_PARAM_INDEX_FIRST + channel * CHANNEL_NAME_NBR_OF_PARAMS;
   unsigned int i;
 
-  DEBUGPRINT(1, (TXT("[%s,%d]\n"), __FUNCTION__, __LINE__));
+  DEBUGPRINT(2, (TXT("[%s,%d]\n"), __FUNCTION__, __LINE__));
 
   nbr_of_bytes_to_copy = PARAMETER_MAX_SIZE * CHANNEL_NAME_NBR_OF_PARAMS;
   if (data_size < nbr_of_bytes_to_copy) {
@@ -4092,7 +4744,7 @@ static int mhydra_get_cust_channel_name(const VCanChanData * const vChan,
     unsigned chunk_size;
 
     r = mhydra_read_parameter(vChan, status, CHANNEL_NAME_ID, param_index + i, sizeof(tempdata), tempdata);
-    DEBUGPRINT(1, (TXT("[%s,%d] - %d:%u\n"), __FUNCTION__, __LINE__, r, *status));
+    DEBUGPRINT(2, (TXT("[%s,%d] - %d:%u\n"), __FUNCTION__, __LINE__, r, *status));
     if (*status) {
       r = VCAN_STAT_FAIL;
     }
@@ -4117,13 +4769,13 @@ static int mhydra_get_cust_channel_name(const VCanChanData * const vChan,
 }
 
 
-INIT int init_module (void)
+int init_module (void)
 {
   driverData.hwIf = &hwIf;
   return vCanInit (&driverData, HYDRA_MAX_DRIVER_CHANNELS);
 }
 
-EXIT void cleanup_module (void)
+void cleanup_module (void)
 {
   vCanCleanup (&driverData);
 }

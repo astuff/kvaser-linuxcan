@@ -69,16 +69,16 @@
 #define VCAN_IOC_SENDMSG            _IOW(VCAN_IOC_MAGIC, 101, int)
 #define VCAN_IOC_RECVMSG            _IOR(VCAN_IOC_MAGIC, 102, int)
 #define VCAN_IOC_OPEN_CHAN          _IO(VCAN_IOC_MAGIC,107)
-#define VCAN_IOC_OPEN_TRANSP        _IO(VCAN_IOC_MAGIC,106)
+#define VCAN_IOC_OPEN_TRANSP        _IO(VCAN_IOC_MAGIC,106) //not used
 #define VCAN_IOC_OPEN_EXCL          _IO(VCAN_IOC_MAGIC,105)
 #define VCAN_IOC_GET_NRCHANNELS     _IO(VCAN_IOC_MAGIC,104)
 #define VCAN_IOC_WAIT_EMPTY         _IO(VCAN_IOC_MAGIC,109)
 #define VCAN_IOC_FLUSH_RCVBUFFER    _IO(VCAN_IOC_MAGIC,112)
 #define VCAN_IOC_GET_STAT           _IO(VCAN_IOC_MAGIC,113)
-#define VCAN_IOC_SET_WRITE_BLOCK    _IO(VCAN_IOC_MAGIC,114)
-#define VCAN_IOC_SET_READ_BLOCK     _IO(VCAN_IOC_MAGIC,115)
+#define VCAN_IOC_SET_WRITE_BLOCK    _IO(VCAN_IOC_MAGIC,114) //not used
+#define VCAN_IOC_RECVMSG_SYNC       _IO(VCAN_IOC_MAGIC,115)
 #define VCAN_IOC_SET_WRITE_TIMEOUT  _IO(VCAN_IOC_MAGIC,116)
-#define VCAN_IOC_SET_READ_TIMEOUT   _IO(VCAN_IOC_MAGIC,117)
+#define VCAN_IOC_SET_READ           _IO(VCAN_IOC_MAGIC,117)
 #define VCAN_IOC_FLUSH_SENDBUFFER   _IO(VCAN_IOC_MAGIC,118)
 #define VCAN_IOC_BUS_ON             _IO(VCAN_IOC_MAGIC,119)
 #define VCAN_IOC_BUS_OFF            _IO(VCAN_IOC_MAGIC,120)
@@ -128,6 +128,11 @@
 #define VCAN_IOC_RESET_OVERRUN_COUNT _IO(VCAN_IOC_MAGIC,164)
 #define VCAN_IOC_RECVMSG_SPECIFIC    _IO(VCAN_IOC_MAGIC,165)
 #define VCAN_IOC_SET_READ_SPECIFIC    _IO(VCAN_IOC_MAGIC,166)
+#define VCAN_IOC_FLASH_LEDS          _IO(VCAN_IOC_MAGIC,167)
+
+//must have this ioctl's to make canNOTIFY_TX work.
+#define VCAN_IOC_GET_TRANSID     _IO(VCAN_IOC_MAGIC,168)
+#define VCAN_IOC_SET_TRANSID     _IO(VCAN_IOC_MAGIC,169)
 
 
 #define MAX_IOCTL_CARD_NAME       31
@@ -144,6 +149,7 @@
 #define VCAN_CHANNEL_CAP_TIME_SYNC              0x00000020
 #define VCAN_CHANNEL_CAP_ABSOLUTE_TIME          0x00000040
 #define VCAN_CHANNEL_CAP_EXTENDED_CAN           0x00000080
+#define VCAN_CHANNEL_CAP_SYNC_TX_FLUSH          0x00000100
 /* Flags for Kvasers channel capabilities */
 #define VCAN_CHANNEL_CAP_ERROR_COUNTERS         0x00010000
 #define VCAN_CHANNEL_CAP_CAN_DIAGNOSTICS        0x00020000
@@ -156,10 +162,18 @@
 #define VCAN_CHANNEL_CAP_CANFD_NONISO           0x01000000  // Device (channel) supports non-ISO CAN-FD
 #define VCAN_CHANNEL_CAP_SILENTMODE             0x02000000  // Device is capable of silentmode
 #define VCAN_CHANNEL_CAP_SINGLE_SHOT            0x04000000  // Device is capable of Single Shot
+#define VCAN_CHANNEL_CAP_HAS_LOGGER             0x08000000  // Device has logger capabilities
+#define VCAN_CHANNEL_CAP_HAS_REMOTE             0x10000000  // Device has remote capabilities
+#define VCAN_CHANNEL_CAP_HAS_SCRIPT             0x20000000  // Device has script capabilities
 
 #define VCAN_CHANNEL_STATUS_TIME_SYNC_ENABLED   0x00000001
 #define VCAN_CHANNEL_STATUS_TIME_SYNC_RUNNING   0x00000002
 #define VCAN_CHANNEL_STATUS_ON_BUS              0x00000004
 #define VCAN_CHANNEL_STATUS_ACTIVATED           0x00000008
+
+
+// Windows to Linux translations:
+//===========================================================================
+#define KCAN_IOCTL_LED_ACTION VCAN_IOC_FLASH_LEDS
 
 #endif /* _VCAN_IOCTL_H */

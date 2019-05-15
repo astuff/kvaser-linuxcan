@@ -52,6 +52,10 @@
 
 #include "dlc.h"
 
+#ifndef USER_SPACE
+#include <linux/export.h>
+#endif
+
 uint32_t dlc_bytes_to_dlc_fd (uint32_t n_bytes)
 {
   if (n_bytes > 48) return 15;
@@ -63,6 +67,9 @@ uint32_t dlc_bytes_to_dlc_fd (uint32_t n_bytes)
   else if (n_bytes >  8) return 9;
   else return n_bytes;
 }
+#ifndef USER_SPACE
+EXPORT_SYMBOL(dlc_bytes_to_dlc_fd);
+#endif
 
 uint32_t dlc_dlc_to_bytes_fd (uint32_t dlc)
 {
@@ -77,24 +84,27 @@ uint32_t dlc_dlc_to_bytes_fd (uint32_t dlc)
     default:  return dlc;
   }
 }
+#ifndef USER_SPACE
+EXPORT_SYMBOL(dlc_dlc_to_bytes_fd);
+#endif
 
-uint32_t dlc_is_dlc_ok (uint32_t accept_large_dlc, uint32_t is_fd, uint32_t* dlc)
+uint32_t dlc_is_dlc_ok (uint32_t accept_large_dlc, uint32_t is_fd, uint32_t dlc)
 {
   if (is_fd)  {
-    return ((*dlc <= 8)  ||
-            (*dlc == 12) || (*dlc == 16) ||
-            (*dlc == 20) || (*dlc == 24) ||
-            (*dlc == 32) || (*dlc == 48) ||
-            (*dlc == 64));
-  }
-  else if (accept_large_dlc) {
-    // Should be 15 but if we change this, we change the API
+    return ((dlc <= 8)  ||
+            (dlc == 12) || (dlc == 16) ||
+            (dlc == 20) || (dlc == 24) ||
+            (dlc == 32) || (dlc == 48) ||
+            (dlc == 64));
+  } else if (accept_large_dlc) {
     return 1;
-    //return dlc <= UINT_MAX;
   } else {
-    return (*dlc <= 8);
+    return (dlc <= 8);
   }
 }
+#ifndef USER_SPACE
+EXPORT_SYMBOL(dlc_is_dlc_ok);
+#endif
 
 uint32_t dlc_dlc_to_bytes_classic (uint32_t dlc)
 {
@@ -104,3 +114,6 @@ uint32_t dlc_dlc_to_bytes_classic (uint32_t dlc)
     return dlc;
   }
 }
+#ifndef USER_SPACE
+EXPORT_SYMBOL(dlc_dlc_to_bytes_classic);
+#endif

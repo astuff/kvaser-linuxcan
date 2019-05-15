@@ -180,12 +180,12 @@ int main(int argc, char *argv[])
     if (stat == canOK) {
       msgCounter++;
       if (flag & canMSG_ERROR_FRAME) {
-        printf("(%d) ERROR FRAME", msgCounter);
+        printf("(%u) ERROR FRAME", msgCounter);
       }
       else {
         unsigned j;
 
-        printf("(%d) id:%ld dlc:%u data: ", msgCounter, id, dlc);
+        printf("(%u) id:%ld dlc:%u data: ", msgCounter, id, dlc);
         if (dlc > 8) {
           dlc = 8;
         }

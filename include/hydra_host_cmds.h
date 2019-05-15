@@ -197,6 +197,10 @@
 #define CMD_DEVICE_PING_REQ                         164
 #define CMD_DEVICE_PING_RESP                        165
 
+#define CMD_LOG_TRIG_FD                             172
+#define CMD_LOG_TRIG_STARTUP_FD                     173
+#define CMD_LOG_RTC_TIME_FD                         174
+#define CMD_LOG_VERSION_FD                          175
 
 #define CMD_MAP_CHANNEL_REQ                         200
 #define CMD_MAP_CHANNEL_RESP                        201
@@ -1511,12 +1515,35 @@ typedef struct {
 #define CAP_SUB_CMD_BUS_STATS                4
 #define CAP_SUB_CMD_ERRCOUNT_READ            5
 #define CAP_SUB_CMD_SINGLE_SHOT              6
+#define CAP_SUB_CMD_SYNC_TX_FLUSH            7 // Used in filo
+#define CAP_SUB_CMD_HAS_LOGGER               8
+#define CAP_SUB_CMD_HAS_REMOTE               9
+#define CAP_SUB_CMD_HAS_SCRIPT               10
 
+// the following are not capabilities/bits
+#define CAP_SUB_CMD_DATA_START               1024
+#define CAP_SUB_CMD_GET_LOGGER_INFO          CAP_SUB_CMD_DATA_START+1
+#define CAP_SUB_CMD_REMOTE_INFO              CAP_SUB_CMD_DATA_START+2
+
+// CAP_SUB_CMD_GET_LOGGER_TYPE
+#define LOGGERTYPE_NOT_A_LOGGER 0
+#define LOGGERTYPE_V1 1
+#define LOGGERTYPE_V2 2
+
+// CAP_SUB_CMD_REMOTE_TYPE
+#define REMOTE_TYPE_NOT_REMOTE  0
+#define REMOTE_TYPE_WLAN 1
+#define REMOTE_TYPE_LAN  2 
+
+typedef union {
+  uint32_t padding[6];
+  uint32_t channel;
+} hcapExtraInfo_u;
 
 typedef struct {
   uint16_t  subCmdNo;
   uint16_t  unused;
-  uint32_t padding[6];
+  hcapExtraInfo_u  subData;
 } hcmdCapabilitiesReq;
 
 typedef struct
@@ -1524,7 +1551,18 @@ typedef struct
   uint32_t mask;
   uint32_t value;
   uint32_t padding[4];
-}hchannelCap32_t;
+} hchannelCap32_t;
+
+typedef struct
+{
+  uint32_t data;
+} hInfo_t;
+
+typedef struct
+{
+  unsigned int     webServer;
+  unsigned int     remoteType;
+} hRemoteInfo_t;
 
 //Status codes in CMD_GET_CAPABILITIES_RESP 
 #define CAP_STATUS_OK 0
@@ -1535,12 +1573,16 @@ typedef struct {
   uint16_t  subCmdNo;
   uint16_t  status;
   union {
-    hchannelCap32_t silentMode;  // CAP_SUB_CMD_SILENT_MODE
-    hchannelCap32_t errframeCap; // CAP_SUB_CMD_ERRFRAME
-    hchannelCap32_t busstatCap;  // CAP_SUB_CMD_BUS_STATS
-    hchannelCap32_t errcountCap; // CAP_SUB_CMD_ERRCOUNT_READ    
+    hchannelCap32_t silentMode;    // CAP_SUB_CMD_SILENT_MODE
+    hchannelCap32_t errframeCap;   // CAP_SUB_CMD_ERRFRAME
+    hchannelCap32_t busstatCap;    // CAP_SUB_CMD_BUS_STATS
+    hchannelCap32_t errcountCap;   // CAP_SUB_CMD_ERRCOUNT_READ    
     hchannelCap32_t singleshotCap; // CAP_SUB_CMD_SINGLE_SHOT    
-    
+    hchannelCap32_t loggerCap;     // CAP_SUB_CMD_HAS_LOGGER    
+    hchannelCap32_t remoteCap;     // CAP_SUB_CMD_HAS_REMOTE    
+    hchannelCap32_t scriptCap;     // CAP_SUB_CMD_HAS_SCRIPT 
+    hInfo_t loggerType;            // CAP_SUB_CMD_GET_LOGGER_TYPE
+    hRemoteInfo_t remoteInfo;      // CAP_SUB_CMD_REMOTE_TYPE
   };
 } hcmdCapabilitiesResp;
    

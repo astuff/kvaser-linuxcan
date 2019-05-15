@@ -90,8 +90,6 @@
 #include "helios_cmds.h"
 #include "VCanOsIf.h"
 #include "PciCan2HwIf.h"
-#include "osif_kernel.h"
-#include "osif_functions_kernel.h"
 #include "queue.h"
 #include "memq.h"
 #include "hwnames.h"
@@ -130,7 +128,7 @@ static int debug_level= PCICAN2_DEBUG;
 // HW function pointers
 //======================================================================
 
-static int INIT pciCanInitAllDevices(void);
+static int pciCanInitAllDevices(void);
 static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par);
 static int pciCanGetBusParams (VCanChanData *vChd, VCanBusParams *par);
 static int pciCanSetOutputMode (VCanChanData *vChd, int silent);
@@ -140,12 +138,12 @@ static int pciCanBusOff (VCanChanData *vChd);
 static int pciCanGetTxErr(VCanChanData *vChd);
 static int pciCanGetRxErr(VCanChanData *vChd);
 static int pciCanInSync (VCanChanData *vChd);
-static int EXIT pciCanCloseAllDevices(void);
+static int pciCanCloseAllDevices(void);
 static int pciCanProcRead (struct seq_file* m, void* v);
 static int pciCanRequestChipState (VCanChanData *vChd);
 static unsigned long pciCanTxQLen(VCanChanData *vChd);
 static void pciCanRequestSend (VCanCardData *vCard, VCanChanData *vChan);
-static int pciCanTime(VCanCardData *vCard, unsigned long *time);
+static int pciCanTime(VCanCardData *vCard, uint64_t *time);
 static int pciCanFlushSendBuffer (VCanChanData *vChan);
 
 static int pciCanWaitResponse(VCanCardData *vCard, heliosCmd *cmd,
@@ -198,11 +196,11 @@ static VCanHWInterface hwIf = {
 };
 
 
-static int DEVINIT pciCanInitOne(struct pci_dev *dev,
+static int pciCanInitOne(struct pci_dev *dev,
                                  const struct pci_device_id *id);
-static void DEVEXIT pciCanRemoveOne(struct pci_dev *dev);
+static void pciCanRemoveOne(struct pci_dev *dev);
 
-static struct pci_device_id id_table[] DEVINITDATA = {
+static struct pci_device_id id_table[] = {
   {
     .vendor    = PCICAN2_VENDOR,
     .device    = PCICAN2_ID,
@@ -234,13 +232,13 @@ static struct pci_driver pcican_tbl = {
   .name     = "kvpcicanII",
   .id_table = id_table,
   .probe    = pciCanInitOne,
-  .remove   = DEVEXITP(pciCanRemoveOne),
+  .remove   = pciCanRemoveOne,
 };
 
 //======================================================================
 //    getTransId
 //======================================================================
-static OS_IF_INLINE int getTransId (heliosCmd *cmd)
+static inline int getTransId (heliosCmd *cmd)
 {
     if (cmd->head.cmdNo > CMD_TX_EXT_MESSAGE) {
         // Any of the commands
@@ -502,7 +500,7 @@ static int pciCanBusOff (VCanChanData *vChd)
         pciCanRequestChipState(vChd);
     }
 
-    return ret;
+    return vCanFlushSendBuffer (vChd);
 } // pciCanBusOff
 
 
@@ -530,7 +528,7 @@ static void pciCanInterrupts (VCanCardData *vCard, int enable)
 //======================================================================
 // Get time
 //======================================================================
-static int pciCanTime (VCanCardData *vCard, unsigned long *time)
+static int pciCanTime (VCanCardData *vCard, uint64_t *time)
 {
     PciCan2CardData *hCard = vCard->hwCardData;
     heliosCmd cmd;
@@ -563,9 +561,9 @@ static unsigned long pciCanTimeStamp (VCanCardData *vCard, unsigned long timeLo)
     PciCan2CardData *hCd = vCard->hwCardData;
     unsigned long    irqFlags;
 
-    os_if_spin_lock_irqsave(&hCd->timeHi_lock, &irqFlags);
+    spin_lock_irqsave(&hCd->timeHi_lock, irqFlags);
     ret = (vCard->timeHi + timeLo) / PCICAN2_TICKS_PER_10US;
-    os_if_spin_unlock_irqrestore(&hCd->timeHi_lock, irqFlags);
+    spin_unlock_irqrestore(&hCd->timeHi_lock, irqFlags);
 
     return ret;
 }
@@ -717,7 +715,7 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
                         if ((atomic_read(&hChd->outstanding_tx) == 0) &&
                            queue_empty(&vChd->txChanQueue)          &&
                            test_and_clear_bit(0, &vChd->waitEmpty)) {
-                           os_if_wake_up_interruptible(&vChd->flushQ);
+                           wake_up_interruptible(&vChd->flushQ);
                         }
 
                         if (!queue_empty(&vChd->txChanQueue))
@@ -731,11 +729,11 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
                     }
                     else
                     {
-                      DEBUGPRINT(1, "TX ACK when not waiting for one\n");
+                      DEBUGPRINT(2, "TX ACK when not waiting for one\n");
                     }
                 }
                 else {
-                  DEBUGPRINT(1, "CMD_TX_ACKNOWLEDGE, chan = %d\n", chan);
+                  DEBUGPRINT(2, "CMD_TX_ACKNOWLEDGE, chan = %d\n", chan);
                 }
                 break;
             }
@@ -840,9 +838,9 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
             case CMD_CLOCK_OVERFLOW_EVENT:
             {
                 unsigned long irqFlags;
-                os_if_spin_lock_irqsave(&hCd->timeHi_lock, &irqFlags);
+                spin_lock_irqsave(&hCd->timeHi_lock, irqFlags);
                 vCard->timeHi = cmd.clockOverflowEvent.currentTime & 0xFFFF0000;
-                os_if_spin_unlock_irqrestore(&hCd->timeHi_lock, irqFlags);
+                spin_unlock_irqrestore(&hCd->timeHi_lock, irqFlags);
                 break;
             }
 
@@ -855,9 +853,9 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
                 hCd->recClock = hCd->recClock << 16;
                 hCd->recClock += cmd.readClockResp.time[0];
 
-                os_if_spin_lock_irqsave(&hCd->timeHi_lock, &irqFlags);
+                spin_lock_irqsave(&hCd->timeHi_lock, irqFlags);
                 vCard->timeHi = cmd.readClockResp.time[1] << 16;
-                os_if_spin_unlock_irqrestore(&hCd->timeHi_lock, irqFlags);
+                spin_unlock_irqrestore(&hCd->timeHi_lock, irqFlags);
                 break;
             }
 
@@ -889,7 +887,7 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
                                       MAX_CARD_CHANNELS);
 
                 if (hCd->isWaiting) {
-                    os_if_wake_up_interruptible(&hCd->waitHwInfo);
+                    wake_up_interruptible(&hCd->waitHwInfo);
                 }
                 hCd->receivedHwInfo = 1;
                 break;
@@ -903,7 +901,7 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
                 vCard->firmwareVersionBuild = (appVersion & 0xFFFF);
 
                 if (hCd->isWaiting) {
-                    os_if_wake_up_interruptible(&hCd->waitSwInfo);
+                    wake_up_interruptible(&hCd->waitSwInfo);
                 }
                 hCd->receivedSwInfo = 1;
 
@@ -935,7 +933,7 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
                       AUTOTXBUFFER_CMD_GET_INFO) {
                     hCd->autoTxBufferCount      = cmd.autoTxBufferResp.bufferCount;
                     hCd->autoTxBufferResolution = cmd.autoTxBufferResp.timerResolution;
-                    DEBUGPRINT(2, "AUTOTXBUFFER_CMD_GET_INFO: count=%d resolution=%d\n",
+                    DEBUGPRINT(1, "AUTOTXBUFFER_CMD_GET_INFO: count=%d resolution=%d\n",
                                hCd->autoTxBufferCount, hCd->autoTxBufferResolution);
                 }
                 break;
@@ -1135,16 +1133,16 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
             struct list_head *currHead, *tmpHead;
             WaitNode *currNode;
             unsigned long irqFlags;
-            os_if_read_lock_irqsave(&hCd->replyWaitListLock, &irqFlags);
+            read_lock_irqsave(&hCd->replyWaitListLock, irqFlags);
             list_for_each_safe(currHead, tmpHead, &hCd->replyWaitList) {
                 currNode = list_entry(currHead, WaitNode, list);
                 if (currNode->cmdNr == cmd.head.cmdNo &&
                     getTransId(&cmd) == currNode->transId) {
                     memcpy(currNode->replyPtr, &cmd, cmd.head.cmdLen);
-                    os_if_up_sema(&currNode->waitSemaphore);
+                    complete(&currNode->waitCompletion);
                 }
             }
-            os_if_read_unlock_irqrestore(&hCd->replyWaitListLock, irqFlags);
+            read_unlock_irqrestore(&hCd->replyWaitListLock, irqFlags);
         }
     }
 
@@ -1155,7 +1153,7 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
 //  Main ISR
 //======================================================================
 // Interrupt handler prototype changed in 2.6.19.
-static OS_IF_INTR_HANDLER
+static irqreturn_t
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 19))
 pciCanInterrupt (int irq, void *dev_id, struct pt_regs *regs)
 #else
@@ -1214,7 +1212,7 @@ static int pciCanTransmitMessage (VCanChanData *vChd, CAN_MSG *m)
     transId = atomic_read(&vChd->transId);
 
     if (hChd->current_tx_message[transId - 1].user_data) {
-        DEBUGPRINT(1, "In use: %x %d   %x %d\n",
+        DEBUGPRINT(2, "In use: %x %d   %x %d\n",
                    hChd->current_tx_message[transId - 1].id, transId,
                    m->id, atomic_read(&hChd->outstanding_tx));
     }
@@ -1332,7 +1330,7 @@ static int pciCanFlushSendBuffer (VCanChanData *vChan)
 //======================================================================
 //  Initialize H/W
 //======================================================================
-static int DEVINIT pciCanInitHW (VCanCardData *vCard)
+static int pciCanInitHW (VCanCardData *vCard)
 {
     PciCan2CardData  *hCard = vCard->hwCardData;
     void __iomem      *addr;
@@ -1359,8 +1357,8 @@ static int DEVINIT pciCanInitHW (VCanCardData *vCard)
         return VCAN_STAT_NO_DEVICE;
     }
 
-    os_if_init_waitqueue_head(&hCard->waitHwInfo);
-    os_if_init_waitqueue_head(&hCard->waitSwInfo);
+    init_waitqueue_head(&hCard->waitHwInfo);
+    init_waitqueue_head(&hCard->waitSwInfo);
     hCard->isWaiting = 0;
 
     // Enable interrupts from card and reset it.
@@ -1376,15 +1374,15 @@ static int DEVINIT pciCanInitHW (VCanCardData *vCard)
     }
 
     hCard->isWaiting = 1;
-    timeOut = os_if_wait_event_interruptible_timeout(hCard->waitHwInfo,
-                                                     hCard->receivedHwInfo, 1000);
+    timeOut = wait_event_interruptible_timeout(hCard->waitHwInfo,
+                                               hCard->receivedHwInfo, 1000);
     if (!timeOut) {
         DEBUGPRINT(1, "no HW wakeup\n");
         goto error;
     }
 
-    timeOut = os_if_wait_event_interruptible_timeout(hCard->waitSwInfo,
-                                                     hCard->receivedSwInfo, 1000);
+    timeOut = wait_event_interruptible_timeout(hCard->waitSwInfo,
+                                               hCard->receivedSwInfo, 1000);
     if (!timeOut) {
         DEBUGPRINT(1, "no SW wakeup\n");
         goto error;
@@ -1415,10 +1413,10 @@ static int DEVINIT pciCanInitHW (VCanCardData *vCard)
         if (pciCanWaitResponse(vCard, (heliosCmd *)&auto_cmd, &reply,
                                CMD_AUTO_TX_BUFFER_RESP, auto_cmd.requestType) ==
               VCAN_STAT_OK) {
-            DEBUGPRINT(2, "objbufs supported, count=%d resolution=%d\n",
+            DEBUGPRINT(1, "objbufs supported, count=%d resolution=%d\n",
                        hCard->autoTxBufferCount, hCard->autoTxBufferResolution);
         } else {
-          DEBUGPRINT(2, "objbufs supported, but could not check details\n");
+          DEBUGPRINT(1, "objbufs supported, but could not check details\n");
         }
     }
 
@@ -1427,8 +1425,8 @@ static int DEVINIT pciCanInitHW (VCanCardData *vCard)
     return VCAN_STAT_OK;
 
 error:
-    os_if_delete_waitqueue_head(&hCard->waitHwInfo);
-    os_if_delete_waitqueue_head(&hCard->waitSwInfo);
+    //os_if_delete_waitqueue_head(&hCard->waitHwInfo);
+    //os_if_delete_waitqueue_head(&hCard->waitSwInfo);
     hCard->isWaiting   = 0;
     hCard->initDone    = 0;
     vCard->cardPresent = 0;
@@ -1440,7 +1438,7 @@ error:
 //======================================================================
 //  Find out addresses for one card
 //======================================================================
-static int DEVINIT readPCIAddresses (struct pci_dev *dev, VCanCardData *vCard)
+static int readPCIAddresses (struct pci_dev *dev, VCanCardData *vCard)
 {
   PciCan2CardData *hCd = vCard->hwCardData;
 
@@ -1480,9 +1478,9 @@ static void pciCanRequestSend (VCanCardData *vCard, VCanChanData *vChan)
     PciCan2ChanData *hChan = vChan->hwChanData;
     if (pciCanTxAvailable(vChan)) {
 # if !defined(TRY_RT_QUEUE)
-        os_if_queue_task(&hChan->txTaskQ);
+        schedule_work(&hChan->txTaskQ);
 # else
-        os_if_queue_task_not_default_queue(hChan->txTaskQ, &hChan->txWork);
+        queue_work(hChan->txTaskQ, &hChan->txWork);
 # endif
 #else
     int queuePos;
@@ -1520,7 +1518,7 @@ static void pciCanRequestSend (VCanCardData *vCard, VCanChanData *vChan)
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20)
 static void pciCanSend (void *void_chanData)
 #else
-static void pciCanSend (OS_IF_TASK_QUEUE_HANDLE *work)
+static void pciCanSend (struct work_struct *work)
 #endif
 {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20)
@@ -1563,9 +1561,9 @@ static void pciCanSend (OS_IF_TASK_QUEUE_HANDLE *work)
             queue_release(&chd->txChanQueue);
             // Need to retry work!
 #if !defined(TRY_RT_QUEUE)
-            os_if_queue_task(&devChan->txTaskQ);
+            schedule_work(&devChan->txTaskQ);
 #else
-            os_if_queue_task_not_default_queue(devChan->txTaskQ, &devChan->txWork);
+            queue_work(devChan->txTaskQ, &devChan->txWork);
 #endif
         }
     } else {
@@ -1585,7 +1583,7 @@ static void responseTimeout (unsigned long voidWaitNode)
 {
     WaitNode *waitNode = (WaitNode *)voidWaitNode;
     waitNode->timedOut = 1;
-    os_if_up_sema(&waitNode->waitSemaphore);
+    complete(&waitNode->waitCompletion);
     return;
 }
 
@@ -1603,7 +1601,7 @@ static int pciCanWaitResponse (VCanCardData *vCard, heliosCmd *cmd,
     unsigned long irqFlags = 0;
     struct timer_list waitTimer;
 
-    os_if_init_sema(&waitNode.waitSemaphore);
+    init_completion(&waitNode.waitCompletion);
 
     waitNode.replyPtr = replyPtr;
     waitNode.cmdNr    = cmdNr;
@@ -1612,15 +1610,15 @@ static int pciCanWaitResponse (VCanCardData *vCard, heliosCmd *cmd,
 
     // Add to card's list of expected responses
 
-    os_if_write_lock_irqsave(&hCard->replyWaitListLock, &irqFlags);
+    write_lock_irqsave(&hCard->replyWaitListLock, irqFlags);
     list_add(&waitNode.list, &hCard->replyWaitList);
-    os_if_write_unlock_irqrestore(&hCard->replyWaitListLock, irqFlags);
+    write_unlock_irqrestore(&hCard->replyWaitListLock, irqFlags);
 
     if (pciCanNoResponse(hCard, cmd)) {
         DEBUGPRINT(1, "ERROR----- pciCanWaitResponse----------\n");
-        os_if_write_lock_irqsave(&hCard->replyWaitListLock, &irqFlags);
+        write_lock_irqsave(&hCard->replyWaitListLock, irqFlags);
         list_del(&waitNode.list);
-        os_if_write_unlock_irqrestore(&hCard->replyWaitListLock, irqFlags);
+        write_unlock_irqrestore(&hCard->replyWaitListLock, irqFlags);
         return VCAN_STAT_NO_RESOURCES;
     }
 
@@ -1630,12 +1628,12 @@ static int pciCanWaitResponse (VCanCardData *vCard, heliosCmd *cmd,
     waitTimer.expires = jiffies + msecs_to_jiffies(PCICAN2_CMD_RESP_WAIT_TIME);
     add_timer(&waitTimer);
 
-    os_if_down_sema(&waitNode.waitSemaphore);
+    wait_for_completion(&waitNode.waitCompletion);
 
     // Now we either got a response or a timeout
-    os_if_write_lock_irqsave(&hCard->replyWaitListLock, &irqFlags);
+    write_lock_irqsave(&hCard->replyWaitListLock, irqFlags);
     list_del(&waitNode.list);
-    os_if_write_unlock_irqrestore(&hCard->replyWaitListLock, irqFlags);
+    write_unlock_irqrestore(&hCard->replyWaitListLock, irqFlags);
     del_timer_sync(&waitTimer);
 
     if (waitNode.timedOut) {
@@ -1663,7 +1661,7 @@ static int pciCanNoResponse (PciCan2CardData *hCard, heliosCmd *cmd)
 //======================================================================
 //  Initialize H/W specific data
 //======================================================================
-static void DEVINIT pciCanInitData (VCanCardData *vCard)
+static void pciCanInitData (VCanCardData *vCard)
 {
     PciCan2CardData *hCd = vCard->hwCardData;
 
@@ -1681,9 +1679,9 @@ static void DEVINIT pciCanInitData (VCanCardData *vCard)
 
     INIT_LIST_HEAD(&hCd->replyWaitList);
 
-    os_if_rwlock_init(&hCd->replyWaitListLock);
-    os_if_spin_lock_init(&hCd->timeHi_lock);
-    os_if_spin_lock_init(&hCd->memQLock);   // Only used in memQ.c
+    rwlock_init(&hCd->replyWaitListLock);
+    spin_lock_init(&hCd->timeHi_lock);
+    spin_lock_init(&hCd->memQLock);   // Only used in memQ.c
 
     for (chNr = 0; chNr < vCard->nrChannels; chNr++) {
         VCanChanData *vChd     = vCard->chanData[chNr];
@@ -1691,16 +1689,24 @@ static void DEVINIT pciCanInitData (VCanCardData *vCard)
 #if !defined(TRY_DIRECT_SEND)
 # if !defined(TRY_RT_QUEUE)
         hChd->vChan = vChd;
-        os_if_init_task(&hChd->txTaskQ, pciCanSend, vChd);
+#    if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20))
+        INIT_WORK(&hChd->txTaskQ, pciCanSend, vChd);
+#    else
+        INIT_WORK(&hChd->txTaskQ, pciCanSend);
+#    endif
 # else
         char name[] = "pcicanII_txX";
         name[11]    = '0' + chNr;   // Replace the X with channel number
         hChd->vChan = vChd;
-        os_if_init_task(&hChd->txWork, pciCanSend, vChd);
+#  if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20))
+        INIT_WORK(&hChd->txWork, pciCanSend, vChd);
+#  else
+        INIT_WORK(&hChd->txWork, pciCanSend);
+#  endif
         // Note that this will not create an RT task if the kernel
         // does not actually support it (only 2.6.28+ do).
         // In that case, you must (for now) do it manually using chrt.
-        hChd->txTaskQ = os_if_declare_rt_task(name, &hChd->txWork);
+        hChd->txTaskQ = create_rt_workqueue(name, &hChd->txWork);
 # endif
 #endif
         memset(hChd->current_tx_message, 0, sizeof(hChd->current_tx_message));
@@ -1716,8 +1722,8 @@ static void DEVINIT pciCanInitData (VCanCardData *vCard)
 //======================================================================
 // Initialize the HW for one card
 //======================================================================
-static int DEVINIT pciCanInitOne (struct pci_dev *dev,
-                                  const struct pci_device_id *id)
+static int pciCanInitOne (struct pci_dev *dev,
+                          const struct pci_device_id *id)
 {
     // Helper struct for allocation
     typedef struct {
@@ -1733,7 +1739,7 @@ static int DEVINIT pciCanInitOne (struct pci_dev *dev,
     VCanCardData *vCard;
 
     // Allocate data area for this card
-    vCard  = os_if_kernel_malloc(sizeof(VCanCardData) + sizeof(PciCan2CardData));
+    vCard  = kmalloc(sizeof(VCanCardData) + sizeof(PciCan2CardData), GFP_KERNEL);
     if (!vCard) {
       goto card_alloc_err;
     }
@@ -1744,7 +1750,7 @@ static int DEVINIT pciCanInitOne (struct pci_dev *dev,
     hCd = vCard->hwCardData;
 
     // Allocate memory for n channels
-    chs = os_if_kernel_malloc(sizeof(ChanHelperStruct));
+    chs = kmalloc(sizeof(ChanHelperStruct), GFP_KERNEL);
     if (!chs) {
       goto chan_alloc_err;
     }
@@ -1795,10 +1801,10 @@ static int DEVINIT pciCanInitOne (struct pci_dev *dev,
     }
 
     // Insert into list of cards
-    os_if_spin_lock(&driverData.canCardsLock);
+    spin_lock(&driverData.canCardsLock);
     vCard->next = driverData.canCards;
     driverData.canCards = vCard;
-    os_if_spin_unlock(&driverData.canCardsLock);
+    spin_unlock(&driverData.canCardsLock);
 
     return VCAN_STAT_OK;
 
@@ -1809,21 +1815,17 @@ irq_err:
     for (chNr = 0; chNr < vCard->nrChannels; chNr++) {
 #if defined(TRY_RT_QUEUE)
       PciCan2ChanData *hChd = vCard->chanData[chNr]->hwChanData;
-      os_if_destroy_task(hChd->txTaskQ);
+      destroy_workqueue(hChd->txTaskQ);
 #endif
-      os_if_spin_lock_remove(&vCard->chanData[chNr]->openLock);
     }
-    os_if_rwlock_remove(&hCd->replyWaitListLock);
-    os_if_spin_lock_remove(&hCd->timeHi_lock);
-    os_if_spin_lock_remove(&hCd->memQLock);
 probe_err:
     pci_iounmap(dev, hCd->baseAddr);
     pci_disable_device(dev);
     pci_release_regions(dev);
 pci_err:
-    os_if_kernel_free(vCard->chanData);
+    kfree(vCard->chanData);
 chan_alloc_err:
-    os_if_kernel_free(vCard);
+    kfree(vCard);
 card_alloc_err:
 
     return VCAN_STAT_FAIL;
@@ -1833,7 +1835,7 @@ card_alloc_err:
 //======================================================================
 // Shut down the HW for one card
 //======================================================================
-static void DEVEXIT pciCanRemoveOne (struct pci_dev *dev)
+static void pciCanRemoveOne (struct pci_dev *dev)
 {
   VCanCardData *vCard, *lastCard;
   VCanChanData *vChan;
@@ -1852,29 +1854,25 @@ static void DEVEXIT pciCanRemoveOne (struct pci_dev *dev)
     vChan = vCard->chanData[chNr];
     DEBUGPRINT(3, "Waiting for all closed on minor %d\n", vChan->minorNr);
     while (atomic_read(&vChan->fileOpenCount) > 0) {
-      os_if_set_task_uninterruptible ();
-      os_if_wait_for_event_timeout_simple(10);
+      set_current_state(TASK_UNINTERRUPTIBLE);
+      schedule_timeout(msecs_to_jiffies(10));
     }
   }
 
   for (chNr = 0; chNr < vCard->nrChannels; chNr++) {
 #if defined(TRY_RT_QUEUE)
     PciCan2ChanData *hChd = vCard->chanData[chNr]->hwChanData;
-    os_if_destroy_task(hChd->txTaskQ);
+    destroy_workqueue(hChd->txTaskQ);
 #endif
-    os_if_spin_lock_remove(&vCard->chanData[chNr]->openLock);
   }
 
-  os_if_rwlock_remove(&hCd->replyWaitListLock);
-  os_if_spin_lock_remove(&hCd->timeHi_lock);
-  os_if_spin_lock_remove(&hCd->memQLock);
 
   pci_iounmap(dev, hCd->baseAddr);
   pci_disable_device(dev);
   pci_release_regions(dev);
 
   // Remove from canCards list
-  os_if_spin_lock(&driverData.canCardsLock);
+  spin_lock(&driverData.canCardsLock);
   lastCard = driverData.canCards;
   if (lastCard == vCard) {
     driverData.canCards = vCard->next;
@@ -1888,27 +1886,27 @@ static void DEVEXIT pciCanRemoveOne (struct pci_dev *dev)
       lastCard->next = vCard->next;
     }
   }
-  os_if_spin_unlock(&driverData.canCardsLock);
+  spin_unlock(&driverData.canCardsLock);
 
   for(i = 0; i < MAX_CARD_CHANNELS; i++) {
     VCanChanData *vChd     = vCard->chanData[i];
     PciCan2ChanData *hChd = vChd->hwChanData;
     if (hChd->objbufs) {
       DEBUGPRINT(2, "Free vCard->chanData[i]->hwChanData->objbufs[%d]\n", i);
-      os_if_kernel_free(hChd->objbufs);
+      kfree(hChd->objbufs);
       hChd->objbufs = NULL;
     }
   }
 
-  os_if_kernel_free(vCard->chanData);
-  os_if_kernel_free(vCard);
+  kfree(vCard->chanData);
+  kfree(vCard);
 }
 
 
 //======================================================================
 // Find and initialize all cards
 //======================================================================
-static int INIT pciCanInitAllDevices (void)
+static int pciCanInitAllDevices (void)
 {
     int found;
 
@@ -1925,7 +1923,7 @@ static int INIT pciCanInitAllDevices (void)
 //======================================================================
 // Shut down and free resources before unloading driver
 //======================================================================
-static int EXIT pciCanCloseAllDevices (void)
+static int pciCanCloseAllDevices (void)
 {
     DEBUGPRINT(1, "pciCanCloseAllDevices\n");
     pci_unregister_driver(&pcican_tbl);
@@ -2008,10 +2006,12 @@ static int pciCanObjbufAlloc (VCanChanData *chd, int bufType, int *bufNo)
 
   if (!hChd->objbufs) {
     DEBUGPRINT(4, "Allocating hChd->objbufs[]\n");
-    hChd->objbufs = os_if_kernel_malloc(sizeof(OBJECT_BUFFER) * dev->autoTxBufferCount);
+    hChd->objbufs = kmalloc(sizeof(OBJECT_BUFFER) * dev->autoTxBufferCount, GFP_KERNEL);
     if (!hChd->objbufs) {
       return VCAN_STAT_NO_MEMORY;
     }
+
+    memset(hChd->objbufs, 0, sizeof(OBJECT_BUFFER) * dev->autoTxBufferCount);
   }
 
   for (i = 0; i < dev->autoTxBufferCount; i++) {
@@ -2272,13 +2272,13 @@ static int pciCanObjbufExists (VCanChanData *chd, int bufType, int bufNo)
   return 1;
 }
 
-INIT int init_module (void)
+int init_module (void)
 {
   driverData.hwIf = &hwIf;
   return vCanInit (&driverData, MAX_DRIVER_CHANNELS);
 }
 
-EXIT void cleanup_module (void)
+void cleanup_module (void)
 {
   vCanCleanup (&driverData);
 }

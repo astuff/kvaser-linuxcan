@@ -48,37 +48,40 @@ DEPMOD=`which depmod`
 UDEVCTRL=`which udevcontrol`
 UDEVADM=`which udevadm`
 
+GCC_MAJ_VERSION_GTEQ_4 := $(shell expr `gcc -dumpversion | cut -f1 -d.` \>= 4)
+GCC_MIN_VERSION_GTEQ_7 := $(shell expr `gcc -dumpversion | cut -f2 -d.` \>= 7)
+
 # alter lines below to change default debug level
 ifndef KV_VCANOSIF_DEBUG_LEVEL
-export KV_VCANOSIF_DEBUG_LEVEL = 8
+export KV_VCANOSIF_DEBUG_LEVEL = 1
 endif
 
 ifndef KV_PCICAN_DEBUG_LEVEL
-export KV_PCICAN_DEBUG_LEVEL    = 8
+export KV_PCICAN_DEBUG_LEVEL    = 1
 endif
 
 ifndef KV_USBCAN_DEBUG_LEVEL
-export KV_USBCAN_DEBUG_LEVEL    = 8
+export KV_USBCAN_DEBUG_LEVEL    = 1
 endif
 
 ifndef KV_PCICAN2_DEBUG_LEVEL
-export KV_PCICAN2_DEBUG_LEVEL  = 8
+export KV_PCICAN2_DEBUG_LEVEL  = 1
 endif
 
 ifndef KV_LEAF_DEBUG_LEVEL
-export KV_LEAF_DEBUG_LEVEL      = 8
+export KV_LEAF_DEBUG_LEVEL      = 1
 endif
 
 ifndef KV_MHYDRA_DEBUG_LEVEL
-export KV_MHYDRA_DEBUG_LEVEL    = 8
+export KV_MHYDRA_DEBUG_LEVEL    = 1
 endif
 
 ifndef KV_VIRTUAL_DEBUG_LEVEL
-export KV_VIRTUAL_DEBUG_LEVEL   = 8
+export KV_VIRTUAL_DEBUG_LEVEL   = 1
 endif
 
 ifndef KV_PCIEFD_DEBUG_LEVEL
-export KV_PCIEFD_DEBUG_LEVEL = 8
+export KV_PCIEFD_DEBUG_LEVEL = 1
 endif
 
 #---------------------------------------------------------------------------
@@ -103,9 +106,19 @@ KV_KERNEL_SRC_DIR := $(KDIR)
 #---------------------------------------------------------------------------
 # export these flags to compilation
 KV_XTRA_COMMON_FLAGS = -DLINUX=1 $(foreach INC,$(INCLUDES),-I$(INC)) -Werror -Wno-date-time -Wall \
-                       -Wclobbered -Wempty-body -Wignored-qualifiers \
-                       -Wmissing-parameter-type -Wold-style-declaration -Woverride-init -Wtype-limits \
+                       -Wclobbered -Wempty-body -Wignored-qualifiers -Wmissing-parameter-type \
+                       -Wold-style-declaration -Woverride-init -Wtype-limits \
                        -Wuninitialized
+
+# gcc 4.6 does not allow initializing a struct field with '{ 0 }'
+ifeq ($(GCC_MAJ_VERSION_GTEQ_4),1)
+ifeq ($(GCC_MIN_VERSION_GTEQ_7),1)
+  KV_XTRA_COMMON_FLAGS += -Wmissing-field-initializers
+ifeq ($(ARCH),arm) # On ARM, ignore missing field initializers in <kv_module_name>.mod.c
+  CFLAGS_$(KV_MODULE_NAME).mod.o += -Wno-missing-field-initializers
+endif
+endif
+endif
 
 export KV_XTRA_CFLAGS       = $(KV_XTRA_COMMON_FLAGS) $(KV_NDEBUGFLAGS) -DWIN32=0
 export KV_XTRA_CFLAGS_DEBUG = $(KV_XTRA_COMMON_FLAGS) $(KV_DEBUGFLAGS)  -DWIN32=0
@@ -125,7 +138,7 @@ endif
 obj-m := $(KV_MODULE_NAME).o
 $(KV_MODULE_NAME)-objs := $(OBJS)
 
-KBUILD_EXTRA_SYMBOLS = $(PWD)/../common/Module.symvers
+KBUILD_EXTRA_SYMBOLS = $(KBUILD_EXTMOD)/../common/Module.symvers
 
 CHECK_LOGFILE = checklog.txt
 
@@ -138,7 +151,7 @@ kv_module:
 	$(MAKE) -C $(KV_KERNEL_SRC_DIR) SUBDIRS=$(PWD) modules
 	@echo --------------------------------------------------------------------
 
-install: kv_module
+install:
 	@echo --------------------------------------------------------------------
 	@echo "You need to manually install by running 'sudo ./installscript.sh'"
 	@echo --------------------------------------------------------------------

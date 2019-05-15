@@ -58,7 +58,6 @@
 #define _MHYDRA_HW_IF_H_
 
 
-#include "osif_kernel.h"
 #include "hydra_host_cmds.h"
 #include "objbuf.h"
 
@@ -96,13 +95,20 @@
 typedef struct MhydraChanData {
   /* These are the number of outgoing packets residing in the device */
   uint32_t      outstanding_tx;
-  OS_IF_LOCK    outTxLock;
+  spinlock_t    outTxLock;
   uint64_t      timestamp_correction_value;
   OBJECT_BUFFER *objbufs;
   CAN_MSG       current_tx_message[HYDRA_MAX_OUTSTANDING_TX];
 } MhydraChanData;
 
+#define NUM_IN_PIPES 2
 
+typedef struct MhydraUsbPipeInfo {
+  uint8_t   *buffer;            // the buffer to receive data
+  size_t    size;               // the size of the receive buffer
+  uint8_t   endpointAddr;       // the address of the bulk in endpoint
+  uint32_t  maxPacketSize;
+} MhydraUsbPipeInfo;
 
 /*  Cards specific data */
 typedef struct MhydraCardData {
@@ -113,13 +119,13 @@ typedef struct MhydraCardData {
   int32_t   autoTxBufferCount;
   int32_t   autoTxBufferResolution;
 
-  OS_IF_LOCK  replyWaitListLock;
+  spinlock_t  replyWaitListLock;
   struct list_head replyWaitList;
 
   /* Structure to hold all of our device specific stuff */
 
-  OS_IF_WQUEUE                *txTaskQ;
-  OS_IF_TASK_QUEUE_HANDLE     txWork;
+  struct workqueue_struct  *txTaskQ;
+  struct work_struct       txWork;
 
   hydraHostCmdExt txCmdBuffer[KV_MHYDRA_TX_CMD_BUF_SIZE]; /* Control messages */
   Queue           txCmdQueue;
@@ -134,11 +140,10 @@ typedef struct MhydraCardData {
   struct usb_device       *udev;        // save off the usb device pointer
   struct usb_interface    *interface;   // the interface for this device
 
-  uint8_t   *bulk_in_buffer;            // the buffer to receive data
-  size_t    bulk_in_size;               // the size of the receive buffer
-  uint8_t   bulk_in_endpointAddr;       // the address of the bulk in endpoint
-
-  uint32_t  bulk_in_MaxPacketSize;
+  MhydraUsbPipeInfo  bulk_in[NUM_IN_PIPES];
+  struct workqueue_struct  *memoBulkQ;
+  struct work_struct memoBulkWork;
+  struct completion  bulk_in_1_data_valid; // bulk_in[1].buffer has valid data
 
   uint8_t   *bulk_out_buffer;           // the buffer to send data
   size_t    bulk_out_size;              // the size of the send buffer
@@ -147,10 +152,9 @@ typedef struct MhydraCardData {
 
   struct urb *write_urb;                // the urb used to send data
   uint8_t    bulk_out_endpointAddr;    // the address of the bulk out endpoint
-  OS_IF_SEMAPHORE   write_finished;     // wait for the write to finish
+  struct completion   write_finished;     // wait for the write to finish
 
   int32_t  present;                     // if the device is not disconnected
-  OS_IF_SEMAPHORE   sem;                // locks this structure
 
   VCanCardData  *vCard;
 

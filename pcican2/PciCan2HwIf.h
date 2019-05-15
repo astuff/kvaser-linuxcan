@@ -50,8 +50,8 @@
 ** ---------------------------------------------------------------------------
 **/
 
-/* Kvaser CAN driver PCIcan hardware specific parts                    
-** PCIcan definitions                                                    
+/* Kvaser CAN driver PCIcan hardware specific parts
+** PCIcan definitions
 */
 
 #ifndef _PCICAN_HW_IF_H_
@@ -62,7 +62,6 @@
 #include <asm/atomic.h>
 
 #include "VCanOsIf.h"
-#include "osif_kernel.h"
 #include "helios_cmds.h"
 #include "helios_dpram.h"
 
@@ -127,10 +126,10 @@ typedef struct PciCan2ChanData
     atomic_t outstanding_tx;
     int channel;
 #if !defined(TRY_RT_QUEUE)
-    OS_IF_TASK_QUEUE_HANDLE txTaskQ;
+    struct work_struct txTaskQ;
 #else
-    OS_IF_WQUEUE *txTaskQ;
-    OS_IF_TASK_QUEUE_HANDLE txWork;
+    struct workqueue_struct *txTaskQ;
+    struct work_struct txWork;
 #endif
 
     OBJECT_BUFFER *objbufs;
@@ -152,12 +151,12 @@ typedef struct PciCan2CardData {
     int                  waitForChipState; // wait for chip state event
     void __iomem         *baseAddr;
     int                  irq;
-    OS_IF_WAITQUEUE_HEAD waitHwInfo;
-    OS_IF_WAITQUEUE_HEAD waitSwInfo;
-    OS_IF_WAITQUEUE_HEAD waitResponse;
-    OS_IF_WAITQUEUE_HEAD waitClockResp;
-    OS_IF_LOCK           timeHi_lock;
-    OS_IF_LOCK           memQLock;
+    wait_queue_head_t    waitHwInfo;
+    wait_queue_head_t    waitSwInfo;
+    wait_queue_head_t    waitResponse;
+    wait_queue_head_t    waitClockResp;
+    spinlock_t           timeHi_lock;
+    spinlock_t           memQLock;
     unsigned long        recClock;
 
     int                  autoTxBufferCount;

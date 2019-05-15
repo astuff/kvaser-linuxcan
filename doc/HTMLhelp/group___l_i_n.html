@@ -115,6 +115,7 @@ Typedefs</h2></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___l_i_n.html#gaf47a1f1078f6b3919e2b2d9dfd559d8b">linInitializeLibrary</a> (void)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___l_i_n.html#ga3b6bd0017ef68891ac1843a5921f81da">linUnloadLibrary</a> (void)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___l_i_n.html#ga95408cd6c8639514b4be8e188bd7b38a">linGetTransceiverData</a> (int channel, unsigned char eanNo[8], unsigned char serNo[8], int *ttype)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___l_i_n.html#ga040336f8176a10cb9578b47c42baef6b">linOpenChannel</a> (int channel, int flags)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="group___l_i_n.html#ga7a5ecfd2846ddd76cd49fb4edec7fc14">LinStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___l_i_n.html#ga5d8cb59baccdefc9e772ad34c01c596f">linClose</a> (<a class="el" href="group___l_i_n.html#ga759b2696d97bd97008d8df007d9ac44a">LinHandle</a> h)</td></tr>
@@ -1391,6 +1392,24 @@ For LIN 2.0 compliance, you must specify both <a class="el" href="group___l_i_n.
 
 </div>
 </div>
+<a class="anchor" id="ga3b6bd0017ef68891ac1843a5921f81da"></a><!-- doxytag: member="linlib.h::linUnloadLibrary" ref="ga3b6bd0017ef68891ac1843a5921f81da" args="(void)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void linUnloadLibrary </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<p>This function de-initializes the LIN library. After this function is called /ref linInitializeLibrary must be called before any other LIN function is called. </p>
+
+</div>
+</div>
 <a class="anchor" id="ga5bf84820248e95fde2718fa46304a5a5"></a><!-- doxytag: member="linlib.h::linUpdateMessage" ref="ga5bf84820248e95fde2718fa46304a5a5" args="(LinHandle h, unsigned int id, const void *msg, unsigned int dlc)" -->
 <div class="memitem">
 <div class="memproto">
@@ -1596,7 +1615,7 @@ For LIN 2.0 compliance, you must specify both <a class="el" href="group___l_i_n.
     <ul>
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.17) - Generated on Thu Sep 15 2016</small>
+<small>Kvaser Linux CANLIB (canlib 5.19) - Generated on Wed Feb 15 2017</small>
 </address>
 </body>
 </html>

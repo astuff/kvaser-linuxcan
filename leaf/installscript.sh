@@ -56,9 +56,18 @@ UDEVCTRL=`which udevcontrol`
 UDEVADM=`which udevadm`
 UDEVD=`which udevd`
 
-install -D -m 700 $MODNAME.ko /lib/modules/`uname -r`/kernel/drivers/usb/misc/$MODNAME.ko
-install -m 700 $MODNAME.sh /usr/sbin/
+install -D -m 644 $MODNAME.ko /lib/modules/`uname -r`/kernel/drivers/usb/misc/$MODNAME.ko
+if [ "$?" -ne 0 ] ; then
+  exit 1
+fi
+install -m 755 $MODNAME.sh /usr/sbin/
+if [ "$?" -ne 0 ] ; then
+  exit 1
+fi
 install -m 644 ../10-kvaser.rules /etc/udev/rules.d
+if [ "$?" -ne 0 ] ; then
+  exit 1
+fi
 
 if [ -z $UDEVD ] ; then
   $UDEVADM control --reload-rules ;

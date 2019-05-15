@@ -57,6 +57,7 @@
 
 //#   include <linux/ioctl.h>
 #   include <asm/ioctl.h>
+#   include "debug.h"
 
 #   define KCAN_IOC_MAGIC 'k'
 
@@ -88,10 +89,19 @@
 #define  KCAN_IOCTL_TX_INTERVAL                 CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 68, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 #define KCAN_IOCTL_CANFD                        CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 69, METHOD_BUFFERED, FILE_ANY_ACCESS)
-
+// Windows code has this in vcanio.h
+#define VCAN_IOCTL_GET_CARD_INFO                CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 70, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define KCAN_IOCTL_GET_CARD_INFO_2              CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 71, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 #define KCAN_IOCTL_SET_BRLIMIT                  CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 72, METHOD_BUFFERED, FILE_ANY_ACCESS)
 #define KCAN_IOCTL_GET_CUST_CHANNEL_NAME        CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 73, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define KCAN_IOCTL_GET_CARD_INFO_MISC           CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 74, METHOD_BUFFERED, FILE_ANY_ACCESS)
+
+#define KCANY_IOCTL_MEMO_CONFIG_MODE     CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 75, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define KCANY_IOCTL_MEMO_GET_DATA        CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 76, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define KCANY_IOCTL_MEMO_PUT_DATA        CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 77, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define KCANY_IOCTL_MEMO_DISK_IO         CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 78, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define KCANY_IOCTL_MEMO_DISK_IO_FAST    CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 79, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 #define KCAN_CARDFLAG_FIRMWARE_BETA       0x01  // Firmware is beta
 #define KCAN_CARDFLAG_FIRMWARE_RC         0x02  // Firmware is release candidate
@@ -133,5 +143,112 @@ typedef struct {
   unsigned char data[64];   // Transfered bytes between user space and kernel space
 } KCAN_IOCTL_GET_CUST_CHANNEL_NAME_T;
 
+#define KCAN_IOCTL_MISC_INFO_REMOTE_TYPE     0
+#define KCAN_IOCTL_MISC_INFO_LOGGER_TYPE     1
+#define KCAN_IOCTL_MISC_INFO_WEBSERVER_TYPE  2
+
+/*possible values*/
+#define KCAN_IOCTL_MISC_INFO_NOT_IMPLEMENTED      0
+#define KCAN_IOCTL_MISC_INFO_REMOTE_TYPE_WLAN     1
+#define KCAN_IOCTL_MISC_INFO_REMOTE_TYPE_LAN      2
+#define KCAN_IOCTL_MISC_INFO_LOGGER_TYPE_V1       1
+#define KCAN_IOCTL_MISC_INFO_LOGGER_TYPE_V2       2
+#define KCAN_IOCTL_MISC_INFO_REMOTE_WEBSERVER_V1  1
+
+typedef struct {
+  unsigned int type;
+  unsigned int value;
+} KCAN_IOCTL_MISC_INFO;
+
+//===========================================================================
+// for KCAN_IOCTL_LED_ACTION_I
+#define KCAN_LED_SUBCOMMAND_ALL_LEDS_ON    0
+#define KCAN_LED_SUBCOMMAND_ALL_LEDS_OFF   1
+#define KCAN_LED_SUBCOMMAND_LED_0_ON       2
+#define KCAN_LED_SUBCOMMAND_LED_0_OFF      3
+#define KCAN_LED_SUBCOMMAND_LED_1_ON       4
+#define KCAN_LED_SUBCOMMAND_LED_1_OFF      5
+#define KCAN_LED_SUBCOMMAND_LED_2_ON       6
+#define KCAN_LED_SUBCOMMAND_LED_2_OFF      7
+#define KCAN_LED_SUBCOMMAND_LED_3_ON       8
+#define KCAN_LED_SUBCOMMAND_LED_3_OFF      9
+
+typedef struct s_kcan_ioctl_led_action {
+  unsigned long   sub_command;    // One of KCAN_LED_SUBCOMMAND_xxx
+  int             timeout;
+} KCAN_IOCTL_LED_ACTION_I;
+
+typedef struct {
+  int             interval;
+  int             padding[10]; // for future usage.
+} KCANY_CONFIG_MODE;
+
+typedef struct {
+  unsigned int   subcommand;
+  int            status;          // From the driver: MEMO_STATUS_xxx
+  int            dio_status;      // From the driver: DioResult
+  int            lio_status;      // From the driver: LioResult
+  unsigned int   buflen;
+  unsigned int   timeout;         // Timeout in ms
+  unsigned char  buffer[1000];    // Contents & usage dependent on subcommand
+} KCANY_MEMO_INFO;
+
+
+typedef struct {
+  unsigned int  subcommand;
+  unsigned int  first_sector;
+  unsigned int  count;
+  unsigned char buffer[512];
+  int status;                     // From the driver: MEMO_STATUS_...
+  int dio_status;                 // From the driver: DioResult
+  int lio_status;                 // From the driver: LioResult
+} KCANY_MEMO_DISK_IO;
+
+
+typedef struct {
+  unsigned int subcommand;        // To the driver: ..IO_FASTREAD..
+  unsigned int first_sector;      // To the driver: first sector no
+  unsigned int count;             // To the driver: sector count
+  int status;                     // From the driver: MEMO_STATUS_...
+  int dio_status;                 // From the driver: DioResult
+  int lio_status;                 // From the driver: LioResult
+  unsigned char buffer[16][512];
+} KCANY_MEMO_DISK_IO_FAST;
+
+
+// Must agree with MEMO_SUBCMD_xxx in filo_cmd.h
+#define KCANY_MEMO_DISK_IO_READ_PHYSICAL_SECTOR         4
+#define KCANY_MEMO_DISK_IO_WRITE_PHYSICAL_SECTOR        5
+#define KCANY_MEMO_DISK_IO_ERASE_PHYSICAL_SECTOR        6
+#define KCANY_MEMO_DISK_IO_READ_LOGICAL_SECTOR          7
+#define KCANY_MEMO_DISK_IO_WRITE_LOGICAL_SECTOR         8
+#define KCANY_MEMO_DISK_IO_ERASE_LOGICAL_SECTOR         9
+#define KCANY_MEMO_DISK_IO_FASTREAD_PHYSICAL_SECTOR    17
+#define KCANY_MEMO_DISK_IO_FASTREAD_LOGICAL_SECTOR     18
+
+#define KCAN_USBSPEED_NOT_AVAILABLE   0
+#define KCAN_USBSPEED_FULLSPEED       1
+#define KCAN_USBSPEED_HISPEED         2
+
+typedef struct s_kcan_ioctl_card_info_2 {
+    unsigned char   ean[8];
+    unsigned long   hardware_address;
+    unsigned long   ui_number;
+    unsigned long   usb_speed;            // KCAN_USBSPEED_xxx
+    unsigned long   softsync_running;
+    long            softsync_instab;
+    long            softsync_instab_max;
+    long            softsync_instab_min;
+    unsigned long   card_flags;           // KCAN_CARDFLAG_xxx
+    unsigned long   driver_flags;         // KCAN_DRVFLAG_xxx
+    char            pcb_id[32];           // e.g. P023B002V1-2 (see doc Q023-059)
+    unsigned long   mfgdate;              // Seconds since 1970-01-01
+    unsigned long   usb_host_id;          // Checksum of USB host controller
+    unsigned int    usb_throttle;         // Enforced delay between transmission of commands.
+    unsigned char   reserved[40];
+} KCAN_IOCTL_CARD_INFO_2;
+#if defined(CompilerAssert)
+CompilerAssert(sizeof(KCAN_IOCTL_CARD_INFO_2) == 128);
+#endif
 #endif /* KCANIO_H */
 

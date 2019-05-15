@@ -57,8 +57,6 @@
 #ifndef _VIRTUAL_HW_IF_H_
 #define _VIRTUAL_HW_IF_H_
 
-#include "osif_kernel.h"
-
 /*****************************************************************************/
 /* defines */
 /*****************************************************************************/
@@ -84,7 +82,7 @@
 typedef struct virtualChanData
 {
     VCanBusParams busparams;
-    OS_IF_TASK_QUEUE_HANDLE txTaskQ;
+    struct work_struct txTaskQ;
     int silentmode;
     atomic_t outstanding_tx;
 } virtualChanData;

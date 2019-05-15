@@ -57,9 +57,6 @@
 #include "canIfData.h"
 #include "canlib_data.h"
 
-#include "osif_user.h"
-#include "osif_functions_user.h"
-
 #include "vcan_ioctl.h"    // Need this for IOCtl to check # channels
 #include "vcanevt.h"
 
@@ -74,9 +71,8 @@
 #include <errno.h>
 #include <signal.h>
 #include <pthread.h>
-
 #include <string.h>
-
+#include <sys/ioctl.h>
 
 #if DEBUG
 #   define DEBUGPRINT(args) printf args
@@ -257,7 +253,7 @@ canStatus getDevParams (int channel, char devName[], int *devChannel,
   int ChannelNoOnCard = 0;
   int ChannelsOnCard  = 0;
   int err;
-  OS_IF_FILE_HANDLE fd;
+  int fd;
 
   for(n = 0; n < sizeof(dev_name) / sizeof(*dev_name); n++) {
     CardNo = -1;
@@ -273,8 +269,7 @@ canStatus getDevParams (int channel, char devName[], int *devChannel,
           err = 1;
           fd = open(devName, O_RDONLY);
           if (fd != -1) {
-            err = os_if_ioctl_read(fd, VCAN_IOC_GET_NRCHANNELS,
-                                   &ChannelsOnCard, sizeof(ChannelsOnCard));
+            err = ioctl(fd, VCAN_IOC_GET_NRCHANNELS, &ChannelsOnCard);
             close(fd);
           }
           if (err) {
@@ -332,7 +327,7 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags)
     return canERR_PARAM;
   }
 
-  hData = (HandleData *)OS_IF_ALLOC_MEM(sizeof(HandleData));
+  hData = (HandleData *)malloc(sizeof(HandleData));
   if (hData == NULL) {
     DEBUGPRINT((TXT("ERROR: cannot allocate memory (%d)\n"),
                 (int)sizeof(HandleData)));
@@ -341,8 +336,6 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags)
 
   memset(hData, 0, sizeof(HandleData));
 
-  hData->readIsBlock      = 1;
-  hData->writeIsBlock     = 1;
   hData->isExtended       = flags & canOPEN_REQUIRE_EXTENDED;
 
   if (flags & canOPEN_CAN_FD_NONISO)
@@ -352,11 +345,11 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags)
   else
     hData->fdMode = OPEN_AS_CAN;
 
-  hData->acceptLargeDlc   = ((flags & canOPEN_ACCEPT_LARGE_DLC) != 0);
-  hData->wantExclusive    = flags & canOPEN_EXCLUSIVE;
-  hData->acceptVirtual    = flags & canOPEN_ACCEPT_VIRTUAL;
-  hData->notifyFd         = OS_IF_INVALID_HANDLE;
-  hData->valid            = TRUE;
+  hData->acceptLargeDlc      = ((flags & canOPEN_ACCEPT_LARGE_DLC) != 0);
+  hData->wantExclusive       = flags & canOPEN_EXCLUSIVE;
+  hData->acceptVirtual       = flags & canOPEN_ACCEPT_VIRTUAL;
+  hData->notifyFd            = canINVALID_HANDLE;
+  hData->valid               = TRUE;
 
   status = getDevParams(channel,
                         hData->deviceName,
@@ -366,14 +359,14 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags)
 
   if (status < 0) {
     DEBUGPRINT((TXT("getDevParams ret %d\n"), status));
-    OS_IF_FREE_MEM(hData);
+    free(hData);
     return status;
   }
 
   status = hData->canOps->openChannel(hData);
   if (status < 0) {
     DEBUGPRINT((TXT("openChannel ret %d\n"), status));
-    OS_IF_FREE_MEM(hData);
+    free(hData);
     return status;
   }
 
@@ -381,8 +374,8 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags)
 
   if (hnd < 0) {
     DEBUGPRINT((TXT("insertHandle ret %d\n"), hnd));
-    OS_IF_CLOSE_HANDLE(hData->fd);
-    OS_IF_FREE_MEM(hData);
+    close(hData->fd);
+    free(hData);
     return canERR_NOMEM;
   }
 
@@ -396,21 +389,31 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags)
 int CANLIBAPI canClose (const CanHandle hnd)
 {
   HandleData *hData;
+  canStatus stat;
 
   // Try to go Bus Off before closing
-  canBusOff(hnd);
+  stat = canBusOff(hnd);
 
+  if (stat != canOK) {
+    return stat;
+  }
+
+  stat = canSetNotify(hnd, NULL, 0, NULL);
+
+  if (stat != canOK) {
+    return stat;
+  }
+  
   hData = removeHandle(hnd);
   if (hData == NULL) {
     return canERR_INVHANDLE;
   }
 
-  canSetNotify(hnd, NULL, 0, NULL);
-  if (OS_IF_IS_CLOSE_ERROR(OS_IF_CLOSE_HANDLE(hData->fd))) {
+  if (close(hData->fd) != 0) {
     return canERR_INVHANDLE;
   }
 
-  OS_IF_FREE_MEM(hData);
+  free(hData);
 
   return canOK;
 }
@@ -427,7 +430,7 @@ canStatus CANLIBAPI canGetRawHandle (const CanHandle hnd, void *pvFd)
   if (hData == NULL) {
     return canERR_INVHANDLE;
   }
-  *(OS_IF_FILE_HANDLE *)pvFd = hData->fd;
+  *(int *)pvFd = hData->fd;
 
   return canOK;
 }
@@ -729,6 +732,23 @@ canStatus CANLIBAPI canReadStatus (const CanHandle hnd,
 
 
 //******************************************************
+// Flash LED
+//******************************************************
+canStatus CANLIBAPI kvFlashLeds (const CanHandle hnd,
+                                 int action, int timeout)
+{
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  return hData->canOps->kvFlashLeds(hData, action, timeout);
+}
+
+
+//******************************************************
 // Request chip status
 //******************************************************
 canStatus CANLIBAPI canRequestChipStatus (const CanHandle hnd)
@@ -818,34 +838,14 @@ canStatus CANLIBAPI
 canRead (const CanHandle hnd, long *id, void *msgPtr, unsigned int *dlc,
          unsigned int *flag, unsigned long *time)
 {
-  int i;
   HandleData *hData;
-
+  
   hData = findHandle(hnd);
   if (hData == NULL) {
     return canERR_INVHANDLE;
   }
-  if (hData->syncPressent == 1)
-  {
-    hData->syncPressent = 0;
-    if (id)   *id = hData->syncId;
-    if (msgPtr != NULL) {
-      int count = hData->syncDlc;
-      if (count > 8) {
-        count = 8;
-      }
-      for (i = 0; i < count; i++)
-        ((unsigned char *)msgPtr)[i] = hData->syncMsg[i];
-    }
-    if (dlc)  *dlc = hData->syncDlc;
-    if (flag) *flag = hData->syncFlag;
-    if (time) *time = hData->syncTime;
-    return canOK;
-  }
-  else
-  {
-    return hData->canOps->read(hData, id, msgPtr, dlc, flag, time);
-  }
+
+  return hData->canOps->read(hData, id, msgPtr, dlc, flag, time);
 }
 
 //*********************************************************
@@ -919,34 +919,15 @@ canStatus CANLIBAPI
 canReadWait (const CanHandle hnd, long *id, void *msgPtr, unsigned int *dlc,
              unsigned int *flag, unsigned long *time, unsigned long timeout)
 {
-  int i;
   HandleData *hData;
 
   hData = findHandle(hnd);
+
   if (hData == NULL) {
     return canERR_INVHANDLE;
   }
-  if (hData->syncPressent == 1)
-  {
-    hData->syncPressent = 0;
-    if (id)   *id = hData->syncId;
-    if (msgPtr != NULL) {
-      int count = hData->syncDlc;
-      if (count > 8) {
-        count = 8;
-      }
-      for (i = 0; i < count; i++)
-        ((unsigned char *)msgPtr)[i] = hData->syncMsg[i];
-    }
-    if (dlc)  *dlc = hData->syncDlc;
-    if (flag) *flag = hData->syncFlag;
-    if (time) *time = hData->syncTime;
-    return canOK;
-  }
-  else
-  {
-    return hData->canOps->readWait(hData, id, msgPtr, dlc, flag, time, timeout);
-  }
+  
+  return hData->canOps->readWait(hData, id, msgPtr, dlc, flag, time, timeout);
 }
 
 //*********************************************************
@@ -956,34 +937,15 @@ canReadWait (const CanHandle hnd, long *id, void *msgPtr, unsigned int *dlc,
 canStatus CANLIBAPI
 canReadSync(const CanHandle hnd, unsigned long timeout)
 {
-  canStatus CANLIBAPI stat;
-
   HandleData *hData;
 
   hData = findHandle(hnd);
+
   if (hData == NULL) {
     return canERR_INVHANDLE;
   }
 
-  if (hData->syncPressent == 0)
-  {
-    stat = canReadWait (hnd, &hData->syncId, &hData->syncMsg, &hData->syncDlc,
-              &hData->syncFlag, &hData->syncTime, timeout);
-    if (stat != canOK)
-    {
-      hData->syncPressent = 0;
-      return canERR_TIMEOUT;
-    }
-    else
-    {
-      hData->syncPressent = 1;
-      return canOK;
-    }
-  }
-  else
-  {
-    return canOK;
-  }
+  return hData->canOps->readSync(hData, timeout);
 }
 
 //****************************************************************
@@ -1034,6 +996,38 @@ canStatus CANLIBAPI canReadTimer (const CanHandle hnd, unsigned long *time)
   }
 
   return hData->canOps->readTimer(hData, time);
+}
+
+
+//******************************************************
+// Read the time from hw
+//******************************************************
+canStatus CANLIBAPI kvReadTimer (const CanHandle hnd, unsigned int *time)
+{
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  return hData->canOps->kvReadTimer(hData, time);
+}
+
+
+//******************************************************
+// Read the 64-bit time from hw
+//******************************************************
+canStatus CANLIBAPI kvReadTimer64 (const CanHandle hnd, uint64_t *time)
+{
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  return hData->canOps->kvReadTimer64(hData, time);
 }
 
 
@@ -1227,7 +1221,7 @@ canStatus CANLIBAPI canGetNumberOfChannels (int *channelCount)
     // There are 256 minor inode numbers
     for(cardNr = 0; cardNr <= 255; cardNr++) {
       snprintf(filename,  DEVICE_NAME_LEN, "/dev/%s%d", dev_name[n], cardNr);
-      if (os_if_access(filename, F_OK) == 0) {  // Check for existance
+      if (access(filename, F_OK) == 0) {  // Check for existance
         tmpCount++;
       }
       else {
@@ -1672,7 +1666,7 @@ canSetNotify (const CanHandle hnd, void (*callback)(canNotifyData *),
     return canERR_INVHANDLE;
   }
   if (notifyFlags == 0 || callback == NULL) {
-    if (hData->notifyFd != OS_IF_INVALID_HANDLE) {
+    if (hData->notifyFd != canINVALID_HANDLE) {
       // We want to shut off notification, close file and clear callback
 
       pthread_cancel(hData->notifyThread);
@@ -1680,10 +1674,10 @@ canSetNotify (const CanHandle hnd, void (*callback)(canNotifyData *),
       // Wait for thread to finish
       pthread_join(hData->notifyThread, NULL);
 
-      if (hData->notifyFd != OS_IF_INVALID_HANDLE) {
-        OS_IF_CLOSE_HANDLE(hData->notifyFd);
+      if (hData->notifyFd != canINVALID_HANDLE) {
+        close(hData->notifyFd);
       }
-      hData->notifyFd = OS_IF_INVALID_HANDLE;
+      hData->notifyFd = canINVALID_HANDLE;
     }
 
     return canOK;
@@ -1711,7 +1705,7 @@ kvStatus CANLIBAPI kvSetNotifyCallback(const CanHandle hnd,
     return canERR_INVHANDLE;
   }
   if (notifyFlags == 0 || callback == NULL) {
-    if (hData->notifyFd != OS_IF_INVALID_HANDLE) {
+    if (hData->notifyFd != canINVALID_HANDLE) {
       // We want to shut off notification, close file and clear callback
 
       pthread_cancel(hData->notifyThread);
@@ -1719,10 +1713,10 @@ kvStatus CANLIBAPI kvSetNotifyCallback(const CanHandle hnd,
       // Wait for thread to finish
       pthread_join(hData->notifyThread, NULL);
 
-      if (hData->notifyFd != OS_IF_INVALID_HANDLE) {
-        OS_IF_CLOSE_HANDLE(hData->notifyFd);
+      if (hData->notifyFd != canINVALID_HANDLE) {
+        close(hData->notifyFd);
       }
-      hData->notifyFd = OS_IF_INVALID_HANDLE;
+      hData->notifyFd = canINVALID_HANDLE;
     }
 
     return canOK;
@@ -1742,6 +1736,17 @@ void CANLIBAPI canInitializeLibrary (void)
 
   Initialized = TRUE;
   return;
+}
+
+//******************************************************
+// Unload library
+//******************************************************
+canStatus CANLIBAPI canUnloadLibrary (void)
+{
+  foreachHandle(&canClose);
+  Initialized = FALSE;
+
+  return canOK;
 }
 
 static canStatus check_bitrate (const CanHandle hnd, unsigned int bitrate)

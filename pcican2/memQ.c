@@ -64,7 +64,6 @@
 
 #include <asm/io.h>
 
-#include "osif_functions_kernel.h"
 #include "helios_cmds.h"
 #include "memq.h"
 
@@ -82,7 +81,7 @@ int MemQSanityCheck (PciCan2CardData *ci)
     uint32_t p;
     unsigned long irqFlags;
 
-    os_if_spin_lock_irqsave(&ci->memQLock, &irqFlags);
+    spin_lock_irqsave(&ci->memQLock, irqFlags);
 
     p = ioread32(ci->baseAddr + DPRAM_HOST_WRITE_PTR);
     if (p > 10000)
@@ -100,12 +99,12 @@ int MemQSanityCheck (PciCan2CardData *ci)
     if (p > 10000)
         goto error;
 
-    os_if_spin_unlock_irqrestore(&ci->memQLock, irqFlags);
+    spin_unlock_irqrestore(&ci->memQLock, irqFlags);
 
     return 1;
 
 error:
-    os_if_spin_unlock_irqrestore(&ci->memQLock, irqFlags);
+    spin_unlock_irqrestore(&ci->memQLock, irqFlags);
 
     return 0;
 }
@@ -114,9 +113,9 @@ error:
 //help fkt for Tx/Rx- FreeSpace(...)
 /////////////////////////////////////////////////////////////////////////
 
-static int AvailableSpace (unsigned int  cmdLen, unsigned long rAddr,  
-                           unsigned long wAddr,  unsigned long bufStart, 
-                           unsigned int bufSize) 
+static int AvailableSpace (unsigned int  cmdLen, unsigned long rAddr,
+                           unsigned long wAddr,  unsigned long bufStart,
+                           unsigned int bufSize)
 {
     int remaining;
     //cmdLen in bytes
@@ -182,10 +181,10 @@ int QCmd (PciCan2CardData *ci, heliosCmd *cmd)
     void __iomem  *addr = ci->baseAddr;
     unsigned long irqFlags;
 
-    os_if_spin_lock_irqsave(&ci->memQLock, &irqFlags);
+    spin_lock_irqsave(&ci->memQLock, irqFlags);
 
     if (!TxAvailableSpace(ci, cmd->head.cmdLen)) {
-        os_if_spin_unlock_irqrestore(&ci->memQLock, irqFlags);
+        spin_unlock_irqrestore(&ci->memQLock, irqFlags);
         return MEM_Q_FULL;
     }
 
@@ -201,14 +200,14 @@ int QCmd (PciCan2CardData *ci, heliosCmd *cmd)
     }
 
     hwp += cmd->head.cmdLen;
- 
+
     if ((hwp + MAX_CMD_LEN) > DPRAM_TX_BUF_END) {
         hwp = DPRAM_TX_BUF_START;
     }
 
     iowrite32(hwp, addr + DPRAM_HOST_WRITE_PTR);
 
-    os_if_spin_unlock_irqrestore(&ci->memQLock, irqFlags);
+    spin_unlock_irqrestore(&ci->memQLock, irqFlags);
 
     return MEM_Q_SUCCESS;
 }
@@ -224,7 +223,7 @@ int GetCmdFromQ (PciCan2CardData *ci, heliosCmd *cmdPtr)
     void __iomem  *addr = ci->baseAddr;
     unsigned long irqFlags;
 
-    os_if_spin_lock_irqsave(&ci->memQLock, &irqFlags);
+    spin_lock_irqsave(&ci->memQLock, irqFlags);
 
     hrp = ioread32(addr + DPRAM_HOST_READ_PTR);
     cwp = ioread32(addr + DPRAM_M16C_WRITE_PTR);
@@ -254,12 +253,12 @@ int GetCmdFromQ (PciCan2CardData *ci, heliosCmd *cmdPtr)
 
         iowrite32(hrp, addr + DPRAM_HOST_READ_PTR);
 
-        os_if_spin_unlock_irqrestore(&ci->memQLock, irqFlags);
+        spin_unlock_irqrestore(&ci->memQLock, irqFlags);
 
         return MEM_Q_SUCCESS;
     }
     else {
-        os_if_spin_unlock_irqrestore(&ci->memQLock, irqFlags);
+        spin_unlock_irqrestore(&ci->memQLock, irqFlags);
 
         return MEM_Q_EMPTY;
     }

@@ -54,14 +54,15 @@
 // Linux USBcanII driver
 //
 
-#  include <linux/version.h>
-#  include <linux/usb.h>
-#  include <linux/types.h>
-#  include <linux/seq_file.h>
+#include <linux/version.h>
+#include <linux/usb.h>
+#include <linux/types.h>
+#include <linux/seq_file.h>
+#include <linux/module.h>
+#include <linux/slab.h>
+#include <linux/kthread.h>
 
 // Non system headers
-#include "osif_kernel.h"
-#include "osif_functions_kernel.h"
 #include "VCanOsIf.h"
 #include "usbcanHWIf.h"
 #include "helios_cmds.h"
@@ -76,9 +77,9 @@
 #define USB_USBCAN_MINOR_BASE   96
 
 
-    MODULE_LICENSE("Dual BSD/GPL");
-    MODULE_AUTHOR("KVASER");
-    MODULE_DESCRIPTION("USBcanII CAN module.");
+MODULE_LICENSE("Dual BSD/GPL");
+MODULE_AUTHOR("KVASER");
+MODULE_DESCRIPTION("USBcanII CAN module.");
 
 
 //----------------------------------------------------------------------------
@@ -87,23 +88,26 @@
 // be present but disabled -- but it can then be enabled for specific
 // modules at load time with a 'pc_debug=#' option to insmod.
 //
-#   ifdef USBCAN_DEBUG
-        static int pc_debug = USBCAN_DEBUG;
-        MODULE_PARM_DESC(pc_debug, "USBCanII debug level");
-        module_param(pc_debug, int, 0644);
-#       define DEBUGPRINT(n, arg)     if (pc_debug >= (n)) { DEBUGOUT(n, arg); }
-#   else
-#       define DEBUGPRINT(n, arg)     if ((n) == 1) { DEBUGOUT(n, arg); }
-#   endif
+#ifdef USBCAN_DEBUG
+    static int pc_debug = USBCAN_DEBUG;
+    MODULE_PARM_DESC(pc_debug, "USBCanII debug level");
+    module_param(pc_debug, int, 0644);
+#   define DEBUGPRINT(n, arg)     if (pc_debug >= (n)) { DEBUGOUT(n, arg); }
+#else
+#   define DEBUGPRINT(n, arg)     if ((n) == 1) { DEBUGOUT(n, arg); }
+#endif
 //----------------------------------------------------------------------------
 
+#ifndef THIS_MODULE
+#define THIS_MODULE 0
+#endif
 
 
 //======================================================================
 // HW function pointers
 //======================================================================
 
-static int INIT usbcan_init_driver(void);
+static int usbcan_init_driver(void);
 static int usbcan_set_busparams(VCanChanData *vChd, VCanBusParams *par);
 static int usbcan_get_busparams(VCanChanData *vChd, VCanBusParams *par);
 static int usbcan_set_silent(VCanChanData *vChd, int silent);
@@ -113,10 +117,10 @@ static int usbcan_bus_off(VCanChanData *vChd);
 static int usbcan_get_tx_err(VCanChanData *vChd);
 static int usbcan_get_rx_err(VCanChanData *vChd);
 static int usbcan_outstanding_sync(VCanChanData *vChan);
-static int EXIT usbcan_close_all(void);
+static int usbcan_close_all(void);
 static int usbcan_proc_read(struct seq_file* m, void* v);
 static int usbcan_get_chipstate(VCanChanData *vChd);
-static int usbcan_get_time(VCanCardData *vCard, unsigned long *time);
+static int usbcan_get_time(VCanCardData *vCard, uint64_t *time);
 static int usbcan_flush_tx_buffer(VCanChanData *vChan);
 static void usbcan_schedule_send(VCanCardData *vCard, VCanChanData *vChan);
 static unsigned long usbcan_get_hw_tx_q_len(VCanChanData *vChan);
@@ -133,6 +137,7 @@ static int usbcan_objbuf_set_flags(VCanChanData *chd, int bufType, int bufNo,
                                    int flags);
 static int usbcan_objbuf_set_period(VCanChanData *chd, int bufType, int bufNo,
                                     int period);
+static int usbcan_flash_leds(const VCanChanData *chd, int action, int timeout);
 
 static VCanDriverData driverData;
 
@@ -154,6 +159,7 @@ static VCanHWInterface hwIf = {
   .txQLen            = usbcan_get_hw_tx_q_len,
   .requestChipState  = usbcan_get_chipstate,
   .requestSend       = usbcan_schedule_send,
+  .flashLeds         = usbcan_flash_leds,
   .objbufExists      = usbcan_objbuf_exists,
   .objbufFree        = usbcan_objbuf_free,
   .objbufAlloc       = usbcan_objbuf_alloc,
@@ -178,9 +184,9 @@ static VCanHWInterface hwIf = {
 
 //======================================================================
 // Prototypes
-static int    DEVINIT usbcan_plugin(struct usb_interface *interface,
-                                    const struct usb_device_id *id);
-static void   DEVEXIT usbcan_remove(struct usb_interface *interface);
+static int    usbcan_plugin(struct usb_interface *interface,
+                            const struct usb_device_id *id);
+static void   usbcan_remove(struct usb_interface *interface);
 
 // Interrupt handler prototype changed in 2.6.19.
  #if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 19))
@@ -231,7 +237,7 @@ static struct usb_device_id usbcan_table[] = {
   { USB_DEVICE(KVASER_VENDOR_ID, USB_USBCAN_REVB_PRODUCT_ID) },
   { USB_DEVICE(KVASER_VENDOR_ID, USB_MEMORATOR_PRODUCT_ID) },
   { USB_DEVICE(KVASER_VENDOR_ID, USB_VCI2_PRODUCT_ID) },
-  { }  // Terminating entry
+  { 0 }  // Terminating entry
 };
 
 MODULE_DEVICE_TABLE(usb, usbcan_table);
@@ -298,7 +304,7 @@ static void usbcan_write_bulk_callback (struct urb *urb)
   }
 
   // Notify anyone waiting that the write has finished
-  os_if_up_sema(&dev->write_finished);
+  complete(&dev->write_finished);
 }
 
 
@@ -349,11 +355,11 @@ static int usbcan_rx_thread (void *context)
                        usb_rcvbulkpipe(dev->udev, dev->bulk_in_endpointAddr),
                        dev->bulk_in_buffer, dev->bulk_in_size, &len,
 // Timeout changed from jiffies to milliseconds in 2.6.12.
-# if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 12))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 12))
                        HZ * 30);
-# else
+#else
                        30000);
-# endif
+#endif
 
     if (ret) {
       if (ret != -ETIMEDOUT) {
@@ -423,7 +429,8 @@ static int usbcan_rx_thread (void *context)
 
   DEBUGPRINT(3, (TXT("rx thread Ended - finalised\n")));
 
-  os_if_exit_thread(THIS_MODULE, result);
+  module_put(THIS_MODULE);
+  do_exit(result);
 
   return result;
 } // _rx_thread
@@ -472,10 +479,10 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
         e.tag               = V_RECEIVE_MSG;
 
         e.transId           = 0;
-        os_if_spin_lock_irqsave(&dev->timeHi_lock, &irqFlags);
+        spin_lock_irqsave(&dev->timeHi_lock, irqFlags);
         e.timeStamp         = (cmd->rxCanMessage.time + vCard->timeHi) /
                               USBCANII_TICKS_PER_10US;
-        os_if_spin_unlock_irqrestore(&dev->timeHi_lock, irqFlags);
+        spin_unlock_irqrestore(&dev->timeHi_lock, irqFlags);
 
         e.tagData.msg.id     = cmd->rxCanMessage.rawMessage[0] & 0x1F;
         e.tagData.msg.id   <<= 6;
@@ -571,10 +578,10 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
         //  wake_up(&hCd->waitResponse);
 
         e.tag       = V_CHIP_STATE;
-        os_if_spin_lock_irqsave(&dev->timeHi_lock, &irqFlags);
+        spin_lock_irqsave(&dev->timeHi_lock, irqFlags);
         e.timeStamp = (cmd->chipStateEvent.time + vCard->timeHi) /
                       USBCANII_TICKS_PER_10US;
-        os_if_spin_unlock_irqrestore(&dev->timeHi_lock, irqFlags);
+        spin_unlock_irqrestore(&dev->timeHi_lock, irqFlags);
         e.transId   = 0;
         e.tagData.chipState.busStatus      = (unsigned char)vChd->chipState.state;
         e.tagData.chipState.txErrorCounter = (unsigned char)vChd->chipState.txerr;
@@ -599,17 +606,17 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
 
     case CMD_READ_CLOCK_RESP:
       DEBUGPRINT(4, (TXT("CMD_READ_CLOCK_RESP\n")));
-      os_if_spin_lock_irqsave(&dev->timeHi_lock, &irqFlags);
+      spin_lock_irqsave(&dev->timeHi_lock, irqFlags);
       vCard->timeHi = cmd->readClockResp.time[1] << 16;
-      os_if_spin_unlock_irqrestore(&dev->timeHi_lock, irqFlags);
+      spin_unlock_irqrestore(&dev->timeHi_lock, irqFlags);
       DEBUGPRINT(6, (TXT("C %x\n"), vCard->timeHi));
       break;
 
     case CMD_CLOCK_OVERFLOW_EVENT:
       DEBUGPRINT(4, (TXT("CMD_CLOCK_OVERFLOW_EVENT\n")));
-      os_if_spin_lock_irqsave(&dev->timeHi_lock, &irqFlags);
+      spin_lock_irqsave(&dev->timeHi_lock, irqFlags);
       vCard->timeHi = cmd->clockOverflowEvent.currentTime & 0xFFFF0000;
-      os_if_spin_unlock_irqrestore(&dev->timeHi_lock, irqFlags);
+      spin_unlock_irqrestore(&dev->timeHi_lock, irqFlags);
       DEBUGPRINT(6, (TXT("O %x\n"), vCard->timeHi));
       break;
 
@@ -665,10 +672,10 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
         if (((UsbcanChanData *)vChan->hwChanData)->current_tx_message[transId - 1].flags & VCAN_MSG_FLAG_TXRQ) {
           VCAN_EVENT *e = (VCAN_EVENT *)&((UsbcanChanData *)vChan->hwChanData)->current_tx_message[transId - 1];
           e->tag = V_RECEIVE_MSG;
-          os_if_spin_lock_irqsave(&dev->timeHi_lock, &irqFlags);
+          spin_lock_irqsave(&dev->timeHi_lock, irqFlags);
           e->timeStamp = (cmd->txRequest.time + vCard->timeHi) /
                          USBCANII_TICKS_PER_10US;
-          os_if_spin_unlock_irqrestore(&dev->timeHi_lock, irqFlags);
+          spin_unlock_irqrestore(&dev->timeHi_lock, irqFlags);
           e->tagData.msg.flags &= ~VCAN_MSG_FLAG_TXACK;
           vCanDispatchEvent(vChan, e);
         }
@@ -702,9 +709,9 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
         if (usbChan->current_tx_message[transId - 1].flags & VCAN_MSG_FLAG_TXACK) {
           VCAN_EVENT *e = (VCAN_EVENT *)&usbChan->current_tx_message[transId - 1];
           e->tag = V_RECEIVE_MSG;
-          os_if_spin_lock_irqsave(&dev->timeHi_lock, &irqFlags);
+          spin_lock_irqsave(&dev->timeHi_lock, irqFlags);
           e->timeStamp = (cmd->txAck.time + vCard->timeHi) / USBCANII_TICKS_PER_10US;
-          os_if_spin_unlock_irqrestore(&dev->timeHi_lock, irqFlags);
+          spin_unlock_irqrestore(&dev->timeHi_lock, irqFlags);
           e->tagData.msg.flags &= ~VCAN_MSG_FLAG_TXRQ;
 
           vCanDispatchEvent(vChan, e);
@@ -712,24 +719,24 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
 
         usbChan->current_tx_message[transId - 1].user_data = 0;
 
-        os_if_spin_lock(&usbChan->outTxLock);
+        spin_lock(&usbChan->outTxLock);
         if (usbChan->outstanding_tx) {
           usbChan->outstanding_tx--;
         }
 
         // Outstanding is changing from *full* to at least one open slot?
         if (usbChan->outstanding_tx >= (dev->max_outstanding_tx - 1)) {
-          os_if_spin_unlock(&usbChan->outTxLock);
+          spin_unlock(&usbChan->outTxLock);
           DEBUGPRINT(6, (TXT("Buffer in chan %d not full (%d) anymore\n"),
                          cmd->txAck.channel, usbChan->outstanding_tx));
-          os_if_queue_task_not_default_queue(dev->txTaskQ, &dev->txWork);
+          queue_work(dev->txTaskQ, &dev->txWork);
         }
 
         // Check if we should *wake* canwritesync
         else if ((usbChan->outstanding_tx == 0) && txQEmpty(vChan) &&
                  test_and_clear_bit(0, &vChan->waitEmpty)) {
-          os_if_spin_unlock(&usbChan->outTxLock);
-          os_if_wake_up_interruptible(&vChan->flushQ);
+          spin_unlock(&usbChan->outTxLock);
+          wake_up_interruptible(&vChan->flushQ);
           DEBUGPRINT(6, (TXT("W%d\n"), cmd->txAck.channel));
         }
         else {
@@ -741,7 +748,7 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
                            constant_test_bit(0, &vChan->waitEmpty),
                            dev->max_outstanding_tx));
 #endif
-          os_if_spin_unlock(&usbChan->outTxLock);
+          spin_unlock(&usbChan->outTxLock);
         }
 
         DEBUGPRINT(6, (TXT("X%d\n"), cmd->txAck.channel));
@@ -915,7 +922,7 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
   // Wake up those who are waiting for a resp
   //
 
-  os_if_spin_lock_irqsave(&dev->replyWaitListLock, &irqFlags);
+  spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
   list_for_each_safe(currHead, tmpHead, &dev->replyWaitList)
   {
     currNode = list_entry(currHead, WaitNode, list);
@@ -927,7 +934,7 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
                      TXT2("_get_trans_id(%d) == cN->transId(%d)\n"),
                      currNode->cmdNr, cmd->head.cmdNo,
                      usbcan_get_trans_id(cmd), currNode->transId));
-      os_if_up_sema(&currNode->waitSemaphore);
+      complete(&currNode->waitCompletion);
     }
 #if DEBUG
     else {
@@ -938,7 +945,7 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
     }
 #endif
   }
-  os_if_spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
+  spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
 } // _handle_command
 
 
@@ -963,16 +970,16 @@ static int usbcan_get_trans_id (heliosCmd *cmd)
 //============================================================================
 // _send
 //
-# if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20)
-#  define USE_CONTEXT 1
-# else
-#  define USE_CONTEXT 0
-# endif
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20)
+# define USE_CONTEXT 1
+#else
+# define USE_CONTEXT 0
+#endif
 
 #if USE_CONTEXT
 static void usbcan_send (void *context)
 #else
-static void usbcan_send (OS_IF_TASK_QUEUE_HANDLE *work)
+static void usbcan_send (struct work_struct *work)
 #endif
 {
   unsigned int     i;
@@ -992,12 +999,12 @@ static void usbcan_send (OS_IF_TASK_QUEUE_HANDLE *work)
     return;
   }
 
-  os_if_down_sema(&dev->write_finished);
+  wait_for_completion(&dev->write_finished);
 
   if (!dev->present) {
     // The device was unplugged before the file was released
     // We cannot deallocate here it is to early and handled elsewhere
-    os_if_up_sema(&dev->write_finished);
+    complete(&dev->write_finished);
     return;
   }
 
@@ -1033,7 +1040,7 @@ static void usbcan_send (OS_IF_TASK_QUEUE_HANDLE *work)
 
     if ((result = usbcan_transmit(vCard)) <= 0) {
       // The transmission failed - mark write as finished
-      os_if_up_sema(&dev->write_finished);
+      complete(&dev->write_finished);
     }
 
     // Wake up those who are waiting to send a cmd or msg
@@ -1052,11 +1059,11 @@ static void usbcan_send (OS_IF_TASK_QUEUE_HANDLE *work)
     if (result) {
       // Give ourselves a little extra work in case all the queues could not
       // be emptied this time.
-      os_if_queue_task_not_default_queue(dev->txTaskQ, &dev->txWork);
+      queue_work(dev->txTaskQ, &dev->txWork);
     }
   }
   else {
-    os_if_up_sema(&dev->write_finished);
+    complete(&dev->write_finished);
   }
 
   return;
@@ -1078,7 +1085,7 @@ static void usbcan_translate_can_msg (VCanChanData *vChan,
   // Save a copy of the message.
   transId = atomic_read(&vChan->transId);
   if (((UsbcanChanData *)vChan->hwChanData)->current_tx_message[transId - 1].user_data) {
-    DEBUGPRINT(1, (TXT("In use: %x %d   %x %d\n"),
+    DEBUGPRINT(2, (TXT("In use: %x %d   %x %d\n"),
                    ((UsbcanChanData *)vChan->hwChanData)->current_tx_message[transId - 1].id, transId,
                    can_msg->id, ((UsbcanChanData *)vChan->hwChanData)->outstanding_tx));
   }
@@ -1265,9 +1272,9 @@ static int usbcan_fill_usb_buffer (VCanCardData *vCard, unsigned char *buffer,
       }
 
       // Have to be here (after all the breaks and continues)
-      os_if_spin_lock(&usbChan->outTxLock);
+      spin_lock(&usbChan->outTxLock);
       usbChan->outstanding_tx++;
-      os_if_spin_unlock(&usbChan->outTxLock);
+      spin_unlock(&usbChan->outTxLock);
 
       DEBUGPRINT(5, (TXT("t usbcan, chan %d, out %d\n"),
                      j, usbChan->outstanding_tx));
@@ -1326,7 +1333,7 @@ static int usbcan_transmit (VCanCardData *vCard /*, void *cmd*/)
 //============================================================================
 // _get_card_info
 //
-static void DEVINIT usbcan_get_card_info (VCanCardData* vCard)
+static void usbcan_get_card_info (VCanCardData* vCard)
 {
   UsbcanCardData        *dev = (UsbcanCardData *)vCard->hwCardData;
   cmdGetCardInfoReq     card_cmd;
@@ -1414,7 +1421,7 @@ static void usbcan_response_timer (unsigned long voidWaitNode)
 {
   WaitNode *waitNode = (WaitNode *)voidWaitNode;
   waitNode->timedOut = 1;
-  os_if_up_sema(&waitNode->waitSemaphore);
+  complete(&waitNode->waitCompletion);
 } // response_timeout
 
 
@@ -1443,7 +1450,7 @@ static int usbcan_send_and_wait_reply (VCanCardData *vCard, heliosCmd *cmd,
     return VCAN_STAT_NO_DEVICE;
   }
 
-  os_if_init_sema(&waitNode.waitSemaphore);
+  init_completion(&waitNode.waitCompletion);
   waitNode.replyPtr  = replyPtr;
   waitNode.cmdNr     = cmdNr;
   waitNode.transId   = transId;
@@ -1451,15 +1458,15 @@ static int usbcan_send_and_wait_reply (VCanCardData *vCard, heliosCmd *cmd,
   waitNode.timedOut  = 0;
 
   // Add to card's list of expected responses
-  os_if_spin_lock_irqsave(&dev->replyWaitListLock, &irqFlags);
+  spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
   list_add(&waitNode.list, &dev->replyWaitList);
-  os_if_spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
+  spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
 
   ret = usbcan_queue_cmd(vCard, cmd, USBCAN_Q_CMD_WAIT_TIME);
   if (ret) {
-    os_if_spin_lock_irqsave(&dev->replyWaitListLock, &irqFlags);
+    spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
     list_del(&waitNode.list);
-    os_if_spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
+    spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
     return ret;
   }
 
@@ -1470,11 +1477,11 @@ static int usbcan_send_and_wait_reply (VCanCardData *vCard, heliosCmd *cmd,
   waitTimer.expires   = jiffies + msecs_to_jiffies(USBCAN_CMD_RESP_WAIT_TIME);
   add_timer(&waitTimer);
 
-  os_if_down_sema(&waitNode.waitSemaphore);
+  wait_for_completion(&waitNode.waitCompletion);
   // Now we either got a response or a timeout
-  os_if_spin_lock_irqsave(&dev->replyWaitListLock, &irqFlags);
+  spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
   list_del(&waitNode.list);
-  os_if_spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
+  spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
   del_timer_sync(&waitTimer);
 
   DEBUGPRINT(5, (TXT("after del timer\n")));
@@ -1501,8 +1508,8 @@ static int usbcan_queue_cmd (VCanCardData *vCard, heliosCmd *cmd,
   UsbcanCardData *dev  = (UsbcanCardData *)vCard->hwCardData;
   int queuePos;
   // Using an unrolled sleep
-  OS_IF_WAITQUEUE wait;
-  os_if_init_waitqueue_entry(&wait);
+  wait_queue_t wait;
+  init_waitqueue_entry(&wait, current);
   queue_add_wait_for_space(&dev->txCmdQueue, &wait);
 
   // Sleep when buffer is full and timeout > 0
@@ -1510,7 +1517,7 @@ static int usbcan_queue_cmd (VCanCardData *vCard, heliosCmd *cmd,
     // We are indicated as interruptible
     DEBUGPRINT(5, (TXT("queue cmd len: %d\n"), queue_length(&dev->txCmdQueue)));
 
-    os_if_set_task_interruptible();
+    set_current_state(TASK_INTERRUPTIBLE);
 
     queuePos = queue_back(&dev->txCmdQueue);
     if (queuePos >= 0) {   // Did we actually find space in the queue?
@@ -1521,12 +1528,12 @@ static int usbcan_queue_cmd (VCanCardData *vCard, heliosCmd *cmd,
     // Do we want a timeout?
     if (timeout == 0) {
       // We shouldn't wait and thus we must be active
-      os_if_set_task_running();
+      set_current_state(TASK_RUNNING);
       queue_remove_wait_for_space(&dev->txCmdQueue, &wait);
       DEBUGPRINT(2, (TXT("ERROR 1 NO_RESOURCES\n")));
       return VCAN_STAT_NO_RESOURCES;
     } else {
-      if (os_if_wait_for_event_timeout(timeout, &wait) == 0) {
+      if (schedule_timeout(msecs_to_jiffies(timeout) + 1) == 0) {
         // Sleep was interrupted by timer
         queue_remove_wait_for_space(&dev->txCmdQueue, &wait);
         DEBUGPRINT(2, (TXT("ERROR 2 NO_RESOURCES\n")));
@@ -1535,14 +1542,14 @@ static int usbcan_queue_cmd (VCanCardData *vCard, heliosCmd *cmd,
     }
 
     // Are we interrupted by a signal?
-    if (os_if_signal_pending()) {
+    if (signal_pending(current)) {
       queue_remove_wait_for_space(&dev->txCmdQueue, &wait);
       DEBUGPRINT(2, (TXT("ERROR 3 SIGNALED\n")));
       return VCAN_STAT_SIGNALED;
     }
   }
 
-  os_if_set_task_running();
+  set_current_state(TASK_RUNNING);
   queue_remove_wait_for_space(&dev->txCmdQueue, &wait);
 
   // Get a pointer to the right bufferspace
@@ -1551,7 +1558,7 @@ static int usbcan_queue_cmd (VCanCardData *vCard, heliosCmd *cmd,
   queue_push(&dev->txCmdQueue);
 
   // Wake up the tx-thread
-  os_if_queue_task_not_default_queue(dev->txTaskQ, &dev->txWork);
+  queue_work(dev->txTaskQ, &dev->txWork);
 
   return VCAN_STAT_OK;
 } // _queue_cmd
@@ -1564,7 +1571,7 @@ static int usbcan_queue_cmd (VCanCardData *vCard, heliosCmd *cmd,
 //  this driver might be interested in.
 //  Also allocates card info struct mem space and starts workqueues
 //
-static int DEVINIT usbcan_plugin (struct usb_interface *interface,
+static int usbcan_plugin (struct usb_interface *interface,
                                   const struct usb_device_id *id)
 {
   struct usb_device               *udev = interface_to_usbdev(interface);
@@ -1633,7 +1640,6 @@ static int DEVINIT usbcan_plugin (struct usb_interface *interface,
   }
 
   dev = vCard->hwCardData;
-  os_if_init_sema(&((UsbcanCardData *)vCard->hwCardData)->sem);
   dev->udev = udev;
   dev->interface = interface;
 
@@ -1652,7 +1658,7 @@ static int DEVINIT usbcan_plugin (struct usb_interface *interface,
       buffer_size                = MAX_PACKET_IN;
       dev->bulk_in_size          = buffer_size;
       dev->bulk_in_endpointAddr  = endpoint->bEndpointAddress;
-      dev->bulk_in_buffer        = os_if_kernel_malloc(buffer_size);
+      dev->bulk_in_buffer        = kmalloc(buffer_size, GFP_KERNEL);
       dev->bulk_in_MaxPacketSize = le16_to_cpu(endpoint->wMaxPacketSize);
       DEBUGPRINT(2, (TXT("MaxPacketSize in = %d\n"),
                      dev->bulk_in_MaxPacketSize));
@@ -1759,37 +1765,40 @@ error:
 //
 // Init stuff, called from end of _plugin
 //
-static void DEVINIT usbcan_start (VCanCardData *vCard)
+static void usbcan_start (VCanCardData *vCard)
 {
   UsbcanCardData *dev = (UsbcanCardData *)vCard->hwCardData;
-  OS_IF_THREAD rx_thread;
   unsigned int i;
 
   DEBUGPRINT(3, (TXT("usbcan: _start\n")));
 
   // Initialize queues/waitlists for commands
-  os_if_spin_lock_init(&dev->replyWaitListLock);
+  spin_lock_init(&dev->replyWaitListLock);
 
   INIT_LIST_HEAD(&dev->replyWaitList);
   queue_init(&dev->txCmdQueue, KV_USBCAN_TX_CMD_BUF_SIZE);
 
   // Init the lock for the hi part of the timestamps
-  os_if_spin_lock_init(&dev->timeHi_lock);
+  spin_lock_init(&dev->timeHi_lock);
 
   // Set spinlocks for the outstanding tx
   for (i = 0; i < MAX_CARD_CHANNELS; i++) {
     VCanChanData    *vChd    = vCard->chanData[i];
     UsbcanChanData  *usbChan = vChd->hwChanData;
-    os_if_spin_lock_init(&usbChan->outTxLock);
+    spin_lock_init(&usbChan->outTxLock);
   }
 
-  os_if_init_sema(&dev->write_finished);
-  os_if_up_sema(&dev->write_finished);
+  init_completion(&dev->write_finished);
+  complete(&dev->write_finished);
 
-  os_if_init_task(&dev->txWork, &usbcan_send, vCard);
-  dev->txTaskQ = os_if_declare_task("usbcan_tx", &dev->txWork);
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 20))
+  INIT_WORK(&dev->txWork, usbcan_send, vCard);
+#else
+ INIT_WORK(&dev->txWork, usbcan_send);
+#endif
+  dev->txTaskQ = create_workqueue("usbcan_tx");
 
-  rx_thread = os_if_kernel_thread(usbcan_rx_thread, vCard);
+  kthread_run(usbcan_rx_thread, vCard, "Kvaser kernel thread");
 
   // Gather some card info
   usbcan_get_card_info(vCard);
@@ -1803,7 +1812,7 @@ static void DEVINIT usbcan_start (VCanCardData *vCard)
 //
 // Allocates space for card structs
 //
-static int DEVINIT usbcan_allocate (VCanCardData **in_vCard)
+static int usbcan_allocate (VCanCardData **in_vCard)
 {
   // Helper struct for allocation
   typedef struct {
@@ -1819,7 +1828,7 @@ static int DEVINIT usbcan_allocate (VCanCardData **in_vCard)
   DEBUGPRINT(3, (TXT("usbcan: _allocate\n")));
 
   // Allocate data area for this card
-  vCard = os_if_kernel_malloc(sizeof(VCanCardData) + sizeof(UsbcanCardData));
+  vCard = kmalloc(sizeof(VCanCardData) + sizeof(UsbcanCardData), GFP_KERNEL);
   DEBUGPRINT(2, (TXT("MALLOC _allocate\n")));
   if (!vCard) {
     DEBUGPRINT(1, (TXT("alloc error\n")));
@@ -1831,7 +1840,7 @@ static int DEVINIT usbcan_allocate (VCanCardData **in_vCard)
   vCard->hwCardData = vCard + 1;
 
   // Allocate memory for n channels
-  chs = os_if_kernel_malloc(sizeof(ChanHelperStruct));
+  chs = kmalloc(sizeof(ChanHelperStruct), GFP_KERNEL);
   DEBUGPRINT(2, (TXT("MALLOC _alloc helperstruct\n")));
   if (!chs) {
     DEBUGPRINT(1, (TXT("chan alloc error\n")));
@@ -1848,18 +1857,18 @@ static int DEVINIT usbcan_allocate (VCanCardData **in_vCard)
   }
   vCard->chanData = chs->dataPtrArray;
 
-  os_if_spin_lock(&driverData.canCardsLock);
+  spin_lock(&driverData.canCardsLock);
   // Insert into list of cards
   vCard->next = driverData.canCards;
   driverData.canCards = vCard;
-  os_if_spin_unlock(&driverData.canCardsLock);
+  spin_unlock(&driverData.canCardsLock);
 
   *in_vCard = vCard;
 
   return VCAN_STAT_OK;
 
 chan_alloc_err:
-  os_if_kernel_free(vCard);
+  kfree(vCard);
 
 card_alloc_err:
 
@@ -1872,7 +1881,7 @@ card_alloc_err:
 //============================================================================
 // usbcan_deallocate
 //
-static void DEVEXIT usbcan_deallocate (VCanCardData *vCard)
+static void usbcan_deallocate (VCanCardData *vCard)
 {
   UsbcanCardData *dev = (UsbcanCardData *)vCard->hwCardData;
   VCanCardData *local_vCard;
@@ -1885,21 +1894,21 @@ static void DEVEXIT usbcan_deallocate (VCanCardData *vCard)
 
   if (dev->bulk_in_buffer != NULL) {
     DEBUGPRINT(2, (TXT("Free bulk_in_buffer\n")));
-    os_if_kernel_free(dev->bulk_in_buffer);
+    kfree(dev->bulk_in_buffer);
     dev->bulk_in_buffer = NULL;
   }
-#  if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 35))
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 35))
   usb_buffer_free(dev->udev, dev->bulk_out_size,
                   dev->bulk_out_buffer,
                   dev->write_urb->transfer_dma);
-#  else
+#else
   usb_free_coherent(dev->udev, dev->bulk_out_size,
                     dev->bulk_out_buffer,
                     dev->write_urb->transfer_dma);
-#  endif
+#endif
   usb_free_urb(dev->write_urb);
 
-  os_if_spin_lock(&driverData.canCardsLock);
+  spin_lock(&driverData.canCardsLock);
 
   local_vCard = driverData.canCards;
 
@@ -1927,35 +1936,35 @@ static void DEVEXIT usbcan_deallocate (VCanCardData *vCard)
     }
   }
 
-  os_if_spin_unlock(&driverData.canCardsLock);
+  spin_unlock(&driverData.canCardsLock);
 
   for(i = 0; i < MAX_CARD_CHANNELS; i++) {
     VCanChanData *vChd      = vCard->chanData[i];
     UsbcanChanData *usbChan = vChd->hwChanData;
     if (usbChan->objbufs) {
       DEBUGPRINT(2, (TXT("Free vCard->chanData[i]->hwChanData->objbufs[%d]\n"), i));
-      os_if_kernel_free(usbChan->objbufs);
+      kfree(usbChan->objbufs);
       usbChan->objbufs = NULL;
     }
   }
   if (vCard->chanData != NULL) {
     DEBUGPRINT(2, (TXT("Free vCard->chanData\n")));
-    os_if_kernel_free(vCard->chanData);
+    kfree(vCard->chanData);
     vCard->chanData = NULL;
   }
   if (vCard != NULL) {
     DEBUGPRINT(2, (TXT("Free vCard\n")));
-    os_if_kernel_free(vCard);    // Also frees hwCardData (allocated together)
+    kfree(vCard);    // Also frees hwCardData (allocated together)
     vCard = NULL;
   }
 } // _deallocate
 
 
-#  if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 8))
-#    define USB_KILL_URB(x) usb_unlink_urb(x)
-#  else
-#    define USB_KILL_URB(x) usb_kill_urb(x)
-#  endif
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 8))
+# define USB_KILL_URB(x) usb_unlink_urb(x)
+#else
+# define USB_KILL_URB(x) usb_kill_urb(x)
+#endif
 
 //============================================================================
 //     usbcan_remove
@@ -1967,7 +1976,7 @@ static void DEVEXIT usbcan_deallocate (VCanCardData *vCard)
 //     active urbs.  Unfortunately, usb_bulk_msg(), does not provide any way
 //     to do this.  But at least we can cancel an active write.
 //
-static void DEVEXIT usbcan_remove (struct usb_interface *interface)
+static void usbcan_remove (struct usb_interface *interface)
 {
   VCanCardData *vCard;
   VCanChanData *vChan;
@@ -1990,7 +1999,7 @@ static void DEVEXIT usbcan_remove (struct usb_interface *interface)
     vChan = vCard->chanData[i];
     DEBUGPRINT(3, (TXT("Waiting for all closed on minor %d\n"), vChan->minorNr));
     while (atomic_read(&vChan->fileOpenCount) > 0) {
-      os_if_wait_for_event_timeout_simple(10);
+      schedule_timeout(msecs_to_jiffies(10));
     }
   }
 
@@ -2004,21 +2013,11 @@ static void DEVEXIT usbcan_remove (struct usb_interface *interface)
   DEBUGPRINT(6, (TXT("Ongoing write terminated\n")));
   USB_KILL_URB(dev->write_urb);
   DEBUGPRINT(6, (TXT("Unlinking urb\n")));
-  os_if_down_sema(&dev->write_finished);
-
-  // Remove spin locks
-  for (i = 0; i < MAX_CARD_CHANNELS; i++) {
-    VCanChanData   *vChd    = vCard->chanData[i];
-    UsbcanChanData *usbChan = vChd->hwChanData;
-    os_if_spin_lock_remove(&usbChan->outTxLock);
-  }
+  wait_for_completion(&dev->write_finished);
 
   // Flush and destroy tx workqueue
   DEBUGPRINT(2, (TXT("destroy_workqueue\n")));
-  os_if_destroy_task(dev->txTaskQ);
-
-  os_if_delete_sema(&dev->write_finished);
-  os_if_spin_lock_remove(&dev->replyWaitListLock);
+  destroy_workqueue(dev->txTaskQ);
 
   driverData.noOfDevices -= vCard->nrChannels;
 
@@ -2059,11 +2058,11 @@ static int usbcan_set_busparams (VCanChanData *vChan, VCanBusParams *par)
   tmp = par->freq * (par->tseg1 + par->tseg2 + 1);
   if ((tmp == 0) || (par->tseg1 == 0) || (par->tseg2 == 0) || (par->sjw == 0) ||
       (par->tseg1 > 0xFF) || (par->tseg2 > 0xFF) || (par->sjw > 0xFF)) {
-    DEBUGPRINT(1, (TXT("usbcan: _set_busparams() bad parameters\n")));
+    DEBUGPRINT(2, (TXT("usbcan: _set_busparams() bad parameters\n")));
     return VCAN_STAT_BAD_PARAMETER;
   }
   if ((8000000 / tmp) > 16) {
-    DEBUGPRINT(1, (TXT("usbcan: _set_busparams() prescaler wrong\n")));
+    DEBUGPRINT(2, (TXT("usbcan: _set_busparams() prescaler wrong\n")));
     return VCAN_STAT_BAD_PARAMETER;
   }
 
@@ -2198,9 +2197,9 @@ static int usbcan_bus_on (VCanChanData *vChan)
 
   memset(((UsbcanChanData *)vChan->hwChanData)->current_tx_message, 0, sizeof(((UsbcanChanData *)vChan->hwChanData)->current_tx_message));
   atomic_set(&vChan->transId, 1);
-  os_if_spin_lock(&usbChan->outTxLock);
+  spin_lock(&usbChan->outTxLock);
   usbChan->outstanding_tx = 0;
-  os_if_spin_unlock(&usbChan->outTxLock);
+  spin_unlock(&usbChan->outTxLock);
 
   cmd.head.cmdNo            = CMD_START_CHIP_REQ;
   cmd.startChipReq.cmdLen   = sizeof(cmdStartChipReq);
@@ -2253,14 +2252,14 @@ static int usbcan_bus_off (VCanChanData *vChan)
     vChan->chipState.state = CHIPSTAT_BUSOFF;
     memset(usbChan->current_tx_message, 0, sizeof(usbChan->current_tx_message));
 
-    os_if_spin_lock(&usbChan->outTxLock);
+    spin_lock(&usbChan->outTxLock);
     usbChan->outstanding_tx = 0;
-    os_if_spin_unlock(&usbChan->outTxLock);
+    spin_unlock(&usbChan->outTxLock);
 
     atomic_set(&vChan->transId, 1);
   }
 
-  return ret;
+  return vCanFlushSendBuffer (vChan);
 } // _bus_off
 
 
@@ -2289,18 +2288,18 @@ static int usbcan_flush_tx_buffer (VCanChanData *vChan)
   // a message from the queue, increasing outstanding_tx after our clear.
   // With a cleared queue, the transmit code will not be doing anything.
   queue_reinit(&vChan->txChanQueue);
-  os_if_spin_lock(&usbChan->outTxLock);
+  spin_lock(&usbChan->outTxLock);
   usbChan->outstanding_tx = 0;
-  os_if_spin_unlock(&usbChan->outTxLock);
+  spin_unlock(&usbChan->outTxLock);
 
   ret = usbcan_queue_cmd(vChan->vCard, &cmd, 5 /* There is no response */);
 
   if (ret == VCAN_STAT_OK) {
     atomic_set(&vChan->transId, 1);
     queue_reinit(&vChan->txChanQueue);
-    os_if_spin_lock(&usbChan->outTxLock);
+    spin_lock(&usbChan->outTxLock);
     usbChan->outstanding_tx = 0;
-    os_if_spin_unlock(&usbChan->outTxLock);
+    spin_unlock(&usbChan->outTxLock);
   }
 
   return ret;
@@ -2318,7 +2317,7 @@ static void usbcan_schedule_send (VCanCardData *vCard, VCanChanData *vChan)
   DEBUGPRINT(3, (TXT("usbcan: _schedule_send\n")));
 
   if (usbcan_tx_available(vChan) && dev->present) {
-    os_if_queue_task_not_default_queue(dev->txTaskQ, &dev->txWork);
+    queue_work(dev->txTaskQ, &dev->txWork);
   }
 #if DEBUG
   else {
@@ -2369,9 +2368,9 @@ static unsigned long usbcan_get_hw_tx_q_len (VCanChanData *vChan)
 
   DEBUGPRINT(3, (TXT("usbcan: _get_hw_tx_q_len\n")));
 
-  os_if_spin_lock(&hChd->outTxLock);
+  spin_lock(&hChd->outTxLock);
   res = hChd->outstanding_tx;
-  os_if_spin_unlock(&hChd->outTxLock);
+  spin_unlock(&hChd->outTxLock);
 
   return res;
 } // _get_hw_tx_q_len
@@ -2384,7 +2383,7 @@ static unsigned long usbcan_get_hw_tx_q_len (VCanChanData *vChan)
 //
 // Run when driver is loaded
 //
-static int INIT usbcan_init_driver (void)
+static int usbcan_init_driver (void)
 {
   int result;
 
@@ -2408,7 +2407,7 @@ static int INIT usbcan_init_driver (void)
 //======================================================================
 // Run when driver is unloaded
 //
-static int EXIT usbcan_close_all (void)
+static int usbcan_close_all (void)
 {
   DEBUGPRINT(2, (TXT("usbcan: _close_all (deregister driver..)\n")));
   usb_deregister(&usbcan_driver);
@@ -2452,9 +2451,9 @@ static int usbcan_tx_available (VCanChanData *vChan)
   DEBUGPRINT(3, (TXT("usbcan: _tx_available %d (%d)!\n"),
                  usbChan->outstanding_tx, dev->max_outstanding_tx));
 
-  os_if_spin_lock(&usbChan->outTxLock);
+  spin_lock(&usbChan->outTxLock);
   res = usbChan->outstanding_tx;
-  os_if_spin_unlock(&usbChan->outTxLock);
+  spin_unlock(&usbChan->outTxLock);
 
   return (res < dev->max_outstanding_tx);
 } // _tx_available
@@ -2471,9 +2470,9 @@ static int usbcan_outstanding_sync (VCanChanData *vChan)
   DEBUGPRINT(3, (TXT("usbcan: _outstanding_sync (%d)\n"),
                  usbChan->outstanding_tx));
 
-  os_if_spin_lock(&usbChan->outTxLock);
+  spin_lock(&usbChan->outTxLock);
   res = usbChan->outstanding_tx;
-  os_if_spin_unlock(&usbChan->outTxLock);
+  spin_unlock(&usbChan->outTxLock);
 
   return (res == 0);
 } // _outstanding_sync
@@ -2483,7 +2482,7 @@ static int usbcan_outstanding_sync (VCanChanData *vChan)
 //======================================================================
 // Get time
 //
-static int usbcan_get_time (VCanCardData *vCard, unsigned long *time)
+static int usbcan_get_time (VCanCardData *vCard, uint64_t *time)
 {
   heliosCmd cmd;
   heliosCmd reply;
@@ -2509,6 +2508,26 @@ static int usbcan_get_time (VCanCardData *vCard, unsigned long *time)
     //DEBUGPRINT(2, (TXT("time %d\n"), (time / USBCANII_TICKS_PER_10US)));
   }
 
+  return ret;
+}
+
+
+//======================================================================
+// Flash LED
+//
+static int usbcan_flash_leds(const VCanChanData *chd, int action, int timeout)
+{
+  heliosCmd cmd, reply;
+  int ret;
+
+  memset(&cmd, 0, sizeof(cmd));
+  cmd.ledActionReq.cmdNo = CMD_LED_ACTION_REQ;
+  cmd.ledActionReq.cmdLen = sizeof(cmdLedActionReq);
+  cmd.ledActionReq.subCmd = action;
+  cmd.ledActionReq.timeout = timeout;
+  ret = usbcan_send_and_wait_reply(chd->vCard, &cmd, &reply,
+                                   CMD_LED_ACTION_RESP,
+                                   cmd.getBusparamsReq.transId);
   return ret;
 }
 
@@ -2587,10 +2606,11 @@ static int usbcan_objbuf_alloc (VCanChanData *chd, int bufType, int *bufNo)
 
   if (!usbChan->objbufs) {
     DEBUGPRINT(4, (TXT("Allocating usbChan->objbufs[]\n")));
-    usbChan->objbufs = os_if_kernel_malloc(sizeof(OBJECT_BUFFER) * dev->autoTxBufferCount);
+    usbChan->objbufs = kmalloc(sizeof(OBJECT_BUFFER) * dev->autoTxBufferCount, GFP_KERNEL);
     if (!usbChan->objbufs) {
       return VCAN_STAT_NO_MEMORY;
     }
+    memset(usbChan->objbufs, 0, sizeof(OBJECT_BUFFER) * dev->autoTxBufferCount);
   }
 
   for (i = 0; i < dev->autoTxBufferCount; i++) {
@@ -2857,13 +2877,13 @@ static int usbcan_objbuf_exists (VCanChanData *chd, int bufType, int bufNo)
 
 
 
-INIT int init_module (void)
+int init_module (void)
 {
   driverData.hwIf = &hwIf;
   return vCanInit (&driverData, MAX_DRIVER_CHANNELS);
 }
 
-EXIT void cleanup_module (void)
+void cleanup_module (void)
 {
   vCanCleanup (&driverData);
 }

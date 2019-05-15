@@ -52,6 +52,7 @@
 
 #include <linux/seq_file.h>
 #include <linux/math64.h>
+#include <linux/export.h>
 #include "ticks.h"
 
 #define TIMESTAMP_WRAP_STATE_LO       0
@@ -68,6 +69,7 @@ void ticks_init  (ticks_class* self)
   self->high16 = 0;
   self->state  = TIMESTAMP_WRAP_STATE_NORMAL;
 }
+EXPORT_SYMBOL(ticks_init);
 
 uint64_t ticks_to_64bit_ns (ticks_class* self, uint64_t n_ticks, uint32_t freq_mhz)
 {
@@ -114,3 +116,4 @@ uint64_t ticks_to_64bit_ns (ticks_class* self, uint64_t n_ticks, uint32_t freq_m
 
   return div_u64 (retval * 1000, freq_mhz); //convert to nano seconds
 }
+EXPORT_SYMBOL(ticks_to_64bit_ns);

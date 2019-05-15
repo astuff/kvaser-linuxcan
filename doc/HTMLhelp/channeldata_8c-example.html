@@ -152,6 +152,7 @@ function toggleVisibility(linkObj) {
     <a class="code" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canHandle</a> hnd;
     DWORD flags;
     DWORD  drivertype;
+    <span class="keywordtype">char</span> cust_channel_name[64];
 
     printf(<span class="stringliteral">&quot;== Channel %d ===============================\n&quot;</span>, i);
 
@@ -168,7 +169,7 @@ function toggleVisibility(linkObj) {
     <span class="keywordflow">if</span> (tmp &amp; <a name="a13"></a><a class="code" href="canlib_8h.html#a46307333df823ca35cf18a582a2fedb0" title="Can report when a CAN messages has been transmitted.">canCHANNEL_CAP_TXACKNOWLEDGE</a>) printf(<span class="stringliteral">&quot;TxAck &quot;</span>);
     <span class="keywordflow">if</span> (tmp &amp; <a name="a14"></a><a class="code" href="canlib_8h.html#a79e88cce2d07e78b482070824583e059" title="Virtual CAN channel.">canCHANNEL_CAP_VIRTUAL</a>) printf(<span class="stringliteral">&quot;Virt &quot;</span>);
     <span class="keywordflow">if</span> (tmp &amp; <a name="a15"></a><a class="code" href="canlib_8h.html#a62edfa89566e668ea94fe669f3bedb74" title="Simulated CAN channel.">canCHANNEL_CAP_SIMULATED</a>) printf(<span class="stringliteral">&quot;Simulated &quot;</span>);
-    <span class="keywordflow">if</span> (tmp &amp; <a name="a16"></a><a class="code" href="canlib_8h.html#a7748990724fd22b9be3cd02265358755" title="Remote CAN channel (e.g. BlackBird).">canCHANNEL_CAP_REMOTE</a>) printf(<span class="stringliteral">&quot;Remote &quot;</span>);
+    <span class="keywordflow">if</span> (tmp &amp; <a name="a16"></a><a class="code" href="group___obsolete.html#ga7748990724fd22b9be3cd02265358755" title="Obsolete, use canCHANNEL_CAP_REMOTE_ACCESS or canCHANNELDATA_IS_REMOTE.">canCHANNEL_CAP_REMOTE</a>) printf(<span class="stringliteral">&quot;Remote &quot;</span>);
     <span class="keywordflow">if</span> (tmp &amp; <a name="a17"></a><a class="code" href="canlib_8h.html#af46aa24f177eabf4355d89a00fc0ffe4" title="CAN-FD ISO compliant channel.">canCHANNEL_CAP_CAN_FD</a>) printf(<span class="stringliteral">&quot;Fd &quot;</span>);
     <span class="keywordflow">if</span> (tmp &amp; <a name="a18"></a><a class="code" href="canlib_8h.html#a45e356713bd5b6f87d15966045a19f1c" title="CAN-FD NON-ISO compliant channel.">canCHANNEL_CAP_CAN_FD_NONISO</a>) printf(<span class="stringliteral">&quot;Non-ISO &quot;</span>);
     <span class="keywordflow">if</span> (tmp &amp; <a name="a19"></a><a class="code" href="canlib_8h.html#af685c865f8ee78b5a2e5285bb57bd335" title="Channel supports Silent mode.">canCHANNEL_CAP_SILENT_MODE</a>) printf(<span class="stringliteral">&quot;Silent &quot;</span>);
@@ -250,20 +251,26 @@ function toggleVisibility(linkObj) {
     Check(<span class="stringliteral">&quot;canCHANNELDATA_CHANNEL_NAME&quot;</span>, stat);
     printf(<span class="stringliteral">&quot;Channel name =          &#39;%s&#39;\n&quot;</span>, name);
 
-    stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a46"></a><a class="code" href="canlib_8h.html#a329cc65b32c3bfa8b5057db0782c914f">canCHANNELDATA_REMOTE_OPERATIONAL_MODE</a>, &amp;tmp, <span class="keyword">sizeof</span>(tmp));
-    <span class="keywordflow">if</span> ((stat != <a name="a47"></a><a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a41e892edb8f1b6f9f609599df8e20bdf">canERR_NOT_IMPLEMENTED</a>) &amp;&amp; (stat != <a name="a48"></a><a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a632ad377bdda7890936099a9c48fb1bd">canERR_HARDWARE</a>)) {
+    stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a46"></a><a class="code" href="canlib_8h.html#a0e91dd0d999b3043c6da5cb911dd83d8">canCHANNELDATA_CUST_CHANNEL_NAME</a>, cust_channel_name, 
+                             <span class="keyword">sizeof</span>(cust_channel_name));
+    <span class="keywordflow">if</span> (stat == <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a>) {
+      printf(<span class="stringliteral">&quot;Cust. Channel name =    &#39;%s&#39;\n&quot;</span>, cust_channel_name);
+    }
+
+    stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a47"></a><a class="code" href="canlib_8h.html#a329cc65b32c3bfa8b5057db0782c914f">canCHANNELDATA_REMOTE_OPERATIONAL_MODE</a>, &amp;tmp, <span class="keyword">sizeof</span>(tmp));
+    <span class="keywordflow">if</span> ((stat != <a name="a48"></a><a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a41e892edb8f1b6f9f609599df8e20bdf">canERR_NOT_IMPLEMENTED</a>) &amp;&amp; (stat != <a name="a49"></a><a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a632ad377bdda7890936099a9c48fb1bd">canERR_HARDWARE</a>)) {
       Check(<span class="stringliteral">&quot;canCHANNELDATA_REMOTE_OPERATIONAL_MODE&quot;</span>, stat);
       printf(<span class="stringliteral">&quot;Operational mode =      %lu (%s)\n&quot;</span>, tmp, CANCHANNEL_OPMODE_TEXT[tmp]);
 
-      stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a49"></a><a class="code" href="canlib_8h.html#a35149bdcf36515f1dc329b25e77d6072">canCHANNELDATA_REMOTE_PROFILE_NAME</a>, name, <span class="keyword">sizeof</span>(name));
+      stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a50"></a><a class="code" href="canlib_8h.html#a35149bdcf36515f1dc329b25e77d6072">canCHANNELDATA_REMOTE_PROFILE_NAME</a>, name, <span class="keyword">sizeof</span>(name));
       Check(<span class="stringliteral">&quot;canCHANNELDATA_REMOTE_PROFILE_NAME&quot;</span>, stat);
       printf(<span class="stringliteral">&quot;Profile name =          &#39;%s&#39;\n&quot;</span>, name);
 
-      stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a50"></a><a class="code" href="canlib_8h.html#a88a81aaeb5efbe8dc84d8b5385175e56">canCHANNELDATA_REMOTE_HOST_NAME</a>, name, <span class="keyword">sizeof</span>(name));
+      stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a51"></a><a class="code" href="canlib_8h.html#a88a81aaeb5efbe8dc84d8b5385175e56">canCHANNELDATA_REMOTE_HOST_NAME</a>, name, <span class="keyword">sizeof</span>(name));
       Check(<span class="stringliteral">&quot;canCHANNELDATA_REMOTE_HOST_NAME&quot;</span>, stat);
       printf(<span class="stringliteral">&quot;Remote host name =      &#39;%s&#39;\n&quot;</span>, name);
 
-      stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a51"></a><a class="code" href="canlib_8h.html#a2777677d94f63434f83da6e587a9db17">canCHANNELDATA_REMOTE_MAC</a>, name, <span class="keyword">sizeof</span>(name));
+      stat = <a class="code" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(i, <a name="a52"></a><a class="code" href="canlib_8h.html#a2777677d94f63434f83da6e587a9db17">canCHANNELDATA_REMOTE_MAC</a>, name, <span class="keyword">sizeof</span>(name));
       Check(<span class="stringliteral">&quot;canCHANNELDATA_REMOTE_MAC&quot;</span>, stat);
       printf(<span class="stringliteral">&quot;MAC =                   &#39;%s&#39;\n&quot;</span>, name);
     } <span class="keywordflow">else</span> {
@@ -277,7 +284,7 @@ function toggleVisibility(linkObj) {
 </div>
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser CANLIB (canlib 5.17) - Generated on Thu Sep 15 2016</small>
+<small>Kvaser CANLIB (canlib 5.19) - Generated on Wed Feb 15 2017</small>
 </address>
 </body>
 </html>

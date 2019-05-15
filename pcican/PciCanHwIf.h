@@ -50,14 +50,12 @@
 ** ---------------------------------------------------------------------------
 **/
 
-/* Kvaser CAN driver PCIcan hardware specific parts                    
-** PCIcan definitions                                                    
+/* Kvaser CAN driver PCIcan hardware specific parts
+** PCIcan definitions
 */
 
 #ifndef _PCICAN_HW_IF_H_
 #define _PCICAN_HW_IF_H_
-
-#include "osif_kernel.h"
 
 /*****************************************************************************/
 /* defines */
@@ -79,7 +77,7 @@
 #define OCR_DEFAULT_GAL 0xDB
 
 #define MAX_ERROR_COUNT 128
-#define ERROR_RATE 30000
+#define ERROR_RATE      800 
 #define PCICAN_BYTES_PER_CIRCUIT 0x20
 
 
@@ -111,15 +109,18 @@ typedef struct PciCanChanData
     void __iomem       *xilinxAddressCtrl;
     void __iomem       *xilinxAddressIn;
 
-    OS_IF_LOCK         lock;
+    spinlock_t         lock;
 #if !defined(TRY_RT_QUEUE)
-    OS_IF_TASK_QUEUE_HANDLE txTaskQ;
+    struct work_struct txTaskQ;
 #else
-    OS_IF_WQUEUE *txTaskQ;
-    OS_IF_TASK_QUEUE_HANDLE txWork;
+    struct workqueue_struct *txTaskQ;
+    struct work_struct txWork;
 #endif
-    DALLAS_CONTEXT     chanEeprom;    
+    DALLAS_CONTEXT      chanEeprom;
     VCanChanData       *vChan;
+    uint32_t            outstanding_tx;
+    CAN_MSG            *currentTxMsg;
+    uint32_t            flushing;
 } PciCanChanData;
 
 /*  Cards specific data */

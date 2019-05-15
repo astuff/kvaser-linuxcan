@@ -272,12 +272,12 @@ function toggleVisibility(linkObj) {
     <span class="keywordflow">if</span> (stat == <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a>) {
       msgCounter++;
       <span class="keywordflow">if</span> (flag &amp; <a name="a24"></a><a class="code" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8" title="Message is an error frame.">canMSG_ERROR_FRAME</a>) {
-        printf(<span class="stringliteral">&quot;(%d) ERROR FRAME&quot;</span>, msgCounter);
+        printf(<span class="stringliteral">&quot;(%u) ERROR FRAME&quot;</span>, msgCounter);
       }
       <span class="keywordflow">else</span> {
         <span class="keywordtype">unsigned</span> j;
 
-        printf(<span class="stringliteral">&quot;(%d) id:%ld dlc:%u data: &quot;</span>, msgCounter, <span class="keywordtype">id</span>, dlc);
+        printf(<span class="stringliteral">&quot;(%u) id:%ld dlc:%u data: &quot;</span>, msgCounter, <span class="keywordtype">id</span>, dlc);
         <span class="keywordflow">if</span> (dlc &gt; 8) {
           dlc = 8;
         }
@@ -320,7 +320,7 @@ ErrorExit:
     <ul>
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.17) - Generated on Thu Sep 15 2016</small>
+<small>Kvaser Linux CANLIB (canlib 5.19) - Generated on Wed Feb 15 2017</small>
 </address>
 </body>
 </html>

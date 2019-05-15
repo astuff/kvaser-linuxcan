@@ -59,7 +59,6 @@
 
 
 
-#include "osif_kernel.h"
 #include "filo_cmds.h"
 #include "objbuf.h"
 
@@ -96,7 +95,7 @@ typedef struct LeafChanData
 {
   /* These are the number of outgoing packets residing in the device */
   unsigned int outstanding_tx;
-  OS_IF_LOCK   outTxLock;
+  spinlock_t   outTxLock;
 
 
   unsigned long          timestamp_correction_value;
@@ -116,13 +115,13 @@ typedef struct LeafCardData {
   int              autoTxBufferCount;
   int              autoTxBufferResolution;
 
-  OS_IF_LOCK       replyWaitListLock;
+  spinlock_t       replyWaitListLock;
   struct list_head replyWaitList;
 
   /* Structure to hold all of our device specific stuff */
 
-  OS_IF_WQUEUE                *txTaskQ;
-  OS_IF_TASK_QUEUE_HANDLE     txWork;
+  struct workqueue_struct   *txTaskQ;
+  struct work_struct        txWork;
 
   filoCmd            txCmdBuffer[KV_LEAF_TX_CMD_BUF_SIZE]; /* Control messages */
   Queue              txCmdQueue;
@@ -150,10 +149,9 @@ typedef struct LeafCardData {
   struct urb *            write_urb;           // the urb used to send data
   struct urb *            read_urb;            // the urb used to receive data
   __u8                    bulk_out_endpointAddr;//the address of the bulk out endpoint
-  OS_IF_SEMAPHORE         write_finished;       // wait for the write to finish
+  struct completion       write_finished;       // wait for the write to finish
 
   volatile int            present;              // if the device is not disconnected
-  OS_IF_SEMAPHORE         sem;                  // locks this structure
 
   VCanCardData           *vCard;
 

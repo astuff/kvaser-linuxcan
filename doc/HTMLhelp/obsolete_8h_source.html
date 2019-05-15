@@ -143,113 +143,116 @@ function toggleVisibility(linkObj) {
 <a name="l00118"></a><a class="code" href="group___obsolete.html#gad994912c4536903f28970014eee3c5f2">00118</a> <span class="preprocessor"></span><span class="preprocessor">#define canCIRCSTAT_BUS_OFF       0x0002    ///&lt; Bus off \warning Obsolete!</span>
 <a name="l00119"></a><a class="code" href="group___obsolete.html#ga7c565661a9acce72058a7b719eb3ac6a">00119</a> <span class="preprocessor"></span><span class="preprocessor">#define canCIRCSTAT_ERROR_WARNING 0x0004    ///&lt; Error counter &gt; 96 \warning Obsolete!</span>
 <a name="l00120"></a>00120 <span class="preprocessor"></span>
-<a name="l00127"></a><a class="code" href="group___obsolete.html#ga8030c90631adbc8f0d956619f422e568">00127</a> <span class="preprocessor">#define canSTICKY_ACK_ERROR       0x80000801 ///&lt; \warning Obsolete!</span>
-<a name="l00128"></a><a class="code" href="group___obsolete.html#gade9ddc2154553f218bcc5ed27ea96d6c">00128</a> <span class="preprocessor"></span><span class="preprocessor">#define canSTICKY_FORM_ERROR      0x80000002 ///&lt; \warning Obsolete!</span>
-<a name="l00129"></a><a class="code" href="group___obsolete.html#ga0d33e6325f41149efc7c63a0811e55bf">00129</a> <span class="preprocessor"></span><span class="preprocessor">#define canSTICKY_STUFF_ERROR     0x80000004 ///&lt; \warning Obsolete!</span>
-<a name="l00130"></a><a class="code" href="group___obsolete.html#ga65857c22156421ee5702cf0d437e16a8">00130</a> <span class="preprocessor"></span><span class="preprocessor">#define canSTICKY_CRC_ERROR       0x80000008 ///&lt; \warning Obsolete!</span>
-<a name="l00131"></a><a class="code" href="group___obsolete.html#ga5ae21ef82de862e96009b54f9760be0b">00131</a> <span class="preprocessor"></span><span class="preprocessor">#define canSTICKY_BIT0_ERROR      0x80000010 ///&lt; \warning Obsolete!</span>
-<a name="l00132"></a><a class="code" href="group___obsolete.html#gaad97eb3d6da6c032ad6a089c344b7866">00132</a> <span class="preprocessor"></span><span class="preprocessor">#define canSTICKY_BIT1_ERROR      0x80000020 ///&lt; \warning Obsolete!</span>
-<a name="l00133"></a><a class="code" href="group___obsolete.html#gaf1d768287e551593a1e2ad56a58febdd">00133</a> <span class="preprocessor"></span><span class="preprocessor">#define canSTICKY_HW_OVERRUN      0x80000040 ///&lt; \warning Obsolete!</span>
-<a name="l00134"></a><a class="code" href="group___obsolete.html#ga8de86e1d8e2eabe18c3356b3de2d1104">00134</a> <span class="preprocessor"></span><span class="preprocessor">#define canSTICKY_SW_OVERRUN      0x80000080 ///&lt; \warning Obsolete!</span>
-<a name="l00135"></a>00135 <span class="preprocessor"></span>
-<a name="l00137"></a><a class="code" href="group___obsolete.html#ga06fb192e046b16bd077ec8a92104d65f">00137</a> <span class="preprocessor">#define canSTAT_INACTIVE          canSTAT_RESERVED_1    ///&lt; The circuit is not active (removed from the sw bus) \warning Obsolete!</span>
-<a name="l00138"></a>00138 <span class="preprocessor"></span>
-<a name="l00139"></a>00139 
-<a name="l00140"></a>00140 <span class="comment">/*</span>
-<a name="l00141"></a>00141 <span class="comment">#define canCIRCSTAT_TXERR       0x0001      // TX error has occurred</span>
-<a name="l00142"></a>00142 <span class="comment">#define canCIRCSTAT_RXERR       0x0002      // Receive error has occurred</span>
-<a name="l00143"></a>00143 <span class="comment">#define canCIRCSTAT_OVERRUN     0x0004      // Receiver overrun</span>
-<a name="l00144"></a>00144 <span class="comment">#define canCIRCSTAT_WAKEUP      0x0008      // Wakeup has occurred</span>
-<a name="l00145"></a>00145 <span class="comment">#define canCIRCSTAT_INT         0x0010      // ??</span>
-<a name="l00146"></a>00146 <span class="comment">#define canCIRCSTAT_ACK         0x0020      // ACK error</span>
-<a name="l00147"></a>00147 <span class="comment">#define canCIRCSTAT_BIT         0x0040      // Bit error</span>
-<a name="l00148"></a>00148 <span class="comment">*/</span>
+<a name="l00128"></a><a class="code" href="group___obsolete.html#ga7748990724fd22b9be3cd02265358755">00128</a> <span class="preprocessor">#define canCHANNEL_CAP_REMOTE canCHANNEL_CAP_RESERVED_1 ///&lt; Obsolete, use \ref canCHANNEL_CAP_REMOTE_ACCESS or \ref canCHANNELDATA_IS_REMOTE</span>
+<a name="l00129"></a>00129 <span class="preprocessor"></span>
+<a name="l00130"></a>00130 
+<a name="l00136"></a><a class="code" href="group___obsolete.html#ga8030c90631adbc8f0d956619f422e568">00136</a> <span class="preprocessor">#define canSTICKY_ACK_ERROR       0x80000801 ///&lt; \warning Obsolete!</span>
+<a name="l00137"></a><a class="code" href="group___obsolete.html#gade9ddc2154553f218bcc5ed27ea96d6c">00137</a> <span class="preprocessor"></span><span class="preprocessor">#define canSTICKY_FORM_ERROR      0x80000002 ///&lt; \warning Obsolete!</span>
+<a name="l00138"></a><a class="code" href="group___obsolete.html#ga0d33e6325f41149efc7c63a0811e55bf">00138</a> <span class="preprocessor"></span><span class="preprocessor">#define canSTICKY_STUFF_ERROR     0x80000004 ///&lt; \warning Obsolete!</span>
+<a name="l00139"></a><a class="code" href="group___obsolete.html#ga65857c22156421ee5702cf0d437e16a8">00139</a> <span class="preprocessor"></span><span class="preprocessor">#define canSTICKY_CRC_ERROR       0x80000008 ///&lt; \warning Obsolete!</span>
+<a name="l00140"></a><a class="code" href="group___obsolete.html#ga5ae21ef82de862e96009b54f9760be0b">00140</a> <span class="preprocessor"></span><span class="preprocessor">#define canSTICKY_BIT0_ERROR      0x80000010 ///&lt; \warning Obsolete!</span>
+<a name="l00141"></a><a class="code" href="group___obsolete.html#gaad97eb3d6da6c032ad6a089c344b7866">00141</a> <span class="preprocessor"></span><span class="preprocessor">#define canSTICKY_BIT1_ERROR      0x80000020 ///&lt; \warning Obsolete!</span>
+<a name="l00142"></a><a class="code" href="group___obsolete.html#gaf1d768287e551593a1e2ad56a58febdd">00142</a> <span class="preprocessor"></span><span class="preprocessor">#define canSTICKY_HW_OVERRUN      0x80000040 ///&lt; \warning Obsolete!</span>
+<a name="l00143"></a><a class="code" href="group___obsolete.html#ga8de86e1d8e2eabe18c3356b3de2d1104">00143</a> <span class="preprocessor"></span><span class="preprocessor">#define canSTICKY_SW_OVERRUN      0x80000080 ///&lt; \warning Obsolete!</span>
+<a name="l00144"></a>00144 <span class="preprocessor"></span>
+<a name="l00146"></a><a class="code" href="group___obsolete.html#ga06fb192e046b16bd077ec8a92104d65f">00146</a> <span class="preprocessor">#define canSTAT_INACTIVE          canSTAT_RESERVED_1    ///&lt; The circuit is not active (removed from the sw bus) \warning Obsolete!</span>
+<a name="l00147"></a>00147 <span class="preprocessor"></span>
+<a name="l00148"></a>00148 
 <a name="l00149"></a>00149 <span class="comment">/*</span>
-<a name="l00150"></a>00150 <span class="comment">More apocryphs.</span>
-<a name="l00151"></a>00151 <span class="comment">#define canCIRCSTAT_OVERRUN     0x0004      // Receiver overrun</span>
-<a name="l00152"></a>00152 <span class="comment">#define canCIRCSTAT_WAKEUP      0x0008      // Wakeup has occurred</span>
-<a name="l00153"></a>00153 <span class="comment">#define canCIRCSTAT_ACK         0x0010      // ACK error</span>
-<a name="l00154"></a>00154 <span class="comment">#define canCIRCSTAT_BIT0        0x0020      // Bit error</span>
-<a name="l00155"></a>00155 <span class="comment">#define canCIRCSTAT_BIT1        0x0040      // Bit error</span>
-<a name="l00156"></a>00156 <span class="comment">#define canCIRCSTAT_BOFF        0x0080      // Chip went Bus Off</span>
+<a name="l00150"></a>00150 <span class="comment">#define canCIRCSTAT_TXERR       0x0001      // TX error has occurred</span>
+<a name="l00151"></a>00151 <span class="comment">#define canCIRCSTAT_RXERR       0x0002      // Receive error has occurred</span>
+<a name="l00152"></a>00152 <span class="comment">#define canCIRCSTAT_OVERRUN     0x0004      // Receiver overrun</span>
+<a name="l00153"></a>00153 <span class="comment">#define canCIRCSTAT_WAKEUP      0x0008      // Wakeup has occurred</span>
+<a name="l00154"></a>00154 <span class="comment">#define canCIRCSTAT_INT         0x0010      // ??</span>
+<a name="l00155"></a>00155 <span class="comment">#define canCIRCSTAT_ACK         0x0020      // ACK error</span>
+<a name="l00156"></a>00156 <span class="comment">#define canCIRCSTAT_BIT         0x0040      // Bit error</span>
 <a name="l00157"></a>00157 <span class="comment">*/</span>
 <a name="l00158"></a>00158 <span class="comment">/*</span>
-<a name="l00159"></a>00159 <span class="comment">Even more.</span>
-<a name="l00160"></a>00160 <span class="comment">#define canCIRCSTAT_BOFF_HW     0x10000L      // Chip is Bus Off</span>
-<a name="l00161"></a>00161 <span class="comment">#define canCIRCSTAT_BOFF_SW     0x20000L      // We are Bus Off</span>
-<a name="l00162"></a>00162 <span class="comment">*/</span>
-<a name="l00163"></a>00163 
-<a name="l00164"></a>00164 
-<a name="l00170"></a><a class="code" href="group___obsolete.html#ga5ce1872dbf11af861f47b6dce50b0291">00170</a> <span class="preprocessor">#define canWANT_ACTIONS         0x01  ///&lt; \warning Obsolete!</span>
-<a name="l00171"></a><a class="code" href="group___obsolete.html#ga95fbe13f2afafbf4ffda3f4fb28b05a8">00171</a> <span class="preprocessor"></span><span class="preprocessor">#define canWANT_OWN_BUFFERS     0x02  ///&lt; \warning Obsolete!</span>
-<a name="l00172"></a><a class="code" href="group___obsolete.html#ga75968fe478206eee0007542219d8c34d">00172</a> <span class="preprocessor"></span><span class="preprocessor">#define canWANT_ERROR_COUNTERS  0x04  ///&lt; \warning Obsolete!</span>
-<a name="l00173"></a><a class="code" href="group___obsolete.html#ga48cd7c2e8ed2e7bf39d3524f7a4294d6">00173</a> <span class="preprocessor"></span><span class="preprocessor">#define canWANT_EXCLUSIVE       0x08  ///&lt; \warning Obsolete! Use \ref canOPEN_xxx instead.</span>
-<a name="l00174"></a><a class="code" href="group___obsolete.html#gab146450ad0889edc72e3d59dea710a17">00174</a> <span class="preprocessor"></span><span class="preprocessor">#define canWANT_EXTENDED        0x10  ///&lt; \warning Obsolete! Use \ref canOPEN_xxx instead.</span>
-<a name="l00175"></a>00175 <span class="preprocessor"></span><span class="preprocessor">#if defined(CANLIB_DECLARE_ALL)</span>
-<a name="l00176"></a><a class="code" href="group___obsolete.html#ga568de577a456a8fda2722f1f01e4cdd5">00176</a> <span class="preprocessor"></span><span class="preprocessor"># define canWANT_VIRTUAL        0x20  ///&lt; \warning Obsolete! Use \ref canOPEN_xxx instead.</span>
-<a name="l00177"></a>00177 <span class="preprocessor"></span><span class="preprocessor">#endif</span>
-<a name="l00178"></a>00178 <span class="preprocessor"></span>
-<a name="l00186"></a>00186 <span class="comment">// No circuit                   0</span>
-<a name="l00187"></a><a class="code" href="group___obsolete.html#ga19a934f79a572bfd61a37d333ceb369e">00187</a> <span class="preprocessor">#define PCCAN_PHILIPS           1     ///&lt; 82C200 on PCCAN 1.0  \warning Obsolete!</span>
-<a name="l00188"></a><a class="code" href="group___obsolete.html#ga6f568221b0f99615dc9180ceef26a9a2">00188</a> <span class="preprocessor"></span><span class="preprocessor">#define PCCAN_INTEL526          2     ///&lt; Not supported.       \warning Obsolete!</span>
-<a name="l00189"></a><a class="code" href="group___obsolete.html#gabc1429917402cbacb9f560cf5c734cd8">00189</a> <span class="preprocessor"></span><span class="preprocessor">#define PCCAN_INTEL527          3     ///&lt; 82527 on PCCAN 1.0   \warning Obsolete!</span>
-<a name="l00190"></a><a class="code" href="group___obsolete.html#ga10ca79a83886db92d3e39d040c7692f5">00190</a> <span class="preprocessor"></span><span class="preprocessor">#define CANCARD_NEC72005        4     ///&lt; NEC72005 on CANCard  \warning Obsolete!</span>
-<a name="l00191"></a><a class="code" href="group___obsolete.html#ga517ed48749255b252de9ec72e66b4a1a">00191</a> <span class="preprocessor"></span><span class="preprocessor">#define CIRC_VIRTUAL            5     ///&lt;                      \warning Obsolete!</span>
-<a name="l00192"></a><a class="code" href="group___obsolete.html#gae7e88220b602c64364707d7db4f79a5a">00192</a> <span class="preprocessor"></span><span class="preprocessor">#define CIRC_SJA1000            6     ///&lt;                      \warning Obsolete!</span>
-<a name="l00193"></a>00193 <span class="preprocessor"></span>
-<a name="l00200"></a><a class="code" href="group___obsolete.html#ga65cb4f34d3fa0e5bf1045b7d8beff8f3">00200</a> <span class="preprocessor">#define canCARD_PCCAN           1     ///&lt; PCCAN ver 1.x (KVASER)       \warning Obsolete!</span>
-<a name="l00201"></a><a class="code" href="group___obsolete.html#ga08220bf4990d9fa2ea8638f474805738">00201</a> <span class="preprocessor"></span><span class="preprocessor">#define canCARD_CANCARD         2     ///&lt; CANCard (Softing)            \warning Obsolete!</span>
-<a name="l00202"></a><a class="code" href="group___obsolete.html#ga001d5b5faa6b7cf763f8c7dc46145eb0">00202</a> <span class="preprocessor"></span><span class="preprocessor">#define canCARD_AC2             3     ///&lt; CAN-AC2 (Softing)            \warning Obsolete!</span>
-<a name="l00203"></a><a class="code" href="group___obsolete.html#gadf16112de350267f399b9c05f2e4dc0f">00203</a> <span class="preprocessor"></span><span class="preprocessor">#define canCARD_LAPCAN          4     ///&lt;                              \warning Obsolete!</span>
-<a name="l00204"></a><a class="code" href="group___obsolete.html#ga02a364c07a477546ae6126b25789b4a4">00204</a> <span class="preprocessor"></span><span class="preprocessor">#define canCARD_ISACAN          5     ///&lt;                              \warning Obsolete!</span>
-<a name="l00205"></a><a class="code" href="group___obsolete.html#ga632ebe7918d7b5b17470a8951caa6ebe">00205</a> <span class="preprocessor"></span><span class="preprocessor">#define canCARD_PCCAN_OEM       6     ///&lt; Special for OEM PCcan cards. \warning Obsolete!</span>
-<a name="l00206"></a>00206 <span class="preprocessor"></span>
-<a name="l00213"></a><a class="code" href="group___obsolete.html#gaecf642915bde354d18919ce81f1cd334">00213</a> <span class="preprocessor">#define canFlgACCEPT            1     ///&lt; \warning Obsolete!</span>
-<a name="l00214"></a><a class="code" href="group___obsolete.html#gad0f169d4007c3f56e4ca00a0c61010ce">00214</a> <span class="preprocessor"></span><span class="preprocessor">#define canFlgREJECT            2     ///&lt; \warning Obsolete!</span>
-<a name="l00215"></a><a class="code" href="group___obsolete.html#gab193293a42ee0d30017c313e437a14f7">00215</a> <span class="preprocessor"></span><span class="preprocessor">#define canFlgCODE              3     ///&lt; \warning Obsolete!</span>
-<a name="l00216"></a><a class="code" href="group___obsolete.html#gab42af8693277aea78bcaa557bc33fd38">00216</a> <span class="preprocessor"></span><span class="preprocessor">#define canFlgMASK              4     ///&lt; \warning Obsolete!</span>
-<a name="l00217"></a>00217 <span class="preprocessor"></span>
-<a name="l00224"></a><a class="code" href="group___obsolete.html#ga48aba51976ac7ed6955b5f1b6e4d0d81">00224</a> <span class="preprocessor">#define canDISCARD_MESSAGE      3     ///&lt; \warning Obsolete!</span>
-<a name="l00225"></a><a class="code" href="group___obsolete.html#ga8a72d54036ad69f35a2bc25815482572">00225</a> <span class="preprocessor"></span><span class="preprocessor">#define canRETAIN_MESSAGE       4     ///&lt; \warning Obsolete!</span>
+<a name="l00159"></a>00159 <span class="comment">More apocryphs.</span>
+<a name="l00160"></a>00160 <span class="comment">#define canCIRCSTAT_OVERRUN     0x0004      // Receiver overrun</span>
+<a name="l00161"></a>00161 <span class="comment">#define canCIRCSTAT_WAKEUP      0x0008      // Wakeup has occurred</span>
+<a name="l00162"></a>00162 <span class="comment">#define canCIRCSTAT_ACK         0x0010      // ACK error</span>
+<a name="l00163"></a>00163 <span class="comment">#define canCIRCSTAT_BIT0        0x0020      // Bit error</span>
+<a name="l00164"></a>00164 <span class="comment">#define canCIRCSTAT_BIT1        0x0040      // Bit error</span>
+<a name="l00165"></a>00165 <span class="comment">#define canCIRCSTAT_BOFF        0x0080      // Chip went Bus Off</span>
+<a name="l00166"></a>00166 <span class="comment">*/</span>
+<a name="l00167"></a>00167 <span class="comment">/*</span>
+<a name="l00168"></a>00168 <span class="comment">Even more.</span>
+<a name="l00169"></a>00169 <span class="comment">#define canCIRCSTAT_BOFF_HW     0x10000L      // Chip is Bus Off</span>
+<a name="l00170"></a>00170 <span class="comment">#define canCIRCSTAT_BOFF_SW     0x20000L      // We are Bus Off</span>
+<a name="l00171"></a>00171 <span class="comment">*/</span>
+<a name="l00172"></a>00172 
+<a name="l00173"></a>00173 
+<a name="l00179"></a><a class="code" href="group___obsolete.html#ga5ce1872dbf11af861f47b6dce50b0291">00179</a> <span class="preprocessor">#define canWANT_ACTIONS         0x01  ///&lt; \warning Obsolete!</span>
+<a name="l00180"></a><a class="code" href="group___obsolete.html#ga95fbe13f2afafbf4ffda3f4fb28b05a8">00180</a> <span class="preprocessor"></span><span class="preprocessor">#define canWANT_OWN_BUFFERS     0x02  ///&lt; \warning Obsolete!</span>
+<a name="l00181"></a><a class="code" href="group___obsolete.html#ga75968fe478206eee0007542219d8c34d">00181</a> <span class="preprocessor"></span><span class="preprocessor">#define canWANT_ERROR_COUNTERS  0x04  ///&lt; \warning Obsolete!</span>
+<a name="l00182"></a><a class="code" href="group___obsolete.html#ga48cd7c2e8ed2e7bf39d3524f7a4294d6">00182</a> <span class="preprocessor"></span><span class="preprocessor">#define canWANT_EXCLUSIVE       0x08  ///&lt; \warning Obsolete! Use \ref canOPEN_xxx instead.</span>
+<a name="l00183"></a><a class="code" href="group___obsolete.html#gab146450ad0889edc72e3d59dea710a17">00183</a> <span class="preprocessor"></span><span class="preprocessor">#define canWANT_EXTENDED        0x10  ///&lt; \warning Obsolete! Use \ref canOPEN_xxx instead.</span>
+<a name="l00184"></a>00184 <span class="preprocessor"></span><span class="preprocessor">#if defined(CANLIB_DECLARE_ALL)</span>
+<a name="l00185"></a><a class="code" href="group___obsolete.html#ga568de577a456a8fda2722f1f01e4cdd5">00185</a> <span class="preprocessor"></span><span class="preprocessor"># define canWANT_VIRTUAL        0x20  ///&lt; \warning Obsolete! Use \ref canOPEN_xxx instead.</span>
+<a name="l00186"></a>00186 <span class="preprocessor"></span><span class="preprocessor">#endif</span>
+<a name="l00187"></a>00187 <span class="preprocessor"></span>
+<a name="l00195"></a>00195 <span class="comment">// No circuit                   0</span>
+<a name="l00196"></a><a class="code" href="group___obsolete.html#ga19a934f79a572bfd61a37d333ceb369e">00196</a> <span class="preprocessor">#define PCCAN_PHILIPS           1     ///&lt; 82C200 on PCCAN 1.0  \warning Obsolete!</span>
+<a name="l00197"></a><a class="code" href="group___obsolete.html#ga6f568221b0f99615dc9180ceef26a9a2">00197</a> <span class="preprocessor"></span><span class="preprocessor">#define PCCAN_INTEL526          2     ///&lt; Not supported.       \warning Obsolete!</span>
+<a name="l00198"></a><a class="code" href="group___obsolete.html#gabc1429917402cbacb9f560cf5c734cd8">00198</a> <span class="preprocessor"></span><span class="preprocessor">#define PCCAN_INTEL527          3     ///&lt; 82527 on PCCAN 1.0   \warning Obsolete!</span>
+<a name="l00199"></a><a class="code" href="group___obsolete.html#ga10ca79a83886db92d3e39d040c7692f5">00199</a> <span class="preprocessor"></span><span class="preprocessor">#define CANCARD_NEC72005        4     ///&lt; NEC72005 on CANCard  \warning Obsolete!</span>
+<a name="l00200"></a><a class="code" href="group___obsolete.html#ga517ed48749255b252de9ec72e66b4a1a">00200</a> <span class="preprocessor"></span><span class="preprocessor">#define CIRC_VIRTUAL            5     ///&lt;                      \warning Obsolete!</span>
+<a name="l00201"></a><a class="code" href="group___obsolete.html#gae7e88220b602c64364707d7db4f79a5a">00201</a> <span class="preprocessor"></span><span class="preprocessor">#define CIRC_SJA1000            6     ///&lt;                      \warning Obsolete!</span>
+<a name="l00202"></a>00202 <span class="preprocessor"></span>
+<a name="l00209"></a><a class="code" href="group___obsolete.html#ga65cb4f34d3fa0e5bf1045b7d8beff8f3">00209</a> <span class="preprocessor">#define canCARD_PCCAN           1     ///&lt; PCCAN ver 1.x (KVASER)       \warning Obsolete!</span>
+<a name="l00210"></a><a class="code" href="group___obsolete.html#ga08220bf4990d9fa2ea8638f474805738">00210</a> <span class="preprocessor"></span><span class="preprocessor">#define canCARD_CANCARD         2     ///&lt; CANCard (Softing)            \warning Obsolete!</span>
+<a name="l00211"></a><a class="code" href="group___obsolete.html#ga001d5b5faa6b7cf763f8c7dc46145eb0">00211</a> <span class="preprocessor"></span><span class="preprocessor">#define canCARD_AC2             3     ///&lt; CAN-AC2 (Softing)            \warning Obsolete!</span>
+<a name="l00212"></a><a class="code" href="group___obsolete.html#gadf16112de350267f399b9c05f2e4dc0f">00212</a> <span class="preprocessor"></span><span class="preprocessor">#define canCARD_LAPCAN          4     ///&lt;                              \warning Obsolete!</span>
+<a name="l00213"></a><a class="code" href="group___obsolete.html#ga02a364c07a477546ae6126b25789b4a4">00213</a> <span class="preprocessor"></span><span class="preprocessor">#define canCARD_ISACAN          5     ///&lt;                              \warning Obsolete!</span>
+<a name="l00214"></a><a class="code" href="group___obsolete.html#ga632ebe7918d7b5b17470a8951caa6ebe">00214</a> <span class="preprocessor"></span><span class="preprocessor">#define canCARD_PCCAN_OEM       6     ///&lt; Special for OEM PCcan cards. \warning Obsolete!</span>
+<a name="l00215"></a>00215 <span class="preprocessor"></span>
+<a name="l00222"></a><a class="code" href="group___obsolete.html#gaecf642915bde354d18919ce81f1cd334">00222</a> <span class="preprocessor">#define canFlgACCEPT            1     ///&lt; \warning Obsolete!</span>
+<a name="l00223"></a><a class="code" href="group___obsolete.html#gad0f169d4007c3f56e4ca00a0c61010ce">00223</a> <span class="preprocessor"></span><span class="preprocessor">#define canFlgREJECT            2     ///&lt; \warning Obsolete!</span>
+<a name="l00224"></a><a class="code" href="group___obsolete.html#gab193293a42ee0d30017c313e437a14f7">00224</a> <span class="preprocessor"></span><span class="preprocessor">#define canFlgCODE              3     ///&lt; \warning Obsolete!</span>
+<a name="l00225"></a><a class="code" href="group___obsolete.html#gab42af8693277aea78bcaa557bc33fd38">00225</a> <span class="preprocessor"></span><span class="preprocessor">#define canFlgMASK              4     ///&lt; \warning Obsolete!</span>
 <a name="l00226"></a>00226 <span class="preprocessor"></span>
-<a name="l00234"></a><a class="code" href="group___obsolete.html#gaf3568376c75640ee4ef87aa760c73d68">00234</a> <span class="preprocessor">#define canSLOW_MODE            0x01  ///&lt; Sync on rising and falling edge \warning Obsolete!</span>
+<a name="l00233"></a><a class="code" href="group___obsolete.html#ga48aba51976ac7ed6955b5f1b6e4d0d81">00233</a> <span class="preprocessor">#define canDISCARD_MESSAGE      3     ///&lt; \warning Obsolete!</span>
+<a name="l00234"></a><a class="code" href="group___obsolete.html#ga8a72d54036ad69f35a2bc25815482572">00234</a> <span class="preprocessor"></span><span class="preprocessor">#define canRETAIN_MESSAGE       4     ///&lt; \warning Obsolete!</span>
 <a name="l00235"></a>00235 <span class="preprocessor"></span>
-<a name="l00243"></a><a class="code" href="group___obsolete.html#ga617b014a43ee96f2606f3c12553e3eb7">00243</a> <span class="preprocessor">#define canOFF                  0     ///&lt;                            \warning Obsolete!</span>
-<a name="l00244"></a><a class="code" href="group___obsolete.html#gaa87e5c3de3aeb3c182b5b6f887add48b">00244</a> <span class="preprocessor"></span><span class="preprocessor">#define canTRISTATE             1     ///&lt;                            \warning Obsolete!</span>
-<a name="l00245"></a><a class="code" href="group___obsolete.html#ga9275fa9361820f5d65332519a55435da">00245</a> <span class="preprocessor"></span><span class="preprocessor">#define canPULLUP               2     ///&lt;                            \warning Obsolete!</span>
-<a name="l00246"></a><a class="code" href="group___obsolete.html#gaa1da0634f0eeed650569e8a5b5ce1859">00246</a> <span class="preprocessor"></span><span class="preprocessor">#define canPULLDOWN             3     ///&lt;                            \warning Obsolete!</span>
-<a name="l00247"></a><a class="code" href="group___obsolete.html#ga737411dc9c47ef015221766d3a2e76e0">00247</a> <span class="preprocessor"></span><span class="preprocessor">#define canPUSHPULL             4     ///&lt; This is the usual setting. \warning Obsolete!</span>
-<a name="l00248"></a><a class="code" href="group___obsolete.html#ga0e5622d9f06f5abde9f963c9a85aaaaf">00248</a> <span class="preprocessor"></span><span class="preprocessor">#define canINVPULLUP            5     ///&lt;                            \warning Obsolete!</span>
-<a name="l00249"></a><a class="code" href="group___obsolete.html#gab77a444a6d4ccc09caf9aa3ba32663a1">00249</a> <span class="preprocessor"></span><span class="preprocessor">#define canINVPULLDOWN          6     ///&lt;                            \warning Obsolete!</span>
-<a name="l00250"></a><a class="code" href="group___obsolete.html#ga6e158a4fe2ecfec1128ceea673544c77">00250</a> <span class="preprocessor"></span><span class="preprocessor">#define canINVPUSHPULL          7     ///&lt;                            \warning Obsolete!</span>
-<a name="l00251"></a>00251 <span class="preprocessor"></span>
-<a name="l00259"></a><a class="code" href="group___obsolete.html#ga9948614d7b592c89a8c860de251337b5">00259</a> <span class="preprocessor">#define canIOCTL_LOCAL_ECHO_ON  3     ///&lt; \warning Obsolete!</span>
-<a name="l00260"></a><a class="code" href="group___obsolete.html#ga20f09562378f9e0531c37c9a0d2ecaf1">00260</a> <span class="preprocessor"></span><span class="preprocessor">#define canIOCTL_LOCAL_ECHO_OFF 4     ///&lt; \warning Obsolete!</span>
-<a name="l00261"></a>00261 <span class="preprocessor"></span>
-<a name="l00262"></a><a class="code" href="group___obsolete.html#ga8c5f48d3ea2c97e5940544a58b12f9d8">00262</a> <span class="preprocessor">#define canMSG_STATUS 0x0008</span>
-<a name="l00263"></a>00263 <span class="preprocessor"></span>
-<a name="l00265"></a>00265 <span class="preprocessor">#ifdef __cplusplus</span>
-<a name="l00266"></a>00266 <span class="preprocessor"></span><span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> {
-<a name="l00267"></a>00267 <span class="preprocessor">#endif</span>
-<a name="l00268"></a>00268 <span class="preprocessor"></span>
-<a name="l00272"></a>00272 <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> CANLIBAPI <a class="code" href="group___obsolete.html#gab8992255af9c02c75d646425a73eac26">canInstallAction</a>(<span class="keywordtype">int</span> handle, <span class="keywordtype">long</span> <span class="keywordtype">id</span>, <span class="keywordtype">int</span> (*fn)());
-<a name="l00273"></a>00273 
-<a name="l00277"></a>00277 <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> CANLIBAPI <a class="code" href="group___obsolete.html#ga4430127078d9cbd9f6e750f9eb4a4715">canUninstallAction</a>(<span class="keywordtype">int</span> handle, <span class="keywordtype">long</span> <span class="keywordtype">id</span>);
-<a name="l00278"></a>00278 
-<a name="l00282"></a>00282 <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> CANLIBAPI <a class="code" href="group___obsolete.html#gaf3d79256de520acbafae2442bb779956">canInstallOwnBuffer</a>(<span class="keywordtype">int</span> handle, <span class="keywordtype">long</span> <span class="keywordtype">id</span>, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> len,
-<a name="l00283"></a>00283                                         <span class="keywordtype">void</span> * buf);
-<a name="l00284"></a>00284 
-<a name="l00288"></a>00288 <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> CANLIBAPI <a class="code" href="group___obsolete.html#ga8094bf56752bd08cd550032e8b165cac">canUninstallOwnBuffer</a>(<span class="keywordtype">int</span> handle, <span class="keywordtype">long</span> <span class="keywordtype">id</span>);
-<a name="l00289"></a>00289 <span class="preprocessor">#ifdef __cplusplus</span>
-<a name="l00290"></a>00290 <span class="preprocessor"></span>}
-<a name="l00291"></a>00291 <span class="preprocessor">#endif</span>
-<a name="l00292"></a>00292 <span class="preprocessor"></span>
-<a name="l00295"></a>00295 <span class="preprocessor">#endif</span>
+<a name="l00243"></a><a class="code" href="group___obsolete.html#gaf3568376c75640ee4ef87aa760c73d68">00243</a> <span class="preprocessor">#define canSLOW_MODE            0x01  ///&lt; Sync on rising and falling edge \warning Obsolete!</span>
+<a name="l00244"></a>00244 <span class="preprocessor"></span>
+<a name="l00252"></a><a class="code" href="group___obsolete.html#ga617b014a43ee96f2606f3c12553e3eb7">00252</a> <span class="preprocessor">#define canOFF                  0     ///&lt;                            \warning Obsolete!</span>
+<a name="l00253"></a><a class="code" href="group___obsolete.html#gaa87e5c3de3aeb3c182b5b6f887add48b">00253</a> <span class="preprocessor"></span><span class="preprocessor">#define canTRISTATE             1     ///&lt;                            \warning Obsolete!</span>
+<a name="l00254"></a><a class="code" href="group___obsolete.html#ga9275fa9361820f5d65332519a55435da">00254</a> <span class="preprocessor"></span><span class="preprocessor">#define canPULLUP               2     ///&lt;                            \warning Obsolete!</span>
+<a name="l00255"></a><a class="code" href="group___obsolete.html#gaa1da0634f0eeed650569e8a5b5ce1859">00255</a> <span class="preprocessor"></span><span class="preprocessor">#define canPULLDOWN             3     ///&lt;                            \warning Obsolete!</span>
+<a name="l00256"></a><a class="code" href="group___obsolete.html#ga737411dc9c47ef015221766d3a2e76e0">00256</a> <span class="preprocessor"></span><span class="preprocessor">#define canPUSHPULL             4     ///&lt; This is the usual setting. \warning Obsolete!</span>
+<a name="l00257"></a><a class="code" href="group___obsolete.html#ga0e5622d9f06f5abde9f963c9a85aaaaf">00257</a> <span class="preprocessor"></span><span class="preprocessor">#define canINVPULLUP            5     ///&lt;                            \warning Obsolete!</span>
+<a name="l00258"></a><a class="code" href="group___obsolete.html#gab77a444a6d4ccc09caf9aa3ba32663a1">00258</a> <span class="preprocessor"></span><span class="preprocessor">#define canINVPULLDOWN          6     ///&lt;                            \warning Obsolete!</span>
+<a name="l00259"></a><a class="code" href="group___obsolete.html#ga6e158a4fe2ecfec1128ceea673544c77">00259</a> <span class="preprocessor"></span><span class="preprocessor">#define canINVPUSHPULL          7     ///&lt;                            \warning Obsolete!</span>
+<a name="l00260"></a>00260 <span class="preprocessor"></span>
+<a name="l00268"></a><a class="code" href="group___obsolete.html#ga9948614d7b592c89a8c860de251337b5">00268</a> <span class="preprocessor">#define canIOCTL_LOCAL_ECHO_ON  3     ///&lt; \warning Obsolete!</span>
+<a name="l00269"></a><a class="code" href="group___obsolete.html#ga20f09562378f9e0531c37c9a0d2ecaf1">00269</a> <span class="preprocessor"></span><span class="preprocessor">#define canIOCTL_LOCAL_ECHO_OFF 4     ///&lt; \warning Obsolete!</span>
+<a name="l00270"></a>00270 <span class="preprocessor"></span>
+<a name="l00271"></a><a class="code" href="group___obsolete.html#ga8c5f48d3ea2c97e5940544a58b12f9d8">00271</a> <span class="preprocessor">#define canMSG_STATUS 0x0008</span>
+<a name="l00272"></a>00272 <span class="preprocessor"></span>
+<a name="l00274"></a>00274 <span class="preprocessor">#ifdef __cplusplus</span>
+<a name="l00275"></a>00275 <span class="preprocessor"></span><span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> {
+<a name="l00276"></a>00276 <span class="preprocessor">#endif</span>
+<a name="l00277"></a>00277 <span class="preprocessor"></span>
+<a name="l00281"></a>00281 <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> CANLIBAPI <a class="code" href="group___obsolete.html#gab8992255af9c02c75d646425a73eac26">canInstallAction</a>(<span class="keywordtype">int</span> handle, <span class="keywordtype">long</span> <span class="keywordtype">id</span>, <span class="keywordtype">int</span> (*fn)());
+<a name="l00282"></a>00282 
+<a name="l00286"></a>00286 <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> CANLIBAPI <a class="code" href="group___obsolete.html#ga4430127078d9cbd9f6e750f9eb4a4715">canUninstallAction</a>(<span class="keywordtype">int</span> handle, <span class="keywordtype">long</span> <span class="keywordtype">id</span>);
+<a name="l00287"></a>00287 
+<a name="l00291"></a>00291 <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> CANLIBAPI <a class="code" href="group___obsolete.html#gaf3d79256de520acbafae2442bb779956">canInstallOwnBuffer</a>(<span class="keywordtype">int</span> handle, <span class="keywordtype">long</span> <span class="keywordtype">id</span>, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> len,
+<a name="l00292"></a>00292                                         <span class="keywordtype">void</span> * buf);
+<a name="l00293"></a>00293 
+<a name="l00297"></a>00297 <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> CANLIBAPI <a class="code" href="group___obsolete.html#ga8094bf56752bd08cd550032e8b165cac">canUninstallOwnBuffer</a>(<span class="keywordtype">int</span> handle, <span class="keywordtype">long</span> <span class="keywordtype">id</span>);
+<a name="l00298"></a>00298 <span class="preprocessor">#ifdef __cplusplus</span>
+<a name="l00299"></a>00299 <span class="preprocessor"></span>}
+<a name="l00300"></a>00300 <span class="preprocessor">#endif</span>
+<a name="l00301"></a>00301 <span class="preprocessor"></span>
+<a name="l00304"></a>00304 <span class="preprocessor">#endif</span>
 </pre></div></div>
 </div>
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser CANLIB (canlib 5.17) - Generated on Thu Sep 15 2016</small>
+<small>Kvaser CANLIB (canlib 5.19) - Generated on Wed Feb 15 2017</small>
 </address>
 </body>
 </html>

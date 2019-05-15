@@ -82,8 +82,6 @@
 // Kvaser definitions
 #include "VCanOsIf.h"
 #include "virtualcan.h"
-#include "osif_kernel.h"
-#include "osif_functions_kernel.h"
 #include "queue.h"
 #include "hwnames.h"
 #include "vcan_ioctl.h"
@@ -114,7 +112,7 @@ static int debug_level = VIRTUAL_DEBUG;
 // HW function pointers
 //======================================================================
 
-static int INIT virtualInitAllDevices(void);
+static int virtualInitAllDevices(void);
 static int virtualSetBusParams (VCanChanData *vChd, VCanBusParams *par);
 static int virtualGetBusParams (VCanChanData *vChd, VCanBusParams *par);
 static int virtualSetOutputMode (VCanChanData *vChd, int silent);
@@ -124,7 +122,7 @@ static int virtualBusOff (VCanChanData *vChd);
 static int virtualGetTxErr(VCanChanData *vChd);
 static int virtualGetRxErr(VCanChanData *vChd);
 static int virtualTxAvailable (VCanChanData *vChd);
-static int EXIT virtualCloseAllDevices(void);
+static int virtualCloseAllDevices(void);
 static int virtualProcRead (struct seq_file* m, void* v);
 static int virtualRequestChipState (VCanChanData *vChd);
 static unsigned long virtualTxQLen(VCanChanData *vChd);
@@ -166,7 +164,7 @@ static int virtualSend (void *void_chanData);
 //======================================================================
 static unsigned long getTime(VCanCardData *vCard)
 {
-  unsigned long time;
+  uint64_t time;
 
   hwIf.getTime(vCard, &time);
 
@@ -480,7 +478,7 @@ static int virtualSend (void *void_chanData)
             queue_pop(&chd->txChanQueue);
         }
         else if (test_and_clear_bit(0, &chd->waitEmpty)) {
-            os_if_wake_up_interruptible(&chd->flushQ);
+            wake_up_interruptible(&chd->flushQ);
             break;
         }
         else {
@@ -603,7 +601,7 @@ static int virtualInitOne (void)
     VCanCardData       *vCard;
 
     // Allocate data area for this card
-    vCard = os_if_kernel_malloc(sizeof(VCanCardData) + sizeof(virtualCardData));
+    vCard = kmalloc(sizeof(VCanCardData) + sizeof(virtualCardData), GFP_KERNEL);
     if (!vCard) {
         goto card_alloc_err;
     }
@@ -613,7 +611,7 @@ static int virtualInitOne (void)
     vCard->hwCardData = vCard + 1;
 
     // Allocate memory for n channels
-    chs = os_if_kernel_malloc(sizeof(ChanHelperStruct));
+    chs = kmalloc(sizeof(ChanHelperStruct), GFP_KERNEL);
     if (!chs) {
         goto chan_alloc_err;
     }
@@ -637,16 +635,16 @@ static int virtualInitOne (void)
     virtualInitData(vCard);
 
     // Insert into list of cards
-    os_if_spin_lock(&driverData.canCardsLock);
+    spin_lock(&driverData.canCardsLock);
     vCard->next = driverData.canCards;
     driverData.canCards    = vCard;
-    os_if_spin_unlock(&driverData.canCardsLock);
+    spin_unlock(&driverData.canCardsLock);
 
     return 1;
 
 chan_alloc_err:
 probe_err:
-    os_if_kernel_free(vCard);
+    kfree(vCard);
 card_alloc_err:
 
     return 0;
@@ -663,13 +661,13 @@ static void virtualRemoveOne (VCanCardData *vCard)
     vChan = vCard->chanData[chNr];
     DEBUGPRINT(3, "Waiting for all closed on minor %d\n", vChan->minorNr);
     while (atomic_read(&vChan->fileOpenCount) > 0) {
-      os_if_set_task_uninterruptible ();
-      os_if_wait_for_event_timeout_simple(10);
+      set_current_state(TASK_UNINTERRUPTIBLE);
+      schedule_timeout(msecs_to_jiffies(10));
     }
   }
 
-  os_if_kernel_free(vCard->chanData);
-  os_if_kernel_free(vCard);
+  kfree(vCard->chanData);
+  kfree(vCard);
 }
 
 
@@ -699,14 +697,14 @@ static int virtualCloseAllDevices (void)
     VCanCardData *vCard;
 
     while (1) {
-        os_if_spin_lock(&driverData.canCardsLock);
+        spin_lock(&driverData.canCardsLock);
         vCard = driverData.canCards;
         if (!vCard) {
-            os_if_spin_unlock(&driverData.canCardsLock);
+            spin_unlock(&driverData.canCardsLock);
             break;
         }
         driverData.canCards = vCard->next;
-        os_if_spin_unlock(&driverData.canCardsLock);
+        spin_unlock(&driverData.canCardsLock);
         virtualRemoveOne(vCard);
     }
     DEBUGPRINT(1, "Kvaser Virtual Closed.\n");
@@ -714,13 +712,13 @@ static int virtualCloseAllDevices (void)
     return 0;
 } // virtualCloseAllDevices
 
-INIT int init_module (void)
+int init_module (void)
 {
   driverData.hwIf = &hwIf;
   return vCanInit (&driverData, MAX_CHANNELS);
 }
 
-EXIT void cleanup_module (void)
+void cleanup_module (void)
 {
   vCanCleanup (&driverData);
 }

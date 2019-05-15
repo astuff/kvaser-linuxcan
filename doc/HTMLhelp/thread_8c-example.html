@@ -192,7 +192,7 @@ HANDLE events[4];
 <span class="keywordtype">int</span> channels[4];
 
 
-DWORD WINAPI SendAndReceive(PVOID p)
+DWORD <a name="a6"></a><a class="code" href="group___c_a_n_d_b.html#ga9aa60e1ead64be77ad551e745cbfd4d3">WINAPI</a> SendAndReceive(PVOID p)
 {
   <a class="code" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canHandle</a>   hnd;
   <span class="keywordtype">long</span>        id_read;
@@ -218,22 +218,22 @@ DWORD WINAPI SendAndReceive(PVOID p)
       <span class="comment">//memcpy(msg, &amp;i, sizeof(i));</span>
       memcpy(msg, &amp;count, <span class="keyword">sizeof</span>(count));
       count++;
-      stat = <a name="a6"></a><a class="code" href="group___c_a_n.html#ga30a6dda4b300294c2e549186c992b44a">canWrite</a>(hnd, <span class="keywordtype">id</span>, msg, 8, 0);
+      stat = <a name="a7"></a><a class="code" href="group___c_a_n.html#ga30a6dda4b300294c2e549186c992b44a">canWrite</a>(hnd, <span class="keywordtype">id</span>, msg, 8, 0);
       Check(<span class="stringliteral">&quot;canWrite A&quot;</span>, stat);
       TotalSent[idx]++;
 
       <span class="comment">// And receive all that is pending..</span>
       <span class="keywordflow">do</span> {
-        stat = <a name="a7"></a><a class="code" href="group___c_a_n.html#ga46e62517c7a4bcf7d5f96aa7d9f56684">canRead</a>(hnd, &amp;id_read, NULL, &amp;dlc, &amp;flags, NULL);
+        stat = <a name="a8"></a><a class="code" href="group___c_a_n.html#ga46e62517c7a4bcf7d5f96aa7d9f56684">canRead</a>(hnd, &amp;id_read, NULL, &amp;dlc, &amp;flags, NULL);
         <span class="keywordflow">if</span> (stat == <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a>) {
           <span class="keywordflow">if</span> (Verbose &gt; 1) printf(<span class="stringliteral">&quot;R&quot;</span>);
           TotalReceived[idx]++;
           <span class="comment">// if (id_read != SRC_ID) printf(&quot;Id=%d dlc=%d flags=0x%x\n&quot;, id_read, dlc, flags);</span>
-          <span class="keywordflow">if</span> (flags &amp; <a name="a8"></a><a class="code" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8" title="Message is an error frame.">canMSG_ERROR_FRAME</a>) printf(<span class="stringliteral">&quot;x&quot;</span>);
+          <span class="keywordflow">if</span> (flags &amp; <a name="a9"></a><a class="code" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8" title="Message is an error frame.">canMSG_ERROR_FRAME</a>) printf(<span class="stringliteral">&quot;x&quot;</span>);
         }
       } <span class="keywordflow">while</span> (stat == <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a>);
     }
-    stat = <a name="a9"></a><a class="code" href="group___c_a_n.html#ga4eb2c1537a14150d34f5fdc99f09f535">canWriteSync</a>(hnd, 1000);
+    stat = <a name="a10"></a><a class="code" href="group___c_a_n.html#ga4eb2c1537a14150d34f5fdc99f09f535">canWriteSync</a>(hnd, 1000);
     Check(<span class="stringliteral">&quot;canWriteSync A&quot;</span>, stat);
     Sleep(P_NAP);
 
@@ -242,7 +242,7 @@ DWORD WINAPI SendAndReceive(PVOID p)
   <span class="keywordflow">return</span> 0;
 }
 
-DWORD WINAPI ReadOne(PVOID p)
+DWORD <a class="code" href="group___c_a_n_d_b.html#ga9aa60e1ead64be77ad551e745cbfd4d3">WINAPI</a> ReadOne(PVOID p)
 {
   <a class="code" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canHandle</a>   hnd;
   <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>   stat;
@@ -260,7 +260,7 @@ DWORD WINAPI ReadOne(PVOID p)
     <span class="comment">// are sending back and forth, then call canRead to consume the messages.</span>
     <span class="comment">//</span>
     <span class="keywordflow">do</span> {
-      stat = <a name="a10"></a><a class="code" href="group___c_a_n.html#gab51efe7c6c69f95a47c4cd9bc0c1394d">canReadSyncSpecific</a>(hnd, SRC_ID, 500);
+      stat = <a name="a11"></a><a class="code" href="group___c_a_n.html#gab51efe7c6c69f95a47c4cd9bc0c1394d">canReadSyncSpecific</a>(hnd, SRC_ID, 500);
       <span class="keywordflow">if</span> (stat == <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a>) {
         <span class="keywordflow">if</span> (Verbose &gt; 1) printf(<span class="stringliteral">&quot;r&quot;</span>);
       } <span class="keywordflow">else</span> {
@@ -292,7 +292,7 @@ DWORD WINAPI ReadOne(PVOID p)
 <span class="comment">//</span>
 <span class="comment">// Just consume all messages on the bus.</span>
 <span class="comment">//</span>
-DWORD WINAPI Sink(PVOID p)
+DWORD <a class="code" href="group___c_a_n_d_b.html#ga9aa60e1ead64be77ad551e745cbfd4d3">WINAPI</a> Sink(PVOID p)
 {
   <a class="code" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canHandle</a> hnd;
   <span class="keywordtype">int</span> idx;
@@ -344,9 +344,9 @@ DWORD WINAPI Sink(PVOID p)
       channels[3] = tmp;
     } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (sscanf(argv[i], <span class="stringliteral">&quot;-B%d%c&quot;</span>, &amp;tmp, &amp;c) == 1) {
       <span class="keywordflow">switch</span> (tmp) {
-      <span class="keywordflow">case</span> 1000 : Bitrate = <a name="a11"></a><a class="code" href="canlib_8h.html#ac823cae7d94763607a7ca40fcdb5196d">canBITRATE_1M</a>; <span class="keywordflow">break</span>;
-      <span class="keywordflow">case</span> 500  : Bitrate = <a name="a12"></a><a class="code" href="canlib_8h.html#ae72ee3c12379c4817de3b53c7cc6d89c">canBITRATE_500K</a>; <span class="keywordflow">break</span>;
-      <span class="keywordflow">case</span> 250  : Bitrate = <a name="a13"></a><a class="code" href="canlib_8h.html#a87f618db13ec4f48610def72cfb40969">canBITRATE_250K</a>; <span class="keywordflow">break</span>;
+      <span class="keywordflow">case</span> 1000 : Bitrate = <a name="a12"></a><a class="code" href="canlib_8h.html#ac823cae7d94763607a7ca40fcdb5196d">canBITRATE_1M</a>; <span class="keywordflow">break</span>;
+      <span class="keywordflow">case</span> 500  : Bitrate = <a name="a13"></a><a class="code" href="canlib_8h.html#ae72ee3c12379c4817de3b53c7cc6d89c">canBITRATE_500K</a>; <span class="keywordflow">break</span>;
+      <span class="keywordflow">case</span> 250  : Bitrate = <a name="a14"></a><a class="code" href="canlib_8h.html#a87f618db13ec4f48610def72cfb40969">canBITRATE_250K</a>; <span class="keywordflow">break</span>;
       <span class="keywordflow">case</span> 125  : Bitrate = <a class="code" href="canlib_8h.html#a29a9aafde6e861b4fffb72ad124aeed1">canBITRATE_125K</a>; <span class="keywordflow">break</span>;
       <span class="keywordflow">default</span> : Usage(argc, argv);
       }
@@ -363,7 +363,7 @@ DWORD WINAPI Sink(PVOID p)
   memset(TotalSent, 0, <span class="keyword">sizeof</span>(TotalSent));
   memset(TotalReceived, 0, <span class="keyword">sizeof</span>(TotalReceived));
 
-  <a name="a14"></a><a class="code" href="group___general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1">canInitializeLibrary</a>();
+  <a name="a15"></a><a class="code" href="group___general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1">canInitializeLibrary</a>();
 
   InitializeCriticalSection(&amp;cs);
   TimeToLeave = FALSE;
@@ -418,7 +418,7 @@ DWORD WINAPI Sink(PVOID p)
 </div>
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser CANLIB (canlib 5.17) - Generated on Thu Sep 15 2016</small>
+<small>Kvaser CANLIB (canlib 5.19) - Generated on Wed Feb 15 2017</small>
 </address>
 </body>
 </html>

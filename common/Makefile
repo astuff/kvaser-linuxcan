@@ -62,7 +62,7 @@ KV_MODULE_NAME = kvcommon
 INCLUDES := $(src)/../include
 
 # source files
-SRCS := VCanOsIf.c objbuf.c osif_functions_kernel.c queue.c util.c softsync.c capabilities.c
+SRCS := VCanOsIf.c objbuf.c queue.c util.c softsync.c capabilities.c dlc.c ticks.c
 
 ifneq ($(KERNELRELEASE),)
 	RUNDIR := $(src)

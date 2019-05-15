@@ -53,8 +53,14 @@
 MODNAME=kvpciefd
 DEPMOD=`which depmod`
 
-install -m 600 $MODNAME.ko /lib/modules/`uname -r`/kernel/drivers/char/
-install -m 700 pciefd.sh /usr/sbin/
+install -m 644 $MODNAME.ko /lib/modules/`uname -r`/kernel/drivers/char/
+if [ "$?" -ne 0 ] ; then
+  exit 1
+fi
+install -m 755 pciefd.sh /usr/sbin/
+if [ "$?" -ne 0 ] ; then
+  exit 1
+fi
 /usr/sbin/pciefd.sh stop 2>/dev/null
 
 echo Checking for loaded SocketCAN driver for Kvaser PCI devices.
@@ -103,7 +109,7 @@ fi
 
 MODCONF=/etc/modules-load.d/kvaser.conf
 
-if [ "$#" -gt 0 ] && [ $1 = "load" ]] ; then
+if [ "$#" -gt 0 ] && [ $1 = "load" ] ; then
   /usr/sbin/pciefd.sh start
   touch $MODCONF
   if [ -f $MODCONF ] ; then

@@ -95,6 +95,7 @@ uint8_t convert_vcan_to_hydra_cmd (uint32_t vcan_cmd) {
     case VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION: return CAP_SUB_CMD_BUS_STATS; break;
     case VCAN_CHANNEL_CAP_ERROR_COUNTERS:      return CAP_SUB_CMD_ERRCOUNT_READ; break;
     case VCAN_CHANNEL_CAP_SINGLE_SHOT:         return CAP_SUB_CMD_SINGLE_SHOT; break;
+    case VCAN_CHANNEL_CAP_SYNC_TX_FLUSH:       return CAP_SUB_CMD_SYNC_TX_FLUSH; break;
     default: return 0; break;
   }
 }

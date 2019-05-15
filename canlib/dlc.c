@@ -50,43 +50,55 @@
 ** ---------------------------------------------------------------------------
 **/
 
-#ifndef OSIF_KERNEL_H_
-#define OSIF_KERNEL_H_
-
-//###############################################################
-
-#   include <linux/types.h>
-#   include <linux/tty.h>
-#   include <linux/module.h>
-#   include <linux/spinlock.h>
-#   include <linux/workqueue.h>
-
-// DEFINES
-#   define OS_IF_TIMEOUT 0
-#   define OS_IF_TICK_COUNT jiffies
-#   define OS_IF_MOD_INC_USE_COUNT ;
-#   define OS_IF_MOD_DEC_USE_COUNT ;
-
-    // TYPEDEFS
-    typedef struct timeval        OS_IF_TIME_VAL;
-    typedef off_t                 OS_IF_OFFSET;
-    typedef unsigned long         OS_IF_SIZE;
-    typedef struct task_struct*   OS_IF_THREAD;
-    typedef wait_queue_head_t     OS_IF_WAITQUEUE_HEAD;
-    typedef wait_queue_t          OS_IF_WAITQUEUE;
-    typedef spinlock_t            OS_IF_LOCK;
-
-    typedef struct work_struct      OS_IF_TASK_QUEUE_HANDLE;
-    typedef struct workqueue_struct OS_IF_WQUEUE;
-    typedef struct completion       OS_IF_SEMAPHORE;
+#include "dlc.h"
 
 
+uint32_t dlc_bytes_to_dlc_fd (uint32_t n_bytes)
+{
+  if (n_bytes > 48) return 15;
+  else if (n_bytes > 32) return 14;
+  else if (n_bytes > 24) return 13;
+  else if (n_bytes > 20) return 12;
+  else if (n_bytes > 16) return 11;
+  else if (n_bytes > 12) return 10;
+  else if (n_bytes >  8) return 9;
+  else return n_bytes;
+}
 
-#define INIT           // __init
-#define EXIT           // __exit
-#define DEVINIT        // __devinit
-#define DEVEXIT        // __devexit
-#define DEVINITDATA    // __devinitdata
-#define DEVEXITP(x) x  // __devexit_p(x)
+uint32_t dlc_dlc_to_bytes_fd (uint32_t dlc)
+{
+  switch (dlc & 0x0000000FU) {
+    case 9:   return 12;
+    case 10:  return 16;
+    case 11:  return 20;
+    case 12:  return 24;
+    case 13:  return 32;
+    case 14:  return 48;
+    case 15:  return 64;
+    default:  return dlc;
+  }
+}
 
-#endif //OSIF_KERNEL_H_
+uint32_t dlc_is_dlc_ok (uint32_t accept_large_dlc, uint32_t is_fd, uint32_t dlc)
+{
+  if (is_fd)  {
+    return ((dlc <= 8)  ||
+            (dlc == 12) || (dlc == 16) ||
+            (dlc == 20) || (dlc == 24) ||
+            (dlc == 32) || (dlc == 48) ||
+            (dlc == 64));
+  } else if (accept_large_dlc) {
+    return 1;
+  } else {
+    return (dlc <= 8);
+  }
+}
+
+uint32_t dlc_dlc_to_bytes_classic (uint32_t dlc)
+{
+  if ((dlc & 0x0000000FU) > 8) {
+    return 8;
+  } else {
+    return dlc;
+  }
+}

@@ -305,6 +305,22 @@ void LINLIBAPI linInitializeLibrary(void)
   LeaveCriticalSection(&crit);
 }
 
+//===========================================================================
+void LINLIBAPI linUnloadLibrary(void)
+{
+  int i;
+
+  EnterCriticalSection(&crit);  
+  canUnloadLibrary();
+  for (i = 0; i < MAXHANDLES; i++) {
+    linClose(linChannels[i].h);
+    linChannels[i].inUse = 0;
+  }
+  isInitialized = FALSE;
+  LeaveCriticalSection(&crit);
+}
+
+
 
 //===========================================================================
 // Return the CAN handle given an open LIN handle

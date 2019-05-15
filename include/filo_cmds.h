@@ -117,7 +117,8 @@
 #define CMD_TCP_KEEPALIVE                     65
 #define CMD_TX_INTERVAL_REQ                   66
 #define CMD_TX_INTERVAL_RESP                  67
-// 68-72 can be reused
+#define CMD_FILO_FLUSH_QUEUE_RESP             68
+// 69-72 can be reused
 #define CMD_AUTO_TX_BUFFER_REQ                72
 #define CMD_AUTO_TX_BUFFER_RESP               73
 #define CMD_SET_TRANSCEIVER_MODE_REQ          74
@@ -1150,6 +1151,16 @@ typedef struct {
   uint16_t padding2;
 } cmdFlushQueue;
 
+typedef struct {
+  uint8_t  cmdLen;
+  uint8_t  cmdNo;
+  uint8_t  transId;
+  uint8_t  channel;
+  uint8_t  flags;
+  uint8_t  padding;
+  uint16_t padding2;
+} cmdFlushQueueResp;
+
 
 typedef struct {
   uint8_t cmdLen;
@@ -1501,13 +1512,37 @@ typedef struct {
 #define CAP_SUB_CMD_ERRFRAME                   3
 #define CAP_SUB_CMD_BUS_STATS                  4
 #define CAP_SUB_CMD_ERRCOUNT_READ              5
+#define CAP_SUB_CMD_SINGLE_SHOT                6
+#define CAP_SUB_CMD_SYNC_TX_FLUSH              7
+#define CAP_SUB_CMD_HAS_LOGGER                 8
+#define CAP_SUB_CMD_HAS_REMOTE                 9
+#define CAP_SUB_CMD_HAS_SCRIPT                10
+
+// the following are not capabilities/bits
+#define CAP_SUB_CMD_DATA_START               1024
+#define CAP_SUB_CMD_GET_LOGGER_INFO          CAP_SUB_CMD_DATA_START+1
+#define CAP_SUB_CMD_REMOTE_INFO              CAP_SUB_CMD_DATA_START+2
+
+// CAP_SUB_CMD_GET_LOGGER_TYPE
+#define LOGGERTYPE_NOT_A_LOGGER 0
+#define LOGGERTYPE_V1 1
+
+// CAP_SUB_CMD_REMOTE_TYPE
+#define REMOTE_TYPE_NOT_REMOTE  0
+#define REMOTE_TYPE_WLAN 1
+#define REMOTE_TYPE_LAN  2 
+
+typedef union {
+  uint16_t padding;
+  uint16_t channel;
+} capExtraInfo_u;
 
 typedef struct {
   uint8_t  cmdLen;
   uint8_t  cmdNo;
   uint16_t pad;
   uint16_t subCmdNo;
-  uint16_t unused;
+  capExtraInfo_u  subData;
 } cmdCapabilitiesReq;
 
 
@@ -1516,6 +1551,18 @@ typedef struct
   uint32_t mask;
   uint32_t value;
 } channelCap32_t;
+
+
+typedef struct
+{
+  uint32_t     webServer;
+  uint32_t     remoteType;
+} RemoteInfo_t;
+
+typedef struct
+{
+  uint32_t data;
+} Info_t;
 
 //Status codes in CMD_GET_CAPABILITIES_RESP
 #define CAP_STATUS_OK                          0
@@ -1529,10 +1576,16 @@ typedef struct {
   uint16_t subCmdNo;
   uint16_t status;
   union {
-    channelCap32_t silentMode;  // CAP_SUB_CMD_SILENT_MODE
-    channelCap32_t errframeCap; // CAP_SUB_CMD_ERRFRAME
-    channelCap32_t busstatCap;  // CAP_SUB_CMD_BUS_STATS
-    channelCap32_t errcountCap; // CAP_SUB_CMD_ERRCOUNT_READ
+    channelCap32_t silentMode;     // CAP_SUB_CMD_SILENT_MODE
+    channelCap32_t errframeCap;    // CAP_SUB_CMD_ERRFRAME
+    channelCap32_t busstatCap;     // CAP_SUB_CMD_BUS_STATS
+    channelCap32_t errcountCap;    // CAP_SUB_CMD_ERRCOUNT_READ
+    channelCap32_t syncTxFlushCap; // CAP_SUB_CMD_SYNC_TX_FLUSH
+    channelCap32_t loggerCap;     // CAP_SUB_CMD_HAS_LOGGER    
+    channelCap32_t remoteCap;     // CAP_SUB_CMD_HAS_REMOTE    
+    channelCap32_t scriptCap;     // CAP_SUB_CMD_HAS_SCRIPT 
+    Info_t loggerType;            // CAP_SUB_CMD_GET_LOGGER_TYPE
+    RemoteInfo_t remoteInfo;      // CAP_SUB_CMD_REMOTE_TYPE    
   };
 } cmdCapabilitiesResp;
 
@@ -1622,6 +1675,7 @@ typedef union {
   cmdResetStatisticsReq           resetStatisticsReq;
   cmdErrorEvent                   errorEvent;
   cmdFlushQueue                   flushQueue;
+  cmdFlushQueueResp               flushQueueResp;
   cmdNoCommand                    noCommand;
   cmdResetErrorCounter            resetErrorCounter;
   cmdCanErrorEvent                canErrorEvent;
@@ -1775,6 +1829,7 @@ FILO_CMD_ALIGNMENT(cmdGetBusLoadResp            );
 FILO_CMD_ALIGNMENT(cmdResetStatisticsReq        );
 FILO_CMD_ALIGNMENT(cmdErrorEvent                );
 FILO_CMD_ALIGNMENT(cmdFlushQueue                );
+FILO_CMD_ALIGNMENT(cmdFlushQueueResp            );
 FILO_CMD_ALIGNMENT(cmdNoCommand                 );
 FILO_CMD_ALIGNMENT(cmdResetErrorCounter         );
 FILO_CMD_ALIGNMENT(cmdCanErrorEvent             );
@@ -1899,6 +1954,7 @@ CompilerAssert(sizeof(cmdGetBusLoadResp) == 16);
 CompilerAssert(sizeof(cmdResetStatisticsReq) == 4);
 CompilerAssert(sizeof(cmdErrorEvent) == 16);
 CompilerAssert(sizeof(cmdFlushQueue) == 8);
+CompilerAssert(sizeof(cmdFlushQueueResp) == 8);
 CompilerAssert(sizeof(cmdNoCommand) == 4);
 CompilerAssert(sizeof(cmdResetErrorCounter) == 4);
 CompilerAssert(sizeof(cmdCanErrorEvent) == 16);
@@ -1969,7 +2025,7 @@ CompilerAssert(sizeof(cmdPingReq) == 8);
 CompilerAssert(sizeof(cmdPingResp) == 8);
 
 CompilerAssert(sizeof(cmdSetUnlockCode) == 8);
-CompilerAssert(sizeof(cmdCapabilitiesReq) == 8);
+CompilerAssert(sizeof(cmdCapabilitiesReq) == 8); 
 CompilerAssert(sizeof(cmdCapabilitiesResp) == 16);
 #undef FILO_CMD_ALIGNMENT
 
