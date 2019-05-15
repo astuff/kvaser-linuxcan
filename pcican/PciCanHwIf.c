@@ -1,13 +1,13 @@
 /*
-**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
-**                        http://www.kvaser.com
+**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
 ** BSD-new and GPLv2. You may use either one. See the included
 ** COPYING file for details.
 **
 ** License: BSD-new
-** ===============================================================================
+** ==============================================================================
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
 **     * Redistributions of source code must retain the above copyright
@@ -19,24 +19,25 @@
 **       names of its contributors may be used to endorse or promote products
 **       derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+** IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
 **
 **
 ** License: GPLv2
-** ===============================================================================
-** This program is free software; you can redistribute it and/or
-** modify it under the terms of the GNU General Public License
-** as published by the Free Software Foundation; either version 2
-** of the License, or (at your option) any later version.
+** ==============================================================================
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,20 +46,28 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 **
-** ---------------------------------------------------------------------------
-**/
+**
+** IMPORTANT NOTICE:
+** ==============================================================================
+** This source code is made available for free, as an open license, by Kvaser AB,
+** for use with its applications. Kvaser AB does not accept any liability
+** whatsoever for any third party patent or other immaterial property rights
+** violations that may result from any usage of this source code, regardless of
+** the combination of source code and various applications that it can be used
+** in, or with.
+**
+** -----------------------------------------------------------------------------
+*/
 
 //--------------------------------------------------
 // NOTE! module_versioning HAVE to be included first
 #include "module_versioning.h"
 //--------------------------------------------------
 
-//
 // Kvaser CAN driver PCIcan hardware specific parts
 // PCIcan functions
-//
 
 #include <linux/version.h>
 #include <linux/pci.h>
@@ -79,9 +88,13 @@
 #include <linux/seq_file.h>
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)
 #   include <asm/system.h>
-#endif
+#endif /* KERNEL_VERSION < 3.4.0 */
 #include <asm/bitops.h>
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 12, 0))
 #include <asm/uaccess.h>
+#else
+#include <linux/uaccess.h>
+#endif /* KERNEL_VERSION < 4.12.0 */
 
 #include <asm/delay.h>
 
@@ -162,7 +175,9 @@ static VCanHWInterface hwIf = {
     .getRxErr           = pciCanGetRxErr,
     .txQLen             = pciCanTxQLen,
     .requestChipState   = pciCanRequestChipState,
-    .requestSend        = pciCanRequestSend
+    .requestSend        = pciCanRequestSend,
+    .getCardInfo        = vCanGetCardInfo,
+    .getCardInfo2       = vCanGetCardInfo2,
 };
 
 
@@ -226,11 +241,13 @@ static int pciCanFlushSendBuffer (VCanChanData *vChd)
 
   spin_unlock_irqrestore(&hChd->lock, irqFlags);
   vCanFlushSendBuffer (vChd);
-  
+
   {//wait for flush to finish
     unsigned int n = 0;
     while (1) {
-      if (hChd->flushing) {
+      if (!vChd->vCard->cardPresent) {
+        break;
+      } else if (hChd->flushing) {
         n++;
         if (n > 10) {
           break;
@@ -243,7 +260,7 @@ static int pciCanFlushSendBuffer (VCanChanData *vChd)
       }
     }
   }
-  
+
   return VCAN_STAT_OK;
 }
 
@@ -806,6 +823,9 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
 
     spin_lock_irqsave(&hChd->lock, irqFlags);
 
+    hChd->outstanding_tx = 0;
+    hChd->flushing       = 0;
+
     // Put the circuit in Reset Mode
     tmp = ioread8(circAddr + PCAN_MOD);
 
@@ -818,8 +838,8 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
     iowrite8(cbt1, circAddr + PCAN_BTR1);
 
     if (!resetStatus) {
-        tmp = ioread8(circAddr + PCAN_MOD);
-        iowrite8(tmp & ~PCAN_RM, circAddr + PCAN_MOD);
+      tmp = ioread8(circAddr + PCAN_MOD);
+      iowrite8(tmp & ~PCAN_RM, circAddr + PCAN_MOD);
     }
 
     spin_unlock_irqrestore(&hChd->lock, irqFlags);
@@ -875,6 +895,9 @@ static int pciCanSetOutputMode (VCanChanData *vChd, int silent)
     unsigned long irqFlags;
 
     spin_lock_irqsave(&hChd->lock, irqFlags);
+
+    hChd->outstanding_tx = 0;
+    hChd->flushing       = 0;
 
     // Save control register
     tmp = ioread8(hChd->sja1000 + PCAN_MOD);
@@ -1087,7 +1110,7 @@ static int pciCanBusOff (VCanChanData *vChd)
     hChd->currentTxMsg     = NULL;
     hChd->outstanding_tx   = 0;
     hChd->flushing         = 0;
-    
+
     tmp = ioread8(hChd->sja1000 + PCAN_MOD);
     iowrite8(tmp | PCAN_RM, hChd->sja1000 + PCAN_MOD);
 
@@ -1682,7 +1705,7 @@ void pciCanRequestSend (VCanCardData *vCard, VCanChanData *vChd)
 {
   PciCanChanData *hChd = vChd->hwChanData;
   unsigned long  irqFlags;
-  
+
   spin_lock_irqsave(&hChd->lock, irqFlags);
   if (pciCanTxAvailable (vChd)) {
 #if !defined(TRY_RT_QUEUE)
@@ -1718,7 +1741,7 @@ void pciCanRequestSend (VCanCardData *vCard, VCanChanData *vChd)
 #endif
 
   int           queuePos;
- 
+
   if (hwIf.txAvailable(vChd) && (vChd->minorNr >= 0)) {
     // Send Messages
     queuePos = queue_front(&vChd->txChanQueue);
@@ -1906,10 +1929,18 @@ static void pciCanRemoveOne (struct pci_dev *dev)
 
   free_irq(hCd->irq, vCard);
 
+  vCard->cardPresent = 0;
+
+  DEBUGPRINT(3, "pcican: Stopping all \"waitQueue's\"\n");
+
+  for (chNr = 0; chNr < vCard->nrChannels; chNr++) {
+    vCanCardRemoved(vCard->chanData[chNr]);
+  }
+
 
   for (chNr = 0; chNr < vCard->nrChannels; chNr++) {
     vChd = vCard->chanData[chNr];
-    DEBUGPRINT(3, "Waiting for all closed on minor %d\n", vChd->minorNr);
+    DEBUGPRINT(3, "pcican: Waiting for all closed on minor %d\n", vChd->minorNr);
     while (atomic_read(&vChd->fileOpenCount) > 0) {
       set_current_state(TASK_UNINTERRUPTIBLE);
       schedule_timeout(msecs_to_jiffies(10));

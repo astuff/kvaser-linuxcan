@@ -1,13 +1,13 @@
 /*
-**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
-**                        http://www.kvaser.com
+**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
 ** BSD-new and GPLv2. You may use either one. See the included
 ** COPYING file for details.
 **
 ** License: BSD-new
-** ===============================================================================
+** ==============================================================================
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
 **     * Redistributions of source code must retain the above copyright
@@ -19,24 +19,25 @@
 **       names of its contributors may be used to endorse or promote products
 **       derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+** IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
 **
 **
 ** License: GPLv2
-** ===============================================================================
-** This program is free software; you can redistribute it and/or
-** modify it under the terms of the GNU General Public License
-** as published by the Free Software Foundation; either version 2
-** of the License, or (at your option) any later version.
+** ==============================================================================
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,14 +46,26 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 **
-** ---------------------------------------------------------------------------
+**
+** IMPORTANT NOTICE:
+** ==============================================================================
+** This source code is made available for free, as an open license, by Kvaser AB,
+** for use with its applications. Kvaser AB does not accept any liability
+** whatsoever for any third party patent or other immaterial property rights
+** violations that may result from any usage of this source code, regardless of
+** the combination of source code and various applications that it can be used
+** in, or with.
+**
+** -----------------------------------------------------------------------------
 */
 
 ================================================================
-Release notes for linuxcan V5.20  
+Release notes for linuxcan V5.22  
 ================================================================
+
+These release notes apply to both CANLIB SDK and the Linux drivers.
 
 Linux device drivers for
 
@@ -77,12 +90,15 @@ Linux device drivers for
   *  KVASER Leaf Light v2
   *  KVASER Mini PCI Express HS
   *  KVASER Mini PCI Express 2xHS
+  *  KVASER Mini PCI Express HS v2 (01038-3)
+  *  KVASER Mini PCI Express 2xHS v2 (01029-1)
   *  KVASER BlackBird SemiPro *****
   *  KVASER OEM Mercury
   *  KVASER OEM Leaf
   *  KVASER Virtual CAN
   *  KVASER Eagle
   *  KVASER BlackBird v2 *****
+  *  Kvaser BlackBird Pro HS v2 **** (00983-7)
   *  KVASER Memorator Pro 5xHS
   *  KVASER USBcan Pro 5xHS
   *  KVASER USBcan Light 4xHS (00831-1)
@@ -90,6 +106,8 @@ Linux device drivers for
   *  KVASER USBcan Pro 2xHS v2 (00752-9)
   *  KVASER Memorator 2xHS v2 (00821-2)
   *  KVASER Memorator Pro 2xHS v2 (00819-9)
+  *  KVASER Hybrid 2xCAN/LIN (00965-3)
+  *  KVASER Hybrid Pro 2xCAN/LIN (01042-0)
 
   **    Recommended firmware > 3.0
   ***   Only with USBcan II functionality.
@@ -112,8 +130,8 @@ Version info
    * Tested under x86_64 SMP Ubuntu 12.04 x32/x64 (3.2.0-29-generic-pae/3.2.0-23-generic).
    * Tested under x86_64 SMP Ubuntu 14.04 x32/x64 (3.13.0-32-generic/3.13.0-32-generic).
    * Tested under x86_64 SMP Ubuntu 16.04 x32/x64 (4.4.0-generic/4.4.0-generic).
-   * Compiled with gcc version 4.6.3, 4.7.3, 4.8.2, 4.8.4, 6.1.1 and 6.3.1.
-   * Used glibc version 2.15, 2.17, 2.19 and 2.24.
+   * Compiled with gcc version 4.6.3, 4.7.3, 4.8.2, 4.8.4, 6.1.1, 6.3.1, 7.1.1 and 7.2.0.
+   * Used glibc version 2.15, 2.17, 2.19, 2.24 and 2.26.
 
 
 ================================================================
@@ -140,6 +158,74 @@ Known problems
      hardware, the same is not true for auto tx. The latter is only
      available if there is firmware support in the device.
      (This is the same as under Windows.)
+
+
+New Features and Fixed Problems in V5.22   (12-FEB-2018)
+===========================================================================
+
+* Added support for new devices:
+    - Kvaser Mini PCI Express 2xHS v2 (01029-1)
+    - Kvaser Mini PCI Express HS v2   (01038-3)
+    - Kvaser Hybrid Pro 2xCAN/LIN     (01042-0)
+    - Kvaser BlackBird Pro HS v2      (00983-7)
+
+* Fixed bug in driver for KVASER Virtual CAN that only allowed a single
+  virtual device.
+
+* Virtual channels are always listed last, as in Windows.
+
+* Fixed bug in USB driver. Filling the Tx buffer for one channel, will prevent
+  all channels with higher channel number (on the same device) from sending.
+
+* Fixed bug in canClose which made it impossible to close canHandle if device
+  has been disconnected.
+
+* Fixed race condition bug in canRead* functions.
+
+* Fixed build problems for kernel v4.15.0.
+
+* Fixed a bug in kvlclib (introduced in v5.21) that placed values in wrong
+  column by omitting a newline character in .csv file for:
+    - CSV Signal, Selected signals in CSV format, and
+    - CSV CCP/XCP, CCP/XCP calibration in CSV forma
+
+
+
+New Features and Fixed Problems in V5.21   (13-SEP-2017)
+===========================================================================
+
+* Added support for Kvaser Hybrid 2xCAN/LIN (00965-3).
+
+* Added Magisync support for mhydra and leaf.
+
+* Updated canlib example code.
+
+* Fixed build problems for kernel v4.11.0, v4.12.0 and v4.13.0.
+
+* canOpenChannel now accepts flags canOPEN_OVERRIDE_EXCLUSIVE,
+  canOPEN_REQUIRE_INIT_ACCESS and canOPEN_NO_INIT_ACCESS.
+
+* Replaced do_div with div_u64 to fix build problems on some ARM targets.
+
+* Fixed build problems for GCC 4.7 and 7.1.
+
+* Fixed bug (introduced in V5.20) in mhydra, causing error when device is using
+  USB full-speed.
+
+* Fixed bug in canBusOn. The tx-queue was cleared every call to canBuson.
+  Now it is only cleared when we physically goes bus on.
+
+* canERR_HARDWARE is now returned if a Kvaser USB device has been disconnected.
+
+* SDK:
+  * Fixed a bug regarding extraction of logfiles with kvmlib.
+  * Fixed date in header of Vector ASCII generated by kvlclib.
+  * Added timezone property for kvlclib (affects headers and calendar timestamps).
+  * Added extended bit to CAN identifiers in MDF4.1 generated by kvlclib.
+  * Added start date in Vector BLF format generated by kvlclib.
+  * Logger configurations can now contain more than one external trigger, i.e.
+    trigger on both rising and falling edge. Will only work with firmware 3.7
+    or better.
 
 
 New Features and Fixed Problems in V5.20   (05-MAY-2017)
@@ -180,6 +266,12 @@ New Features and Fixed Problems in V5.20   (05-MAY-2017)
 
 New Features and Fixed Problems in V5.19   (15-FEB-2017)
 ===========================================================================
+
+* The reported frame-id in the callback for canSetNotify is now
+  correct when using extended-id.
+
+* The reported event in the the callback for canSetNotify is now
+  correct.
 
 * Fixed bug in canReadSyncSpecific where extended identifiers was not
   recognized.

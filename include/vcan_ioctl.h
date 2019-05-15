@@ -1,13 +1,13 @@
 /*
-**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
-**                        http://www.kvaser.com
+**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
 ** BSD-new and GPLv2. You may use either one. See the included
 ** COPYING file for details.
 **
 ** License: BSD-new
-** ===============================================================================
+** ==============================================================================
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
 **     * Redistributions of source code must retain the above copyright
@@ -19,24 +19,25 @@
 **       names of its contributors may be used to endorse or promote products
 **       derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+** IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
 **
 **
 ** License: GPLv2
-** ===============================================================================
-** This program is free software; you can redistribute it and/or
-** modify it under the terms of the GNU General Public License
-** as published by the Free Software Foundation; either version 2
-** of the License, or (at your option) any later version.
+** ==============================================================================
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,10 +46,20 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 **
-** ---------------------------------------------------------------------------
-**/
+**
+** IMPORTANT NOTICE:
+** ==============================================================================
+** This source code is made available for free, as an open license, by Kvaser AB,
+** for use with its applications. Kvaser AB does not accept any liability
+** whatsoever for any third party patent or other immaterial property rights
+** violations that may result from any usage of this source code, regardless of
+** the combination of source code and various applications that it can be used
+** in, or with.
+**
+** -----------------------------------------------------------------------------
+*/
 
 /*
 ** Description:
@@ -78,7 +89,7 @@
 #define VCAN_IOC_SET_WRITE_BLOCK    _IO(VCAN_IOC_MAGIC,114) //not used
 #define VCAN_IOC_RECVMSG_SYNC       _IO(VCAN_IOC_MAGIC,115)
 #define VCAN_IOC_SET_WRITE_TIMEOUT  _IO(VCAN_IOC_MAGIC,116)
-#define VCAN_IOC_SET_READ           _IO(VCAN_IOC_MAGIC,117)
+#define VCAN_IOC_SET_READ           _IO(VCAN_IOC_MAGIC,117) // not used
 #define VCAN_IOC_FLUSH_SENDBUFFER   _IO(VCAN_IOC_MAGIC,118)
 #define VCAN_IOC_BUS_ON             _IO(VCAN_IOC_MAGIC,119)
 #define VCAN_IOC_BUS_OFF            _IO(VCAN_IOC_MAGIC,120)
@@ -121,31 +132,29 @@
 #define VCAN_IOC_SSP_AUTO            _IO(VCAN_IOC_MAGIC,154)
 #define VCAN_IOC_SSP_GET             _IO(VCAN_IOC_MAGIC,155)
 #define VCAN_IOC_SSP_SET             _IO(VCAN_IOC_MAGIC,156)
+#define VCAN_IOC_RESET_CLOCK         _IO(VCAN_IOC_MAGIC,157)
+#define VCAN_IOC_GET_CLOCK_OFFSET    _IO(VCAN_IOC_MAGIC,158)
+#define VCAN_IOC_SET_CLOCK_OFFSET    _IO(VCAN_IOC_MAGIC,159)
 #define VCAN_IOC_GET_CHAN_CAP_MASK   _IO(VCAN_IOC_MAGIC,160)
 #define VCAN_IOC_GET_MAX_BITRATE     _IO(VCAN_IOC_MAGIC,161)
 #define VCAN_IOC_REQ_BUS_STATS       _IO(VCAN_IOC_MAGIC,162)
 #define VCAN_IOC_GET_BUS_STATS       _IO(VCAN_IOC_MAGIC,163)
 #define VCAN_IOC_RESET_OVERRUN_COUNT _IO(VCAN_IOC_MAGIC,164)
 #define VCAN_IOC_RECVMSG_SPECIFIC    _IO(VCAN_IOC_MAGIC,165)
-#define VCAN_IOC_SET_READ_SPECIFIC   _IO(VCAN_IOC_MAGIC,166)
+#define VCAN_IOC_SET_READ_SPECIFIC   _IO(VCAN_IOC_MAGIC,166) // not used
 #define VCAN_IOC_FLASH_LEDS          _IO(VCAN_IOC_MAGIC,167)
 
 //must have this ioctl's to make canNOTIFY_TX work.
 #define VCAN_IOC_GET_TRANSID         _IO(VCAN_IOC_MAGIC,168)
 #define VCAN_IOC_SET_TRANSID         _IO(VCAN_IOC_MAGIC,169)
 
-#define VCAN_IOC_GET_DRIVER_NAME     _IO(VCAN_IOC_MAGIC,170)
-#define VCAN_IOC_GET_DEVICE_MODE     _IO(VCAN_IOC_MAGIC,171)
-#define VCAN_IOC_SET_DEVICE_MODE     _IO(VCAN_IOC_MAGIC,172)
-#define VCAN_IOC_FILE_GET_COUNT      _IO(VCAN_IOC_MAGIC,173)
-#define VCAN_IOC_FILE_GET_NAME       _IO(VCAN_IOC_MAGIC,174)
+#define VCAN_IOC_GET_DRIVER_NAME      _IO(VCAN_IOC_MAGIC,170)
+#define VCAN_IOC_GET_DEVICE_MODE      _IO(VCAN_IOC_MAGIC,171)
+#define VCAN_IOC_SET_DEVICE_MODE      _IO(VCAN_IOC_MAGIC,172)
+#define VCAN_IOC_FILE_GET_COUNT       _IO(VCAN_IOC_MAGIC,173)
+#define VCAN_IOC_FILE_GET_NAME        _IO(VCAN_IOC_MAGIC,174)
 #define VCAN_IOC_GET_TRANSCEIVER_INFO _IO(VCAN_IOC_MAGIC,175)
-
-#define MAX_IOCTL_CARD_NAME       31
-#define MAX_IOCTL_DRIVER_NAME     31
-#define MAX_IOCTL_VENDOR_NAME     31
-#define MAX_IOCTL_CHANNEL_PREFIX  31
-#define MAX_IOCTL_CHANNEL_NAME    31
+#define VCAN_IOC_OPEN_INIT_ACCESS     _IO(VCAN_IOC_MAGIC,176)
 
 #define VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES      0x00000001
 #define VCAN_CHANNEL_CAP_RECEIVE_ERROR_FRAMES   0x00000002
@@ -171,7 +180,7 @@
 #define VCAN_CHANNEL_CAP_HAS_LOGGER             0x08000000  // Device has logger capabilities
 #define VCAN_CHANNEL_CAP_HAS_REMOTE             0x10000000  // Device has remote capabilities
 #define VCAN_CHANNEL_CAP_HAS_SCRIPT             0x20000000  // Device has script capabilities
-#define VCAN_CHANNEL_CAP_LIN_FLEX               0x40000000  // Device supports can/lin flex
+#define VCAN_CHANNEL_CAP_LIN_HYBRID             0x40000000  // Device supports can/lin hybrid
 
 #define VCAN_CHANNEL_STATUS_TIME_SYNC_ENABLED   0x00000001
 #define VCAN_CHANNEL_STATUS_TIME_SYNC_RUNNING   0x00000002

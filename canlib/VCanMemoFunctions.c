@@ -1,13 +1,13 @@
 /*
-**             Copyright 2012-2017 by Kvaser AB, Molndal, Sweden
-**                        http://www.kvaser.com
+**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
 ** BSD-new and GPLv2. You may use either one. See the included
 ** COPYING file for details.
 **
 ** License: BSD-new
-** ===============================================================================
+** ==============================================================================
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
 **     * Redistributions of source code must retain the above copyright
@@ -19,24 +19,25 @@
 **       names of its contributors may be used to endorse or promote products
 **       derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+** IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
 **
 **
 ** License: GPLv2
-** ===============================================================================
-** This program is free software; you can redistribute it and/or
-** modify it under the terms of the GNU General Public License
-** as published by the Free Software Foundation; either version 2
-** of the License, or (at your option) any later version.
+** ==============================================================================
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,20 +46,30 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 **
-** ---------------------------------------------------------------------------
-**/
+**
+** IMPORTANT NOTICE:
+** ==============================================================================
+** This source code is made available for free, as an open license, by Kvaser AB,
+** for use with its applications. Kvaser AB does not accept any liability
+** whatsoever for any third party patent or other immaterial property rights
+** violations that may result from any usage of this source code, regardless of
+** the combination of source code and various applications that it can be used
+** in, or with.
+**
+** -----------------------------------------------------------------------------
+*/
 
-/*  Kvaser Linux Canlib VCan layer functions used in Memorators */
+/* Kvaser Linux Canlib VCan layer functions used in Memorators */
 
 #include <errno.h>
 #include <string.h>
 #include <sys/ioctl.h>
-
+#include "kcanio_memorator.h"
+#include "kcanio_script.h"
 #include "VCanMemoFunctions.h"
 #include "VCanFuncUtil.h"
-#include "hydra_host_cmds.h"
 #include "lio_error.h"
 #include "dio_error.h"
 
@@ -67,7 +78,6 @@
 #else
 #   define DEBUGPRINT(args)
 #endif
-
 
 /***************************************************************************/
 static canStatus lioResultToCanStatus(LioResult r)
@@ -142,7 +152,7 @@ static canStatus memoResultToCanStatus(KCANY_MEMO_INFO *info)
 {
   canStatus ret = canOK;
 
-  if (info->status == MEMO_STATUS_FAILED) {
+  if (info->status == KCANIO_MEMO_STATUS_FAILED) {
     DEBUGPRINT((TXT("errcodes = stat: %d, dio: %d, lio: %d\n"), info->status,
                 info->dio_status, info->lio_status));
     if (info->dio_status) {
@@ -175,8 +185,8 @@ static int is_filename_invalid(char *filename)
 canStatus vCanMemo_file_delete(HandleData *hData, char *deviceFileName)
 {
   KCANY_MEMO_INFO info;
-  int status = 0;
-  int ret = 0;
+  int             status = 0;
+  int             ret = 0;
 
   if (is_filename_invalid(deviceFileName)) {
     return canERR_PARAM;
@@ -184,9 +194,10 @@ canStatus vCanMemo_file_delete(HandleData *hData, char *deviceFileName)
 
   memset(&info, 0, sizeof(info));
   (void) strncpy((char*)&info.buffer[0], deviceFileName, CANIO_MAX_FILE_NAME);
-  info.subcommand = MEMO_SUBCMD_DELETE_FILE;
-  info.buflen = CANIO_MAX_FILE_NAME + 2; // 'mode' and '\0';
-  info.timeout = 30*1000; // 30s
+
+  info.subcommand = KCANIO_MEMO_SUBCMD_DELETE_FILE;
+  info.buflen     = CANIO_MAX_FILE_NAME + 2; // 'mode' and '\0';
+  info.timeout    = 30*1000;                 // 30s
   ret = ioctl(hData->fd, KCANY_IOCTL_MEMO_PUT_DATA, &info, sizeof(info));
   if (ret != 0) {
     DEBUGPRINT((TXT("vCanFileDelete: Communication error (%d)\n"), ret));
@@ -203,18 +214,19 @@ canStatus vCanMemo_file_delete(HandleData *hData, char *deviceFileName)
 // vCanMemo_file_copy_to_device
 //======================================================================
 canStatus vCanMemo_file_copy_to_device(HandleData *hData, char *hostFileName,
-                                      char *deviceFileName)
+                                       char *deviceFileName)
 {
-  FILE *hFile;
-  KCANY_MEMO_INFO info;
-  int status = 0;
-  int ret = 0;
+  FILE            *hFile;
+  KCANY_MEMO_INFO  info;
+  int              status = 0;
+  int              ret = 0;
 
   if (is_filename_invalid(deviceFileName)) {
     return canERR_PARAM;
   }
 
   hFile = fopen(hostFileName, "rb");
+
   if (!hFile) {
     DEBUGPRINT((TXT("vCanFileCopyToDevice: Could not open the file '%s'\n"), hostFileName));
     return canERR_HOST_FILE;
@@ -222,11 +234,12 @@ canStatus vCanMemo_file_copy_to_device(HandleData *hData, char *hostFileName,
 
   // Open the file and copy the blocks
   memset(&info, 0, sizeof(info));
-  info.buffer[0] = CANIO_DFS_WRITE;  // 'mode'
   (void) strncpy((char*)&info.buffer[1], deviceFileName, CANIO_MAX_FILE_NAME);
-  info.subcommand = MEMO_SUBCMD_OPEN_FILE;
-  info.buflen = CANIO_MAX_FILE_NAME + 2;  // 'mode' and '\0';
-  info.timeout = 30*1000;  // 30 seconds
+
+  info.buffer[0]  = CANIO_DFS_WRITE;  // 'mode'
+  info.subcommand = KCANIO_MEMO_SUBCMD_OPEN_FILE;
+  info.buflen     = CANIO_MAX_FILE_NAME + 2;  // 'mode' and '\0';
+  info.timeout    = 30*1000;  // 30 seconds
   ret = ioctl(hData->fd, KCANY_IOCTL_MEMO_PUT_DATA, &info, sizeof(info));
   if (ret != 0) {
     DEBUGPRINT((TXT("vCanFileCopyToDevice: (1) Communication error (%d)\n"), ret));
@@ -235,7 +248,8 @@ canStatus vCanMemo_file_copy_to_device(HandleData *hData, char *hostFileName,
   }
 
   // Check the status
-  if ((status = memoResultToCanStatus(&info)) != canOK) {
+  status = memoResultToCanStatus(&info);
+  if (status != canOK) {
     DEBUGPRINT((TXT("vCanFileCopyToDevice: MEMO_SUBCMD_OPEN_FILE error (%d)\n"), (int)info.buffer[0]));
     fclose(hFile);
     return status;
@@ -251,9 +265,9 @@ canStatus vCanMemo_file_copy_to_device(HandleData *hData, char *hostFileName,
       break;
     }
     memcpy(&info.buffer[0],&bytes,sizeof(bytes));
-    info.subcommand = MEMO_SUBCMD_WRITE_FILE;
-    info.buflen = (unsigned int) (bytes+sizeof(bytes));
-    info.timeout = 30*1000; // 2minutes
+    info.subcommand = KCANIO_MEMO_SUBCMD_WRITE_FILE;
+    info.buflen     = (unsigned int) (bytes+sizeof(bytes));
+    info.timeout    = 30*1000; // 30s
     ret = ioctl(hData->fd, KCANY_IOCTL_MEMO_PUT_DATA, &info, sizeof(info));
     if (ret != 0) {
       DEBUGPRINT((TXT("vCanFileCopyToDevice: (2) Communication error (%d)\n"), ret));
@@ -262,14 +276,17 @@ canStatus vCanMemo_file_copy_to_device(HandleData *hData, char *hostFileName,
       status = memoResultToCanStatus(&info);
     }
   }
+
   fclose(hFile);
+
   if (status != canOK) {
     return status;
   }
+
   memset(&info, 0, sizeof(info));
-  info.subcommand = MEMO_SUBCMD_CLOSE_FILE;
-  info.timeout = 30*1000; // 30s
-  info.buflen = CANIO_MAX_FILE_NAME;
+  info.subcommand = KCANIO_MEMO_SUBCMD_CLOSE_FILE;
+  info.timeout    = 30*1000; // 30s
+  info.buflen     = CANIO_MAX_FILE_NAME;
   ret = ioctl(hData->fd, KCANY_IOCTL_MEMO_PUT_DATA, &info, sizeof(info));
   if (ret != 0) {
     DEBUGPRINT((TXT("vCanFileCopyToDevice: (3) Communication error (%d)\n"), ret));
@@ -287,28 +304,32 @@ canStatus vCanMemo_file_copy_from_device(HandleData *hData,
                                          char *deviceFileName,
                                          char *hostFileName)
 {
-  FILE *hFile;
-  KCANY_MEMO_INFO info;
-  int status = 0;
-  int ret = 0;
-  uint32_t bytes = 0;  // Size is specified by FW (src/common/he/hscle/logger_glue.c)
+  FILE            *hFile;
+  KCANY_MEMO_INFO  info;
+  int              status = 0;
+  int              ret = 0;
+  uint32_t         bytes = 0;  // Size is specified by FW (src/common/he/hscle/logger_glue.c)
 
   if (is_filename_invalid(deviceFileName)) {
     return canERR_PARAM;
   }
 
   memset(&info, 0, sizeof(info));
-  info.buffer[0] = CANIO_DFS_READ;
   (void) strncpy((char*)&info.buffer[1], deviceFileName, CANIO_MAX_FILE_NAME);
-  info.subcommand = MEMO_SUBCMD_OPEN_FILE;
-  info.buflen = CANIO_MAX_FILE_NAME + 2; // 'mode' and '\0';
-  info.timeout = 30*1000; // 30s
+
+  info.buffer[0]  = CANIO_DFS_READ;
+  info.subcommand = KCANIO_MEMO_SUBCMD_OPEN_FILE;
+  info.buflen     = CANIO_MAX_FILE_NAME + 2; // 'mode' and '\0';
+  info.timeout    = 30*1000; // 30s
   ret = ioctl(hData->fd, KCANY_IOCTL_MEMO_PUT_DATA, &info, sizeof(info));
+
   if (ret != 0) {
     DEBUGPRINT((TXT("vCanFileCopyFromDevice: Communication error (%d)\n"), ret));
     return errnoToCanStatus(errno);
   }
+
   status = memoResultToCanStatus(&info);
+
   if (status != canOK) {
     DEBUGPRINT((TXT("vCanFileCopyFromDevice: MEMO_SUBCMD_OPEN_FILE error (%d)\n"), (int)info.buffer[0]));
     return status;
@@ -319,17 +340,15 @@ canStatus vCanMemo_file_copy_from_device(HandleData *hData,
   hFile = fopen(hostFileName, "wb");
   if (!hFile) {
     DEBUGPRINT((TXT("vCanFileCopyFromDevice: Could not create the file '%s'\n"), hostFileName));
-    if(!status) {
-      status = canERR_HOST_FILE;
-    }
+    return canERR_HOST_FILE;
   }
 
   // Copy data from memorator to file
-  while (!status && (bytes > 0)) {
+  while (bytes > 0) {
     memset(&info, 0, sizeof(info));
-    info.subcommand = MEMO_SUBCMD_READ_FILE;
-    info.buflen = 1000; // Only using 512 + bytesRead
-    info.timeout = 30*1000; // 60s
+    info.subcommand = KCANIO_MEMO_SUBCMD_READ_FILE;
+    info.buflen     = 1000;    // Only using 512 + bytesRead
+    info.timeout    = 30*1000; // 30s
     ret = ioctl(hData->fd, KCANY_IOCTL_MEMO_GET_DATA, &info, sizeof(info));
     if (ret != 0) {
       DEBUGPRINT((TXT("vCanFileCopyFromDevice: (2) Communication error (%d)\n"), ret));
@@ -349,21 +368,28 @@ canStatus vCanMemo_file_copy_from_device(HandleData *hData,
       }
     }
   }
+
   if (hFile) {
     fclose(hFile);
   }
 
-  memset(&info, 0, sizeof(info));
-  info.subcommand = MEMO_SUBCMD_CLOSE_FILE;
-  info.timeout = 30*1000; // 30s
-  info.buflen = CANIO_MAX_FILE_NAME + 2; // 'mode' and '\0';
-  ret = ioctl(hData->fd, KCANY_IOCTL_MEMO_PUT_DATA, &info, sizeof(info));
-  if (ret != 0) {
-      DEBUGPRINT((TXT("vCanFileCopyFromDevice: (2) Communication error (%d)\n"), ret));
-      status = errnoToCanStatus(errno);
-  } else {
-      memcpy(&bytes, &(info.buffer[0]), sizeof(bytes));
-      status = memoResultToCanStatus(&info);
+  if (status != canOK) {
+    return status;
   }
+
+  memset(&info, 0, sizeof(info));
+  info.subcommand = KCANIO_MEMO_SUBCMD_CLOSE_FILE;
+  info.timeout    = 30*1000; // 30s
+  info.buflen     = CANIO_MAX_FILE_NAME + 2; // 'mode' and '\0';
+  ret = ioctl(hData->fd, KCANY_IOCTL_MEMO_PUT_DATA, &info, sizeof(info));
+
+  if (ret != 0) {
+    DEBUGPRINT((TXT("vCanFileCopyFromDevice: (3) Communication error (%d)\n"), ret));
+    status = errnoToCanStatus(errno);
+  } else {
+    memcpy(&bytes, &(info.buffer[0]), sizeof(bytes));
+    status = memoResultToCanStatus(&info);
+  }
+
   return status;
 }

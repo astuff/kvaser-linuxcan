@@ -1,13 +1,13 @@
 /*
-**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
-**                        http://www.kvaser.com
+**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
 ** BSD-new and GPLv2. You may use either one. See the included
 ** COPYING file for details.
 **
 ** License: BSD-new
-** ===============================================================================
+** ==============================================================================
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
 **     * Redistributions of source code must retain the above copyright
@@ -19,24 +19,25 @@
 **       names of its contributors may be used to endorse or promote products
 **       derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+** IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
 **
 **
 ** License: GPLv2
-** ===============================================================================
-** This program is free software; you can redistribute it and/or
-** modify it under the terms of the GNU General Public License
-** as published by the Free Software Foundation; either version 2
-** of the License, or (at your option) any later version.
+** ==============================================================================
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,10 +46,20 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 **
-** ---------------------------------------------------------------------------
-**/
+**
+** IMPORTANT NOTICE:
+** ==============================================================================
+** This source code is made available for free, as an open license, by Kvaser AB,
+** for use with its applications. Kvaser AB does not accept any liability
+** whatsoever for any third party patent or other immaterial property rights
+** violations that may result from any usage of this source code, regardless of
+** the combination of source code and various applications that it can be used
+** in, or with.
+**
+** -----------------------------------------------------------------------------
+*/
 
 /*
 ** Project:
@@ -65,6 +76,7 @@
 #include <asm/atomic.h>
 #include <linux/types.h>
 #include <linux/tty.h>
+#include <linux/completion.h>
 
 #include "canIfData.h"
 #include "kcan_ioctl.h"
@@ -256,20 +268,23 @@ typedef struct VCanCardData
     unsigned int            hwRevisionMinor;
 
     uint32_t                timeHi;
-    uint32_t                timeOrigin;
     uint32_t                usPerTick;
 
     /* Ports and addresses */
-    unsigned char           cardPresent;
-    VCanChanData          **chanData;
-    void                   *hwCardData;
-    VCanDriverData         *driverData;
+    volatile unsigned int    cardPresent;
+    VCanChanData           **chanData;
+    void                    *hwCardData;
+    VCanDriverData          *driverData;
+
+    SOFTSYNC_DATA          *softsync_data;
+    int                     enable_softsync;
+    int                     softsync_running;
+    unsigned int            usb_root_hub_id;
 
     uint64_t                timestamp_offset;
     ticks_class             ticks;
     uint32_t                default_max_bitrate;
     uint32_t                current_max_bitrate;
-    unsigned char           sysdbg_he;
 
     struct VCanCardData    *next;
 } VCanCardData;
@@ -291,29 +306,28 @@ typedef struct
 
 /* File pointer specific data */
 typedef struct VCanOpenFileNode {
-    struct completion       ioctl_completion;
-    VCanReceiveData         rcv;
-    unsigned char           transId;
-    struct file            *filp;
-    struct VCanChanData    *chanData;
-    int                     chanNr;
-    unsigned char           modeTx;
-    unsigned char           modeTxRq;
-    unsigned char           modeNoTxEcho;
-    unsigned char           channelOpen;
-    unsigned char           channelLocked;
-    VCanRequestChipStatus   chip_status;     
-    long                    writeTimeout;
-    VCanMsgFilter           filter;
-    struct work_struct      objbufWork;
+    struct completion        ioctl_completion;
+    VCanReceiveData          rcv;
+    unsigned char            transId;
+    struct file             *filp;
+    struct VCanChanData     *chanData;
+    int                      chanNr;
+    unsigned char            modeTx;
+    unsigned char            modeTxRq;
+    unsigned char            modeNoTxEcho;
+    unsigned char            channelOpen;
+    unsigned char            channelLocked;
+    VCanRequestChipStatus    chip_status;
+    long                     writeTimeout;
+    VCanMsgFilter            filter;
+    struct work_struct       objbufWork;
     struct workqueue_struct *objbufTaskQ;
     OBJECT_BUFFER           *objbuf;
-    atomic_t                objbufActive;
-    VCanOverrun             overrun;
-    uint8_t                 isBusOn;
-    VCanReadSpecific        read_specific;
-    VCanRead                read;
+    atomic_t                 objbufActive;
+    VCanOverrun              overrun;
+    uint8_t                  isBusOn;
     struct VCanOpenFileNode *next;
+    uint8_t                  init_access;
 } VCanOpenFileNode;
 
 
@@ -376,12 +390,11 @@ typedef struct VCanHWInterface {
     int (*memoGetData)          (const VCanChanData *chd, int subcmd,
                                 void *buf, int bufsiz,
                                 unsigned long data1, unsigned short data2,
-                                int *stat, int *dstat, int *lstat
-                                );
+                                int *stat, int *dstat, int *lstat, unsigned int timeout_ms);
     int (*memoPutData)          (const VCanChanData *chd, int subcmd,
                                  void *buf, int bufsiz,
                                  unsigned long data1, unsigned short data2,
-                                 int *stat, int *dstat, int *lstat);
+                                 int *stat, int *dstat, int *lstat, unsigned int timeout_ms);
     int (*memoDiskIo)           (const VCanChanData *chd);
     int (*memoDiskIoFast)       (const VCanChanData *chd);
 } VCanHWInterface;
@@ -391,15 +404,13 @@ typedef struct VCanHWInterface {
 #define ERROR_EVENT_DETECTED 2
 
 typedef struct WaitNode {
-  struct list_head list;
-  struct completion waitCompletion;
-  void             *replyPtr;
-  unsigned char    cmdNr;
-  uint16_t         transId;
-  unsigned char    timedOut;
-  unsigned char    check_trans_id; //when not 0, check that transid matches
-  unsigned char    error_event;    //used to detect that we have got an "CMD_ERROR_EVENT"
-  unsigned int     data_count;     //number of received bytes, used with multiple CMD_MEMO_GET_DATA responses
+  struct list_head   list;
+  struct completion  waitCompletion;
+  void              *replyPtr;
+  unsigned char      cmdNr;
+  uint16_t           transId;
+  unsigned char      timedOut;
+  void               *driver; //driver specific data
 } WaitNode;
 
 
@@ -427,6 +438,9 @@ int             vCanFlushSendBuffer(VCanChanData *chd);
 unsigned long   getQLen(unsigned long head, unsigned long tail, unsigned long size);
 int             vCanInit(VCanDriverData *, unsigned);
 void            vCanCleanup(VCanDriverData *);
-
+int             vCanGetCardInfo(VCanCardData *, VCAN_IOCTL_CARD_INFO *);
+int             vCanGetCardInfo2(VCanCardData *, KCAN_IOCTL_CARD_INFO_2 *);
+struct timeval  vCanCalc_dt(struct timeval *start); //returns now-start
+void            vCanCardRemoved(VCanChanData *chd);
 
 #endif /* _VCAN_OS_IF_H_ */

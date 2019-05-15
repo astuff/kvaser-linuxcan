@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['getting_20and_20setting_20device_20information',['Getting and Setting Device Information',['../page_user_guide_dev_info.html',1,'page_user_guide']]]
+  ['kvaser_20support',['Kvaser Support',['../page_user_guide_support.html',1,'page_user_guide']]]
 ];

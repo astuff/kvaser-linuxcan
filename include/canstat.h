@@ -1,11 +1,13 @@
-/**
-* <pre style="white-space: pre-wrap">
+/*
+ *             Copyright 2017 by Kvaser AB, Molndal, Sweden
+ *                         http://www.kvaser.com
+ *
  * This software is dual licensed under the following two licenses:
  * BSD-new and GPLv2. You may use either one. See the included
  * COPYING file for details.
  *
  * License: BSD-new
- * ============================================================================
+ * ==============================================================================
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -20,21 +22,22 @@
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL \<COPYRIGHT HOLDER\> BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *
  *
  * License: GPLv2
- * ============================================================================
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * ==============================================================================
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -43,41 +46,41 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- *
- * ---------------------------------------------------------------------------
- * </pre>
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
  *
- *   Definitions for the CANLIB API.
+ * IMPORTANT NOTICE:
+ * ==============================================================================
+ * This source code is made available for free, as an open license, by Kvaser AB,
+ * for use with its applications. Kvaser AB does not accept any liability
+ * whatsoever for any third party patent or other immaterial property rights
+ * violations that may result from any usage of this source code, regardless of
+ * the combination of source code and various applications that it can be used
+ * in, or with.
  *
- * \file canstat.h
- * \author Kvaser AB
- *
- * \defgroup General                 General
- * \defgroup CAN                     CAN
- * \defgroup ObjectBuffers           Object buffers
+ * -----------------------------------------------------------------------------
  */
+
 #ifndef _CANSTAT_H_
 #define _CANSTAT_H_
+
+/**
+ * \file canstat.h
+ * \brief Definitions for the CANLIB API.
+ * \details
+ * \ingroup can_status_codes Status Codes
+ *
+*/
+
+/**
+ * \anchor canERR_xxx
+ *
+ * @{
+ */
 
 //
 // Don't forget to update canGetErrorText in canlib.c if this is changed!
 //
-
-/**
- * \name canERR_xxx
- * \anchor canERR_xxx
- *
- * Generally, a return code greater than or equal to zero means success. A
- * value less than zero means failure.
- *
- * You should avoid testing for a specific error code unless it is explicitly
- * stated in the documentation for the API in question that this specific error
- * code is returned. Instead, check if the error code is less than zero. Use
- * \ref canGetErrorText() to obtain an error message suitable for a message to the
- * user, or for a line in an error log file.
- */
 typedef enum {
   /**
    * <b>Normal successful completion</b>; The driver is just fine, and really
@@ -85,7 +88,7 @@ typedef enum {
    */
     canOK                  = 0,
   /**
-   * <b>Error in one or more parameters</b>; a parameter \ref canERR_xxx
+   * <b>Error in one or more parameters</b>; a parameter
    * specified in the call was invalid, out of range, or so. This status code
    * will also be returned when the call is not implemented.
    */
@@ -269,7 +272,7 @@ typedef enum {
   // The last entry - a dummy so we know where NOT to place a comma.
     canERR__RESERVED       = -41    ///< Reserved
 } canStatus;
-
+/** @} */
 
 /**
  * \name Convenience
@@ -353,7 +356,7 @@ typedef enum {
  *
  * \ref canMSG_RTR, \ref canMSG_STD, \ref canMSG_EXT, \ref canMSG_WAKEUP and
  * \ref canMSG_ERROR_FRAME are meaningful also for transmitted messages.
- * \ref canMSG_SINGLE_SHOT is only for transmission. 
+ * \ref canMSG_SINGLE_SHOT is only for transmission.
  *
  * Note that \ref canMSG_RTR cannot be set for CAN FD messages.
  *
@@ -387,9 +390,9 @@ typedef enum {
 #define canMSG_ERROR_FRAME      0x0020      ///< Message is an error frame
 #define canMSG_TXACK            0x0040      ///< Message is a TX ACK (msg is really sent)
 #define canMSG_TXRQ             0x0080      ///< Message is a TX REQUEST (msg is transfered to the chip)
-#define canMSG_DELAY_MSG        0x0100      ///< Message is NOT sent on the bus. The transmission of messages are delayed. The dlc specifies the delay in milliseconds (1..1000).  
+#define canMSG_DELAY_MSG        0x0100      ///< Message is NOT sent on the bus. The transmission of messages are delayed. The dlc specifies the delay in milliseconds (1..1000).
 
-// single shot flags: 
+// single shot flags:
 #define canMSG_SINGLE_SHOT      0x1000000      ///< Message is Single Shot, try to send once, no retransmission. This flag can only be used with transmitted messages.
 #define canMSG_TXNACK           0x2000000      ///< Message is a failed Single Shot, message was not sent. This flag is only used with received messages.
 #define canMSG_ABL              0x4000000      ///< Only together with canMSG_TXNACK, Single shot message was not sent because arbitration was lost. This flag is only used with received messages.
@@ -444,13 +447,11 @@ typedef enum {
  * \name canTRANSCEIVER_LINEMODE_xxx
  * \anchor canTRANSCEIVER_LINEMODE_xxx
  *
- * The following values can be used \win_start with \ref canSetDriverMode() \win_end to set different
- * driver (i.e. transceiver) modes. \win_start Use \ref canGetDriverMode() to obtain the
- * current driver mode for a particular CAN channel. \win_end
+ * The following values can be used with \ref canSetDriverMode() to set different
+ * driver (i.e. transceiver) modes. Use \ref canGetDriverMode() to obtain the
+ * current driver mode for a particular CAN channel.
  *
- * \linux_start
- * Not implemented in Linux.
- * \linux_end
+ * \note Not implemented in Linux.
  * @{
  */
 #define canTRANSCEIVER_LINEMODE_NA          0  ///< Not Affected/Not available.

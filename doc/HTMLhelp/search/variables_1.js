@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['bitrate',['bitrate',['../struct_lin_message_info.html#ae1500e00270cc662f39a27c2f2d23962',1,'LinMessageInfo::bitrate()'],['../struct_j1587_message_info.html#a34ee9ae488c5e76706950ff6b8ae6c2d',1,'J1587MessageInfo::bitrate()']]],
-  ['busload',['busLoad',['../structcan_bus_statistics__s.html#a10d3e5def5be80618a372a441eaadc2f',1,'canBusStatistics_s']]],
-  ['bytetime',['byteTime',['../struct_lin_message_info.html#a49b9c16add79f98b4f26894ae8f44356',1,'LinMessageInfo']]]
+  ['calendartime',['calendarTime',['../structkvm_log_rtc_clock_ex.html#a144eaa57942f3e7ff88a173437737edf',1,'kvmLogRtcClockEx']]],
+  ['channel',['channel',['../structkvm_log_msg_ex.html#aeec5b590ec61f511a514428c6cb22937',1,'kvmLogMsgEx']]],
+  ['checksum',['checkSum',['../struct_lin_message_info.html#a0890e48334b4123d76276b8341d3d82c',1,'LinMessageInfo']]]
 ];

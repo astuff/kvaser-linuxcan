@@ -1,7 +1,9 @@
 var searchData=
 [
-  ['flags',['flags',['../struct_j1587_message_info.html#a78ac89a4a0f57ffa7c2ecf31749aa390',1,'J1587MessageInfo']]],
-  ['framedelay',['frameDelay',['../struct_j1587_message_info.html#a55f2df81911751a16eb20d7a0125ca9c',1,'J1587MessageInfo']]],
-  ['framelength',['frameLength',['../struct_lin_message_info.html#aedcbabfa0a2b5302ee5b5000812096f3',1,'LinMessageInfo::frameLength()'],['../struct_j1587_message_info.html#aedcbabfa0a2b5302ee5b5000812096f3',1,'J1587MessageInfo::frameLength()']]],
-  ['frequently_20asked_20questions',['Frequently Asked Questions',['../page_user_guide_faq.html',1,'page_user_guide']]]
+  ['flags',['flags',['../structkvm_log_msg_ex.html#a81a27ce50e78368b0d0de1e8767fd32d',1,'kvmLogMsgEx']]],
+  ['framelength',['frameLength',['../struct_lin_message_info.html#aedcbabfa0a2b5302ee5b5000812096f3',1,'LinMessageInfo']]],
+  ['fwbuild',['fwBuild',['../structkvm_log_version_ex.html#a32cfe1d73a15997e475810ae13488da8',1,'kvmLogVersionEx']]],
+  ['fwmajor',['fwMajor',['../structkvm_log_version_ex.html#a58833c28a09ae4d60434b0a2a53c991a',1,'kvmLogVersionEx']]],
+  ['fwminor',['fwMinor',['../structkvm_log_version_ex.html#a110dbdd6d83918e6f30bdf9080ef4669',1,'kvmLogVersionEx']]],
+  ['file_20operations',['File Operations',['../group__kvm__files.html',1,'']]]
 ];

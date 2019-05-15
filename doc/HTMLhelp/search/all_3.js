@@ -1,8 +1,12 @@
 var searchData=
 [
-  ['dealloc',['deAlloc',['../structtag_can_s_w_descr.html#a02d13eb86e10f0ce10d4f87ea08093a1',1,'tagCanSWDescr']]],
-  ['debugging_20techniques',['Debugging Techniques',['../page_user_guide_build_debugging.html',1,'page_user_guide_build']]],
-  ['deploying_20your_20application',['Deploying Your Application',['../page_user_guide_build_deploying.html',1,'page_user_guide_build']]],
-  ['driver_20installation',['Driver Installation',['../page_user_guide_build_installation.html',1,'page_user_guide_build']]],
-  ['different_20can_20frame_20types',['Different CAN Frame Types',['../page_user_guide_send_recv_sending_different_types.html',1,'page_user_guide_send_recv']]]
+  ['data',['data',['../structkvm_log_msg_ex.html#a62823cfc5356727ed036cea88e873777',1,'kvmLogMsgEx']]],
+  ['dlc',['dlc',['../structkvm_log_msg_ex.html#a7d3cf80248d9011329b4b269f8b7d2c4',1,'kvmLogMsgEx']]],
+  ['dword',['DWORD',['../linlib_8h.html#a798af1e30bc65f319c1a246cecf59e39',1,'linlib.h']]],
+  ['databases',['Databases',['../group__kvadb__database.html',1,'']]],
+  ['database',['Database',['../group__kvlc__database.html',1,'']]],
+  ['device_20connection',['Device Connection',['../group__kvm__connection.html',1,'']]],
+  ['databases',['Databases',['../group__kvm__database.html',1,'']]],
+  ['disk_20operations',['Disk Operations',['../group__kvm__disk__operations.html',1,'']]],
+  ['database_20api_20_28kvadblib_29',['Database API (kvaDbLib)',['../page_kvadblib.html',1,'']]]
 ];

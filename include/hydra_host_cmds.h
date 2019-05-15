@@ -1,13 +1,13 @@
 /*
-**                Copyright 2014 by Kvaser AB, Molndal, Sweden
-**                        http://www.kvaser.com
+**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
 ** BSD-new and GPLv2. You may use either one. See the included
 ** COPYING file for details.
 **
 ** License: BSD-new
-** ===============================================================================
+** ==============================================================================
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
 **     * Redistributions of source code must retain the above copyright
@@ -19,24 +19,25 @@
 **       names of its contributors may be used to endorse or promote products
 **       derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+** IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
 **
 **
 ** License: GPLv2
-** ===============================================================================
-** This program is free software; you can redistribute it and/or
-** modify it under the terms of the GNU General Public License
-** as published by the Free Software Foundation; either version 2
-** of the License, or (at your option) any later version.
+** ==============================================================================
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,10 +46,21 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 **
-** ---------------------------------------------------------------------------
-**/
+**
+** IMPORTANT NOTICE:
+** ==============================================================================
+** This source code is made available for free, as an open license, by Kvaser AB,
+** for use with its applications. Kvaser AB does not accept any liability
+** whatsoever for any third party patent or other immaterial property rights
+** violations that may result from any usage of this source code, regardless of
+** the combination of source code and various applications that it can be used
+** in, or with.
+**
+** -----------------------------------------------------------------------------
+*/
+
 #ifndef HYDRA_HOST_CMDS_H_
 #define HYDRA_HOST_CMDS_H_
 
@@ -309,7 +321,7 @@ typedef struct {
 #define SCRIPT_CTRL_ERR_PROCESS_NOT_LOADED   21
 
 #define SCRIPT_CTRL_ERR_COMPILER_VERSION     22
-
+#define SCRIPT_CTRL_ERR_INVALID_PARAMETER    23
 #define SCRIPT_CTRL_ERR_NOT_IMPLEMENTED      43
 
 
@@ -654,8 +666,8 @@ typedef struct hcanErrorFrameData_s {
 #define MSGFLAG_EXTENDED_ID         0x20        // Extended id.
 #define MSGFLAG_TX                  0x40        // TX acknowledge
 #define MSGFLAG_TXRQ                0x80        // TX request
-#define MSGFLAG_SSM_NACK        0x001000        // Single shot transmission failed. 
-#define MSGFLAG_ABL             0x002000        // Single shot transmission failed due to ArBitration Loss. 
+#define MSGFLAG_SSM_NACK        0x001000        // Single shot transmission failed.
+#define MSGFLAG_ABL             0x002000        // Single shot transmission failed due to ArBitration Loss.
 #define MSGFLAG_EDL             0x010000        // Obsolete, use MSGFLAG_FDF instead
 #define MSGFLAG_FDF             0x010000        // Message is an FD message (CAN FD)
 #define MSGFLAG_BRS             0x020000        // Message is sent/received with bit rate switch (CAN FD)
@@ -892,18 +904,18 @@ typedef union {
     uint32_t    mtu;
     uint32_t    status;
     uint8_t     padding[16];
-  } start_resp;  
-  struct {    
+  } start_resp;
+  struct {
     uint8_t     payload[24];
-  } data;  
+  } data;
   struct {
     uint32_t    checksum;
     uint8_t     padding[20];
-  } end_req; 
+  } end_req;
   struct {
     uint32_t    status;
     uint8_t     padding[20];
-  } end_resp;   
+  } end_resp;
   uint8_t       raw[24];
 } htrpDataEx;
 
@@ -925,7 +937,7 @@ typedef union {
 
 #define TRP_OK 0
 #define TRP_PIPE_NOT_IMPLEMENTED 1
-#define TRP_BUFFER_OVERFLOW      2  // trying to transfer a larger buffer in one chunk than fw can handle. 
+#define TRP_BUFFER_OVERFLOW      2  // trying to transfer a larger buffer in one chunk than fw can handle.
 
 
 
@@ -933,8 +945,8 @@ typedef union {
 typedef struct {
   uint8_t     cmd;
   uint8_t     len;
-  uint16_t    seqNo;  
-  htrpDataEx  trp;  
+  uint16_t    seqNo;
+  htrpDataEx  trp;
 } htrpDataExtended;
 
 
@@ -1582,7 +1594,9 @@ typedef struct {
 #define CAP_SUB_CMD_HAS_LOGGER               8
 #define CAP_SUB_CMD_HAS_REMOTE               9
 #define CAP_SUB_CMD_HAS_SCRIPT               10
-#define CAP_SUB_CMD_LIN_FLEX                 11
+#define CAP_SUB_CMD_LIN_HYBRID               11
+#define CAP_SUB_CMD_KDI_INFO                 12
+#define CAP_SUB_CMD_HAS_KDI                  13
 
 // the following are not capabilities/bits
 #define CAP_SUB_CMD_DATA_START               1024
@@ -1599,11 +1613,12 @@ typedef struct {
 // CAP_SUB_CMD_REMOTE_TYPE
 #define REMOTE_TYPE_NOT_REMOTE  0
 #define REMOTE_TYPE_WLAN 1
-#define REMOTE_TYPE_LAN  2 
+#define REMOTE_TYPE_LAN  2
 
 typedef union {
   uint32_t padding[6];
   uint32_t channel;
+  uint8_t analyzerNo;
 } hcapExtraInfo_u;
 
 typedef struct {
@@ -1641,7 +1656,17 @@ typedef struct
   uint32_t eanHi;
 } hfeatureEan_t;
 
-//Status codes in CMD_GET_CAPABILITIES_RESP 
+typedef struct
+{
+  uint32_t version;
+  uint8_t  numAnalyzers;
+  uint8_t  analyzerNo;
+  uint8_t  analyzerType;
+  uint8_t  analyzerChanMask;
+  uint32_t reserved2[4];
+} hKdiInfo_t;
+
+//Status codes in CMD_GET_CAPABILITIES_RESP
 #define CAP_STATUS_OK 0
 #define CAP_STATUS_NOT_IMPLEMENTED 1
 #define CAP_STATUS_UNAVAILABLE 2
@@ -1653,19 +1678,21 @@ typedef struct {
     hchannelCap32_t silentMode;    // CAP_SUB_CMD_SILENT_MODE
     hchannelCap32_t errframeCap;   // CAP_SUB_CMD_ERRFRAME
     hchannelCap32_t busstatCap;    // CAP_SUB_CMD_BUS_STATS
-    hchannelCap32_t errcountCap;   // CAP_SUB_CMD_ERRCOUNT_READ    
-    hchannelCap32_t singleshotCap; // CAP_SUB_CMD_SINGLE_SHOT    
-    hchannelCap32_t loggerCap;     // CAP_SUB_CMD_HAS_LOGGER    
-    hchannelCap32_t remoteCap;     // CAP_SUB_CMD_HAS_REMOTE    
+    hchannelCap32_t errcountCap;   // CAP_SUB_CMD_ERRCOUNT_READ
+    hchannelCap32_t singleshotCap; // CAP_SUB_CMD_SINGLE_SHOT
+    hchannelCap32_t loggerCap;     // CAP_SUB_CMD_HAS_LOGGER
+    hchannelCap32_t remoteCap;     // CAP_SUB_CMD_HAS_REMOTE
     hchannelCap32_t scriptCap;     // CAP_SUB_CMD_HAS_SCRIPT
-    hchannelCap32_t linflexCap;    // CAP_SUB_CMD_LIN_FLEX
+    hchannelCap32_t linHybridCap;  // CAP_SUB_CMD_LIN_HYBRID
+    hchannelCap32_t kdiCap;        // CAP_SUB_CMD_HAS_KDI
     hInfo_t loggerType;            // CAP_SUB_CMD_GET_LOGGER_TYPE
     hRemoteInfo_t remoteInfo;      // CAP_SUB_CMD_REMOTE_TYPE
     hhwStatus_t   hwStatus;        // CAP_SUB_CMD_HW_STATUS
     hfeatureEan_t featureEan;      // CAP_SUB_CMD_FEATURE_EAN
+    hKdiInfo_t kdiInfo;            // CAP_SUB_CMD_KDI_INFO
   };
 } hcmdCapabilitiesResp;
-   
+
 // Union for all logged messages.
 typedef union {
   hcmdLogHead                  logHead;
@@ -1759,14 +1786,22 @@ typedef struct {
 #define KDI_SUBCMD_PG_STAT_IDLE     29
 #define KDI_SUBCMD_PG_RUNNING       31
 
+#define KDI_SUBCMD_ATTACH   40
+#define KDI_SUBCMD_DETACH   41
+
 #define SUBCMD_LOOPBACK_GET    50
 #define SUBCMD_LOOPBACK_SET    51
 #define SUBCMD_LOOPBACK_RESP   52
 
+#define KDI_SUBCMD_POWER_UP_ANALYZER    53
+#define KDI_SUBCMD_POWER_DOWN_ANALYZER  54
+
 #define KDI_STATUS_OK                 1
 #define KDI_STATUS_NOT_IMPLEMENTED    2
 #define KDI_LOOPBACK_ERROR            3
+#define KDI_STATUS_ERROR              4
 
+#define KDI_ANALYZER_TYPE_DEFAULT 0
 typedef union {
   uint32_t             pg_ctrl;
   uint32_t             trigger_running;
@@ -1776,20 +1811,23 @@ typedef union {
     uint8_t block;
     uint8_t rx_bus;
     uint8_t tx_bus;
-  } loopback_set;  
+  } loopback_set;
   struct {
     uint8_t block;
-  } loopback_get;  
+  } loopback_get;
   struct {
     uint8_t rx_bus;
     uint8_t tx_bus;
-  } loopback_resp;  
+  } loopback_resp;
+  struct {
+    uint32_t type;
+  } analyzer;
 } hkdiCtrlData;
-  
+
 typedef struct {
   uint8_t subCmdNo; //start, stop
   uint8_t status;
-  uint8_t padding[2];  
+  uint8_t padding[2];
   hkdiCtrlData data;
 } hcmdKDICmd;
 
@@ -1967,7 +2005,7 @@ typedef struct hydraHostCmd {
     hcmdUnknownCommandResp        unknownCommandResp;
     hcmdCapabilitiesReq           capabilitiesReq;
     hcmdCapabilitiesResp          capabilitiesResp;
-    
+
     hcmdKDICmd                    kdiCmd;
 
     hcmdHydraOtherCommand        o;

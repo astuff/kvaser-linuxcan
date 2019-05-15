@@ -1,13 +1,13 @@
 /*
-**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
-**                        http://www.kvaser.com
+**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
 ** BSD-new and GPLv2. You may use either one. See the included
 ** COPYING file for details.
 **
 ** License: BSD-new
-** ============================================================================
+** ==============================================================================
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
 **     * Redistributions of source code must retain the above copyright
@@ -22,21 +22,22 @@
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 ** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 ** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-** ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+** IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
 **
 **
 ** License: GPLv2
-** ============================================================================
-** This program is free software; you can redistribute it and/or
-** modify it under the terms of the GNU General Public License
-** as published by the Free Software Foundation; either version 2
-** of the License, or (at your option) any later version.
+** ==============================================================================
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,10 +46,20 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 **
-** ---------------------------------------------------------------------------
-**/
+**
+** IMPORTANT NOTICE:
+** ==============================================================================
+** This source code is made available for free, as an open license, by Kvaser AB,
+** for use with its applications. Kvaser AB does not accept any liability
+** whatsoever for any third party patent or other immaterial property rights
+** violations that may result from any usage of this source code, regardless of
+** the combination of source code and various applications that it can be used
+** in, or with.
+**
+** -----------------------------------------------------------------------------
+*/
 
 /* Kvaser Linux Canlib */
 
@@ -134,7 +145,7 @@ struct dev_descr {
 };
 
 
-#define CRITICAL_SECTION int
+#define CRITICAL_SECTION pthread_mutex_t
 typedef struct list_entry_s {
   struct list_entry_s *Flink;
   struct list_entry_s *Blink;
@@ -142,6 +153,37 @@ typedef struct list_entry_s {
 
 #define CONTAINING_RECORD(A, T, F) ((T *)((char *)(A) - (long)&(((T *)0)->F)))
 
+typedef struct kvTimeDomainHead_s {
+  CRITICAL_SECTION critSect;
+  LIST_ENTRY headOfAllHeads;
+} kvTimeDomainHead;
+
+typedef struct kvTimeDomainInternal_s {
+  LIST_ENTRY link;
+  LIST_ENTRY magiSynced;
+  LIST_ENTRY nonMagiSynced;
+} kvTimeDomainInternal;
+
+typedef struct kvTimeDomainMagisynced_s {
+  LIST_ENTRY link;
+  LIST_ENTRY head;
+  unsigned softsync_group;
+} kvTimeDomainMagisynced;
+
+typedef struct kvTimeDomainNonMagisynced_s {
+  LIST_ENTRY link;
+  LIST_ENTRY head;
+  uint64_t ean;
+  unsigned sn;
+} kvTimeDomainNonMagisynced;
+
+typedef struct kvTimeDomainHandleData_s {
+  LIST_ENTRY link;
+  int handle;
+} kvTimeDomainHandleData;
+
+#define PRINTF_TIMEDOMAIN(x) DEBUGPRINT(x)
+static kvTimeDomainHead  timeDomains;
 
 #define FALSE 0
 #define TRUE 1
@@ -151,12 +193,14 @@ typedef struct list_entry_s {
 static int Initialized = FALSE;
 
 // This has to be modified if we add/remove drivers.
-static const char *dev_name[] = {"lapcan",   "pcican",   "pcicanII",
-                                 "usbcanII", "leaf",     "kvvirtualcan",
-                                 "mhydra", "pciefd"};
-static const char *off_name[] = {"LAPcan",   "PCIcan",   "PCIcanII",
-                                 "USBcanII", "Leaf",     "VIRTUALcan",
-                                 "Minihydra", "PCIe CAN"};
+static const char *dev_name[] = {"lapcan", "pcican", "pcicanII",
+                                 "usbcanII", "leaf", "mhydra",
+                                 "pciefd",
+                                 "kvvirtualcan"}; // Virtual channels should always be last
+static const char *off_name[] = {"LAPcan", "PCIcan", "PCIcanII",
+                                 "USBcanII", "Leaf", "Minihydra",
+                                 "PCIe CAN",
+                                 "VIRTUALcan"}; // Virtual channels should always be last
 static struct dev_descr dev_descr_list[] = {
           {"Kvaser Unknown",                                    {0x00000000, 0x00000000}},
           {"Kvaser Virtual CAN",                                {0x00000000, 0x00000000}},
@@ -236,9 +280,15 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser Leaf Light HS v2 M12",                       {0x30008816, 0x00073301}},
           {"Kvaser USBcan R v2",                                {0x30009202, 0x00073301}},
           {"Kvaser Leaf Light R v2",                            {0x30009219, 0x00073301}},
+          {"Kvaser Hybrid 2xCAN/LIN",                           {0x30009653, 0x00073301}},
           {"ATI Leaf Light HS v2",                              {0x30009493, 0x00073301}},
           {"ATI USBcan Pro 2xHS v2",                            {0x30009691, 0x00073301}},
-          {"ATI Memorator Pro 2xHS v2",                         {0x30009714, 0x00073301}}
+          {"ATI Memorator Pro 2xHS v2",                         {0x30009714, 0x00073301}},
+          {"Kvaser Mini PCI Express 2xHS v2",                   {0x30010291, 0x00073301}},
+          {"Kvaser Mini PCI Express HS v2",                     {0x30010383, 0x00073301}},
+          {"Kvaser Hybrid Pro 2xCAN/LIN",                       {0x30010420, 0x00073301}},
+          {"Kvaser BlackBird Pro HS v2",                        {0x30009837, 0x00073301}},
+          {"Kvaser Ethercan HS",                                {0x30009769, 0x00073301}}
 };
 
 static canStatus check_bitrate (const CanHandle hnd, unsigned int bitrate);
@@ -330,10 +380,11 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags)
   canStatus          status;
   HandleData         *hData;
   CanHandle          hnd;
-  const int validFlags = canOPEN_EXCLUSIVE      | canOPEN_REQUIRE_EXTENDED |
-                         canOPEN_ACCEPT_VIRTUAL | canOPEN_ACCEPT_LARGE_DLC |
-                         canOPEN_CAN_FD         | canOPEN_CAN_FD_NONISO |
-                         canOPEN_LIN;
+  const int validFlags = canOPEN_EXCLUSIVE           | canOPEN_REQUIRE_EXTENDED |
+                         canOPEN_ACCEPT_VIRTUAL      | canOPEN_ACCEPT_LARGE_DLC |
+                         canOPEN_CAN_FD              | canOPEN_CAN_FD_NONISO    |
+                         canOPEN_INTERNAL_L/*LIN*/   | canOPEN_NO_INIT_ACCESS   |
+                         canOPEN_REQUIRE_INIT_ACCESS | canOPEN_OVERRIDE_EXCLUSIVE;
 
   if ((flags & ~validFlags) != 0) {
     return canERR_PARAM;
@@ -354,16 +405,20 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags)
     hData->openMode = OPEN_AS_CANFD_NONISO;
   else if (flags & canOPEN_CAN_FD)
     hData->openMode = OPEN_AS_CANFD_ISO;
-  else if (flags & canOPEN_LIN) 
+  else if (flags & canOPEN_INTERNAL_L/*LIN*/)
     hData->openMode = OPEN_AS_LIN;
   else
     hData->openMode = OPEN_AS_CAN;
 
-  hData->acceptLargeDlc      = ((flags & canOPEN_ACCEPT_LARGE_DLC) != 0);
-  hData->wantExclusive       = flags & canOPEN_EXCLUSIVE;
-  hData->acceptVirtual       = flags & canOPEN_ACCEPT_VIRTUAL;
-  hData->notifyFd            = canINVALID_HANDLE;
-  hData->valid               = TRUE;
+  hData->acceptLargeDlc      = ((flags & canOPEN_ACCEPT_LARGE_DLC)    != 0);
+  hData->wantExclusive       = ((flags & canOPEN_EXCLUSIVE)           != 0);
+  hData->overrideExclusive   = ((flags & canOPEN_OVERRIDE_EXCLUSIVE)  != 0);
+  hData->acceptVirtual       = ((flags & canOPEN_ACCEPT_VIRTUAL)      != 0);
+  hData->requireInitAccess   = ((flags & canOPEN_REQUIRE_INIT_ACCESS) != 0);
+  hData->initAccess          = ((flags & canOPEN_NO_INIT_ACCESS)      == 0);
+
+  hData->notifyFd = canINVALID_HANDLE;
+  hData->valid    = TRUE;
 
   status = getDevParams(channel,
                         hData->deviceName,
@@ -407,17 +462,23 @@ int CANLIBAPI canClose (const CanHandle hnd)
 
   // Try to go Bus Off before closing
   stat = canBusOff(hnd);
-
   if (stat != canOK) {
-    return stat;
+    if (errno == ESHUTDOWN) { // The device was probably removed,
+                              // continue with the cleanup.
+      DEBUGPRINT((TXT("canClose: canBusOff failed"
+                      "with stat=%d and errno=%m (%d),"
+                      "device was probably removed.\n"),
+                 stat, errno));
+    } else {
+      return stat;
+    }
   }
 
   stat = canSetNotify(hnd, NULL, 0, NULL);
-
   if (stat != canOK) {
     return stat;
   }
-  
+
   hData = removeHandle(hnd);
   if (hData == NULL) {
     return canERR_INVHANDLE;
@@ -478,6 +539,7 @@ canStatus CANLIBAPI canBusOff (const CanHandle hnd)
     return canERR_INVHANDLE;
   }
 
+  errno = 0;
   return hData->canOps->busOff(hData);
 }
 
@@ -900,7 +962,7 @@ canRead (const CanHandle hnd, long *id, void *msgPtr, unsigned int *dlc,
          unsigned int *flag, unsigned long *time)
 {
   HandleData *hData;
-  
+
   hData = findHandle(hnd);
   if (hData == NULL) {
     return canERR_INVHANDLE;
@@ -987,7 +1049,7 @@ canReadWait (const CanHandle hnd, long *id, void *msgPtr, unsigned int *dlc,
   if (hData == NULL) {
     return canERR_INVHANDLE;
   }
-  
+
   return hData->canOps->readWait(hData, id, msgPtr, dlc, flag, time, timeout);
 }
 
@@ -1981,6 +2043,581 @@ kvStatus CANLIBAPI kvScriptLoadFileOnDevice(const CanHandle hnd,
 
 
 
+static void InitializeListHead (LIST_ENTRY *head)
+{
+  head->Flink = head->Blink = head;
+}
+
+static void InsertHeadList (LIST_ENTRY *head, LIST_ENTRY *element)
+{
+  element->Flink = head->Flink;
+  element->Blink = head;
+
+  head->Flink->Blink = element;
+  head->Flink = element;
+}
+
+static int IsListEmpty (LIST_ENTRY *list)
+{
+  return list->Flink == list;
+}
+
+static LIST_ENTRY *RemoveHeadList (LIST_ENTRY *head)
+{
+  LIST_ENTRY *element = head->Flink;
+  element->Flink->Blink = head;
+  head->Flink = element->Flink;
+  return element;
+}
+
+static void RemoveEntryList (LIST_ENTRY *entry)
+{
+  LIST_ENTRY *f = entry->Flink, *b = entry->Blink;
+  b->Flink = f;
+  f->Blink = b;
+}
+
+#define EnterTimeDomainCritical() \
+    do { \
+      if (pthread_mutex_lock(&timeDomains.critSect)){ \
+        PRINTF_TIMEDOMAIN(("EnterTimeDomainCritical: failed\n")); \
+      } \
+    } while(0)
+
+#define LeaveTimeDomainCritical() \
+    do { \
+      if (pthread_mutex_unlock(&timeDomains.critSect)) { \
+        PRINTF_TIMEDOMAIN(("LeaveTimeDomainCritical: failed\n")); \
+      } \
+    } while(0)
+
+/***************************************************************************/
+kvStatus  kvTimeDomainCreate (kvTimeDomain *domain)
+{
+  kvTimeDomainInternal *td;
+
+  // Check input parameters
+  if (!Initialized) return canERR_NOTINITIALIZED;
+  if (!domain)      return canERR_PARAM;
+
+  // Allocate and initialize memory for the domain structure
+  td = (kvTimeDomainInternal *)malloc(sizeof(*td));
+  if (!td) return canERR_NOMEM;
+  memset(td, 0, sizeof(kvTimeDomainInternal));
+
+  // Initialize the member lists
+  InitializeListHead(&td->magiSynced);
+  InitializeListHead(&td->nonMagiSynced);
+
+  // Link the new domain to list of all domains.
+  EnterTimeDomainCritical();
+  InsertHeadList(&timeDomains.headOfAllHeads, &td->link);
+  LeaveTimeDomainCritical();
+
+  // Return the newly created domain
+  *domain = (kvTimeDomain *)td;
+
+  PRINTF_TIMEDOMAIN(("kvTimeDomainCreate: Created\n"));
+
+  return canOK;
+}
+
+
+/***************************************************************************/
+kvStatus  kvTimeDomainDelete (kvTimeDomain domain)
+{
+  kvTimeDomainInternal *td;
+  kvTimeDomainHandleData *member;
+  kvTimeDomainMagisynced *group;
+  kvTimeDomainNonMagisynced *card;
+  LIST_ENTRY *lGroup, *pdLink, *lCard;
+
+  // Check input parameters
+  if (!Initialized) return canERR_NOTINITIALIZED;
+  if (!domain)      return canERR_PARAM;
+
+  td = (kvTimeDomainInternal *)domain;
+
+  // Delete all members before deleting the domain itself.
+  while (!IsListEmpty(&td->magiSynced)) {
+    lGroup = RemoveHeadList(&td->magiSynced);
+    group  = CONTAINING_RECORD(lGroup, kvTimeDomainMagisynced, link);
+
+    while (!IsListEmpty(&group->head)) {
+      pdLink = RemoveHeadList(&group->head);
+      member = CONTAINING_RECORD(pdLink, kvTimeDomainHandleData, link);
+      PRINTF_TIMEDOMAIN(("kvTimeDomainDelete: Deleted synced member %u\n",
+                         member->handle));
+      free(member);
+    }
+
+    PRINTF_TIMEDOMAIN(("kvTimeDomainDelete: Deleted group %u\n",
+                       group->softsync_group));
+    free(group);
+  }
+
+  while (!IsListEmpty(&td->nonMagiSynced)) {
+    lCard = RemoveHeadList(&td->nonMagiSynced);
+    card  = CONTAINING_RECORD(lCard, kvTimeDomainNonMagisynced, link);
+
+    while (!IsListEmpty(&card->head)) {
+      pdLink = RemoveHeadList(&card->head);
+      member = CONTAINING_RECORD(pdLink, kvTimeDomainHandleData, link);
+      PRINTF_TIMEDOMAIN(("kvTimeDomainDelete: Deleted nonsynced member %u\n",
+                         member->handle));
+      free(member);
+    }
+
+    PRINTF_TIMEDOMAIN(("kvTimeDomainDelete: Deleted card %llx with sn %u\n", (long long) card->ean, card->sn));
+    free(card);
+  }
+
+  // Delete the domain from the list of all domains.
+  EnterTimeDomainCritical();
+  RemoveEntryList(&td->link);
+  LeaveTimeDomainCritical();
+
+  // Free the data structures of the domain.
+  free(td);
+  PRINTF_TIMEDOMAIN(("kvTimeDomainDelete: Deleted domain\n"));
+
+  return canOK;
+}
+
+/***************************************************************************/
+kvStatus  kvTimeDomainResetTime (kvTimeDomain domain)
+{
+  kvTimeDomainInternal *td;
+  kvTimeDomainHandleData *member;
+  kvTimeDomainMagisynced *group;
+  kvTimeDomainNonMagisynced *card;
+  LIST_ENTRY *lGroup, *pdLink, *lCard;
+  HandleData *h1, *h2;
+
+  // Check input parameters
+  if (!Initialized) return canERR_NOTINITIALIZED;
+  if (!domain)      return canERR_PARAM;
+
+  td = (kvTimeDomainInternal *)domain;
+
+  PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: Entered\n"));
+
+  EnterTimeDomainCritical();
+
+  lGroup = td->magiSynced.Flink;
+  while (lGroup != &td->magiSynced) {
+    group  = CONTAINING_RECORD(lGroup, kvTimeDomainMagisynced, link);
+    lGroup = lGroup->Flink;
+    pdLink = group->head.Flink;
+
+    PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: Found group %x\n",
+                       group->softsync_group));
+
+    // Find the first valid handle and delete all nonvalid handles while
+    // searching for a valid one.
+    member = CONTAINING_RECORD(pdLink, kvTimeDomainHandleData, link);
+    h1     = findHandle(member->handle);
+
+    PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: Found synced member %u\n",
+                       member->handle));
+
+    while (h1->valid == FALSE) {
+      LIST_ENTRY *pdLink;
+      pdLink = RemoveHeadList(&group->head);
+      member = CONTAINING_RECORD(pdLink, kvTimeDomainHandleData, link);
+      PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: Deleted synced member %u\n",
+                         member->handle));
+      free(member);
+      if (IsListEmpty(&group->head)) break;
+      member = CONTAINING_RECORD(group->head.Flink,
+                                 kvTimeDomainHandleData, link);
+      h1     = findHandle(member->handle);
+    }
+
+    if (IsListEmpty(&group->head)) {
+      PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: Deleted group %u\n",
+                         group->softsync_group));
+      free(group);
+      continue;
+    }
+
+    // Reset the time for the first valid handle.
+    PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: Reset synced member %u\n",
+                       member->handle));
+    h1->canOps->resetClock(h1);
+
+    // Copy the clock offset of the first handle to all other valid handles
+    // in the group and delete all nonvalid handles mean while.
+    pdLink = member->link.Flink;
+    while (pdLink != &group->head) {
+      member = CONTAINING_RECORD(pdLink, kvTimeDomainHandleData, link);
+      PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: Found synced member %u\n",
+                         member->handle));
+
+      pdLink = pdLink->Flink;
+      h2     = findHandle(member->handle);
+      if (h2->valid) {
+        PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: Copied clock "
+                           "to synced member %u\n", member->handle));
+        h1->canOps->setClockOffset(h2, h1);
+      }
+      else {
+        RemoveEntryList(&member->link);
+        PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: Deleted synced "
+                           "member %u\n", member->handle));
+        free(member);
+      }
+    }
+  }
+
+  // Reset the time for all non magisynced handles
+  lCard = td->nonMagiSynced.Flink;
+  while (lCard != &td->nonMagiSynced) {
+    card   = CONTAINING_RECORD(lCard, kvTimeDomainNonMagisynced, link);
+    lCard  = lCard->Flink;
+    pdLink = card->head.Flink;
+
+    PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: Found card %llx with sn %u\n", (long long) card->ean, card->sn));
+
+    // Find the first valid handle and delete all nonvalid handles while
+    // searching for a valid one.
+    member = CONTAINING_RECORD(pdLink, kvTimeDomainHandleData, link);
+    h1     = findHandle(member->handle);
+
+    PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: "
+                       "Found nonsynced member %u\n",
+                       member->handle));
+
+    while (h1->valid == FALSE) {
+      LIST_ENTRY *pdLink;
+      pdLink = RemoveHeadList(&card->head);
+      member = CONTAINING_RECORD(pdLink, kvTimeDomainHandleData, link);
+      PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: "
+                         "Deleted nonsynced member %u\n",
+                         member->handle));
+      free(member);
+      if (IsListEmpty(&card->head)) break;
+      member = CONTAINING_RECORD(card->head.Flink,
+                                 kvTimeDomainHandleData, link);
+      h1 = findHandle(member->handle);
+    }
+
+    if (IsListEmpty(&card->head)) {
+      PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: Deleted card %llx with sn %u\n", (long long) card->ean,
+                        card->sn));
+      free(card);
+      continue;
+    }
+
+    // Reset the time for the first valid handle.
+    PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: "
+                       "Reset nonsynced member %u\n",
+                       member->handle));
+    h1->canOps->resetClock(h1);
+
+    // Copy the clock offset of the first handle to all other valid handles
+    // on the card and delete all nonvalid handles mean while.
+    pdLink = member->link.Flink;
+    while (pdLink != &card->head) {
+      member = CONTAINING_RECORD(pdLink, kvTimeDomainHandleData, link);
+      PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: "
+                         "Found nonsynced member %u\n",
+                         member->handle));
+
+      pdLink = pdLink->Flink;
+      h2 = findHandle(member->handle);
+      if (h2->valid) {
+        PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: "
+                           "Copied clock to nonsynced member %u\n",
+                           member->handle));
+        h1->canOps->setClockOffset(h2, h1);
+      }
+      else {
+        RemoveEntryList(&member->link);
+        PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: "
+                           "Deleted nonsynced member %u\n",
+                           member->handle));
+        free(member);
+      }
+    }
+  }
+
+  LeaveTimeDomainCritical();
+
+  return canOK;
+}
+
+
+/***************************************************************************/
+kvStatus  kvTimeDomainGetData (kvTimeDomain domain,
+                                          kvTimeDomainData *data,
+                                          size_t bufsiz)
+{
+  kvTimeDomainInternal *td;
+  kvTimeDomainMagisynced *group;
+  kvTimeDomainNonMagisynced *card;
+  LIST_ENTRY *lGroup, *pdLink, *lCard;
+
+  PRINTF_TIMEDOMAIN(("kvTimeDomainGetData: Entered\n"));
+  if (!domain || !data || bufsiz != sizeof(kvTimeDomainData)) {
+    return canERR_PARAM;
+  }
+  memset(data, 0, sizeof(kvTimeDomainData));
+  td = (kvTimeDomainInternal *)domain;
+
+  EnterTimeDomainCritical();
+
+  lGroup = td->magiSynced.Flink;
+  while (lGroup != &td->magiSynced) {
+    data->nMagiSyncGroups++;
+    group = CONTAINING_RECORD(lGroup, kvTimeDomainMagisynced, link);
+    PRINTF_TIMEDOMAIN(("kvTimeDomainGetData: Found group %x\n",
+                       group->softsync_group));
+    pdLink = group->head.Flink;
+    while (pdLink != &group->head) {
+      PRINTF_TIMEDOMAIN(("kvTimeDomainGetData: Found synced member\n"));
+      data->nMagiSyncedMembers++;
+      pdLink = pdLink->Flink;
+    }
+    lGroup = lGroup->Flink;
+  }
+
+  lCard = td->nonMagiSynced.Flink;
+  while (lCard != &td->nonMagiSynced) {
+    data->nNonMagiSyncCards++;
+    card = CONTAINING_RECORD(lCard, kvTimeDomainNonMagisynced, link);
+    PRINTF_TIMEDOMAIN(("kvTimeDomainGetData: Found card %llx with sn %u\n", (long long) card->ean, card->sn));
+    pdLink = card->head.Flink;
+    while (pdLink != &card->head) {
+      PRINTF_TIMEDOMAIN(("kvTimeDomainGetData: Found nonsynced member\n"));
+      data->nNonMagiSyncedMembers++;
+      pdLink = pdLink->Flink;
+    }
+    lCard = lCard->Flink;
+  }
+
+  LeaveTimeDomainCritical();
+
+  return canOK;
+}
+
+
+/***************************************************************************/
+kvStatus  kvTimeDomainAddHandle (kvTimeDomain domain, int handle)
+{
+  kvTimeDomainInternal *td;
+  kvTimeDomainHandleData *member;
+  VCAN_IOCTL_CARD_INFO ci;
+  KCAN_IOCTL_CARD_INFO_2 ci2;
+  HandleData *hData;
+  uint64_t ean;
+  int err;
+
+  if (!domain || (findHandle(handle) == NULL)) {
+    return canERR_PARAM;
+  }
+
+  td = (kvTimeDomainInternal *)domain;
+
+  // Allocate and initialize memory for the member structure
+  member = (kvTimeDomainHandleData *)malloc(sizeof(*member));
+  if (!member) return canERR_NOMEM;
+  member->handle = handle;
+
+  memset (&ci2, 0, sizeof(ci2));
+
+  // Determine whether softsync is running and if so which
+  // softsync group it belongs to.
+  hData = findHandle(handle);
+  err = hData->canOps->getCardInfo (hData, &ci);
+  err |= hData->canOps->getCardInfo2 (hData, &ci2);
+  if (err) {
+    free(member);
+    return canERR_INTERNAL;
+  }
+  memcpy(&ean, ci2.ean, 8);
+
+  EnterTimeDomainCritical();
+
+  if (ci2.softsync_running) {
+    // Check if any previously added handles are connected to the same hub.
+    // If so add this handle to that group otherwise create a new.
+    kvTimeDomainMagisynced *group;
+    LIST_ENTRY *lGroup = td->magiSynced.Flink;
+
+    while (lGroup != &td->magiSynced) {
+      group = CONTAINING_RECORD(lGroup, kvTimeDomainMagisynced, link);
+      PRINTF_TIMEDOMAIN(("kvTimeDomainAddHandle: Found group %x\n",
+                         group->softsync_group));
+
+      if (group->softsync_group == ci2.usb_host_id) {
+        LIST_ENTRY *pdLink;
+        HandleData *h1, *h2;
+
+        InsertHeadList(&group->head, &member->link);
+        PRINTF_TIMEDOMAIN(("kvTimeDomainAddHandle: Added synced member %u "
+                           "to group %x\n", member->handle, group->softsync_group));
+
+        // h1 is the handle of the newly inserted member
+        h1 = findHandle(member->handle);
+
+        // Copy the clock offset from the second member in the list to
+        // the new member (that we just inserted at the head)
+        pdLink = member->link.Flink;
+        while (pdLink != &group->head) {
+          member = CONTAINING_RECORD(pdLink, kvTimeDomainHandleData, link);
+          PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: Found already synced member %u\n",
+                             member->handle));
+
+          pdLink = pdLink->Flink;
+          h2     = findHandle(member->handle);
+          if (h2->valid) {
+            PRINTF_TIMEDOMAIN(("kvTimeDomainResetTime: Copied clock "
+                               "from already synced member %u\n", member->handle));
+            h1->canOps->setClockOffset(h1, h2);
+            break;
+          }
+        }
+
+        LeaveTimeDomainCritical();
+        return canOK;
+      }
+      lGroup = lGroup->Flink;
+    }
+
+    group = (kvTimeDomainMagisynced *)malloc(sizeof(*group));
+    if (!group) {
+      LeaveTimeDomainCritical();
+      free(member);
+      return canERR_NOMEM;
+    }
+    InitializeListHead(&group->head);
+    group->softsync_group = ci2.usb_host_id;
+    InsertHeadList(&group->head, &member->link);
+    InsertHeadList(&td->magiSynced, &group->link);
+    PRINTF_TIMEDOMAIN(("kvTimeDomainAddHandle: Added synced member %u to"
+                " new group %x\n", member->handle, group->softsync_group));
+  }
+  else {
+    kvTimeDomainNonMagisynced *card;
+    LIST_ENTRY *lCard = td->nonMagiSynced.Flink;
+
+    while (lCard != &td->nonMagiSynced) {
+      card = CONTAINING_RECORD(lCard, kvTimeDomainNonMagisynced, link);
+      PRINTF_TIMEDOMAIN(("kvTimeDomainAddHandle: Found card %llx with sn %u\n", (long long) card->ean,
+                        card->sn));
+
+      if (card->ean == ean && card->sn == ci.serial_number) {
+        InsertHeadList(&card->head, &member->link);
+        PRINTF_TIMEDOMAIN(("kvTimeDomainAddHandle: Added nonsynced member"
+                           " %u to card %llx with sn %u\n",
+                           member->handle, (long long) card->ean, card->sn));
+        LeaveTimeDomainCritical();
+        return canOK;
+      }
+      lCard = lCard->Flink;
+    }
+
+    card = (kvTimeDomainNonMagisynced *)malloc(sizeof(*card));
+    if (!card) {
+      LeaveTimeDomainCritical();
+      free(member);
+      return canERR_NOMEM;
+    }
+    InitializeListHead(&card->head);
+    card->ean = ean;
+    card->sn  = ci.serial_number;
+    InsertHeadList(&card->head, &member->link);
+    InsertHeadList(&td->nonMagiSynced, &card->link);
+    PRINTF_TIMEDOMAIN(("kvTimeDomainAddHandle: Added nonsynced member"
+                       " %u to new card %llx with sn %u\n",
+                       member->handle, (long long) card->ean, card->sn));
+  }
+
+  LeaveTimeDomainCritical();
+
+  return canOK;
+}
+
+
+/***************************************************************************/
+kvStatus  kvTimeDomainRemoveHandle (kvTimeDomain domain, int handle)
+{
+  kvTimeDomainInternal *td;
+  kvTimeDomainHandleData *member;
+  kvTimeDomainMagisynced *group;
+  kvTimeDomainNonMagisynced *card;
+  LIST_ENTRY *lGroup, *lCard, *pdLink;
+
+#if NEW_HANDLE
+  VALIDATE_AND_DETHREAD(handle, (kvStatus));
+#endif
+
+  if (!domain || (findHandle(handle) == NULL)) {
+    return canERR_PARAM;
+  }
+
+  td = (kvTimeDomainInternal *)domain;
+
+  EnterTimeDomainCritical();
+
+  lGroup = td->magiSynced.Flink;
+  while (lGroup != &td->magiSynced) {
+    group  = CONTAINING_RECORD(lGroup, kvTimeDomainMagisynced, link);
+    pdLink = group->head.Flink;
+    while (pdLink != &group->head) {
+      member = CONTAINING_RECORD(pdLink, kvTimeDomainHandleData, link);
+      if (member->handle == handle) {
+        RemoveEntryList(pdLink);
+        PRINTF_TIMEDOMAIN(("kvTimeDomainRemoveHandle: Deleted synced "
+                           "member %u\n", handle));
+        free(member);
+        if (IsListEmpty(&group->head)) {
+          RemoveEntryList(lGroup);
+          PRINTF_TIMEDOMAIN(("kvTimeDomainRemoveHandle: Deleted group %u\n",
+                             group->softsync_group));
+          free(group);
+        }
+        LeaveTimeDomainCritical();
+        return canOK;
+      }
+      pdLink = pdLink->Flink;
+    }
+    lGroup = lGroup->Flink;
+  }
+
+  lCard = td->nonMagiSynced.Flink;
+  while (lCard != &td->nonMagiSynced) {
+    card   = CONTAINING_RECORD(lCard, kvTimeDomainNonMagisynced, link);
+    pdLink = card->head.Flink;
+    while (pdLink != &card->head) {
+      member = CONTAINING_RECORD(pdLink, kvTimeDomainHandleData, link);
+      if (member->handle == handle) {
+        RemoveEntryList(pdLink);
+        PRINTF_TIMEDOMAIN(("kvTimeDomainRemoveHandle: "
+                           "Deleted nonsynced member %u\n", handle));
+        free(member);
+        if (IsListEmpty(&card->head)) {
+          RemoveEntryList(lCard);
+          PRINTF_TIMEDOMAIN(("kvTimeDomainRemoveHandle: "
+                             "Deleted card %llx with sn %u\n",
+                             (long long) card->ean, card->sn));
+          free(card);
+        }
+        LeaveTimeDomainCritical();
+        return canOK;
+      }
+      pdLink = pdLink->Flink;
+    }
+    lCard = lCard->Flink;
+  }
+
+  LeaveTimeDomainCritical();
+
+  PRINTF_TIMEDOMAIN(("kvTimeDomainRemoveHandle: Handle not found %u\n",
+                     handle));
+  return canOK;  // Not found
+}
 
 
 //******************************************************
@@ -2074,8 +2711,15 @@ kvStatus CANLIBAPI kvSetNotifyCallback(const CanHandle hnd,
 //******************************************************
 void CANLIBAPI canInitializeLibrary (void)
 {
-
-  Initialized = TRUE;
+  if (Initialized != TRUE) {
+    memset(&timeDomains, 0, sizeof(kvTimeDomainHead));
+    if (pthread_mutex_init(&timeDomains.critSect, PTHREAD_PROCESS_PRIVATE)) {
+      PRINTF_TIMEDOMAIN(("canInitializeLibrary: pthread_mutex_init failed\n"));
+    } else {
+      InitializeListHead(&timeDomains.headOfAllHeads);
+      Initialized = TRUE;
+    }
+  }
   return;
 }
 
@@ -2084,7 +2728,16 @@ void CANLIBAPI canInitializeLibrary (void)
 //******************************************************
 canStatus CANLIBAPI canUnloadLibrary (void)
 {
+  while (!IsListEmpty(&timeDomains.headOfAllHeads)) {
+    LIST_ENTRY *td = RemoveHeadList(&timeDomains.headOfAllHeads);
+    kvTimeDomainDelete(td);
+  }
   foreachHandle(&canClose);
+  if (Initialized) {
+    if (pthread_mutex_destroy(&timeDomains.critSect)) {
+      PRINTF_TIMEDOMAIN(("canUnloadLibrary: pthread_mutex_destroy failed\n"));
+    }
+  }
   Initialized = FALSE;
 
   return canOK;

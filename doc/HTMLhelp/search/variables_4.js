@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['errframe',['errFrame',['../structcan_bus_statistics__s.html#a54171b8fd05e42011ec548693594b4c5',1,'canBusStatistics_s']]],
-  ['extdata',['extData',['../structcan_bus_statistics__s.html#ad071e3666d2aedd0e3c971a3b4148385',1,'canBusStatistics_s']]],
-  ['extremote',['extRemote',['../structcan_bus_statistics__s.html#a14481e6fd492f4db9a7db4062d5fc199',1,'canBusStatistics_s']]]
+  ['flags',['flags',['../structkvm_log_msg_ex.html#a81a27ce50e78368b0d0de1e8767fd32d',1,'kvmLogMsgEx']]],
+  ['framelength',['frameLength',['../struct_lin_message_info.html#aedcbabfa0a2b5302ee5b5000812096f3',1,'LinMessageInfo']]],
+  ['fwbuild',['fwBuild',['../structkvm_log_version_ex.html#a32cfe1d73a15997e475810ae13488da8',1,'kvmLogVersionEx']]],
+  ['fwmajor',['fwMajor',['../structkvm_log_version_ex.html#a58833c28a09ae4d60434b0a2a53c991a',1,'kvmLogVersionEx']]],
+  ['fwminor',['fwMinor',['../structkvm_log_version_ex.html#a110dbdd6d83918e6f30bdf9080ef4669',1,'kvmLogVersionEx']]]
 ];

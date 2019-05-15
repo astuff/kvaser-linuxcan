@@ -1,13 +1,13 @@
 /*
-**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
-**                        http://www.kvaser.com
+**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
 ** BSD-new and GPLv2. You may use either one. See the included
 ** COPYING file for details.
 **
 ** License: BSD-new
-** ===============================================================================
+** ==============================================================================
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
 **     * Redistributions of source code must retain the above copyright
@@ -19,24 +19,25 @@
 **       names of its contributors may be used to endorse or promote products
 **       derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+** IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
 **
 **
 ** License: GPLv2
-** ===============================================================================
-** This program is free software; you can redistribute it and/or
-** modify it under the terms of the GNU General Public License
-** as published by the Free Software Foundation; either version 2
-** of the License, or (at your option) any later version.
+** ==============================================================================
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,20 +46,40 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 **
-** ---------------------------------------------------------------------------
-**/
+**
+** IMPORTANT NOTICE:
+** ==============================================================================
+** This source code is made available for free, as an open license, by Kvaser AB,
+** for use with its applications. Kvaser AB does not accept any liability
+** whatsoever for any third party patent or other immaterial property rights
+** violations that may result from any usage of this source code, regardless of
+** the combination of source code and various applications that it can be used
+** in, or with.
+**
+** -----------------------------------------------------------------------------
+*/
+
+/*
+** Description:
+**   Definitions for Helios and Demeter (i.e. PCIcan II, USBcan II and
+**   relatives.)
+**
+**   This file is maintained in "m16firm/include" and shall be copied
+**   (and committed there) to any other location where it is used (e.g canlib)
+**
+** -----------------------------------------------------------------------------
+*/
 
 #ifndef _HELIOS_CMDS_H_
 #define _HELIOS_CMDS_H_
 
+#include <linux/types.h>
 #include "debug.h"
 #ifdef HELIOS_PRIVATE
 #   include "helios_private.h"
-#endif
-
-#   include <linux/types.h>
+#endif /* HELIOS_PRIVATE */
 
 #define CMD_RX_STD_MESSAGE                12
 #define CMD_TX_STD_MESSAGE                13
@@ -122,8 +143,10 @@
 #define CMD_AUTO_TX_BUFFER_REQ                       72
 #define CMD_AUTO_TX_BUFFER_RESP                      73
 #define CMD_SET_TRANSCEIVER_MODE_REQ                 74
+#define CMD_INTERNAL_DUMMY                           75
+#define CMD_MEMO_REINIT_DISK_REQ                     76
 
-// 75,76,77,78,79,80,81 may be used
+// 77,78,79,80,81 may be used
 
 #define CMD_MEMO_GET_RTC_REQ                         82
 #define CMD_MEMO_GET_RTC_RESP                        83
@@ -153,6 +176,9 @@
 
 #define CMD_LED_ACTION_REQ                          101
 #define CMD_LED_ACTION_RESP                         102
+
+#define CMD_LOG_STRUCT                              103
+
 
 // Sub commands for the above commands
 #define SUBCOMMAND_UFILE_START        1
@@ -186,6 +212,7 @@
 #define MEMO_SUBCOMMAND_FORMAT_DISK                   12
 #define MEMO_SUBCOMMAND_GET_RTC                       13
 #define MEMO_SUBCOMMAND_SET_RTC                       14
+#define MEMO_SUBCOMMAND_REINIT_DISK                   15
 
 #define MEMO_SUBCOMMAND_BULK_SECTOR                   16
 #define MEMO_SUBCOMMAND_STOP_SECTOR                   17
@@ -293,7 +320,7 @@
 #define SWOPTION_AUTO_TX_BUFFER       0x02  // Firmware has auto tx buffers
 #define SWOPTION_BETA                 0x04  // Firmware is a beta version
 #define SWOPTION_RC                   0x08  // Firmware is a release candidate
-
+#define SWOPTION_BAD_MOOD             0x10  // Firmware refuses to run for some reason
 
 // CMD_SET_AUTO_TX_REQ and _RESP enum values
 #define AUTOTXBUFFER_CMD_GET_INFO     1     // Get implementation information
@@ -536,7 +563,7 @@ typedef struct {
     uint32_t      mfgDate;
     unsigned char EAN[8];       // LSB..MSB, then the check digit.
     unsigned char hwRevision;
-    unsigned char padding;
+    unsigned char hwType;
     unsigned short padding2;
 } cmdGetCardInfoResp;
 
@@ -684,6 +711,12 @@ typedef struct {
     unsigned char resistorNet;      // Not used in Demeter (left-over from LAPcan)
     unsigned short padding;
 } cmdSetTransceiverModeReq;
+
+typedef struct {
+    unsigned char  cmdLen;
+    unsigned char  cmdNo;
+    unsigned short time;
+} cmdInternalDummy;
 
 //##################################################################
 // Memorator specific commands
@@ -1136,6 +1169,13 @@ typedef struct {
   unsigned short padding0;
 } cmdAutoTxBufferResp;
 
+typedef struct {
+    unsigned char  cmdLen;
+    unsigned char  cmdNo;
+    unsigned short padding;
+    unsigned char  logData[16];
+} cmdLogStruct;
+
 typedef union {
   cmdHead                      head;
 
@@ -1178,6 +1218,7 @@ typedef union {
   cmdReadClockReq              readClockReq;
   cmdReadClockResp             readClockResp;
   cmdSetTransceiverModeReq     setTransceiverModeReq;
+  cmdInternalDummy             internalDummy;
 
   cmdMemoGetFilesystemInfoStructReq   memoGetFilesystemInfoStructReq;
   cmdMemoGetFilesystemInfoStructResp  memoGetFilesystemInfoStructResp;
@@ -1230,9 +1271,11 @@ typedef union {
   cmdAutoTxBufferReq          autoTxBufferReq;
   cmdAutoTxBufferResp         autoTxBufferResp;
 
+  cmdLogStruct                logStruct;
+
 #ifdef HELIOS_PRIVATE
   cmdHeliosOtherCommand       o;
-#endif
+#endif /* HELIOS_PRIVATE */
 } heliosCmd;
 
 
@@ -1251,11 +1294,12 @@ typedef union {
   cmdCanErrorEvent        canErrorEvent;
   cmdHeartbeatResp        heartbeatResp;
   cmdReadClockResp        readClockResp;
+  cmdLogStruct            logStruct;
 } heliosResponse;
 
 #include <poppack.h>
+#include "compilerassert.h"
 
-#if defined(CompilerAssert)
 CompilerAssert(sizeof(heliosResponse) == 20);
 // A basic sanity check of all structs:
 #define CHECK_ALIGNMENT(X) CompilerAssert((sizeof(X) % 4) == 0)
@@ -1352,8 +1396,9 @@ CHECK_ALIGNMENT(cmdSetAutoTxBuffer           );
 CHECK_ALIGNMENT(cmdAutoTxBufferReq           );
 CHECK_ALIGNMENT(cmdAutoTxBufferResp          );
 
+CHECK_ALIGNMENT(cmdLogStruct                 );
+
 CompilerAssert(sizeof(heliosCmd) <= MAX_CMD_LEN);
-#endif
 
 
 #endif //_HELIOS_CMDS_H_

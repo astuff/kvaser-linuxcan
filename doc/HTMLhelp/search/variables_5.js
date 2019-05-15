@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['flags',['flags',['../struct_j1587_message_info.html#a78ac89a4a0f57ffa7c2ecf31749aa390',1,'J1587MessageInfo']]],
-  ['framedelay',['frameDelay',['../struct_j1587_message_info.html#a55f2df81911751a16eb20d7a0125ca9c',1,'J1587MessageInfo']]],
-  ['framelength',['frameLength',['../struct_lin_message_info.html#aedcbabfa0a2b5302ee5b5000812096f3',1,'LinMessageInfo::frameLength()'],['../struct_j1587_message_info.html#aedcbabfa0a2b5302ee5b5000812096f3',1,'J1587MessageInfo::frameLength()']]]
+  ['id',['id',['../structcan_notify_data.html#a7350fbd6ad10618f3b750b1f99ca5c3c',1,'canNotifyData::id()'],['../structkvm_log_msg_ex.html#a3384d9640634d49e84776a97f3e2c241',1,'kvmLogMsgEx::id()']]],
+  ['idpar',['idPar',['../struct_lin_message_info.html#ab657e630aa9b3cd5acfcaec6f914a498',1,'LinMessageInfo']]],
+  ['info',['info',['../structcan_notify_data.html#ae129dc8383274d477e1709e2df4a4d74',1,'canNotifyData']]]
 ];

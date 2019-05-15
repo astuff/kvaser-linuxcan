@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['named_20parameter_20sets',['Named Parameter Sets',['../page_user_guide_misc_named_parameters.html',1,'page_user_guide_misc']]]
+  ['using_20threads',['Using Threads',['../page_user_guide_threads.html',1,'page_user_guide']]]
 ];

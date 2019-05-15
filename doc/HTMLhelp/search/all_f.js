@@ -1,10 +1,9 @@
 var searchData=
 [
-  ['porting_20from_20older_20canlib_20apis',['Porting from older CANLIB APIs',['../page_porting_code_older.html',1,'']]],
-  ['programmer_27s_20overview',['Programmer&apos;s Overview',['../page_user_guide_intro_programmers.html',1,'page_user_guide_intro']]],
-  ['pccan_5fintel526',['PCCAN_INTEL526',['../group___obsolete.html#ga6f568221b0f99615dc9180ceef26a9a2',1,'obsolete.h']]],
-  ['pccan_5fintel527',['PCCAN_INTEL527',['../group___obsolete.html#gabc1429917402cbacb9f560cf5c734cd8',1,'obsolete.h']]],
-  ['pccan_5fphilips',['PCCAN_PHILIPS',['../group___obsolete.html#ga19a934f79a572bfd61a37d333ceb369e',1,'obsolete.h']]],
-  ['portno',['portNo',['../structcan_user_io_port_data.html#a3001cfa2429ae1926b29f0d14e7184e0',1,'canUserIoPortData']]],
-  ['portvalue',['portValue',['../structcan_user_io_port_data.html#acd5ef299b011d43a09b0f97f96edd444',1,'canUserIoPortData']]]
+  ['real_20time_20clock',['Real Time Clock',['../group__kvm__rtc.html',1,'']]],
+  ['raw',['raw',['../structkvm_log_event_ex.html#a2d78703fd9a85a4cb3ead816db9038bc',1,'kvmLogEventEx']]],
+  ['right',['right',['../structtag__token.html#afa54f74105f850a372148e16dde90651',1,'tag_token']]],
+  ['rtc',['rtc',['../structkvm_log_event_ex.html#a1f9964cb31c1515adcee1dc69c01d41b',1,'kvmLogEventEx']]],
+  ['rx',['rx',['../structcan_notify_data.html#a08ba82dcb2d1828a60a16863d4266189',1,'canNotifyData']]],
+  ['rxerrorcounter',['rxErrorCounter',['../structcan_notify_data.html#a575e147dffea7d8a2fc90141079a4fe3',1,'canNotifyData']]]
 ];

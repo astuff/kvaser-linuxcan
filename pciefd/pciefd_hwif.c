@@ -1,13 +1,13 @@
 /*
-**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
-**                        http://www.kvaser.com
+**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
 ** BSD-new and GPLv2. You may use either one. See the included
 ** COPYING file for details.
 **
 ** License: BSD-new
-** ===============================================================================
+** ==============================================================================
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
 **     * Redistributions of source code must retain the above copyright
@@ -19,24 +19,25 @@
 **       names of its contributors may be used to endorse or promote products
 **       derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+** IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
 **
 **
 ** License: GPLv2
-** ===============================================================================
-** This program is free software; you can redistribute it and/or
-** modify it under the terms of the GNU General Public License
-** as published by the Free Software Foundation; either version 2
-** of the License, or (at your option) any later version.
+** ==============================================================================
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,19 +46,27 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 **
-** ---------------------------------------------------------------------------
-**/
+**
+** IMPORTANT NOTICE:
+** ==============================================================================
+** This source code is made available for free, as an open license, by Kvaser AB,
+** for use with its applications. Kvaser AB does not accept any liability
+** whatsoever for any third party patent or other immaterial property rights
+** violations that may result from any usage of this source code, regardless of
+** the combination of source code and various applications that it can be used
+** in, or with.
+**
+** -----------------------------------------------------------------------------
+*/
 
 //--------------------------------------------------
 // NOTE! module_versioning HAS to be included first
 #include "module_versioning.h"
 //--------------------------------------------------
 
-//
 // Kvaser CAN driver pciefd hardware specific parts
-//
 
 #include <linux/version.h>
 #include <linux/pci.h>
@@ -80,10 +89,14 @@
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)
 #   include <asm/system.h>
-#endif
+#endif /* KERNEL_VERSION < 3.4.0 */
 
 #include <asm/bitops.h>
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 12, 0))
 #include <asm/uaccess.h>
+#else
+#include <linux/uaccess.h>
+#endif /* KERNEL_VERSION < 4.12.0 */
 
 #include <asm/delay.h>
 
@@ -114,14 +127,15 @@ int debug_level = PCIEFD_DEBUG;
 MODULE_PARM_DESC(debug_level, "PCIe CAN debug level");
 module_param(debug_level, int, 0644);
 #define DEBUGPRINT(n, arg...)     if (debug_level >= (n)) { DEBUGOUT(n, (arg)); }
+#define INITPRINT(arg...) printk(arg)
 
 #else
 
 #define DEBUGPRINT(n, arg...)     if ((n) == 1) { DEBUGOUT(n, (arg)); }
+#define INITPRINT(arg...)
 
-#endif
+#endif /* PCIEFD_DEBUG */
 
-#define INITPRINT(arg...) printk(arg)
 
 // For measuring delays during debugging
 #include <linux/time.h>
@@ -138,6 +152,8 @@ MODULE_DESCRIPTION("PCIe CAN module.");
 #define PCIEFD_4HS_ID     (0x000d)
 #define PCIEFD_2HS_ID     (0x000e)
 #define PCIEFD_HS_ID      (0x000f)
+#define MINIPCIEFD_HS_ID  (0x0010)
+#define MINIPCIEFD_2HS_ID (0x0011)
 
 #define MAX_NB_PARAMETERS   256
 #define PARAM_MAGIC         0xCAFEF00D
@@ -200,6 +216,8 @@ static VCanHWInterface hwIf = {
   .requestChipState   = pciCanRequestChipState,
   .requestSend        = pciCanRequestSend,
   .getCustChannelName = pciCanGetCustChannelName,
+  .getCardInfo        = vCanGetCardInfo,
+  .getCardInfo2       = vCanGetCardInfo2,
 };
 
 
@@ -222,6 +240,18 @@ static struct pci_device_id id_table[] = {
   {
     .vendor    = PCIEFD_VENDOR,
     .device    = PCIEFD_HS_ID,
+    .subvendor = PCI_ANY_ID,
+    .subdevice = PCI_ANY_ID
+  },
+  {
+    .vendor    = PCIEFD_VENDOR,
+    .device    = MINIPCIEFD_HS_ID,
+    .subvendor = PCI_ANY_ID,
+    .subdevice = PCI_ANY_ID
+  },
+  {
+    .vendor    = PCIEFD_VENDOR,
+    .device    = MINIPCIEFD_2HS_ID,
     .subvendor = PCI_ANY_ID,
     .subdevice = PCI_ANY_ID
   },
@@ -802,7 +832,7 @@ static unsigned long timestamp_to_ticks(VCanCardData *vCard, unsigned long long 
 {
   PciCanCardData *hCard = vCard->hwCardData;
 
-  do_div(ts, hCard->freqToTicksDivider);
+  ts = div_u64(ts, hCard->freqToTicksDivider);
 
   DEBUGPRINT(4,"Freq:%u US:%u TS:%llu\n", hCard->frequency, vCard->usPerTick, ts);
 
@@ -942,7 +972,7 @@ static void printCardInfo(VCanCardData *vCard)
 
   if (vCard->firmwareVersionMajor != PCIEFD_FPGA_MAJOR_VER) {
     vCard->card_flags |= DEVHND_CARD_REFUSE_TO_USE_CAN;
-    INITPRINT("\n    *** ERROR: Unsupported firmware version %d.%d.%d. Please upgrade to at least %d.0.1\n\n",
+    printk("\n    *** ERROR: Unsupported firmware version %d.%d.%d. Please upgrade to at least %d.0.1\n\n",
               vCard->firmwareVersionMajor,
               vCard->firmwareVersionMinor,
               vCard->firmwareVersionBuild,
@@ -1129,6 +1159,10 @@ static int getCardInfo(VCanCardData *vCard)
 
         readParameter(param_image, PARAM_HW_TYPE, &vCard->hw_type, PARAM_HW_TYPE_LEN);
         INITPRINT("    * HW Type: %u\n",vCard->hw_type);
+
+        readParameter(param_image, PARAM_MAX_BITRATE, &vCard->default_max_bitrate, PARAM_MAX_BITRATE_LEN);
+        INITPRINT("    * Default max bitrate: %d\n", (int)vCard->default_max_bitrate);
+        vCard->current_max_bitrate = vCard->default_max_bitrate;
 
         readParameter(param_image, PARAM_NUMBER_CHANNELS, &vCard->nrChannels, PARAM_NUMBER_CHANNELS_LEN);
         INITPRINT("    * Number of channels: %u\n",vCard->nrChannels);
@@ -1376,7 +1410,13 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
 
   quantaPerCycle = tseg1 + tseg2 + 1;
   // Detect overflow.
-  if ((quantaPerCycle < tseg1) || (quantaPerCycle < tseg2)) {
+  if (quantaPerCycle < tseg1) {
+    DEBUGPRINT(1,"Error (pciefd): Bad parameter (tseg1)\n");
+    return VCAN_STAT_BAD_PARAMETER;
+  }
+
+  if (quantaPerCycle < tseg2) {
+    DEBUGPRINT(1,"Error (pciefd): Bad parameter (tseg2)\n");
     return VCAN_STAT_BAD_PARAMETER;
   }
 
@@ -1384,7 +1424,7 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
              freq, tseg1, tseg2, sjw);
 
   if (quantaPerCycle == 0 || freq == 0) {
-    DEBUGPRINT(2,"Error: Bad parameter\n");
+    DEBUGPRINT(1,"Error (pciefd): Bad parameter (freq)\n");
     return VCAN_STAT_BAD_PARAMETER;
   }
 
@@ -1392,7 +1432,7 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
 
   recalc_freq = hCard->frequency / (brp * quantaPerCycle);
   if (recalc_freq != freq) {
-    DEBUGPRINT(2,"Error: CAN prescaler residual. The parameters bitrate:%lu tseg1:%u tseg2:%u gives this bitrate:%lu\n",
+    DEBUGPRINT(1,"Error (pciefd): CAN prescaler residual. The parameters bitrate:%lu tseg1:%u tseg2:%u gives this bitrate:%lu\n",
                freq,tseg1,tseg2, recalc_freq);
     return VCAN_STAT_BAD_PARAMETER;
   }
@@ -1409,12 +1449,18 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
 
     quantaPerCycle = tseg1 + tseg2 + 1;
     // Detect overflow.
-    if ((quantaPerCycle < tseg1) || (quantaPerCycle < tseg2)) {
+    if (quantaPerCycle < tseg1) {
+      DEBUGPRINT(1,"Error (pciefd): Bad parameter fd (tseg1)\n");
       return VCAN_STAT_BAD_PARAMETER;
     }
 
-    if (freq == 0) {
-      DEBUGPRINT(2,"Error: Bad parameter\n");
+    if (quantaPerCycle < tseg2) {
+      DEBUGPRINT(1,"Error (pciefd): Bad parameter fd (tseg2)\n");
+      return VCAN_STAT_BAD_PARAMETER;
+    }
+
+    if (quantaPerCycle == 0 || freq == 0) {
+      DEBUGPRINT(1,"Error (pciefd): Bad parameter fd (freq)\n");
       return VCAN_STAT_BAD_PARAMETER;
     }
 
@@ -1422,13 +1468,13 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
 
     recalc_freq = hCard->frequency / (brp * quantaPerCycle);
     if (recalc_freq != freq) {
-      DEBUGPRINT(2,"Error: CAN FD prescaler residual. The parameters bitrate:%lu tseg1:%u tseg2:%u give this bitrate:%lu\n",
+      DEBUGPRINT(1,"Error (pciefd): CAN FD prescaler residual. The parameters bitrate:%lu tseg1:%u tseg2:%u give this bitrate:%lu\n",
                  freq,tseg1,tseg2, recalc_freq);
       return VCAN_STAT_BAD_PARAMETER;
     }
 
     if (brp > CANFD_MAX_PRESCALER_VALUE) {
-      DEBUGPRINT(2,"[%s, %d] Error: prescaler (%lu) out of limits (>%u)\n", __FILE__, __LINE__, brp,
+      DEBUGPRINT(1,"[%s, %d] Error (pciefd): prescaler (%lu) out of limits (>%u)\n", __FILE__, __LINE__, brp,
                  CANFD_MAX_PRESCALER_VALUE);
       return VCAN_STAT_BAD_PARAMETER;
     }
@@ -1437,7 +1483,7 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
         sjw   < 1 || sjw   >   16 || // 4-bits  1 + 0..15
         tseg1 < 1 || tseg1 >  512 || // 9-bits  1 + 0..511
         tseg2 < 1 || tseg2 >   32) { // 5-bits  1 + 0..31
-      DEBUGPRINT(2,"Error: Other checks can fd data phase brp:%lu sjw:%u tseg1:%u tseg2:%u\n",brp,sjw,tseg1,tseg2);
+      DEBUGPRINT(1,"Error (pciefd): Other checks can fd data phase brp:%lu sjw:%u tseg1:%u tseg2:%u\n",brp,sjw,tseg1,tseg2);
       return VCAN_STAT_BAD_PARAMETER;
     }
 
@@ -1452,7 +1498,7 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
   wait_for_completion(&hChd->busOnCompletion);
 
   if( vChd->isOnBus ) {
-    DEBUGPRINT(4, "Error: Trying to set bus parameter when on bus CH:%u\n",vChd->channel);
+    DEBUGPRINT(2, "Error (pciefd): Trying to set bus parameter when on bus CH:%u\n",vChd->channel);
 
     complete(&hChd->busOnCompletion);
 
@@ -1583,20 +1629,6 @@ static int pciCanSetTranceiverMode (VCanChanData *vChd, int linemode, int resnet
 
 
 //======================================================================
-//  Timeout handler for the waitResponse below
-//======================================================================
-static void responseTimeout (unsigned long voidWaitNode)
-{
-  WaitNode *waitNode = (WaitNode *)voidWaitNode;
-
-  waitNode->timedOut = 1;
-  complete(&waitNode->waitCompletion);
-
-  return;
-}
-
-
-//======================================================================
 // Query chip status (internal)
 // Should not be called with channel locked
 //======================================================================
@@ -1607,7 +1639,8 @@ static int pciCanRequestChipState (VCanChanData *vChd)
   PciCanCardData *hCard = vCard->hwCardData;
   WaitNode waitNode;
   unsigned long irqFlags = 0;
-  struct timer_list waitTimer;
+  int timeout;
+
   int current_id = atomic_inc_return(&hCard->status_seq_no);
   int active_id;
 
@@ -1661,23 +1694,16 @@ static int pciCanRequestChipState (VCanChanData *vChd)
   list_add(&waitNode.list, &hCard->replyWaitList);
   write_unlock_irqrestore(&hCard->replyWaitListLock, irqFlags);
 
-  init_timer(&waitTimer);
-  waitTimer.function = responseTimeout;
-  waitTimer.data = (unsigned long)&waitNode;
-  waitTimer.expires = jiffies + msecs_to_jiffies(PCIEFD_SRQ_RESP_WAIT_TIME);
-  add_timer(&waitTimer);
-
   DEBUGPRINT(6,"Waiting for stat ch:%u\n",waitNode.cmdNr);
 
-  wait_for_completion(&waitNode.waitCompletion);
+  timeout = wait_for_completion_timeout(&waitNode.waitCompletion, msecs_to_jiffies(PCIEFD_SRQ_RESP_WAIT_TIME));
 
   // Now we either got a response or a timeout
   write_lock_irqsave(&hCard->replyWaitListLock, irqFlags);
   list_del(&waitNode.list);
   write_unlock_irqrestore(&hCard->replyWaitListLock, irqFlags);
-  del_timer_sync(&waitTimer);
 
-  if (waitNode.timedOut) {
+  if (timeout == 0) {
     DEBUGPRINT(1, "pciefdWaitResponse: return VCAN_STAT_TIMEOUT ch:%u id:%u\n",waitNode.cmdNr,current_id);
     return VCAN_STAT_TIMEOUT;
   } else {
@@ -1710,11 +1736,15 @@ static int waitForIdleMode(int loopmax, VCanChanData *vChd)
     spin_unlock_irq(&hChd->lock);
 
     set_current_state(TASK_UNINTERRUPTIBLE);
-    schedule_timeout(msecs_to_jiffies(10)); // Wait 1 ms
+    schedule_timeout(msecs_to_jiffies(10)); // Wait 10 ms
 
     spin_lock_irq(&hChd->lock);
 
-    --loopcount;
+    if (vChd->vCard->cardPresent) {
+      --loopcount;
+    } else {
+      loopcount = 0;
+    }
   }
 
   if ( loopcount == 0 ) {
@@ -1759,7 +1789,11 @@ static int waitForAbort(int loopmax, VCanChanData *vChd)
                  vChd->channel);
     }
 
-    --loopcount;
+    if (vChd->vCard->cardPresent) {
+      --loopcount;
+    } else {
+      loopcount = 0;
+    }
   }
 
   if ( loopcount < loopmax - 10 ) {
@@ -1815,7 +1849,11 @@ static int waitForFlush(int loopmax, VCanChanData *vChd)
 
     spin_lock_irq(&hChd->lock);
 
-    --loopcount;
+    if (vChd->vCard->cardPresent) {
+      --loopcount;
+    } else {
+      loopcount = 0;
+    }
   }
 
   if ( loopcount == 0 ) {
@@ -1855,7 +1893,11 @@ static int waitForBusOn(int loopmax, VCanChanData *vChd)
     set_current_state(TASK_UNINTERRUPTIBLE);
     schedule_timeout(msecs_to_jiffies(1));
 
-    --loopcount;
+    if (vChd->vCard->cardPresent) {
+      --loopcount;
+    } else {
+      loopcount = 0;
+    }
   }
 
   if ( loopcount == 0 ) {
@@ -2134,9 +2176,15 @@ static void updateChipState(VCanChanData *vChd)
 //======================================================================
 //  Timeout handler for the waitResponse below
 //======================================================================
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0))
 static void errorRestart (unsigned long data)
 {
   PciCanChanData *hChd = (PciCanChanData *)data;
+#else
+static void errorRestart (struct timer_list *t)
+{
+  PciCanChanData *hChd = from_timer(hChd, t, errorDisableTimer);
+#endif /* KERNEL_VERSION < 4.15.0 */
   unsigned long irqFlags;
 
   spin_lock_irqsave(&hChd->lock, irqFlags);
@@ -2149,6 +2197,7 @@ static void errorRestart (unsigned long data)
 
   DEBUGPRINT(4,"Reenable error packets CH:%u\n", hChd->vChan->channel);
 }
+
 
 //======================================================================
 //
@@ -2198,11 +2247,6 @@ static void receivedPacketHandler (VCanCardData *vCard)
 
       if ( hCard->last_ts >= packet->timestamp )
         {
-          uint64_t diff;
-
-          diff = (hCard->last_ts - packet->timestamp) * 1000000000ULL;
-          do_div(diff, hCard->frequency);
-
           DEBUGPRINT(5,"ts wrong order, last:%llu packet:%llu\n", hCard->last_ts, packet->timestamp);
 
           hChd->debug.ts_wrong_order_cnt++;
@@ -2210,11 +2254,6 @@ static void receivedPacketHandler (VCanCardData *vCard)
 
       if ( hChd->last_ts >= packet->timestamp )
         {
-          uint64_t diff;
-
-          diff = (hChd->last_ts - packet->timestamp) * 1000000000ULL;
-          do_div(diff, hCard->frequency);
-
           DEBUGPRINT(1,"ts wrong order, last:%llu packet:%llu\n", hChd->last_ts, packet->timestamp);
 
           hChd->debug.ts_wrong_order_cnt++;
@@ -2315,9 +2354,13 @@ static void receivedPacketHandler (VCanCardData *vCard)
         DEBUGPRINT(4,"Disable error packets CH:%u\n", chid);
 
         // Set a timer to restart interrupts
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0))
         init_timer(&hChd->errorDisableTimer);
         hChd->errorDisableTimer.function = errorRestart;
         hChd->errorDisableTimer.data = (unsigned long)hChd;
+#else
+        timer_setup(&hChd->errorDisableTimer, errorRestart, 0);
+#endif /* KERNEL_VERSION < 4.15.0 */
         hChd->errorDisableTimer.expires = jiffies + msecs_to_jiffies(ERROR_DISABLE_TIME_MS);
         add_timer(&hChd->errorDisableTimer);
       }
@@ -2565,9 +2608,16 @@ static void receivedPacketHandler (VCanCardData *vCard)
 //======================================================================
 //  Timeout handler for the waitResponse below
 //======================================================================
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0))
 static void interruptRestart (unsigned long data)
 {
-  VCanCardData *vCard = (VCanCardData *)data;
+  VCanCardTimerData *ir = (VCanCardTimerData *) data;
+#else
+static void interruptRestart (struct timer_list *t)
+{
+  VCanCardTimerData *ir = from_timer(ir, t, timer);
+#endif /* KERNEL_VERSION < 4.15.0 */
+  VCanCardData *vCard = ir->vCard;
   int i;
   for(i=0;i<(unsigned)vCard->nrChannels;i++)
     {
@@ -2584,6 +2634,7 @@ static void interruptRestart (unsigned long data)
   pciCanInterrupts(vCard,1);
 }
 
+
 //======================================================================
 //  Interrupt handling functions
 //  Must be called with channel locked (to avoid access interference).
@@ -2593,6 +2644,7 @@ static void interruptRestart (unsigned long data)
 static void pciCanReceiveIsr (VCanCardData *vCard)
 {
   PciCanCardData *hCard = vCard->hwCardData;
+  VCanCardTimerData timerData;
   // Limit absolute number of loops
   unsigned int loopMax  = 10000;
   unsigned long irqFlags;
@@ -2625,11 +2677,16 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
         pciCanInterrupts(vCard,0);
 
         // Set a timer to restart interrupts
-        init_timer(&hCard->interruptDisableTimer);
-        hCard->interruptDisableTimer.function = interruptRestart;
-        hCard->interruptDisableTimer.data = (unsigned long)vCard;
-        hCard->interruptDisableTimer.expires = jiffies + msecs_to_jiffies(100);
-        add_timer(&hCard->interruptDisableTimer);
+        timerData.vCard = vCard;
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 15, 0))
+        init_timer(&timerData.timer);
+        timerData.timer.function = interruptRestart;
+        timerData.timer.data = (unsigned long)&timerData;
+#else
+        timer_setup(&timerData.timer, interruptRestart, 0);
+#endif /* KERNEL_VERSION < 4.15.0 */
+        timerData.timer.expires = jiffies + msecs_to_jiffies(100);
+        add_timer(&timerData.timer);
 
         break;//return;
       }
@@ -3065,7 +3122,7 @@ static int pciCanFlushSendBuffer (VCanChanData *vChd)
   PciCanChanData *hChd  = vChd->hwChanData;
   unsigned long   irqFlags;
   unsigned int tmp;
-  int loopmax = 100;
+  int loopcount = 100;
 
   wait_for_completion(&hChd->busOnCompletion);
 
@@ -3083,7 +3140,7 @@ static int pciCanFlushSendBuffer (VCanChanData *vChd)
 
   spin_unlock_irqrestore(&hChd->lock, irqFlags);
 
-  while (loopmax)
+  while (loopcount)
     {
       if(istatCheck(hChd->canControllerBase, PCIEFD_IRQ_TFD_MSK))
         {
@@ -3101,10 +3158,14 @@ static int pciCanFlushSendBuffer (VCanChanData *vChd)
           DEBUGPRINT(3,"Warning: Abort req is asserted CH:%u\n",vChd->channel);
         }
 
-      --loopmax;
+      if (vChd->vCard->cardPresent) {
+        --loopcount;
+      } else {
+        return VCAN_STAT_OK;
+      }
     }
 
-  if(!loopmax)
+  if(!loopcount)
     {
       DEBUGPRINT(1,"Tx Flush Still Busy? Loopmax reached CH:%u\n",vChd->channel);
     }
@@ -3127,8 +3188,8 @@ static int pciCanFlushSendBuffer (VCanChanData *vChd)
       DEBUGPRINT(1,"Flush: Tx_Flush_Req CH:%u\n",vChd->channel);
     }
 
-  loopmax = 10;
-  while(loopmax)
+  loopcount = 10;
+  while(loopcount)
     {
       uint32_t level;
 
@@ -3141,10 +3202,14 @@ static int pciCanFlushSendBuffer (VCanChanData *vChd)
       set_current_state(TASK_UNINTERRUPTIBLE);
       schedule_timeout(msecs_to_jiffies(1)); // Wait 1 ms
 
-      --loopmax;
+      if (vChd->vCard->cardPresent) {
+        --loopcount;
+      } else {
+        return VCAN_STAT_OK;
+      }
     }
 
-  if(loopmax == 0)
+  if(loopcount == 0)
     {
       DEBUGPRINT(1,"Warning: Transmit buffer is not empty. Probably a failed flush operation [FLUSH]\n");
     }
@@ -3719,11 +3784,37 @@ static void pciCanRemoveOne (struct pci_dev *dev)
 
   DEBUGPRINT(3, "pciCanRemoveOne (2/8)\n");
 
-  for (chNr = 0; chNr < vCard->nrChannels; chNr++) {
-    VCanChanData *vChan = vCard->chanData[chNr];
-    PciCanChanData *hChd = vChan->hwChanData;
+  vCard->cardPresent = 0;
 
-    DEBUGPRINT(3, "Waiting for all closed on minor %d\n", vChan->minorNr);
+  DEBUGPRINT(3, "pciefd: Stopping all \"waitQueue's\"\n");
+
+  for (chNr = 0; chNr < vCard->nrChannels; chNr++) {
+    vCanCardRemoved(vCard->chanData[chNr]);
+  }
+
+  DEBUGPRINT(3, "pciefd: Stopping all \"WaitNode's\"\n");
+
+  {
+    struct list_head *currHead;
+    struct list_head *tmpHead;
+    WaitNode         *currNode;
+    unsigned long    irqFlags;
+
+    write_lock_irqsave(&hCard->replyWaitListLock, irqFlags);
+    list_for_each_safe(currHead, tmpHead, &hCard->replyWaitList)
+    {
+      currNode = list_entry(currHead, WaitNode, list);
+      currNode->timedOut = 1;
+      complete(&currNode->waitCompletion);
+    }
+    write_unlock_irqrestore(&hCard->replyWaitListLock, irqFlags);
+  }
+
+  for (chNr = 0; chNr < vCard->nrChannels; chNr++) {
+    VCanChanData   *vChan = vCard->chanData[chNr];
+    PciCanChanData *hChd  = vChan->hwChanData;
+
+    DEBUGPRINT(3, "pciefd: Waiting for all closed on minor %d\n", vChan->minorNr);
     while (atomic_read(&vChan->fileOpenCount) > 0) {
       set_current_state(TASK_UNINTERRUPTIBLE);
       schedule_timeout(msecs_to_jiffies(10));
@@ -3819,7 +3910,7 @@ static int pciCanGetCustChannelName(const VCanChanData * const vChd,
   const unsigned int channel = vChd->channel;
   unsigned int nbr_of_bytes_to_copy;
 
-  DEBUGPRINT(1, "[%s,%d]\n", __FUNCTION__, __LINE__);
+  DEBUGPRINT(2, "[%s,%d]\n", __FUNCTION__, __LINE__);
 
   nbr_of_bytes_to_copy = PARAMETER_MAX_SIZE;
   if (data_size < nbr_of_bytes_to_copy) {

@@ -8,11 +8,11 @@ var searchData=
   ['baud_5f50k',['BAUD_50K',['../canlib_8h.html#a00d3a118d0760f0cdbc6a7298beb4f3a',1,'canlib.h']]],
   ['baud_5f62k',['BAUD_62K',['../canlib_8h.html#a125320cac09469f1a1ac719a0d0092cf',1,'canlib.h']]],
   ['baud_5f83k',['BAUD_83K',['../canlib_8h.html#a9df1779b295a72d5b4cc3a100c191dbf',1,'canlib.h']]],
-  ['bitrate',['bitrate',['../struct_lin_message_info.html#ae1500e00270cc662f39a27c2f2d23962',1,'LinMessageInfo::bitrate()'],['../struct_j1587_message_info.html#a34ee9ae488c5e76706950ff6b8ae6c2d',1,'J1587MessageInfo::bitrate()']]],
+  ['bitrate',['bitrate',['../struct_lin_message_info.html#ae1500e00270cc662f39a27c2f2d23962',1,'LinMessageInfo']]],
+  ['bool',['BOOL',['../linlib_8h.html#ac3247c51e4e3de674affb32998e133e2',1,'linlib.h']]],
+  ['buserr',['busErr',['../structcan_notify_data.html#a0f3f821312e2c5e8b29394753ef40f94',1,'canNotifyData']]],
   ['busload',['busLoad',['../structcan_bus_statistics__s.html#a10d3e5def5be80618a372a441eaadc2f',1,'canBusStatistics_s']]],
-  ['bytetime',['byteTime',['../struct_lin_message_info.html#a49b9c16add79f98b4f26894ae8f44356',1,'LinMessageInfo']]],
-  ['bit_20rate_20examples',['Bit Rate Examples',['../page_code_snippets_bit_rate.html',1,'page_code_snippets']]],
-  ['bit_20rate_20and_20other_20bus_20parameters',['Bit Rate and Other Bus Parameters',['../page_user_guide_init_bit_rate.html',1,'page_user_guide_init']]],
-  ['bit_20rate_20constants',['Bit Rate Constants',['../page_user_guide_misc_bitrate.html',1,'page_user_guide_misc']]],
-  ['bus_20on_20_2f_20bus_20off',['Bus On / Bus Off',['../page_user_guide_send_recv_bus_on_off.html',1,'page_user_guide_send_recv']]]
+  ['busstatus',['busStatus',['../structcan_notify_data.html#a43a5205812ec3002d08fca45821efc3f',1,'canNotifyData']]],
+  ['byte',['BYTE',['../linlib_8h.html#a4ae1dab0fb4b072a66584546209e7d58',1,'linlib.h']]],
+  ['bytetime',['byteTime',['../struct_lin_message_info.html#a49b9c16add79f98b4f26894ae8f44356',1,'LinMessageInfo']]]
 ];

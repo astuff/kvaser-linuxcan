@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-#              Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
+#             Copyright 2017 by Kvaser AB, Molndal, Sweden
 #                         http://www.kvaser.com
 #
 #  This software is dual licensed under the following two licenses:
@@ -9,7 +9,7 @@
 #  COPYING file for details.
 #
 #  License: BSD-new
-#  ===============================================================================
+#  ==============================================================================
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are met:
 #      * Redistributions of source code must retain the above copyright
@@ -21,24 +21,25 @@
 #        names of its contributors may be used to endorse or promote products
 #        derived from this software without specific prior written permission.
 #
-#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-#  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-#  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-#  DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-#  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-#  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-#  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-#  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+#  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+#  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+#  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+#  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+#  BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+#  IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+#  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#  POSSIBILITY OF SUCH DAMAGE.
 #
 #
 #  License: GPLv2
-#  ===============================================================================
-#  This program is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU General Public License
-#  as published by the Free Software Foundation; either version 2
-#  of the License, or (at your option) any later version.
+#  ==============================================================================
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
 #
 #  This program is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -47,13 +48,29 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 #
-#  ---------------------------------------------------------------------------
+#
+#  IMPORTANT NOTICE:
+#  ==============================================================================
+#  This source code is made available for free, as an open license, by Kvaser AB,
+#  for use with its applications. Kvaser AB does not accept any liability
+#  whatsoever for any third party patent or other immaterial property rights
+#  violations that may result from any usage of this source code, regardless of
+#  the combination of source code and various applications that it can be used
+#  in, or with.
+#
+#  -----------------------------------------------------------------------------
 #
 
 # Kvaser CAN driver
-# pcican.sh - start/stop pcican and create/delete inodes
+# pcican.sh - start/stop pcican and create/delete device files
+
+DEV=pcican
+MODULE=kv$DEV
+
+
+LOG=`PATH=$PATH which logger`
 
 #
 # test kernel version
@@ -68,31 +85,40 @@ else
 fi
 
 #
-# install
+# Install
 #
+
+# Add or remove pcican module
 case "$1" in
    start)
-      MODULE_INSTALL_OUT=$(/sbin/$kv_module_install kvpcican 2>&1)
+      MODULE_INSTALL_OUT=$(/sbin/$kv_module_install $MODULE 2>&1)
       MODULE_INSTALL_RES=$?
       if [ $MODULE_INSTALL_RES -ne 0 ] ; then
         $LOG -t $0 $MODULE_INSTALL_OUT
+        echo $MODULE_INSTALL_OUT
         exit 1
       fi
-      nrchan=`cat /proc/pcican | grep 'total channels' | cut -d \  -f 3`
-      major=`cat /proc/devices | grep 'pcican' |grep 'pcicanII' -v| cut -d \  -f 1`
-      nodes=`ls /dev/ -1|grep pcican|grep -v pcicanII|sed "s|^|/dev/|"`
-      rm -f $nodes
+      $LOG -t $0 "Module $MODULE added"
+      nrchan=`cat /proc/$DEV | grep 'total channels' | cut -d \  -f 3`
+      major=`cat /proc/devices | grep "$DEV$" | cut -d \  -f 1`
+      rm -f /dev/$DEV[0-9]*
       for minor in $(seq 0 `expr $nrchan - 1`) ; do
-         mknod /dev/pcican$minor c $major $minor
+         $LOG -t $0 "Created /dev/$DEV$minor"
+         mknod /dev/$DEV$minor c $major $minor
       done
       ;;
    stop)
-      /sbin/rmmod kvpcican || exit 1
-      nodes=`ls /dev/ -1|grep pcican|grep -v pcicanII|sed "s|^|/dev/|"`
-      rm -f $nodes
+      /sbin/rmmod $MODULE || exit 1
+      rm -f /dev/$DEV[0-9]*
+      $LOG -t $0 "Module $MODULE removed"
+      ;;
+   restart)
+      $LOG -t $0 "Module $MODULE restart"
+      $0 stop
+      $0 start
       ;;
    *)
-      printf "Usage: %s {start|stop}\n" $0
+      printf "Usage: %s {start|stop|restart}\n" $0
 esac
 
 exit 0

@@ -1,13 +1,13 @@
 /*
-**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
-**                        http://www.kvaser.com
+**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
 ** BSD-new and GPLv2. You may use either one. See the included
 ** COPYING file for details.
 **
 ** License: BSD-new
-** ===============================================================================
+** ==============================================================================
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
 **     * Redistributions of source code must retain the above copyright
@@ -19,24 +19,25 @@
 **       names of its contributors may be used to endorse or promote products
 **       derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+** IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
 **
 **
 ** License: GPLv2
-** ===============================================================================
-** This program is free software; you can redistribute it and/or
-** modify it under the terms of the GNU General Public License
-** as published by the Free Software Foundation; either version 2
-** of the License, or (at your option) any later version.
+** ==============================================================================
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,10 +46,20 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 **
-** ---------------------------------------------------------------------------
-**/
+**
+** IMPORTANT NOTICE:
+** ==============================================================================
+** This source code is made available for free, as an open license, by Kvaser AB,
+** for use with its applications. Kvaser AB does not accept any liability
+** whatsoever for any third party patent or other immaterial property rights
+** violations that may result from any usage of this source code, regardless of
+** the combination of source code and various applications that it can be used
+** in, or with.
+**
+** -----------------------------------------------------------------------------
+*/
 
 /*
  * Kvaser Linux Canlib
@@ -59,10 +70,16 @@
 #include <stdio.h>
 #include <string.h>
 
- /*
- Lists available CAN channels
- */
 
+static void check(char* id, canStatus stat)
+{
+  if (stat != canOK) {
+    char buf[50];
+    buf[0] = '\0';
+    canGetErrorText(stat, buf, sizeof(buf));
+    printf("%s: failed, stat=%d (%s)\n", id, (int)stat, buf);
+  }
+}
 
 int main(int argc, char* argv[])
 {
@@ -77,6 +94,8 @@ int main(int argc, char* argv[])
   (void)argc; // Unused.
   (void)argv; // Unused.
 
+  canInitializeLibrary();
+
   canlibVersion = canGetVersion();
   printf("Canlib version %d.%d\n",
          (canlibVersion >> 8),
@@ -90,7 +109,7 @@ int main(int argc, char* argv[])
 
   stat = canGetNumberOfChannels(&chanCount);
   if (stat != canOK) {
-    printf("Error in canGetNumberOfChannels\n");
+    check("canGetNumberOfChannels", stat);
     exit(1);
   }
   printf("Found %d channel(s).\n", chanCount);
@@ -100,7 +119,7 @@ int main(int argc, char* argv[])
     stat = canGetChannelData(i, canCHANNELDATA_DEVDESCR_ASCII,
                              &name, sizeof(name));
     if (stat != canOK) {
-      printf("Error in canGetChannelData - DEVDESCR_ASCII\n");
+      check("canGetChannelData: DEVDESCR_ASCII", stat);
       exit(1);
     }
 
@@ -108,7 +127,7 @@ int main(int argc, char* argv[])
       stat = canGetChannelData(i, canCHANNELDATA_CHANNEL_NAME,
                                &name, sizeof(name));
       if (stat != canOK) {
-        printf("Error in canGetChannelData - CHANNEL_NAME\n");
+        check("canGetChannelData: CHANNEL_NAME", stat);
         exit(1);
       }
     }
@@ -116,21 +135,21 @@ int main(int argc, char* argv[])
     stat = canGetChannelData(i, canCHANNELDATA_CARD_UPC_NO,
                              &ean, sizeof(ean));
     if (stat != canOK) {
-      printf("Error in canGetChannelData - CARD_UPC_NO\n");
+      check("canGetChannelData: CARD_UPC_NO", stat);
       exit(1);
     }
 
     stat = canGetChannelData(i, canCHANNELDATA_CARD_SERIAL_NO,
                              &serial, sizeof(serial));
     if (stat != canOK) {
-      printf("Error in canGetChannelData - CARD_SERIAL_NO\n");
+      check("canGetChannelData: CARD_SERIAL_NO", stat);
       exit(1);
     }
 
     stat = canGetChannelData(i, canCHANNELDATA_CARD_FIRMWARE_REV,
                              &fw, sizeof(fw));
     if (stat != canOK) {
-      printf("Error in canGetChannelData - CARD_FIRMWARE_REV\n");
+      check("canGetChannelData: CARD_FIRMWARE_REV", stat);
       exit(1);
     }
 
@@ -144,6 +163,12 @@ int main(int argc, char* argv[])
            serial[0],
            fw[1] >> 16, fw[1] & 0xffff, fw[0] >> 16, fw[0] & 0xffff,
            custChanName);
+  }
+
+  stat = canUnloadLibrary();
+  if (stat != canOK) {
+    check("canUnloadLibrary", stat);
+    exit(1);
   }
 
   return 0;

@@ -1,7 +1,15 @@
 var searchData=
 [
-  ['reading_20messages',['Reading Messages',['../page_user_guide_send_recv_reading.html',1,'page_user_guide_send_recv']]],
-  ['reserved',['reserved',['../struct_j1587_message_info.html#a3415ebf9c5050a50fa3ae127df65e763',1,'J1587MessageInfo']]],
-  ['retries',['retries',['../struct_j1587_message_info.html#a89d4147f125445dabe7483285cf75e2d',1,'J1587MessageInfo']]],
-  ['rxbufsize',['rxBufSize',['../structtag_can_s_w_descr.html#a22031cf318e44e0c0d51be474623e6f5',1,'tagCanSWDescr']]]
+  ['status_20codes',['Status Codes',['../group__can__status__codes.html',1,'']]],
+  ['signals',['Signals',['../group__kvadb__signals.html',1,'']]],
+  ['system_20information',['System Information',['../group__kvm__system__information.html',1,'']]],
+  ['status_20codes',['Status Codes',['../group__lin__status__codes.html',1,'']]],
+  ['sending_20and_20receiving',['Sending and Receiving',['../page_user_guide_send_recv.html',1,'page_user_guide']]],
+  ['serialnumber',['serialNumber',['../structkvm_log_version_ex.html#a1f36efa76fac084b62745c8e8ed0a751',1,'kvmLogVersionEx']]],
+  ['start_5fpos',['start_pos',['../structtag__token.html#a9715e2df77829e54cb078a298fd6c434',1,'tag_token']]],
+  ['status',['status',['../structcan_notify_data.html#a345c20017f48fbb3fb2b3adada292f29',1,'canNotifyData']]],
+  ['stddata',['stdData',['../structcan_bus_statistics__s.html#a45656d1d249afb1ef001b9d56337b26b',1,'canBusStatistics_s']]],
+  ['stdremote',['stdRemote',['../structcan_bus_statistics__s.html#adbc105164238a47be6d13a16cfdf07d8',1,'canBusStatistics_s']]],
+  ['synchbreaklength',['synchBreakLength',['../struct_lin_message_info.html#a137ad7080687a2011666ac9eafe0832f',1,'LinMessageInfo']]],
+  ['synchedgetime',['synchEdgeTime',['../struct_lin_message_info.html#a2eb7b88360a5994c5a4f49f02138c0f0',1,'LinMessageInfo']]]
 ];

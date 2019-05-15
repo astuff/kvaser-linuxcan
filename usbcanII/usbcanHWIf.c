@@ -1,13 +1,13 @@
 /*
-**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
-**                        http://www.kvaser.com
+**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
 ** BSD-new and GPLv2. You may use either one. See the included
 ** COPYING file for details.
 **
 ** License: BSD-new
-** ===============================================================================
+** ==============================================================================
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
 **     * Redistributions of source code must retain the above copyright
@@ -19,24 +19,25 @@
 **       names of its contributors may be used to endorse or promote products
 **       derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+** IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
 **
 **
 ** License: GPLv2
-** ===============================================================================
-** This program is free software; you can redistribute it and/or
-** modify it under the terms of the GNU General Public License
-** as published by the Free Software Foundation; either version 2
-** of the License, or (at your option) any later version.
+** ==============================================================================
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,14 +46,22 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 **
-** ---------------------------------------------------------------------------
-**/
+**
+** IMPORTANT NOTICE:
+** ==============================================================================
+** This source code is made available for free, as an open license, by Kvaser AB,
+** for use with its applications. Kvaser AB does not accept any liability
+** whatsoever for any third party patent or other immaterial property rights
+** violations that may result from any usage of this source code, regardless of
+** the combination of source code and various applications that it can be used
+** in, or with.
+**
+** -----------------------------------------------------------------------------
+*/
 
-//
 // Linux USBcanII driver
-//
 
 #include <linux/version.h>
 #include <linux/usb.h>
@@ -61,6 +70,11 @@
 #include <linux/module.h>
 #include <linux/slab.h>
 #include <linux/kthread.h>
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 11, 0))
+#include <linux/sched.h>
+#else
+#include <linux/sched/signal.h>
+#endif /* KERNEL_VERSION < 4.11.0 */
 
 // Non system headers
 #include "VCanOsIf.h"
@@ -168,6 +182,8 @@ static VCanHWInterface hwIf = {
   .objbufSetFilter   = usbcan_objbuf_set_filter,
   .objbufSetFlags    = usbcan_objbuf_set_flags,
   .objbufSetPeriod   = usbcan_objbuf_set_period,
+  .getCardInfo       = vCanGetCardInfo,
+  .getCardInfo2      = vCanGetCardInfo2,
 };
 
 
@@ -340,10 +356,10 @@ static int usbcan_rx_thread (void *context)
 
   usbErrorCounter = 0;
 
-  while (dev->present) {
+  while (vCard->cardPresent) {
 
     // Verify that the device wasn't unplugged
-    if (!dev->present){
+    if (!vCard->cardPresent){
       DEBUGPRINT(3, (TXT("rx thread Ended - device removed\n")));
       result = -ENODEV;
       break;
@@ -367,7 +383,7 @@ static int usbcan_rx_thread (void *context)
         if (ret == -EILSEQ || ret == -ESHUTDOWN || ret == -EINVAL) {
           DEBUGPRINT(2, (TXT ("usb_bulk_msg error (%d) - Device probably ")
                          TXT2("removed, closing down\n"), ret));
-          dev->present = 0;
+          vCard->cardPresent = 0;
           result = -ENODEV;
           break;
         }
@@ -381,7 +397,7 @@ static int usbcan_rx_thread (void *context)
           DEBUGPRINT(2, (TXT("rx thread Ended - error (%d)\n"), ret));
 
           // Since this has failed so many times, stop transfers to device
-          dev->present = 0;
+          vCard->cardPresent = 0;
           result = -ENODEV;
           break;
         }
@@ -423,7 +439,7 @@ static int usbcan_rx_thread (void *context)
         usbErrorCounter = 0;
       }
     }
-  } // while (dev->present)
+  } // while (vCard->cardPresent)
 
 
 
@@ -993,7 +1009,7 @@ static void usbcan_send (struct work_struct *work)
   VCanChanData     *vChan     = NULL;
   int              tx_needed  = 0;
 
-  if (!dev->present) {
+  if (!vCard->cardPresent) {
     // The device was unplugged before the file was released
     // We cannot deallocate here, it is too early and handled elsewhere
     return;
@@ -1001,7 +1017,7 @@ static void usbcan_send (struct work_struct *work)
 
   wait_for_completion(&dev->write_finished);
 
-  if (!dev->present) {
+  if (!vCard->cardPresent) {
     // The device was unplugged before the file was released
     // We cannot deallocate here it is to early and handled elsewhere
     complete(&dev->write_finished);
@@ -1146,7 +1162,6 @@ static int usbcan_fill_usb_buffer (VCanCardData *vCard, unsigned char *buffer,
   int             cmd_bwp = 0;
   int             msg_bwp = 0;
   unsigned int    j;
-  int             more_messages_to_send;
   heliosCmd       command;
   UsbcanCardData  *dev = (UsbcanCardData *)vCard->hwCardData;
   VCanChanData    *vChan;
@@ -1210,19 +1225,11 @@ static int usbcan_fill_usb_buffer (VCanCardData *vCard, unsigned char *buffer,
       continue;
     }
 
-    more_messages_to_send = 1;
-
-    while (more_messages_to_send) {
-      more_messages_to_send = !queue_empty(&vChan->txChanQueue);
-
+    while (!queue_empty(&vChan->txChanQueue)) {
       // Make sure we don't write more messages than
       // we are allowed to the usbcan
       if (!usbcan_tx_available(vChan)) {
-        DEBUGPRINT(3, (TXT("Too many outstanding packets\n")));
-        return msg_bwp;
-      }
-
-      if (more_messages_to_send == 0) {
+        DEBUGPRINT(3, (TXT("channel %u: Too many outstanding packets\n"), j));
         break;
       }
 
@@ -1280,7 +1287,7 @@ static int usbcan_fill_usb_buffer (VCanCardData *vCard, unsigned char *buffer,
                      j, usbChan->outstanding_tx));
 
       queue_pop(&vChan->txChanQueue);
-    } // while (more_messages_to_send)
+    } // !queue_empty(&vChan->txChanQueue)
   }
 
   return msg_bwp;
@@ -1308,7 +1315,7 @@ static int usbcan_transmit (VCanCardData *vCard /*, void *cmd*/)
 
   dev->write_urb->transfer_buffer_length = fill;
 
-  if (!dev->present) {
+  if (!vCard->cardPresent) {
     // The device was unplugged before the file was released
     // we cannot deallocate here it shouldn't be done from here
     return VCAN_STAT_NO_DEVICE;
@@ -1413,19 +1420,6 @@ static void usbcan_get_card_info (VCanCardData* vCard)
 } // _get_card_info
 
 
-
-//============================================================================
-//  response_timeout
-//  Used in usbcan_send_and_wait_reply
-static void usbcan_response_timer (unsigned long voidWaitNode)
-{
-  WaitNode *waitNode = (WaitNode *)voidWaitNode;
-  waitNode->timedOut = 1;
-  complete(&waitNode->waitCompletion);
-} // response_timeout
-
-
-
 //============================================================================
 //  usbcan_send_and_wait_reply
 //  Send a heliosCmd and wait for the usbcan to answer.
@@ -1435,8 +1429,8 @@ static int usbcan_send_and_wait_reply (VCanCardData *vCard, heliosCmd *cmd,
                                        unsigned char cmdNr, unsigned char transId)
 {
   UsbcanCardData     *dev = vCard->hwCardData;
-  struct timer_list  waitTimer;
   WaitNode           waitNode;
+  int                timeout;
   int                ret;
   unsigned long      irqFlags;
 
@@ -1446,7 +1440,7 @@ static int usbcan_send_and_wait_reply (VCanCardData *vCard, heliosCmd *cmd,
   }
 
   // See if dev is present
-  if (!dev->present) {
+  if (!vCard->cardPresent) {
     return VCAN_STAT_NO_DEVICE;
   }
 
@@ -1470,22 +1464,13 @@ static int usbcan_send_and_wait_reply (VCanCardData *vCard, heliosCmd *cmd,
     return ret;
   }
 
-  DEBUGPRINT(5, (TXT("b4 init timer\n")));
-  init_timer(&waitTimer);
-  waitTimer.function  = usbcan_response_timer;
-  waitTimer.data      = (unsigned long)&waitNode;
-  waitTimer.expires   = jiffies + msecs_to_jiffies(USBCAN_CMD_RESP_WAIT_TIME);
-  add_timer(&waitTimer);
-
-  wait_for_completion(&waitNode.waitCompletion);
+  timeout = wait_for_completion_timeout(&waitNode.waitCompletion,  msecs_to_jiffies(USBCAN_CMD_RESP_WAIT_TIME));
   // Now we either got a response or a timeout
   spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
   list_del(&waitNode.list);
   spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
-  del_timer_sync(&waitTimer);
 
-  DEBUGPRINT(5, (TXT("after del timer\n")));
-  if (waitNode.timedOut) {
+  if (timeout == 0) {
     DEBUGPRINT(2, (TXT("WARNING: waiting for response(%d) timed out! \n"),
                    waitNode.cmdNr));
     return VCAN_STAT_TIMEOUT;
@@ -1508,7 +1493,7 @@ static int usbcan_queue_cmd (VCanCardData *vCard, heliosCmd *cmd,
   UsbcanCardData *dev  = (UsbcanCardData *)vCard->hwCardData;
   int queuePos;
   // Using an unrolled sleep
-  wait_queue_t wait;
+  wait_queue_entry_t wait;
   init_waitqueue_entry(&wait, current);
   queue_add_wait_for_space(&dev->txCmdQueue, &wait);
 
@@ -1539,6 +1524,13 @@ static int usbcan_queue_cmd (VCanCardData *vCard, heliosCmd *cmd,
         DEBUGPRINT(2, (TXT("ERROR 2 NO_RESOURCES\n")));
         return VCAN_STAT_NO_RESOURCES;
       }
+    }
+
+    // Are we interrupted by a signal?
+    if (signal_pending(current)) {
+      queue_remove_wait_for_space(&dev->txCmdQueue, &wait);
+      DEBUGPRINT(2, (TXT("ERROR 3 SIGNALED\n")));
+      return VCAN_STAT_SIGNALED;
     }
   }
 
@@ -1581,7 +1573,7 @@ static int usbcan_plugin (struct usb_interface *interface,
   // Maximum number of channels for this driver reached
   if (driverData.noOfDevices + MAX_CARD_CHANNELS > MAX_DRIVER_CHANNELS) {
     DEBUGPRINT(1, (TXT("usbcan: _plugin: Max number of devices reached (%d) for this driver (%s)\n"),
-		   driverData.noOfDevices, driverData.deviceName));
+                   driverData.noOfDevices, driverData.deviceName));
     return -ENODEV;
   }
 
@@ -1717,7 +1709,7 @@ static int usbcan_plugin (struct usb_interface *interface,
 
 
   // Allow device read, write and ioctl
-  dev->present = 1;
+  vCard->cardPresent = 1;
 
   // We can register the device now, as it is ready
   usb_set_intfdata(interface, vCard);
@@ -1986,7 +1978,31 @@ static void usbcan_remove (struct usb_interface *interface)
   // Prevent device read, write and ioctl
   // Needs to be done here, or some commands will seem to
   // work even though the device is no longer present.
-  dev->present = 0;
+  vCard->cardPresent = 0;
+
+  DEBUGPRINT(3, (TXT("usbcan: Stopping all \"waitQueue's\"\n")));
+
+  for (i = 0; i < MAX_CARD_CHANNELS; i++) {
+    vCanCardRemoved( vCard->chanData[i]);
+  }
+
+  DEBUGPRINT(3, (TXT("usbcan: Stopping all \"WaitNode's\"\n")));
+
+  {
+    struct list_head *currHead;
+    struct list_head *tmpHead;
+    WaitNode         *currNode;
+    unsigned long    irqFlags;
+
+    spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
+    list_for_each_safe(currHead, tmpHead, &dev->replyWaitList)
+    {
+      currNode = list_entry(currHead, WaitNode, list);
+      currNode->timedOut = 1;
+      complete(&currNode->waitCompletion);
+    }
+    spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
+  }
 
   for (i = 0; i < MAX_CARD_CHANNELS; i++) {
     vChan = vCard->chanData[i];
@@ -2309,7 +2325,7 @@ static void usbcan_schedule_send (VCanCardData *vCard, VCanChanData *vChan)
 
   DEBUGPRINT(3, (TXT("usbcan: _schedule_send\n")));
 
-  if (usbcan_tx_available(vChan) && dev->present) {
+  if (usbcan_tx_available(vChan) && vCard->cardPresent) {
     queue_work(dev->txTaskQ, &dev->txWork);
   }
 #if DEBUG
@@ -2422,7 +2438,7 @@ static int usbcan_proc_read (struct seq_file* m, void* v)
   seq_puts(m, "minor numbers");
   while (NULL != cardData) {
     for (channel = 0; channel < cardData->nrChannels; channel++) {
-    	seq_printf(m, " %d", cardData->chanData[channel]->minorNr);
+      seq_printf(m, " %d", cardData->chanData[channel]->minorNr);
     }
     cardData = cardData->next;
   }

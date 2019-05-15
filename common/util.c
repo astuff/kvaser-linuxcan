@@ -1,13 +1,13 @@
 /*
-**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
-**                        http://www.kvaser.com
+**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
 ** BSD-new and GPLv2. You may use either one. See the included
 ** COPYING file for details.
 **
 ** License: BSD-new
-** ===============================================================================
+** ==============================================================================
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
 **     * Redistributions of source code must retain the above copyright
@@ -19,24 +19,25 @@
 **       names of its contributors may be used to endorse or promote products
 **       derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+** IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
 **
 **
 ** License: GPLv2
-** ===============================================================================
-** This program is free software; you can redistribute it and/or
-** modify it under the terms of the GNU General Public License
-** as published by the Free Software Foundation; either version 2
-** of the License, or (at your option) any later version.
+** ==============================================================================
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,10 +46,20 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 **
-** ---------------------------------------------------------------------------
-**/
+**
+** IMPORTANT NOTICE:
+** ==============================================================================
+** This source code is made available for free, as an open license, by Kvaser AB,
+** for use with its applications. Kvaser AB does not accept any liability
+** whatsoever for any third party patent or other immaterial property rights
+** violations that may result from any usage of this source code, regardless of
+** the combination of source code and various applications that it can be used
+** in, or with.
+**
+** -----------------------------------------------------------------------------
+*/
 
 #include <linux/module.h>
 #include "asm/div64.h"
@@ -57,45 +68,9 @@
 
 
 /****************************************************************************/
-void packed_EAN_to_BCD(unsigned char *ean, unsigned char *bcd)
-{
-  long long ean64;
-  int i;
-
-  //
-  // "ean" points to a 40 bit number (LSB first) which is the EAN code.
-  // The ean code is followed by the check digit in a separate byte.
-  // This is the standard format for DRVcans and LAPcan.
-  //
-  // "bcd" points to a buffer which will contain the EAN number as
-  // a BCD string, LSB first. The buffer must be at least 8 bytes.
-  //
-  // E.g. 733-0130-00122-0 would be (hex)
-  // 20 12 00 30 01 33 07 00
-  //
-  ean64 = 0;
-  for (i = 0; i < 5; i++) {
-    ean64 <<= 8;
-    ean64 += ean[4 - i];
-  }
-  ean64 *= 10;
-  ean64 += ean[5];
-
-  // Store the EAN number as a BCD string.
-  for (i = 0; i < 8; i++) {
-    unsigned char c1, c2;
-    c1 = do_div(ean64, 10);
-    c2 = do_div(ean64, 10);
-    *bcd = c1 + (c2 << 4);
-    bcd++;
-  }
-}
-
-
-/****************************************************************************/
 void packed_EAN_to_BCD_with_csum(unsigned char *ean, unsigned char *bcd)
 {
-  long long ean64, tmp;
+  uint64_t ean64, tmp;
   int i;
   unsigned int csum;
 
@@ -121,9 +96,9 @@ void packed_EAN_to_BCD_with_csum(unsigned char *ean, unsigned char *bcd)
   csum = 0;
   for (i = 0; i < 12; i++) {
     unsigned int x;
-    
-    x = do_div(tmp, 10);
-    
+
+    tmp = div_u64_rem(tmp, 10, &x);
+
     if (i % 2 == 0) {
       csum += 3 * x;
     } else {
@@ -140,10 +115,10 @@ void packed_EAN_to_BCD_with_csum(unsigned char *ean, unsigned char *bcd)
 
   // Store the EAN number as a BCD string.
   for (i = 0; i < 8; i++) {
-    unsigned char c1, c2;
-    c1 = do_div(ean64, 10);
-    c2 = do_div(ean64, 10);
-    *bcd = c1 + (c2 << 4);
+    unsigned int c1, c2;
+    ean64 = div_u64_rem(ean64, 10, &c1);
+    ean64 = div_u64_rem(ean64, 10, &c2);
+    *bcd = (unsigned char)c1 + ((unsigned char)c2 << 4);
     bcd++;
   }
 }
@@ -203,7 +178,7 @@ unsigned int get_usb_root_hub_id (struct usb_device *udev)
   struct usb_device *tmp = udev;
   int done               = 0;
   unsigned int retval;
-  
+
   while (!done)
   {
     if (tmp->parent)

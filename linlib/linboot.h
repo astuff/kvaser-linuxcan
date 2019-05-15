@@ -1,6 +1,6 @@
 /**
- *                Copyright 2012 by Kvaser AB, Molndal, Sweden
- *                        http://www.kvaser.com
+ *             Copyright 2017 by Kvaser AB, Molndal, Sweden
+ *                         http://www.kvaser.com
  *
  * \section LICENSE
  * This software is dual licensed under the following two licenses:
@@ -8,7 +8,7 @@
  * COPYING file for details.
  *
  * License: BSD-new
- * ===============================================================================
+ * ==============================================================================
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -20,24 +20,25 @@
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *
  *
  * License: GPLv2
- * ===============================================================================
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * ==============================================================================
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -46,10 +47,20 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
- * ---------------------------------------------------------------------------
- */
+ *
+ * IMPORTANT NOTICE:
+ * ==============================================================================
+ * This source code is made available for free, as an open license, by Kvaser AB,
+ * for use with its applications. Kvaser AB does not accept any liability
+ * whatsoever for any third party patent or other immaterial property rights
+ * violations that may result from any usage of this source code, regardless of
+ * the combination of source code and various applications that it can be used
+ * in, or with.
+ *
+ * -----------------------------------------------------------------------------
+*/
 
 #ifndef __LINBOOT_H
 #define __LINBOOT_H
@@ -106,6 +117,7 @@
 #define CAN_ID_TIMING           0x7fc
 #define CAN_ID_TIMING0          0x7f8
 #define CAN_ID_TX_WAKEUP        0x7fb // Transmitted to a slave dongle, the slave will transmit a wake-up signal. Optionally two parameters, {count, interval}
+#define CAN_ID_TX_WAKEUP_HYBRID 0x7f3 // Transmitted to a slave dongle, the slave will transmit a wake-up signal. Optionally two parameters, {count, breaklength, interval0, interval1}
 #define CAN_ID_RX_WAKEUP        0x7f9 // Transmitted to Navigator in when receiving a wake up frame.
 #define CAN_ID_TXE_WAKEUP       0x7f4 // Transmitted to Navigator as an echo of a transmitted wake up frame.
 #define CAN_ID_SYNCHERROR       0x7fa // Messagecan contain one data byte with a LIN_SYNCHERROR_- error code.
@@ -171,6 +183,7 @@
 
 #define COMMAND_GET_INFO                0x60 /* {CMD, CCNT, INFO_TYPE, ...}  -->  {CMD, CCNT, flag, INFO_TYPE, d1, d2, d4...} */
 #define GET_INFO_TYPE_REFPOWER             1 /* {CMD, CCNT, GET_INFO_TYPE_REFPOWER, 0, 0, 0, 0, 0}  --> {CMD, CCNT, 0, GET_INFO_TYPE_REFPOWER, 0(power off)/1(powe on), 0, 0, 0} */
+#define COMMAND_SET_BREAK_LENGTH        0x61 /* {CMD, CCNT, 0, breakLength, 0, 0, 0, 0}  -->  {CMD, CCNT, 0, breakLength, 0, 0, 0, 0} */
 
 /* Programming of an 18f458 must be done 8 bytes at a time, and erase 64 bytes
 * at a time. Start by specifying an address (the three LSB of which must be
@@ -275,7 +288,7 @@ doesn't compile. */
   dw 0xf000 \
 #endasm \
 
-   
+
 
 #ifdef LIN_FIRMWARE
 unsigned char   bootloader_mode @ 0x20;

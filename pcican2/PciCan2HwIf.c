@@ -1,13 +1,13 @@
 /*
-**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
-**                        http://www.kvaser.com
+**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
 ** BSD-new and GPLv2. You may use either one. See the included
 ** COPYING file for details.
 **
 ** License: BSD-new
-** ===============================================================================
+** ==============================================================================
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
 **     * Redistributions of source code must retain the above copyright
@@ -19,24 +19,25 @@
 **       names of its contributors may be used to endorse or promote products
 **       derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+** IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
 **
 **
 ** License: GPLv2
-** ===============================================================================
-** This program is free software; you can redistribute it and/or
-** modify it under the terms of the GNU General Public License
-** as published by the Free Software Foundation; either version 2
-** of the License, or (at your option) any later version.
+** ==============================================================================
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,20 +46,28 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 **
-** ---------------------------------------------------------------------------
-**/
+**
+** IMPORTANT NOTICE:
+** ==============================================================================
+** This source code is made available for free, as an open license, by Kvaser AB,
+** for use with its applications. Kvaser AB does not accept any liability
+** whatsoever for any third party patent or other immaterial property rights
+** violations that may result from any usage of this source code, regardless of
+** the combination of source code and various applications that it can be used
+** in, or with.
+**
+** -----------------------------------------------------------------------------
+*/
 
 //--------------------------------------------------
 // NOTE! module_versioning HAVE to be included first
 #include "module_versioning.h"
 //--------------------------------------------------
 
-//
 // Kvaser CAN driver PCIcan hardware specific parts
 // PCIcan functions
-//
 
 #include <linux/version.h>
 #include <linux/pci.h>
@@ -80,9 +89,13 @@
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 4, 0)
 #   include <asm/system.h>
-#endif
+#endif /* KERNEL_VERSION < 3.4.0 */
 #include <asm/bitops.h>
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 12, 0))
 #include <asm/uaccess.h>
+#else
+#include <linux/uaccess.h>
+#endif /* KERNEL_VERSION < 4.12.0 */
 #include <asm/atomic.h>
 
 
@@ -193,6 +206,8 @@ static VCanHWInterface hwIf = {
     .objbufSetFilter   = pciCanObjbufSetFilter,
     .objbufSetFlags    = pciCanObjbufSetFlags,
     .objbufSetPeriod   = pciCanObjbufSetPeriod,
+    .getCardInfo       = vCanGetCardInfo,
+    .getCardInfo2      = vCanGetCardInfo2,
 };
 
 
@@ -256,9 +271,9 @@ static inline int getTransId (heliosCmd *cmd)
 //======================================================================
 static int pciCanProcRead (struct seq_file* m, void* v)
 {
-	seq_printf(m, "\ntotal channels %d\n", driverData.noOfDevices);
+    seq_printf(m, "\ntotal channels %d\n", driverData.noOfDevices);
 
-	return 0;
+    return 0;
 }
 
 //======================================================================
@@ -530,22 +545,33 @@ static void pciCanInterrupts (VCanCardData *vCard, int enable)
 //======================================================================
 static int pciCanTime (VCanCardData *vCard, uint64_t *time)
 {
-    PciCan2CardData *hCard = vCard->hwCardData;
     heliosCmd cmd;
     heliosCmd resp;
     int ret;
+    static unsigned char transid = 255;
+
+    if (transid < 255) {
+      transid++;
+    } else {
+      transid = 1;
+    }
 
     memset(&cmd, 0, sizeof(cmd));
     cmd.readClockReq.cmdNo      = CMD_READ_CLOCK_REQ;
     cmd.readClockReq.cmdLen     = sizeof(cmdReadClockReq);
     cmd.readClockReq.flags      = 0;
-    cmd.readClockReq.transId    = 0;
+    cmd.readClockReq.transId    = transid;
 
     ret = pciCanWaitResponse(vCard, (heliosCmd *)&cmd, (heliosCmd *)&resp,
                              CMD_READ_CLOCK_RESP, cmd.readClockReq.transId);
 
     if (ret == VCAN_STAT_OK) {
-      *time =hCard->recClock / PCICAN2_TICKS_PER_10US;
+      unsigned long tmp;
+
+      tmp = resp.readClockResp.time[1];
+      tmp = tmp << 16;
+      tmp += resp.readClockResp.time[0];
+      *time = tmp / PCICAN2_TICKS_PER_10US;
     }
 
     return ret;
@@ -848,10 +874,6 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
             {
                 unsigned long irqFlags;
                 DEBUGPRINT(3, "CMD_READ_CLOCK_RESP\n");
-
-                hCd->recClock = cmd.readClockResp.time[1];
-                hCd->recClock = hCd->recClock << 16;
-                hCd->recClock += cmd.readClockResp.time[0];
 
                 spin_lock_irqsave(&hCd->timeHi_lock, irqFlags);
                 vCard->timeHi = cmd.readClockResp.time[1] << 16;
@@ -1577,18 +1599,6 @@ static void pciCanSend (struct work_struct *work)
 
 
 //======================================================================
-//  Timeout handler for the waitResponse below
-//======================================================================
-static void responseTimeout (unsigned long voidWaitNode)
-{
-    WaitNode *waitNode = (WaitNode *)voidWaitNode;
-    waitNode->timedOut = 1;
-    complete(&waitNode->waitCompletion);
-    return;
-}
-
-
-//======================================================================
 // Send out a command and wait for a response with timeout
 //======================================================================
 static int pciCanWaitResponse (VCanCardData *vCard, heliosCmd *cmd,
@@ -1599,7 +1609,7 @@ static int pciCanWaitResponse (VCanCardData *vCard, heliosCmd *cmd,
     PciCan2CardData *hCard = vCard->hwCardData;
     WaitNode waitNode;
     unsigned long irqFlags = 0;
-    struct timer_list waitTimer;
+    int timeout;
 
     init_completion(&waitNode.waitCompletion);
 
@@ -1622,21 +1632,14 @@ static int pciCanWaitResponse (VCanCardData *vCard, heliosCmd *cmd,
         return VCAN_STAT_NO_RESOURCES;
     }
 
-    init_timer(&waitTimer);
-    waitTimer.function = responseTimeout;
-    waitTimer.data = (unsigned long)&waitNode;
-    waitTimer.expires = jiffies + msecs_to_jiffies(PCICAN2_CMD_RESP_WAIT_TIME);
-    add_timer(&waitTimer);
-
-    wait_for_completion(&waitNode.waitCompletion);
+    timeout = wait_for_completion_timeout(&waitNode.waitCompletion, msecs_to_jiffies(PCICAN2_CMD_RESP_WAIT_TIME));
 
     // Now we either got a response or a timeout
     write_lock_irqsave(&hCard->replyWaitListLock, irqFlags);
     list_del(&waitNode.list);
     write_unlock_irqrestore(&hCard->replyWaitListLock, irqFlags);
-    del_timer_sync(&waitTimer);
 
-    if (waitNode.timedOut) {
+    if (timeout == 0) {
         DEBUGPRINT(1, "pciCanWaitResponse: return VCAN_STAT_TIMEOUT\n");
         return VCAN_STAT_TIMEOUT;
     }
@@ -1850,9 +1853,34 @@ static void pciCanRemoveOne (struct pci_dev *dev)
 
   free_irq(hCd->irq, vCard);
 
+  vCard->cardPresent = 0;
+
+  DEBUGPRINT(3, "pcican2: Stopping all \"waitQueue's\"\n");
+
+  for (chNr = 0; chNr < vCard->nrChannels; chNr++) {
+    vCanCardRemoved(vCard->chanData[chNr]);
+  }
+
+  DEBUGPRINT(3, "pcican2: Stopping all \"WaitNode's\"\n");
+  {
+    struct list_head *currHead;
+    struct list_head *tmpHead;
+    WaitNode         *currNode;
+    unsigned long    irqFlags;
+
+    write_lock_irqsave(&hCd->replyWaitListLock, irqFlags);
+    list_for_each_safe(currHead, tmpHead, &hCd->replyWaitList)
+    {
+      currNode = list_entry(currHead, WaitNode, list);
+      currNode->timedOut = 1;
+      complete(&currNode->waitCompletion);
+    }
+    write_unlock_irqrestore(&hCd->replyWaitListLock, irqFlags);
+  }
+
   for (chNr = 0; chNr < vCard->nrChannels; chNr++) {
     vChan = vCard->chanData[chNr];
-    DEBUGPRINT(3, "Waiting for all closed on minor %d\n", vChan->minorNr);
+    DEBUGPRINT(3, "pcican2: Waiting for all closed on minor %d\n", vChan->minorNr);
     while (atomic_read(&vChan->fileOpenCount) > 0) {
       set_current_state(TASK_UNINTERRUPTIBLE);
       schedule_timeout(msecs_to_jiffies(10));

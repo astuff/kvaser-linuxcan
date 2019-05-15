@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['version_20checking',['Version Checking',['../page_user_guide_build_driver_version.html',1,'page_user_guide_build']]],
-  ['virtual_20channels',['Virtual Channels',['../page_user_guide_virtual.html',1,'page_user_guide']]],
-  ['virtual_20channels',['Virtual Channels',['../page_user_guide_virtual_info.html',1,'page_user_guide_virtual']]],
-  ['version',['version',['../struct_j1587_message_info.html#a278ac8112eb4d891fdffa2a26fb4de69',1,'J1587MessageInfo']]]
+  ['welcome_20to_20kvaser_20linux_20drivers_20and_20sdk_21',['Welcome to Kvaser Linux Drivers and SDK!',['../index.html',1,'']]],
+  ['winapi',['WINAPI',['../kva_db_lib_8h.html#a9aa60e1ead64be77ad551e745cbfd4d3',1,'WINAPI():&#160;kvaDbLib.h'],['../kvlclib_8h.html#a9aa60e1ead64be77ad551e745cbfd4d3',1,'WINAPI():&#160;kvlclib.h'],['../kvmlib_8h.html#a9aa60e1ead64be77ad551e745cbfd4d3',1,'WINAPI():&#160;kvmlib.h'],['../kva_memo_lib_x_m_l_8h.html#a9aa60e1ead64be77ad551e745cbfd4d3',1,'WINAPI():&#160;kvaMemoLibXML.h']]]
 ];

@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['reserved',['reserved',['../struct_j1587_message_info.html#a3415ebf9c5050a50fa3ae127df65e763',1,'J1587MessageInfo']]],
-  ['retries',['retries',['../struct_j1587_message_info.html#a89d4147f125445dabe7483285cf75e2d',1,'J1587MessageInfo']]],
-  ['rxbufsize',['rxBufSize',['../structtag_can_s_w_descr.html#a22031cf318e44e0c0d51be474623e6f5',1,'tagCanSWDescr']]]
+  ['raw',['raw',['../structkvm_log_event_ex.html#a2d78703fd9a85a4cb3ead816db9038bc',1,'kvmLogEventEx']]],
+  ['right',['right',['../structtag__token.html#afa54f74105f850a372148e16dde90651',1,'tag_token']]],
+  ['rtc',['rtc',['../structkvm_log_event_ex.html#a1f9964cb31c1515adcee1dc69c01d41b',1,'kvmLogEventEx']]],
+  ['rx',['rx',['../structcan_notify_data.html#a08ba82dcb2d1828a60a16863d4266189',1,'canNotifyData']]],
+  ['rxerrorcounter',['rxErrorCounter',['../structcan_notify_data.html#a575e147dffea7d8a2fc90141079a4fe3',1,'canNotifyData']]]
 ];

@@ -1,13 +1,13 @@
 /*
-**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
-**                        http://www.kvaser.com
+**             Copyright 2017 by Kvaser AB, Molndal, Sweden
+**                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
 ** BSD-new and GPLv2. You may use either one. See the included
 ** COPYING file for details.
 **
 ** License: BSD-new
-** ===============================================================================
+** ==============================================================================
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
 **     * Redistributions of source code must retain the above copyright
@@ -19,24 +19,25 @@
 **       names of its contributors may be used to endorse or promote products
 **       derived from this software without specific prior written permission.
 **
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+** BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+** IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
 **
 **
 ** License: GPLv2
-** ===============================================================================
-** This program is free software; you can redistribute it and/or
-** modify it under the terms of the GNU General Public License
-** as published by the Free Software Foundation; either version 2
-** of the License, or (at your option) any later version.
+** ==============================================================================
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,10 +46,20 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 **
-** ---------------------------------------------------------------------------
-**/
+**
+** IMPORTANT NOTICE:
+** ==============================================================================
+** This source code is made available for free, as an open license, by Kvaser AB,
+** for use with its applications. Kvaser AB does not accept any liability
+** whatsoever for any third party patent or other immaterial property rights
+** violations that may result from any usage of this source code, regardless of
+** the combination of source code and various applications that it can be used
+** in, or with.
+**
+** -----------------------------------------------------------------------------
+*/
 
 /*  Kvaser Linux Canlib VCan layer functions */
 #define _GNU_SOURCE // This is required for recursive mutex support in pthread
@@ -111,7 +122,7 @@ static uint32_t capabilities_table[][2] = {
   {VCAN_CHANNEL_CAP_HAS_LOGGER,          canCHANNEL_CAP_LOGGER},
   {VCAN_CHANNEL_CAP_HAS_REMOTE,          canCHANNEL_CAP_REMOTE_ACCESS},
   {VCAN_CHANNEL_CAP_HAS_SCRIPT,          canCHANNEL_CAP_SCRIPT},
-  {VCAN_CHANNEL_CAP_LIN_FLEX,            canCHANNEL_CAP_LIN_FLEX}
+  {VCAN_CHANNEL_CAP_LIN_HYBRID,          canCHANNEL_CAP_LIN_HYBRID}
 };
 
 
@@ -339,18 +350,25 @@ static void notify (HandleData *hData, VCAN_EVENT *msg)
 //======================================================================
 static void *vCanNotifyThread (void *arg)
 {
-  VCAN_EVENT   msg;
-  HandleData  *hData = (HandleData *)arg;
-  int          ret;
+  HandleData        *hData = (HandleData *)arg;
+  int               ret;
+  VCAN_IOCTL_READ_T ioctl_read_arg;
+  VCAN_EVENT        msg;
+  VCanRead          read;
+
+  memset(&read, 0, sizeof(VCanRead));
+  read.timeout = 50;
+  ioctl_read_arg.msg = &msg;
+  ioctl_read_arg.read = &read;
 
   while (1) {
     pthread_testcancel();
 
-    ret = ioctl(hData->notifyFd, VCAN_IOC_RECVMSG, &msg);
-    
+    ret = ioctl(hData->notifyFd, VCAN_IOC_RECVMSG, &ioctl_read_arg);
+
     if (ret == 0) {
       notify(hData, &msg);
-    } else { 
+    } else {
       if (errno != EAGAIN) {
         pthread_exit(0); // When this thread is cancelled, ioctl will be interrupted by a signal.
       }
@@ -370,7 +388,6 @@ static canStatus vCanSetNotify (HandleData *hData,
   int           ret;
   VCanMsgFilter filter;
   unsigned char transId;
-  VCanRead      read;
 
   if (hData->notifyFd == canINVALID_HANDLE) {
     // Open an fd to read events from
@@ -391,19 +408,13 @@ static canStatus vCanSetNotify (HandleData *hData,
       goto error_ioc;
     }
 
-    read.timeout = 50;
-    ret = ioctl(hData->notifyFd, VCAN_IOC_SET_READ, &read);
-    if (ret != 0) {
-      goto error_ioc;
-    }
-
     ret = ioctl(hData->notifyFd, VCAN_IOC_BUS_ON, NULL);
     if (ret != 0) {
       goto error_ioc;
     }
   } else { //must kill thread in order to set new params.
     pthread_cancel(hData->notifyThread);
-    
+
     // Wait for thread to finish
     pthread_join(hData->notifyThread, NULL);
   }
@@ -441,7 +452,7 @@ static canStatus vCanSetNotify (HandleData *hData,
   if (ret != 0) {
     goto error_ioc;
   }
-  
+
   ret = pthread_create(&hData->notifyThread, NULL, vCanNotifyThread, hData);
   if (ret != 0) {
     goto error_ioc;
@@ -464,31 +475,66 @@ error_ioc:
 //======================================================================
 static canStatus vCanOpenChannel (HandleData *hData)
 {
-  int ret = 0;
-  VCanMsgFilter filter;
-  uint32_t capability = 0;
+  int             ret = 0;
+  VCanMsgFilter   filter;
+  uint32_t        capability = 0;
 
   hData->fd = open(hData->deviceName, O_RDONLY);
   if (hData->fd == canINVALID_HANDLE) {
     return canERR_NOTFOUND;
   }
 
-  if (hData->wantExclusive) {
-    ret = ioctl(hData->fd, VCAN_IOC_OPEN_EXCL, &hData->channelNr);
-  }
-  else {
-    ret = ioctl(hData->fd, VCAN_IOC_OPEN_CHAN, &hData->channelNr);
+  {
+    VCanOpen my_arg;
+    my_arg.retval = 0;
+
+    my_arg.chanNr              = hData->channelNr;
+    my_arg.override_exclusive  = hData->overrideExclusive;
+
+    if (hData->wantExclusive) {
+      ret = ioctl(hData->fd, VCAN_IOC_OPEN_EXCL, &my_arg);
+    } else {
+      ret = ioctl(hData->fd, VCAN_IOC_OPEN_CHAN, &my_arg);
+    }
+
+    if (ret) {
+      close(hData->fd);
+      return canERR_NOTFOUND;
+    }
+
+    if (my_arg.retval == VCANOPEN_LOCKED) {
+      close(hData->fd);
+      if (my_arg.override_exclusive) {
+        return canERR_NO_ACCESS;
+      } else {
+        return canERR_NOCHANNELS;
+      }
+    } else if (my_arg.retval == VCANOPEN_OPENED) {
+      close(hData->fd);
+      return canERR_NOCHANNELS;
+    }
   }
 
-  if (ret) {
-    close(hData->fd);
-    return canERR_NOTFOUND;
-  }
+  {
+    VCanInitAccess my_arg;
+    my_arg.retval = 0;
 
-  // VCAN_IOC_OPEN_CHAN sets channelNr to -1 if it fails
-  if (hData->channelNr < 0) {
-    close(hData->fd);
-    return canERR_NOCHANNELS;
+    my_arg.require_init_access = hData->requireInitAccess;
+    my_arg.wants_init_access   = hData->initAccess;
+
+    ret = ioctl(hData->fd, VCAN_IOC_OPEN_INIT_ACCESS, &my_arg);
+
+    if (ret) {
+      close(hData->fd);
+      return canERR_NOTFOUND;
+    }
+
+    if (my_arg.retval == VCANINITACCESS_FAIL) {
+      close(hData->fd);
+      return canERR_NO_ACCESS;
+    }
+
+    hData->report_access_errors = 0;
   }
 
   ret = ioctl(hData->fd, VCAN_IOC_GET_CHAN_CAP, &capability);
@@ -567,29 +613,34 @@ static canStatus vCanSetBusParams (HandleData *hData,
                                    long freq_brs,
                                    unsigned int tseg1_brs,
                                    unsigned int tseg2_brs,
-                                   unsigned int sjw_brs, 
+                                   unsigned int sjw_brs,
                                    unsigned int syncmode)
 {
-  VCanBusParams busParams;
-  int ret;
+  VCanSetBusParams my_arg;
+  int              ret;
 
   (void)syncmode; // Unused.
+  my_arg.retval = 0;
 
-  busParams.freq    = (signed long)freq;
-  busParams.sjw     = sjw;
-  busParams.tseg1   = tseg1;
-  busParams.tseg2   = tseg2;
-  busParams.samp3   = noSamp;   // This variable is # of samples inspite of name!
+  my_arg.bp.freq    = (signed long)freq;
+  my_arg.bp.sjw     = sjw;
+  my_arg.bp.tseg1   = tseg1;
+  my_arg.bp.tseg2   = tseg2;
+  my_arg.bp.samp3   = noSamp;   // This variable is # of samples inspite of name!
 
-  busParams.freq_brs  = (signed long)freq_brs;
-  busParams.sjw_brs   = sjw_brs;
-  busParams.tseg1_brs = tseg1_brs;
-  busParams.tseg2_brs = tseg2_brs;
+  my_arg.bp.freq_brs  = (signed long)freq_brs;
+  my_arg.bp.sjw_brs   = sjw_brs;
+  my_arg.bp.tseg1_brs = tseg1_brs;
+  my_arg.bp.tseg2_brs = tseg2_brs;
 
-  ret = ioctl(hData->fd, VCAN_IOC_SET_BITRATE, &busParams);
+  ret = ioctl(hData->fd, VCAN_IOC_SET_BITRATE, &my_arg);
 
   if (ret != 0) {
     return errnoToCanStatus(errno);
+  }
+
+  if ((my_arg.retval == VCANSETBUSPARAMS_NO_INIT_ACCESS) && (hData->report_access_errors == 1)) {
+    return canERR_NO_ACCESS;
   }
 
   return canOK;
@@ -675,16 +726,20 @@ static canStatus vCanGetBusStats(HandleData *hData, canBusStatistics *stat)
 // vCanReadInternal
 //======================================================================
 static canStatus vCanReadInternal (HandleData *hData, unsigned int iotcl_cmd,
-                                   long *id,
+                                   VCanRead *readOpt, long *id,
                                    void *msgPtr, unsigned int *dlc,
                                    unsigned int *flag, unsigned long *time)
 {
   int i;
   int ret;
+  VCAN_IOCTL_READ_T ioctl_read_arg;
   VCAN_EVENT msg;
 
+  ioctl_read_arg.msg = &msg;
+  ioctl_read_arg.read = readOpt;
+
   while (1) {
-    ret = ioctl(hData->fd, iotcl_cmd, &msg);
+    ret = ioctl(hData->fd, iotcl_cmd, &ioctl_read_arg);
     if (ret != 0) {
       return errnoToCanStatus(errno);
     }
@@ -770,9 +825,10 @@ static canStatus vCanRead (HandleData    *hData,
 {
   VCanRead read;
 
+  memset(&read, 0, sizeof(VCanRead));
   read.timeout = 0;
-  ioctl(hData->fd, VCAN_IOC_SET_READ, &read);
-  return vCanReadInternal(hData, VCAN_IOC_RECVMSG, id, msgPtr, dlc, flag, time);
+  return vCanReadInternal(hData, VCAN_IOC_RECVMSG, &read,
+                          id, msgPtr, dlc, flag, time);
 }
 
 //======================================================================
@@ -801,15 +857,14 @@ static canStatus vCanReadSpecific (HandleData    *hData,
                                    unsigned int  *flag,
                                    unsigned long *time)
 {
-  VCanReadSpecific cmd;
+  VCanRead read;
 
-  cmd.skip    = READ_SPECIFIC_SKIP_MATCHING;
-  cmd.id      = id;
-  cmd.timeout = 0;
+  read.specific.skip = READ_SPECIFIC_SKIP_MATCHING;
+  read.specific.id   = id;
+  read.timeout       = 0;
 
-  ioctl(hData->fd, VCAN_IOC_SET_READ_SPECIFIC, &cmd);
-
-  return vCanReadInternal(hData, VCAN_IOC_RECVMSG_SPECIFIC, NULL, msgPtr, dlc, flag, time);
+  return vCanReadInternal(hData, VCAN_IOC_RECVMSG_SPECIFIC, &read,
+                          NULL, msgPtr, dlc, flag, time);
 }
 
 //======================================================================
@@ -822,15 +877,14 @@ static canStatus vCanReadSpecificSkip (HandleData    *hData,
                                        unsigned int  *flag,
                                        unsigned long *time)
 {
-  VCanReadSpecific cmd;
+  VCanRead read;
 
-  cmd.skip    = READ_SPECIFIC_SKIP_PRECEEDING;
-  cmd.id      = id;
-  cmd.timeout = 0;
+  read.specific.skip = READ_SPECIFIC_SKIP_PRECEEDING;
+  read.specific.id   = id;
+  read.timeout       = 0;
 
-  ioctl(hData->fd, VCAN_IOC_SET_READ_SPECIFIC, &cmd);
-
-  return vCanReadInternal(hData, VCAN_IOC_RECVMSG_SPECIFIC, NULL, msgPtr, dlc, flag, time);
+  return vCanReadInternal(hData, VCAN_IOC_RECVMSG_SPECIFIC, &read,
+                          NULL, msgPtr, dlc, flag, time);
 }
 
 //======================================================================
@@ -840,15 +894,14 @@ static canStatus vCanReadSyncSpecific (HandleData    *hData,
                                        long          id,
                                        unsigned long timeout)
 {
- VCanReadSpecific cmd;
+  VCanRead read;
 
-  cmd.skip    = READ_SPECIFIC_NO_SKIP;
-  cmd.id      = id;
-  cmd.timeout = timeout;
+  read.specific.skip = READ_SPECIFIC_NO_SKIP;
+  read.specific.id   = id;
+  read.timeout       = timeout;
 
-  ioctl(hData->fd, VCAN_IOC_SET_READ_SPECIFIC, &cmd);
-
-  return vCanReadInternal(hData, VCAN_IOC_RECVMSG_SPECIFIC, NULL, NULL, NULL, NULL, NULL);
+  return vCanReadInternal(hData, VCAN_IOC_RECVMSG_SPECIFIC, &read,
+                          NULL, NULL, NULL, NULL, NULL);
 }
 
 //======================================================================
@@ -863,36 +916,43 @@ static canStatus vCanReadWait (HandleData    *hData,
                                long           timeout)
 {
   VCanRead read;
-  
+
+  memset(&read, 0, sizeof(VCanRead));
   read.timeout = timeout;
-  ioctl(hData->fd, VCAN_IOC_SET_READ, &read);
-  return vCanReadInternal(hData, VCAN_IOC_RECVMSG, id, msgPtr, dlc, flag, time);
+  return vCanReadInternal(hData, VCAN_IOC_RECVMSG, &read,
+                          id, msgPtr, dlc, flag, time);
 }
 
 
 //======================================================================
 // vCanSetBusOutputControl
 //======================================================================
-static canStatus vCanSetBusOutputControl (HandleData *hData,
+static canStatus vCanSetBusOutputControl (HandleData   *hData,
                                           unsigned int drivertype)
 {
-  int silent;
-  int ret;
+  VCanSetBusOutputControl my_arg;
+  int                     ret;
+  my_arg.retval = 0;
 
   switch (drivertype) {
-  case canDRIVER_NORMAL:
-    silent = 0;
-    break;
-  case canDRIVER_SILENT:
-    silent = 1;
-    break;
-  default:
-    return canERR_PARAM;
+    case canDRIVER_NORMAL:
+      my_arg.silent = 0;
+      break;
+    case canDRIVER_SILENT:
+      my_arg.silent = 1;
+      break;
+    default:
+      return canERR_PARAM;
   }
-  ret = ioctl(hData->fd, VCAN_IOC_SET_OUTPUT_MODE, &silent);
+
+  ret = ioctl(hData->fd, VCAN_IOC_SET_OUTPUT_MODE, &my_arg);
 
   if (ret != 0) {
     return errnoToCanStatus(errno);
+  }
+
+  if ((my_arg.retval == VCANSETBUSOUTPUTCONTROL_NO_INIT_ACCESS) && (hData->report_access_errors == 1)) {
+    return canERR_NO_ACCESS;
   }
 
   return canOK;
@@ -1128,11 +1188,11 @@ static canStatus vCanWriteInternal(HandleData *hData, long id, void *msgPtr,
     }
     msg.id = id;
   }
-  
+
   if (!dlc_is_dlc_ok (hData->acceptLargeDlc, (flag & canFDMSG_FDF), dlc)) {
     return canERR_PARAM;
   }
-  
+
   if (flag & canFDMSG_FDF) {
     if (hData->openMode) {
       msg.flags |= VCAN_MSG_FLAG_FDF;
@@ -1354,7 +1414,7 @@ static canStatus vCanReadStatus (HandleData *hData, unsigned long *flags)
   }
 
   *flags = 0;
-  
+
   if (ioctl(hData->fd, VCAN_IOC_GET_CHIP_STATE, &chip_status)) {
     goto ioctl_error;
   }
@@ -1372,7 +1432,7 @@ static canStatus vCanReadStatus (HandleData *hData, unsigned long *flags)
   if (chip_status.txErrorCounter) {
     *flags |= canSTAT_TXERR;
   }
-  
+
   if (chip_status.rxErrorCounter) {
     *flags |= canSTAT_RXERR;
   }
@@ -1534,17 +1594,17 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
       }
     }
     break;
-    
+
   case canCHANNELDATA_IS_REMOTE:
     // No remote devices for Linux so far
     {
       if (bufsize < 4 /*"32-bit unsigned int"*/|| !buffer) {
          return canERR_PARAM;
-      }    
+      }
       *(uint32_t*)buffer = 0;
     }
     break;
-    
+
   case canCHANNELDATA_FEATURE_EAN:
   case canCHANNELDATA_HW_STATUS:
   case canCHANNELDATA_LOGGER_TYPE:
@@ -1554,10 +1614,10 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
       if (bufsize < 4 /*"32-bit unsigned int"*/|| !buffer) {
         close(fd);
         return canERR_PARAM;
-      }    
-      
+      }
+
       memset(&miscInfo, 0, sizeof(miscInfo));
-        
+
       switch (item) {
         case canCHANNELDATA_FEATURE_EAN:
           miscInfo.subcmd = KCAN_IOCTL_MISC_INFO_SUBCMD_FEATURE_EAN;
@@ -1565,23 +1625,23 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
         case canCHANNELDATA_HW_STATUS:
           miscInfo.subcmd = KCAN_IOCTL_MISC_INFO_SUBCMD_HW_STATUS;
           break;
-        case canCHANNELDATA_LOGGER_TYPE: 
+        case canCHANNELDATA_LOGGER_TYPE:
           miscInfo.subcmd = KCAN_IOCTL_MISC_INFO_SUBCMD_CHANNEL_LOGGER_INFO;
           break;
 
-        case canCHANNELDATA_REMOTE_TYPE: 
+        case canCHANNELDATA_REMOTE_TYPE:
           miscInfo.subcmd = KCAN_IOCTL_MISC_INFO_SUBCMD_CHANNEL_REMOTE_INFO;
           break;
         default:
-          close(fd);        
+          close(fd);
           return canERR_PARAM;
       }
-      
+
       err = ioctl(fd, KCAN_IOCTL_GET_CARD_INFO_MISC, &miscInfo);
       if (!err) {
         if (miscInfo.retcode == KCAN_IOCTL_MISC_INFO_RETCODE_SUCCESS){
           switch (item) {
-            case canCHANNELDATA_FEATURE_EAN:  
+            case canCHANNELDATA_FEATURE_EAN:
               if (bufsize < sizeof(miscSubCmdFeatureEan)) {
                 close(fd);
                 return canERR_PARAM;
@@ -1593,16 +1653,16 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
                 close(fd);
                 return canERR_PARAM;
               }
-              memcpy(buffer, &miscInfo.payload.hwStatus, sizeof(miscSubCmdHwStatus)); 
+              memcpy(buffer, &miscInfo.payload.hwStatus, sizeof(miscSubCmdHwStatus));
               break;
-            case canCHANNELDATA_LOGGER_TYPE: 
+            case canCHANNELDATA_LOGGER_TYPE:
               *(uint32_t *)buffer = miscInfo.payload.loggerInfo.loggerType;
               break;
-            case canCHANNELDATA_REMOTE_TYPE: 
+            case canCHANNELDATA_REMOTE_TYPE:
               *(uint32_t *)buffer = miscInfo.payload.remoteInfo.remoteType;
               break;
             default:
-              close(fd);          
+              close(fd);
               return canERR_PARAM;
           }
         }
@@ -1610,11 +1670,11 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
           close(fd);
           return canERR_NOT_IMPLEMENTED;
         }
-        
+
       }
     }
     break;
-    
+
   default:
     close(fd);
     return canERR_PARAM;
@@ -1749,27 +1809,52 @@ static canStatus vCanIoCtl(HandleData *hData, unsigned int func,
     *(unsigned int *)buf = hData->timerResolution;
     break;
 
+  case canIOCTL_GET_TREF_LIST:
+    if (!buf) {
+      return canERR_PARAM;
+    }
+    if (ioctl(hData->fd, KCAN_IOCTL_READ_TREF_LIST, buf)) {
+      return errnoToCanStatus(errno);
+    }
+    break;
 
-    case canIOCTL_TX_INTERVAL:
-      if (check_args (buf, buflen, sizeof (uint32_t), ERROR_WHEN_NEQ)) {
-        return canERR_PARAM;
-      }
+  case canIOCTL_TX_INTERVAL:
+    if (check_args (buf, buflen, sizeof (uint32_t), ERROR_WHEN_NEQ)) {
+      return canERR_PARAM;
+    }
 
-      if (ioctl(hData->fd, KCAN_IOCTL_TX_INTERVAL, buf)) {
-        return errnoToCanStatus(errno);
-      }
-      break;
+    if (ioctl(hData->fd, KCAN_IOCTL_TX_INTERVAL, buf)) {
+      return errnoToCanStatus(errno);
+    }
+    break;
 
-    case canIOCTL_SET_BRLIMIT :
-      if (check_args (buf, buflen, sizeof (long), ERROR_WHEN_NEQ)) {
-        return canERR_PARAM;
-      }
+  case canIOCTL_SET_BRLIMIT :
+    if (check_args (buf, buflen, sizeof (long), ERROR_WHEN_NEQ)) {
+      return canERR_PARAM;
+    }
 
-      if (ioctl(hData->fd, KCAN_IOCTL_SET_BRLIMIT, buf)) {
-        return errnoToCanStatus(errno);
-      }
+    if (ioctl(hData->fd, KCAN_IOCTL_SET_BRLIMIT, buf)) {
+      return errnoToCanStatus(errno);
+    }
 
-      break;
+    break;
+
+  case canIOCTL_GET_REPORT_ACCESS_ERRORS:
+    if (check_args (buf, buflen, sizeof (unsigned char), ERROR_WHEN_LT)) {
+      return canERR_PARAM;
+    }
+
+    *(unsigned char*)buf = hData->report_access_errors;
+    break;
+
+  case canIOCTL_SET_REPORT_ACCESS_ERRORS:
+    if (check_args (buf, buflen, sizeof (unsigned char), ERROR_WHEN_LT)) {
+      return canERR_PARAM;
+    }
+
+    hData->report_access_errors = *(unsigned char*)buf;
+    break;
+
   default:
     return canERR_PARAM;
   }
@@ -1835,12 +1920,12 @@ static canStatus kCanObjbufWrite (HandleData *hData, int idx, int id, void* msg,
   if (!dlc_is_dlc_ok (hData->acceptLargeDlc, (flags & canFDMSG_FDF), dlc)) {
     return canERR_PARAM;
   }
-  
+
   if (flags & canFDMSG_FDF) {
     if (!hData->openMode) {
       return canERR_PARAM;
     }
-    
+
     if (flags & canMSG_RTR) {
       return canERR_PARAM;
     }
@@ -1855,11 +1940,11 @@ static canStatus kCanObjbufWrite (HandleData *hData, int idx, int id, void* msg,
     {
       return canERR_PARAM;
     }
-    
+
     if (flags & canMSG_RTR) {
       ioc.flags |= VCAN_AUTOTX_MSG_FLAG_REMOTE_FRAME;
     }
-    
+
     if (dlc > 15) {
       dlc = 15;
     }
@@ -2038,13 +2123,39 @@ static int check_args (void*buf, uint32_t buf_len, uint32_t limit, uint32_t meth
 
   switch (method) {
     case ERROR_WHEN_NEQ: if (buf_len != limit) return canERR_PARAM; break;
-    case ERROR_WHEN_LT:  if (buf_len < limit) return canERR_PARAM; break;
+    case ERROR_WHEN_LT:  if (buf_len < limit)  return canERR_PARAM; break;
     default: return canERR_PARAM; break;
   }
   return 0;
 }
 
 
+static canStatus vCanResetClock (HandleData *hData)
+{
+  if (ioctl(hData->fd, VCAN_IOC_RESET_CLOCK, NULL))
+    goto ioc_error;
+
+  return canOK;
+
+ ioc_error:
+  return errnoToCanStatus(errno);
+}
+
+static canStatus vCanSetClockOffset (HandleData *hData, HandleData *hFrom)
+{
+  uint64_t offset;
+
+  if (ioctl(hFrom->fd, VCAN_IOC_GET_CLOCK_OFFSET, &offset))
+    goto ioc_error;
+
+  if (ioctl(hData->fd, VCAN_IOC_SET_CLOCK_OFFSET, &offset))
+    goto ioc_error;
+
+  return canOK;
+
+ ioc_error:
+  return errnoToCanStatus(errno);
+}
 
 static canStatus vCanGetCardInfo (HandleData *hData, VCAN_IOCTL_CARD_INFO *ci)
 {
@@ -2121,6 +2232,8 @@ CANOps vCanOps = {
   .objbufSendBurst     = kCanObjbufSendBurst,
   .objbufEnable        = kCanObjbufEnable,
   .objbufDisable       = kCanObjbufDisable,
+  .resetClock          = vCanResetClock,
+  .setClockOffset      = vCanSetClockOffset,
   .getCardInfo         = vCanGetCardInfo,
   .getCardInfo2        = vCanGetCardInfo2,
 };

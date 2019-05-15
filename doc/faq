@@ -154,9 +154,10 @@ A10
 
 --------------------------------------------------------------------------------
 Q11
-    I see warnings like this in the kernel log:
+    I see errors like this in syslog:
 
-    [ 20.325910] modprobe: ERROR: could not insert 'mhydra': Required key not available
+    apr 19 16:05:38 mypc /usr/sbin/mhydra.sh[22789]: modprobe: ERROR: could not insert 'mhydra': Required key not available
+    apr 19 16:05:38 mypc systemd-udevd[22776]: Process '/usr/sbin/mhydra.sh start' failed with exit code 1.
 
 A11
     Your kernel is probably configured to only allow loading of validly signed
@@ -169,6 +170,8 @@ A11
     To avoid the problem either disable secure boot in UEFI or sign the compiled
     module with a trusted certificate. More information can be found at
     http://www.rodsbooks.com/efi-bootloaders/secureboot.html
+    How to apply this on Kvaser linuxcan modules can be found in the
+    Developer Blog section at http://www.kvaser.com
 
     It is also possible to get this error if the kernel was built with
     CONFIG_MODULE_SIG_FORCE set. Then you will have to sign the modules with a

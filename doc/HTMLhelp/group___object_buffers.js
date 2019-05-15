@@ -1,14 +1,14 @@
 var group___object_buffers =
 [
-    [ "canObjBufFreeAll", "group___object_buffers.html#gaf836ebe16681215a3a40defa3a9d81ad", null ],
-    [ "canObjBufAllocate", "group___object_buffers.html#gacfd23956af809dfc6db822c2f5ba25e7", null ],
-    [ "canObjBufFree", "group___object_buffers.html#ga2a7e7c895e41b20da47aa850712d264a", null ],
-    [ "canObjBufWrite", "group___object_buffers.html#ga9b0e3dffd54e5abdd6972dd468353022", null ],
-    [ "canObjBufSetFilter", "group___object_buffers.html#ga16a648123fbc05b8c4a2a46d7d7e1c2c", null ],
-    [ "canObjBufSetFlags", "group___object_buffers.html#ga802fdc1accf0124b0b442623c6668f41", null ],
-    [ "canObjBufSetPeriod", "group___object_buffers.html#ga9285a2316c11bc17ec2a98ab64812ce5", null ],
-    [ "canObjBufSetMsgCount", "group___object_buffers.html#gaab0389f48769a91f540d2b97e8fd031b", null ],
-    [ "canObjBufEnable", "group___object_buffers.html#ga3e145ec233501345db191ae715a09cb4", null ],
-    [ "canObjBufDisable", "group___object_buffers.html#gaeb6e506db100de24d556ab65c2fcb593", null ],
-    [ "canObjBufSendBurst", "group___object_buffers.html#ga8385ea3d2278fb45cf2a11042940b92b", null ]
+    [ "canObjBufAllocate", "group___object_buffers.html#gaa189a35c78004d037eed4bd0c2bfa3ee", null ],
+    [ "canObjBufDisable", "group___object_buffers.html#gab1238b563ecf4523092ebe561ece87ea", null ],
+    [ "canObjBufEnable", "group___object_buffers.html#ga1ff3e82f6d0e9795a831e22183c6e7ec", null ],
+    [ "canObjBufFree", "group___object_buffers.html#ga7353b3671b897e1f33b88f9084857382", null ],
+    [ "canObjBufFreeAll", "group___object_buffers.html#gab299ecf20aa368b8ee253ba9610dff3b", null ],
+    [ "canObjBufSendBurst", "group___object_buffers.html#gae3e27cd339700f26897648895e1b37a0", null ],
+    [ "canObjBufSetFilter", "group___object_buffers.html#gaccca9d669c981e910c1805614ee40e72", null ],
+    [ "canObjBufSetFlags", "group___object_buffers.html#ga9369c2f47886d9f815fe5513d6f5b60b", null ],
+    [ "canObjBufSetMsgCount", "group___object_buffers.html#ga769ce97c3b7f3a8e246f872d7dbafe54", null ],
+    [ "canObjBufSetPeriod", "group___object_buffers.html#gaa23baa37921bf089d9123eb97f32541b", null ],
+    [ "canObjBufWrite", "group___object_buffers.html#gad72611f11b4947c96c8d0b50f59b2173", null ]
 ];
