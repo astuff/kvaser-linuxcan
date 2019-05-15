@@ -57,7 +57,7 @@
 #define CANLIB_VERSION_H
 
 #define CANLIB_MAJOR_VERSION (8 - 3)
-#define CANLIB_MINOR_VERSION 8
+#define CANLIB_MINOR_VERSION 9
 
 
 #endif

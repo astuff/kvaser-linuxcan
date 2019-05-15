@@ -3,7 +3,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.8  
+Release notes for linuxcan V5.9  
 ================================================================
 
 Linux device drivers for
@@ -100,6 +100,11 @@ Known problems
      hardware, the same is not true for auto tx. The latter is only
      available if there is firmware support in the device.
      (This is the same as under Windows.)
+
+
+New Features and Fixed Problems in V5.9   (17-MAR-2015)
+===========================================================================
+* Minor changes.
 
 
 New Features and Fixed Problems in V5.8   (02-FEB-2015)
