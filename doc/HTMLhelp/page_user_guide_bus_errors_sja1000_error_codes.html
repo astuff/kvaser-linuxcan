@@ -114,7 +114,7 @@ function toggleVisibility(linkObj) {
 <h1>SJA1000 Error Codes </h1>  </div>
 </div>
 <div class="contents">
-<div class="textblock"><p>Many of our CAN interface boards use the SJA1000 CAN controller. When an error occurs on the bus, the device firmware and driver will pass the error code from the CAN controller to the application by using the CAN identifier field. The identifier will be set to 0x800 (2048) plus the error code from the controller. The flag field will contain the <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8" title="Message is an error frame.">canMSG_ERROR_FRAME</a> flag. The data length will be 0.</p>
+<div class="textblock"><p>Many of our CAN interface boards use the SJA1000 CAN controller. When an error occurs on the bus, the device firmware and driver will pass the error code from the CAN controller to the application by using the CAN identifier field. The identifier will be set to 0x800 (2048) plus the error code from the controller. The flag field will contain the <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a> flag. The data length will be 0.</p>
 <p>You can use the following tables to interpret the error code from the controller. Note that they are applicable only to those CAN interfaces that use SJA1000.</p>
 <table class="doxtable">
 <tr>
@@ -195,7 +195,7 @@ function toggleVisibility(linkObj) {
 <td>0x1C</td><td>overload flag </td></tr>
 </table>
 <p><b>Example</b><br/>
- <em>A message is transmitted on the CAN bus. A stream of error frames are returned. <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> reads messages with id 0x000008D9, dlc = 0 and flags = 0x20 (<a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8" title="Message is an error frame.">canMSG_ERROR_FRAME</a>). What's up?</em></p>
+ <em>A message is transmitted on the CAN bus. A stream of error frames are returned. <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> reads messages with id 0x000008D9, dlc = 0 and flags = 0x20 (<a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a>). What's up?</em></p>
 <p>Using the tables above, we see that 0xD9 means</p>
 <ul>
 <li>Other type of error.</li>
@@ -230,7 +230,7 @@ We recommend that you use this feature for troubleshooting a particular installa
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.2) - Generated on Tue Sep 24 2013</small>
+<small>Kvaser Linux CANLIB (canlib 5.3) - Generated on Thu Mar 20 2014</small>
 </address>
 </body>
 </html>

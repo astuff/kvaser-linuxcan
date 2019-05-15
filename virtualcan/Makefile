@@ -6,7 +6,7 @@
 KV_MODULE_NAME = kvvirtualcan
 
 # Includes
-INCLUDES := $(PWD)/../include/
+INCLUDES := $(src)/../include/
 
 # source files
 SRCS :=           virtualcan.c 
@@ -15,4 +15,10 @@ SRCS += ../common/objbuf.c
 SRCS += ../common/osif_functions_kernel.c
 SRCS += ../common/queue.c
 
-include $(PWD)/../config.mak
+ifneq ($(KERNELRELEASE),)
+	RUNDIR := $(src)
+else
+	RUNDIR := $(PWD)
+endif
+
+include $(RUNDIR)/../config.mak

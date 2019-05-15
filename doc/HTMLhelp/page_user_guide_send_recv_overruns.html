@@ -115,8 +115,8 @@ function toggleVisibility(linkObj) {
 </div>
 <div class="contents">
 <div class="textblock"><p>If the CAN interface or the driver runs out of buffer space, or if the bus load is so high that the CAN controller can't keep up with the traffic, an overload condition is flagged to the application.</p>
-<p>The driver will set the <a class="el" href="canstat_8h.html#ae441634e38d57eb789936f5ac745410b" title="HW buffer overrun.">canMSGERR_HW_OVERRUN</a> and/or <a class="el" href="canstat_8h.html#a810afd58f22df8c44c729f78d955e006" title="SW buffer overrun.">canMSGERR_SW_OVERRUN</a> flags in the flag argument of canRead and its relatives. The flag(s) will be set in the first message read from the driver after the overrun or overload condition happened.</p>
-<p>Your application should test for both these flags. You can use the constant <a class="el" href="canstat_8h.html#adf0d578c7b25ede29a9733da44f08ab3" title="Any overrun condition.">canMSGERR_OVERRUN</a> for doing this. </p>
+<p>The driver will set the <a class="el" href="canstat_8h.html#ae441634e38d57eb789936f5ac745410b">canMSGERR_HW_OVERRUN</a> and/or <a class="el" href="canstat_8h.html#a810afd58f22df8c44c729f78d955e006">canMSGERR_SW_OVERRUN</a> flags in the flag argument of canRead and its relatives. The flag(s) will be set in the first message read from the driver after the overrun or overload condition happened.</p>
+<p>Your application should test for both these flags. You can use the constant <a class="el" href="canstat_8h.html#adf0d578c7b25ede29a9733da44f08ab3">canMSGERR_OVERRUN</a> for doing this. </p>
 </div></div>
 </div>
   <div id="nav-path" class="navpath">
@@ -139,7 +139,7 @@ function toggleVisibility(linkObj) {
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.2) - Generated on Tue Sep 24 2013</small>
+<small>Kvaser Linux CANLIB (canlib 5.3) - Generated on Thu Mar 20 2014</small>
 </address>
 </body>
 </html>

@@ -97,7 +97,9 @@
 #define HWTYPE_EAGLE          62
 #define HWTYPE_BAGEL          64
 #define HWTYPE_MINIPCIE       66
-
+#define HWTYPE_USBCAN_KLINE   68
+#define HWTYPE_ETHERCAN       70
+#define HWTYPE_USBCAN_LIGHT   72
 
 
 

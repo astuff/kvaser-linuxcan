@@ -121,12 +121,12 @@ function toggleVisibility(linkObj) {
     ...
     stat = <a class="code" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite</a>(hnd, 234, msg, 8, 0);
 </pre></div><p><b>Using Extended CAN (CAN 2.0B)</b></p>
-<p>"Standard" CAN has 11-bit identifiers in the range 0 - 2047. "Extended" CAN, also called CAN 2.0B, has 29-bit identifiers. You specify which kind of identifiers you want to use in your call to canWrite: if you set the <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10" title="Message has an extended ID.">canMSG_EXT</a> flag in the flag argument, the message will be transmitted with a 29-bit identifier. Conversely, received 29-bit-identifier messages have the <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10" title="Message has an extended ID.">canMSG_EXT</a> flag set.</p>
+<p>"Standard" CAN has 11-bit identifiers in the range 0 - 2047. "Extended" CAN, also called CAN 2.0B, has 29-bit identifiers. You specify which kind of identifiers you want to use in your call to canWrite: if you set the <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> flag in the flag argument, the message will be transmitted with a 29-bit identifier. Conversely, received 29-bit-identifier messages have the <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> flag set.</p>
 <dl class="note"><dt><b>Note:</b></dt><dd>Not all CAN controllers support CAN 2.0B.</dd></dl>
 <p><b>Example</b>. Sending a CAN message using extended CAN.</p>
 <div class="fragment"><pre class="fragment">    <span class="keywordtype">char</span> msg[8];
     ...
-    stat = <a class="code" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite</a>(hnd, 23456, msg, 8, <a class="code" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10" title="Message has an extended ID.">canMSG_EXT</a>);
+    stat = <a class="code" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite</a>(hnd, 23456, msg, 8, <a class="code" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a>);
 </pre></div> </div></div>
 </div>
   <div id="nav-path" class="navpath">
@@ -149,7 +149,7 @@ function toggleVisibility(linkObj) {
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.2) - Generated on Tue Sep 24 2013</small>
+<small>Kvaser Linux CANLIB (canlib 5.3) - Generated on Thu Mar 20 2014</small>
 </address>
 </body>
 </html>

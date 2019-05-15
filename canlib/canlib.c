@@ -191,7 +191,11 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser BlackBird SemiPro",                          {0x30006294, 0x00073301}},
           {"Kvaser USBcan Professional CB",                     {0x30006843, 0x00073301}},
           {"Kvaser Leaf Light v2",                              {0x30006850, 0x00073301}},
-          {"Kvaser Mini PCI Express HS",                        {0x30006881, 0x00073301}}
+          {"Kvaser Mini PCI Express HS",                        {0x30006881, 0x00073301}},
+          {"Kvaser Leaf Light HS v2 OEM",                       {0x30007352, 0x00073301}},
+          {"Kvaser Ethercan Light HS",                          {0x30007130, 0x00073301}},
+          {"Kvaser Mini PCI Express 2xHS",                      {0x30007437, 0x00073301}},
+          {"Kvaser USBcan Light 2xHS",                          {0x30007147, 0x00073301}},
 };
 
 //******************************************************
@@ -259,11 +263,8 @@ canStatus getDevParams (int channel, char devName[], int *devChannel,
         }
       }
       else {
-        // This implies that there can be no gaps in the numbering.
-        // qqq What happens if there are several Xs connected and the
-        //     user disconnects one with low number. Does hotplug reenumerate
-        //     the usbcanIIs and give them new numbers?
-        break;
+        // Handle gaps in device numbers
+        continue;
       }
     }
   }
@@ -641,6 +642,7 @@ canStatus CANLIBAPI
 canRead (const CanHandle hnd, long *id, void *msgPtr, unsigned int *dlc,
          unsigned int *flag, unsigned long *time)
 {
+  int i;
   HandleData *hData;
 
   hData = findHandle(hnd);
@@ -650,11 +652,18 @@ canRead (const CanHandle hnd, long *id, void *msgPtr, unsigned int *dlc,
   if (hData->syncPressent == 1)
   {
     hData->syncPressent = 0;
-    *id = hData->syncId;
-    memcpy(msgPtr, hData->syncMsg, hData->syncDlc);
-    *dlc = hData->syncDlc;
-    *flag = hData->syncFlag;
-    *time = hData->syncTime;
+    if (id)   *id = hData->syncId;
+    if (msgPtr != NULL) {
+      int count = hData->syncDlc;
+      if (count > 8) {
+        count = 8;
+      }
+      for (i = 0; i < count; i++)
+        ((unsigned char *)msgPtr)[i] = hData->syncMsg[i];
+    }
+    if (dlc)  *dlc = hData->syncDlc;
+    if (flag) *flag = hData->syncFlag;
+    if (time) *time = hData->syncTime;
     return canOK;
   }
   else
@@ -671,6 +680,7 @@ canStatus CANLIBAPI
 canReadWait (const CanHandle hnd, long *id, void *msgPtr, unsigned int *dlc,
              unsigned int *flag, unsigned long *time, unsigned long timeout)
 {
+  int i;
   HandleData *hData;
 
   hData = findHandle(hnd);
@@ -680,11 +690,18 @@ canReadWait (const CanHandle hnd, long *id, void *msgPtr, unsigned int *dlc,
   if (hData->syncPressent == 1)
   {
     hData->syncPressent = 0;
-    *id = hData->syncId;
-    memcpy(msgPtr, hData->syncMsg, hData->syncDlc);
-    *dlc = hData->syncDlc;
-    *flag = hData->syncFlag;
-    *time = hData->syncTime;
+    if (id)   *id = hData->syncId;
+    if (msgPtr != NULL) {
+      int count = hData->syncDlc;
+      if (count > 8) {
+        count = 8;
+      }
+      for (i = 0; i < count; i++)
+        ((unsigned char *)msgPtr)[i] = hData->syncMsg[i];
+    }
+    if (dlc)  *dlc = hData->syncDlc;
+    if (flag) *flag = hData->syncFlag;
+    if (time) *time = hData->syncTime;
     return canOK;
   }
   else
@@ -716,7 +733,7 @@ canReadSync(const CanHandle hnd, unsigned long timeout)
 		if (stat != canOK)
 		{
 		  hData->syncPressent = 0;
-		  return canERR_NOMSG;
+		  return canERR_TIMEOUT;
 		}
 		else
 		{
@@ -959,11 +976,8 @@ canStatus CANLIBAPI canGetNumberOfChannels (int *channelCount)
         tmpCount++;
       }
       else {
-        // This implies that there can be no gaps in the numbering.
-        // qqq What happens if there are several Xs connected and the
-        //     user disconnects one with low number. Does hotplug reenumerate
-        //     the usbcanIIs and give them new numbers?
-        break;
+        // Handle gaps in device numbers
+        continue;
       }
     }
   }

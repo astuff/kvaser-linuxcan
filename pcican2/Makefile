@@ -57,7 +57,7 @@
 KV_MODULE_NAME = kvpcicanII
 
 # Includes
-INCLUDES := $(PWD)/../include/
+INCLUDES := $(src)/../include/
 
 # source files
 SRCS :=           PciCan2HwIf.c 
@@ -67,4 +67,10 @@ SRCS += ../common/osif_functions_kernel.c
 SRCS += ../common/queue.c
 SRCS += memQ.c
 
-include $(PWD)/../config.mak
+ifneq ($(KERNELRELEASE),)
+	RUNDIR := $(src)
+else
+	RUNDIR := $(PWD)
+endif
+
+include $(RUNDIR)/../config.mak

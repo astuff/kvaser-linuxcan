@@ -256,6 +256,8 @@ Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a8b75cdd4599d34abdb299f10f98bd277">canHWTYPE_BLACKBIRD_V2</a>&#160;&#160;&#160;64</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a53a0f2e237fa02f6d97a38389bcb0635">canHWTYPE_MINIPCIE</a>&#160;&#160;&#160;66</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a944b12497ceefa82bd4de5b4198496f4">canHWTYPE_USBCAN_KLINE</a>&#160;&#160;&#160;68</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a4400a999679943a45a0cc9be5518fc7e">canHWTYPE_ETHERCAN</a>&#160;&#160;&#160;70</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a28896ba95ab7687306d598bb7afe3c77">canHWTYPE_USBCAN_LIGHT</a>&#160;&#160;&#160;72</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canCHANNEL_CAP_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canCHANNEL_CAP_xxx"></a></p>
 <p>Channel capabilities. </p>
@@ -381,14 +383,14 @@ kvCallback_t</h2></td></tr>
 <ul>
 <li>hnd - the handle of the CAN channel where the event happened. </li>
 <li>context - the context pointer you passed to <a class="el" href="group___general.html#ga99976c5b8e2c534b27bf9ec2e715d8d3">kvSetNotifyCallback()</a>. </li>
-<li>notifyEvent - one of the <a class="el" href="canstat_8h.html#canNOTIFY_xxx">canNOTIFY_xxx</a> notification codes.</li>
+<li>notifyEvent - one of the canNOTIFY_xxx notification codes.</li>
 </ul>
-<dl class="note"><dt><b>Note:</b></dt><dd>It is really the <a class="el" href="canstat_8h.html#canNOTIFY_xxx">canNOTIFY_xxx</a> codes, and not the <a class="el" href="canstat_8h.html#canEVENT_xxx">canEVENT_xxx</a> codes that the <a class="el" href="group___c_a_n.html#gaa5dd0f277c7059169055321fbda87486">canSetNotify()</a> API is using.</dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>It is really the canNOTIFY_xxx codes, and not the canEVENT_xxx codes that the <a class="el" href="group___c_a_n.html#gaa5dd0f277c7059169055321fbda87486">canSetNotify()</a> API is using.</dd></dl>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">context</td><td>Arbitrary user-defined context data which is passed to the callback function. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">notifyEvent</td><td>One or more of the <a class="el" href="canstat_8h.html#canEVENT_xxx">canEVENT_xxx</a> flags. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">notifyEvent</td><td>One or more of the canEVENT_xxx flags. </td></tr>
   </table>
   </dd>
 </dl>
@@ -399,14 +401,44 @@ kvCallback_t</h2></td></tr>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
 <div class="textblock"><h2><a class="anchor" id="LICENSE"></a>
 LICENSE</h2>
-<p>Copyright 1994-2013 by KVASER AB, SWEDEN</p>
-<p>WWW: <a href="http://www.kvaser.com">http://www.kvaser.com</a></p>
-<p>This software is furnished under a license and may be used and copied only in accordance with the terms of such license.</p>
-<h2><a class="anchor" id="DESCRIPTION"></a>
+<pre style="white-space: pre-wrap">
+ This software is dual licensed under the following two licenses:
+ BSD-new and GPLv2. You may use either one. See the included
+ COPYING file for details.</pre><pre style="white-space: pre-wrap"> License: BSD-new
+ ===============================================================================
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+     * Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+     * Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+     * Neither the name of the &lt;organization&gt; nor the
+       names of its contributors may be used to endorse or promote products
+       derived from this software without specific prior written permission.</pre><pre style="white-space: pre-wrap"> THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL &lt;COPYRIGHT holder&gt;=""&gt; BE LIABLE FOR ANY
+ DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</pre><pre style="white-space: pre-wrap"> License: GPLv2
+ ===============================================================================
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License
+ as published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.</pre><pre style="white-space: pre-wrap"> This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.</pre><pre style="white-space: pre-wrap"> You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.</pre><pre style="white-space: pre-wrap"> ---------------------------------------------------------------------------
+ </pre><h2><a class="anchor" id="DESCRIPTION"></a>
 DESCRIPTION</h2>
 <p>Definitions for the CANLIB API.</p>
-<dl class="author"><dt><b>Author:</b></dt><dd>Kvaser AB</dd></dl>
-<dl class="note"><dt><b>Note:</b></dt><dd>MATLAB users on Windows: if you define WIN32_LEAN_AND_MEAN before including this file, you will see a lot less warnings. </dd></dl>
+<dl class="author"><dt><b>Author:</b></dt><dd>Kvaser AB </dd></dl>
 </div><hr/><h2>Define Documentation</h2>
 <a class="anchor" id="a6457fe726b61066d19a71af031e7091a"></a><!-- doxytag: member="canlib.h::BAUD_100K" ref="a6457fe726b61066d19a71af031e7091a" args="" -->
 <div class="memitem">
@@ -1269,7 +1301,7 @@ DESCRIPTION</h2>
 </div>
 <div class="memdoc">
 <p>This define is used in <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, <em>buffer</em> mentioned below refers to this functions argument.</p>
-<p><em>buffer</em> points to a 32-bit unsigned integer which receives the CAN transceiver type of the specified channel. This value is one of the <a class="el" href="canstat_8h.html#canTRANSCEIVER_TYPE_xxx">canTRANSCEIVER_TYPE_xxx</a> </p>
+<p><em>buffer</em> points to a 32-bit unsigned integer which receives the CAN transceiver type of the specified channel. This value is one of the canTRANSCEIVER_TYPE_xxx </p>
 
 </div>
 </div>
@@ -1563,6 +1595,21 @@ DESCRIPTION</h2>
 
 </div>
 </div>
+<a class="anchor" id="a4400a999679943a45a0cc9be5518fc7e"></a><!-- doxytag: member="canlib.h::canHWTYPE_ETHERCAN" ref="a4400a999679943a45a0cc9be5518fc7e" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canHWTYPE_ETHERCAN&#160;&#160;&#160;70</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Kvaser Ethercan. </p>
+
+</div>
+</div>
 <a class="anchor" id="a9dea9ff0b76197e9487fc061272d9a80"></a><!-- doxytag: member="canlib.h::canHWTYPE_IRIS" ref="a9dea9ff0b76197e9487fc061272d9a80" args="" -->
 <div class="memitem">
 <div class="memproto">
@@ -1679,7 +1726,7 @@ DESCRIPTION</h2>
 </div>
 <div class="memdoc">
 
-<p>"Mini PCI Express" for now, subject to change. </p>
+<p>Kvaser Mini PCI Express. </p>
 
 </div>
 </div>
@@ -1830,6 +1877,21 @@ DESCRIPTION</h2>
 <div class="memdoc">
 
 <p>USBcan Pro HS/K-Line. </p>
+
+</div>
+</div>
+<a class="anchor" id="a28896ba95ab7687306d598bb7afe3c77"></a><!-- doxytag: member="canlib.h::canHWTYPE_USBCAN_LIGHT" ref="a28896ba95ab7687306d598bb7afe3c77" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canHWTYPE_USBCAN_LIGHT&#160;&#160;&#160;72</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Kvaser USBcan Light. </p>
 
 </div>
 </div>
@@ -2358,7 +2420,6 @@ You can't use this function code when the channel is on bus. </dd></dl>
       </table>
 </div>
 <div class="memdoc">
-<p>This is only intended for internal use. </p>
 
 </div>
 </div>
@@ -2622,13 +2683,13 @@ You can't use this function code when the channel is on bus. </dd></dl>
     <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">callback</td><td>A pointer to a callback function of type <a class="el" href="group___general.html#kvCallback_t">kvCallback_t</a> </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">context</td><td>A pointer to arbitrary user-defined context data which is passed to the callback function. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">notifyFlags</td><td>One or more of the <a class="el" href="canstat_8h.html#canNOTIFY_xxx">canNOTIFY_xxx</a> flags.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">notifyFlags</td><td>One or more of the canNOTIFY_xxx flags.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
-<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
+canERR_xxx (negative) if failure</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="group___c_a_n.html#gaa5dd0f277c7059169055321fbda87486">canSetNotify()</a> </dd></dl>
 
 </div>
@@ -2643,7 +2704,7 @@ You can't use this function code when the channel is on bus. </dd></dl>
       </table>
 </div>
 <div class="memdoc">
-<p>Contains status codes according to <a class="el" href="canstat_8h.html#canSTAT_xxx">canSTAT_xxx</a>. </p>
+<p>Contains status codes according to canSTAT_xxx. </p>
 
 </div>
 </div>
@@ -2668,7 +2729,7 @@ You can't use this function code when the channel is on bus. </dd></dl>
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.2) - Generated on Tue Sep 24 2013</small>
+<small>Kvaser Linux CANLIB (canlib 5.3) - Generated on Thu Mar 20 2014</small>
 </address>
 </body>
 </html>

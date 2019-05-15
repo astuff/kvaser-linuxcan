@@ -1,9 +1,9 @@
 /*
-** Copyright 2002-2013 KVASER AB, Sweden.  All rights reserved.
+** Copyright 2002-2014 KVASER AB, Sweden.  All rights reserved.
 */
 
 ================================================================
-Release notes
+Release notes for linuxcan V5.3  
 ================================================================
 
 Linux device drivers for
@@ -19,6 +19,7 @@ Linux device drivers for
   *  KVASER USBcan II Rugged
   *  KVASER USBcan Professional
   *  KVASER USBcan R
+  *  KVASER USBcan Light 2xHS
   *  KVASER Memorator***
   *  KVASER Memorator Professional ****
   *  KVASER Leaf Professional LIN
@@ -27,6 +28,7 @@ Linux device drivers for
   *  KVASER Leaf Light
   *  KVASER Leaf Light v2
   *  KVASER Mini PCI Express HS
+  *  KVASER Mini PCI Express 2xHS
   *  KVASER BlackBird SemiPro ****
   *  KVASER OEM Mercury
   *  KVASER OEM Leaf
@@ -94,8 +96,19 @@ Known problems
      (This is the same as under Windows.)
 
 
-================================================================
-Updates in version 5.2
+New Features and Fixed Problems in V5.3   (20-MAR-2014)
+===========================================================================
+   * Support for Kvaser USBcan Light 2xHS 00714-7
+
+   * Support for Kvaser Mini PCI Express 2xHS 00743-7
+
+   * Corrected retun value upon timeout in canReadSync.
+   
+   * Fixed bug when passing NULL pointer arguments to canRead and
+     canReadWait.
+
+
+New Features and Fixed Problems in V5.2   (26-SEP-2013)
 ================================================================
    * Changed types in canIfData.h in order to handle 32/64bit
      type differences. This implies that both drivers and

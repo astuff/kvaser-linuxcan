@@ -115,7 +115,7 @@ function toggleVisibility(linkObj) {
 </div>
 <div class="contents">
 <div class="textblock"><p>Incoming messages are placed in a queue in the driver. In most cases the hardware does message buffering as well. You can read the first message in the queue by calling canRead; it will return <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a734089f351bc421c230bf8b6cd9b1e8e">canERR_NOMSG</a> if there was no message available.</p>
-<p>The flag parameter of canRead contains a combination of the <a class="el" href="canstat_8h.html#canMSG_xxx">canMSG_xxx</a> flags and provides you with more information about the message; for example, a frame with a 29-bit identifier will have the <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10" title="Message has an extended ID.">canMSG_EXT</a> bit set, and a remote frame will have the <a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3" title="Message is a remote request.">canMSG_RTR</a> bit set. Note that the flag argument is a combination of the <a class="el" href="canstat_8h.html#canMSG_xxx">canMSG_xxx</a> flags, so more than one bit might be set.</p>
+<p>The flag parameter of canRead contains a combination of the canMSG_xxx flags and provides you with more information about the message; for example, a frame with a 29-bit identifier will have the <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> bit set, and a remote frame will have the <a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3">canMSG_RTR</a> bit set. Note that the flag argument is a combination of the canMSG_xxx flags, so more than one bit might be set.</p>
 <p>The size of the queues in the driver and hardware is descibed in <a class="el" href="page_user_guide_send_recv_queue_and_buf_sizes.html">Message Queue and Buffer Sizes</a>.</p>
 <p>Sometimes it is desirable to have a peek into the more remote parts of the queue. Is there, for example, any message waiting that has a certain identifier? You can call canReadSpecific to read that message. Messages not matching the specified identifier will be kept in the queue and will be returned on the next call to canRead.</p>
 <p>If you want to read just a message with a specified identifier, and throw all others away, you can call canReadSpecificSkip(). This routine will return the first message with the specified identifier, discarding any other message in front of the desired one.</p>
@@ -160,7 +160,7 @@ function toggleVisibility(linkObj) {
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.2) - Generated on Tue Sep 24 2013</small>
+<small>Kvaser Linux CANLIB (canlib 5.3) - Generated on Thu Mar 20 2014</small>
 </address>
 </body>
 </html>

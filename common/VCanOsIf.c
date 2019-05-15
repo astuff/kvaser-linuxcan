@@ -313,7 +313,7 @@ int vCanDispatchEvent (VCanChanData *chd, VCAN_EVENT *e)
                                               msg_flags)) != 0)) {
         // This is something that matched the code/mask for at least one buffer,
         // and it's *not* a TXRQ or a TXACK.
-#ifdef __arm__
+#ifdef __arm_
         unsigned int rd;
         unsigned int new_rd;
         do {
@@ -1065,12 +1065,13 @@ static int ioctl (VCanOpenFileNode *fileNodePtr,
       }
       break;
     case VCAN_IOC_SET_TXECHO:
-      ArgPtrIn(sizeof(int));
+      ArgPtrIn(sizeof(char));
       {
+        int flag = *(unsigned char *)arg;
         DEBUGPRINT(3, (TXT("KVASER Try to set VCAN_IOC_SET_TXECHO to %d, was %d\n"),
-                       *(int *)arg, !fileNodePtr->modeNoTxEcho));
-        if (*(int *)arg >= 0 && *(int *)arg <= 2) {
-          fileNodePtr->modeNoTxEcho = !*(int *)arg;
+                       flag, !fileNodePtr->modeNoTxEcho));
+        if (flag >= 0 && flag <= 2) {
+          fileNodePtr->modeNoTxEcho = !flag;
           DEBUGPRINT(3, (TXT("KVASER Managed to set VCAN_IOC_SET_TXECHO to %d\n"),
                          !fileNodePtr->modeNoTxEcho));
         }

@@ -273,7 +273,9 @@ static void   leaf_get_card_info(VCanCardData *vCard);
 #define USB_CAN_R_PRODUCT_ID                39 // Kvaser USBcan R
 #define USB_LEAF_LITE_V2_PRODUCT_ID         288 // Kvaser Leaf Light v2
 #define USB_MINI_PCI_EXPRESS_HS_PRODUCT_ID  289 // Kvaser Mini PCI Express HS
-
+#define USB_LEAF_LIGHT_HS_V2_OEM_PRODUCT_ID 290 // Kvaser Leaf Light HS v2 OEM
+#define USB_USBCAN_LIGHT_2HS_PRODUCT_ID     291 // Kvaser USBcan Light 2xHS
+#define USB_MINI_PCI_EXPRESS_2HS_PRODUCT_ID 292 // Kvaser Mini PCI Express 2xHS
 
 
 // Table of devices that work with this driver
@@ -301,6 +303,9 @@ static struct usb_device_id leaf_table [] = {
   { USB_DEVICE(KVASER_VENDOR_ID, USB_OEM_KEY_DRIVING_PRODUCT_ID) },
   { USB_DEVICE(KVASER_VENDOR_ID, USB_LEAF_LITE_V2_PRODUCT_ID) },
   { USB_DEVICE(KVASER_VENDOR_ID, USB_MINI_PCI_EXPRESS_HS_PRODUCT_ID) },
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_LEAF_LIGHT_HS_V2_OEM_PRODUCT_ID) },
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_USBCAN_LIGHT_2HS_PRODUCT_ID) },
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_MINI_PCI_EXPRESS_2HS_PRODUCT_ID) },
   { }  // Terminating entry
 };
 
@@ -2006,6 +2011,9 @@ static int leaf_plugin (struct usb_interface *interface,
        (udev->descriptor.idProduct != USB_OEM_KEY_DRIVING_PRODUCT_ID)       &&
        (udev->descriptor.idProduct != USB_LEAF_LITE_V2_PRODUCT_ID)          &&
        (udev->descriptor.idProduct != USB_MINI_PCI_EXPRESS_HS_PRODUCT_ID)   &&
+       (udev->descriptor.idProduct != USB_LEAF_LIGHT_HS_V2_OEM_PRODUCT_ID)  &&
+       (udev->descriptor.idProduct != USB_USBCAN_LIGHT_2HS_PRODUCT_ID)      &&
+       (udev->descriptor.idProduct != USB_MINI_PCI_EXPRESS_2HS_PRODUCT_ID)  &&
        (udev->descriptor.idProduct != USB_CAN_R_PRODUCT_ID)
       )
      )
@@ -2131,6 +2139,21 @@ static int leaf_plugin (struct usb_interface *interface,
     case USB_MINI_PCI_EXPRESS_HS_PRODUCT_ID:
           DEBUGPRINT(2, (TXT("\nKVASER ")));
           DEBUGPRINT(2, (TXT("Mini PCI Express HS plugged in\n")));
+          break;
+          
+    case USB_LEAF_LIGHT_HS_V2_OEM_PRODUCT_ID:
+          DEBUGPRINT(2, (TXT("\nKVASER ")));
+          DEBUGPRINT(2, (TXT("Leaf Light HS v2 OEM plugged in\n")));
+          break;
+
+    case USB_USBCAN_LIGHT_2HS_PRODUCT_ID:
+          DEBUGPRINT(2, (TXT("\nKVASER ")));
+          DEBUGPRINT(2, (TXT("USBcan Light 2xHS plugged in\n")));
+          break;
+
+    case USB_MINI_PCI_EXPRESS_2HS_PRODUCT_ID:
+          DEBUGPRINT(2, (TXT("\nKVASER ")));
+          DEBUGPRINT(2, (TXT("Mini PCI Express 2xHS plugged in\n")));
           break;
 
     default:

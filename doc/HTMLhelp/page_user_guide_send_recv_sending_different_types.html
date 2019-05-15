@@ -115,15 +115,15 @@ function toggleVisibility(linkObj) {
 </div>
 <div class="contents">
 <div class="textblock"><h2>Remote Requests</h2>
-<p>You can send remote requests by passing the <a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3" title="Message is a remote request.">canMSG_RTR</a> flag to <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>. Received remote frames are reported by canRead et al using the same flag.</p>
+<p>You can send remote requests by passing the <a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3">canMSG_RTR</a> flag to <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>. Received remote frames are reported by canRead et al using the same flag.</p>
 <h2>Error Frames</h2>
-<p>Nearly all hardware platforms support detection of error frames. If an error frame arrives, the flag <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8" title="Message is an error frame.">canMSG_ERROR_FRAME</a> is set in the flag argument of <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a>. The identifier is garbage if an error frame is received, but for LAPcan it happens to be 2048 plus the error code from the SJA1000.</p>
-<p>Many platforms (for example, LAPcan, Leaf, and USBcan II) support transmission of error frames as well. To send error frames, set the <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8" title="Message is an error frame.">canMSG_ERROR_FRAME</a> flag in the flag argument to <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>.</p>
+<p>Nearly all hardware platforms support detection of error frames. If an error frame arrives, the flag <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a> is set in the flag argument of <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a>. The identifier is garbage if an error frame is received, but for LAPcan it happens to be 2048 plus the error code from the SJA1000.</p>
+<p>Many platforms (for example, LAPcan, Leaf, and USBcan II) support transmission of error frames as well. To send error frames, set the <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a> flag in the flag argument to <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>.</p>
 <h2>Overload Frames</h2>
 <p>These aren't used nowadays. Certain old CAN controllers (Intel 82526) used them to delay frame processing in certain cases.</p>
 <h2>Other frame features of interest</h2>
 <ul>
-<li>You can send wakeup frames (used for Single-Wire CAN) if your hardware supports it, for example, a LAPcan plus a DRVcan S. Just set the <a class="el" href="canstat_8h.html#a616183e2ed8ca81976463914e47b35e1" title="Message to be sent / was received in wakeup mode.">canMSG_WAKEUP</a> flag when calling <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>.</li>
+<li>You can send wakeup frames (used for Single-Wire CAN) if your hardware supports it, for example, a LAPcan plus a DRVcan S. Just set the <a class="el" href="canstat_8h.html#a616183e2ed8ca81976463914e47b35e1">canMSG_WAKEUP</a> flag when calling <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>.</li>
 <li>For "low-speed CAN" (1053/1054 type transceivers), the <a class="el" href="canstat_8h.html#a1f53f2fdeeb263cd2bf5d374e1dd59a2">canMSG_NERR</a> flag is set if a frame is received in "fault-tolerant" mode. </li>
 </ul>
 </div></div>
@@ -148,7 +148,7 @@ function toggleVisibility(linkObj) {
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.2) - Generated on Tue Sep 24 2013</small>
+<small>Kvaser Linux CANLIB (canlib 5.3) - Generated on Thu Mar 20 2014</small>
 </address>
 </body>
 </html>

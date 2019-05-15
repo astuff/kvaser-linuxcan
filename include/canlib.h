@@ -1,33 +1,6 @@
 /**
  * \section LICENSE
- *                   Copyright 1994-2013 by KVASER AB, SWEDEN
- *
- *                        WWW: http://www.kvaser.com
- *
- * This software is furnished under a license and may be used and copied
- * only in accordance with the terms of such license.
- *
- * \section DESCRIPTION
- *
- *   Definitions for the CANLIB API.
- *
- * \file canlib.h
- * \author Kvaser AB
- *
- * \note MATLAB users on Windows: if you define WIN32_LEAN_AND_MEAN before
- * including this file, you will see a lot less warnings.
- *
- * \defgroup General                 General
- * \defgroup CAN                     CAN
- * \defgroup ObjectBuffers           Object buffers
- * \win_start
- * \defgroup TimeDomainHandling      Time Domain Handling
- * \defgroup NamedParameterSettings  Named Parameter Settings
- * \defgroup tScript                 t-script
- * \win_end
- */
-/**
- * \section LICENSE
+ * <pre style="white-space: pre-wrap">
  * This software is dual licensed under the following two licenses:
  * BSD-new and GPLv2. You may use either one. See the included
  * COPYING file for details.
@@ -74,6 +47,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  * ---------------------------------------------------------------------------
+ * </pre>
+ *
+ * \section DESCRIPTION
+ *
+ *   Definitions for the CANLIB API.
+ *
+ * \file canlib.h
+ * \author Kvaser AB
+ *
+ * \defgroup General                 General
+ * \defgroup CAN                     CAN
+ * \defgroup ObjectBuffers           Object buffers
  */
 
 #ifndef _CANLIB_H_
@@ -1622,8 +1607,11 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canHWTYPE_EAGLE              62  ///< Kvaser Eagle family
 #define canHWTYPE_BAGEL              64  ///< Obsolete name, use canHWTYPE_BLACKBIRD_V2 instead
 #define canHWTYPE_BLACKBIRD_V2       64  ///< Kvaser BlackBird v2
-#define canHWTYPE_MINIPCIE           66  ///< "Mini PCI Express" for now, subject to change.
+#define canHWTYPE_MINIPCIE           66  ///< Kvaser Mini PCI Express
 #define canHWTYPE_USBCAN_KLINE       68  ///< USBcan Pro HS/K-Line
+#define canHWTYPE_ETHERCAN           70  ///< Kvaser Ethercan
+#define canHWTYPE_USBCAN_LIGHT       72  ///< Kvaser USBcan Light
+
 /** @} */
                                  
 /**

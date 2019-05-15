@@ -79,30 +79,39 @@ case "$1" in
       /sbin/rmmod leaf
       /sbin/$kv_module_install leaf || exit 1
       $LOG -t $0 "Module leaf added"
-      nrchan=`cat /proc/leaf | grep 'total channels' | cut -d \  -f 3`
+      minors=`cat /proc/leaf | grep 'minor numbers' | cut -d ' ' -f 3-`
       major=`cat /proc/devices | grep 'leaf' | cut -d \  -f 1`
       rm -f /dev/leaf*
-      for minor in $(seq 0 `expr $nrchan - 1`) ; do
+      for minor in $minors; do
          $LOG -t $0 "Created /dev/leaf$minor"
          mknod /dev/leaf$minor c $major $minor
       done
       ;;
    stop)
+      if [ -f /proc/leaf ]; then
+         minors=`cat /proc/leaf | grep 'minor numbers' | cut -d ' ' -f 3-`
+         for leaf in `ls /dev/leaf*`; do
+            l=`echo $leaf | grep -o '[0-9]*$'`
+            found=0
+            for m in $minors; do
+               if [ $l -eq $m ]; then
+                  found=1
+               fi
+            done
+            if [ $found -eq 0 ]; then
+               rm -f $leaf
+               $LOG -t $0 "Device $leaf removed"
+            fi
+         done
+      fi
       /sbin/rmmod leaf || exit 1
       rm -f /dev/leaf*
       $LOG -t $0 "Module leaf removed"
       ;;
    restart)
-      rm -f /dev/leaf*
-      /sbin/$kv_module_install leaf || exit 1
-      $LOG -t $0 "Module leaf added"
-      nrchan=`cat /proc/leaf | grep 'total channels' | cut -d \  -f 3`
-      major=`cat /proc/devices | grep 'leaf' | cut -d \  -f 1`
-      rm -f /dev/leaf*
-      for minor in $(seq 0 `expr $nrchan - 1`) ; do
-         $LOG -t $0 "Created /dev/leaf$minor"
-         mknod /dev/leaf$minor c $major $minor
-      done
+      $LOG -t $0 "Module leaf restart"
+      $0 stop
+      $0 start
       ;;
    *)
       printf "Usage: %s {start|stop|restart}\n" $0

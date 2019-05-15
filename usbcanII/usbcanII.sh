@@ -53,7 +53,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # 
 #  ---------------------------------------------------------------------------
-# 
+#
 
 LOG=`which logger`
 
@@ -79,21 +79,42 @@ case "$1" in
       /sbin/rmmod usbcanII
       /sbin/$kv_module_install usbcanII || exit 1
       $LOG -t $0 "Module usbcanII added"
-      nrchan=`cat /proc/usbcanII | grep 'total channels' | cut -d \  -f 3`
+      minors=`cat /proc/usbcanII | grep 'minor numbers' | cut -d ' ' -f 3-`
       major=`cat /proc/devices | grep 'usbcanII' | cut -d \  -f 1`
       rm -f /dev/usbcanII*
-      for minor in $(seq 0 `expr $nrchan - 1`) ; do
+      for minor in $minors; do
          $LOG -t $0 "Created /dev/usbcanII$minor"
          mknod /dev/usbcanII$minor c $major $minor
       done
       ;;
    stop)
+      if [ -f /proc/usbcanII ]; then
+         minors=`cat /proc/usbcanII | grep 'minor numbers' | cut -d ' ' -f 3-`
+         for usbcanII in `ls /dev/usbcanII*`; do
+            l=`echo $usbcanII | grep -o '[0-9]*$'`
+            found=0
+            for m in $minors; do
+               if [ $l -eq $m ]; then
+                  found=1
+               fi
+            done
+            if [ $found -eq 0 ]; then
+               rm -f $usbcanII
+               $LOG -t $0 "Device $usbcanII removed"
+            fi
+         done
+      fi
       /sbin/rmmod usbcanII || exit 1
       rm -f /dev/usbcanII*
       $LOG -t $0 "Module usbcanII removed"
       ;;
+   restart)
+      $LOG -t $0 "Module usbcanII restart"
+      $0 stop
+      $0 start
+      ;;
    *)
-      printf "Usage: %s {start|stop}\n" $0
+      printf "Usage: %s {start|stop|restart}\n" $0
 esac
 
 exit 0 

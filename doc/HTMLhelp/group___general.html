@@ -131,14 +131,14 @@ kvCallback_t</h2></td></tr>
 <ul>
 <li>hnd - the handle of the CAN channel where the event happened. </li>
 <li>context - the context pointer you passed to <a class="el" href="group___general.html#ga99976c5b8e2c534b27bf9ec2e715d8d3">kvSetNotifyCallback()</a>. </li>
-<li>notifyEvent - one of the <a class="el" href="canstat_8h.html#canNOTIFY_xxx">canNOTIFY_xxx</a> notification codes.</li>
+<li>notifyEvent - one of the canNOTIFY_xxx notification codes.</li>
 </ul>
-<dl class="note"><dt><b>Note:</b></dt><dd>It is really the <a class="el" href="canstat_8h.html#canNOTIFY_xxx">canNOTIFY_xxx</a> codes, and not the <a class="el" href="canstat_8h.html#canEVENT_xxx">canEVENT_xxx</a> codes that the <a class="el" href="group___c_a_n.html#gaa5dd0f277c7059169055321fbda87486">canSetNotify()</a> API is using.</dd></dl>
+<dl class="note"><dt><b>Note:</b></dt><dd>It is really the canNOTIFY_xxx codes, and not the canEVENT_xxx codes that the <a class="el" href="group___c_a_n.html#gaa5dd0f277c7059169055321fbda87486">canSetNotify()</a> API is using.</dd></dl>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">context</td><td>Arbitrary user-defined context data which is passed to the callback function. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">notifyEvent</td><td>One or more of the <a class="el" href="canstat_8h.html#canEVENT_xxx">canEVENT_xxx</a> flags. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">notifyEvent</td><td>One or more of the canEVENT_xxx flags. </td></tr>
   </table>
   </dd>
 </dl>
@@ -195,7 +195,7 @@ kvCallback_t</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
-<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
+canERR_xxx (negative) if failure</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="page_code_snippets_examples.html">Code Examples</a> </dd>
 <dd>
 <a class="el" href="group___general.html#ga65169ca633cd30aa92b8a80e28a5378b">canGetNumberOfChannels()</a> </dd></dl>
@@ -233,7 +233,7 @@ kvCallback_t</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-<p>This function translates an error code (<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a>) to a human-readable, English text.</p>
+<p>This function translates an error code (canERR_xxx) to a human-readable, English text.</p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">err</td><td>The error code. </td></tr>
@@ -244,7 +244,7 @@ kvCallback_t</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
-<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
+canERR_xxx (negative) if failure</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="page_code_snippets_examples.html">Code Examples</a> </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a0">busparms.c</a>, <a class="el" href="cancount_8c-example.html#a0">cancount.c</a>, <a class="el" href="opentest_8c-example.html#a0">opentest.c</a>, <a class="el" href="read_timer_test_8c-example.html#a1">readTimerTest.c</a>, and <a class="el" href="simplewrite_8c-example.html#a0">simplewrite.c</a>.</dd>
 </dl>
@@ -273,7 +273,7 @@ kvCallback_t</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
-<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
+canERR_xxx (negative) if failure</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="page_code_snippets_examples.html">Code Examples</a>, <a class="el" href="page_user_guide_virtual_info.html">Virtual Channels</a> </dd>
 <dd>
 <a class="el" href="group___general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a> </dd></dl>
@@ -316,7 +316,7 @@ kvCallback_t</h2></td></tr>
 <div class="memdoc">
 <p>This function must be called before any other functions is used. It will initialize the driver.</p>
 <p>You may call <a class="el" href="group___general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1">canInitializeLibrary()</a> more than once. The actual initialization will take place only once.</p>
-<p>Any errors encountered during library initialization will be "silent" and an appropriate <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> error code will be returned later on when <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> (or any other API call that requires initialization) is called.</p>
+<p>Any errors encountered during library initialization will be "silent" and an appropriate canERR_xxx error code will be returned later on when <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> (or any other API call that requires initialization) is called.</p>
 <dl class="note"><dt><b>Note:</b></dt><dd>This call replaces the canLocateHardware() API call and serves the same purpose.</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="page_code_snippets_examples.html">Code Examples</a> </dd></dl>
 
@@ -370,7 +370,7 @@ kvCallback_t</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
-<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure </dd></dl>
+canERR_xxx (negative) if failure </dd></dl>
 
 </div>
 </div>
@@ -419,13 +419,13 @@ kvCallback_t</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">callback</td><td>A pointer to a callback function of type <a class="el" href="group___general.html#kvCallback_t">kvCallback_t</a> </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">context</td><td>A pointer to arbitrary user-defined context data which is passed to the callback function. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">notifyFlags</td><td>One or more of the <a class="el" href="canstat_8h.html#canNOTIFY_xxx">canNOTIFY_xxx</a> flags.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">notifyFlags</td><td>One or more of the canNOTIFY_xxx flags.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
-<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
+canERR_xxx (negative) if failure</dd></dl>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="group___c_a_n.html#gaa5dd0f277c7059169055321fbda87486">canSetNotify()</a> </dd></dl>
 
 </div>
@@ -450,7 +450,7 @@ kvCallback_t</h2></td></tr>
 
 <!-- <hr class="footer"/> -->
 <address class="footer">
-<small>Kvaser Linux CANLIB (canlib 5.2) - Generated on Tue Sep 24 2013</small>
+<small>Kvaser Linux CANLIB (canlib 5.3) - Generated on Thu Mar 20 2014</small>
 </address>
 </body>
 </html>

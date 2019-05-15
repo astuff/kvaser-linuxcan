@@ -268,27 +268,27 @@ static void *vCanNotifyThread (void *arg)
       notifyData->info.status.busStatus      = chipState->busStatus;
       notifyData->info.status.txErrorCounter = chipState->txErrorCounter;
       notifyData->info.status.rxErrorCounter = chipState->rxErrorCounter;
-      notifyData->info.status.time           = msg.timeStamp * hData->timerScale;
+      notifyData->info.status.time           = (msg.timeStamp * 10UL) / (hData->timerResolution) ;
       notify(hData, &msg);
     } else if (msg.tag == V_RECEIVE_MSG) {
       if (msg.tagData.msg.flags & VCAN_MSG_FLAG_ERROR_FRAME) {
         if (hData->notifyFlags & canNOTIFY_ERROR) {
           notifyData->eventType = canEVENT_ERROR;
-          notifyData->info.busErr.time = msg.timeStamp * hData->timerScale;
+          notifyData->info.busErr.time = (msg.timeStamp * 10UL) / (hData->timerResolution) ;
           notify(hData, &msg);
         }
       } else if (msg.tagData.msg.flags & VCAN_MSG_FLAG_TXACK) {
         if (hData->notifyFlags & canNOTIFY_TX) {
           notifyData->eventType    = canEVENT_TX;
           notifyData->info.tx.id   = msg.tagData.msg.id;
-          notifyData->info.tx.time = msg.timeStamp * hData->timerScale;
+          notifyData->info.tx.time = (msg.timeStamp * 10UL) / (hData->timerResolution) ;
           notify(hData, &msg);
         }
       } else {
         if (hData->notifyFlags & canNOTIFY_RX) {
           notifyData->eventType    = canEVENT_RX;
           notifyData->info.rx.id   = msg.tagData.msg.id;
-          notifyData->info.tx.time = msg.timeStamp * hData->timerScale;
+          notifyData->info.tx.time = (msg.timeStamp * 10UL) / (hData->timerResolution) ;
           notify(hData, &msg);
         }
       }
@@ -585,7 +585,7 @@ static canStatus vCanReadInternal (HandleData *hData, long *id,
       // MSb is extended flag
       if (id)   *id   = msg.tagData.msg.id & ~EXT_MSG;
       if (dlc)  *dlc  = msg.tagData.msg.dlc;
-      if (time) *time = msg.timeStamp * hData->timerScale;
+      if (time) *time = (msg.timeStamp * 10UL) / (hData->timerResolution) ;
       if (flag) *flag = flags;
 
       // Copy data
@@ -902,7 +902,7 @@ static canStatus vCanReadTimer (HandleData *hData, unsigned long *time)
                        &tmpTime, sizeof(unsigned long))) {
     return toStatus(errno);
   }
-  *time = tmpTime * hData->timerScale;
+  *time = (tmpTime * 10UL) / (hData->timerResolution) ;
 
   return canOK;
 }
@@ -1123,7 +1123,7 @@ static canStatus vCanIoCtl(HandleData *hData, unsigned int func,
     }
     break;
   case canIOCTL_SET_LOCAL_TXECHO:
-    // buf points at a DWORD which contains 0/1 to turn TXECHO on/ff
+    // buf points at an unsigned char which contains 0/1 to turn TXECHO on/ff
     if (os_if_ioctl_write(hData->fd, VCAN_IOC_SET_TXECHO, buf, buflen)) {
       return toStatus(errno);
     }
