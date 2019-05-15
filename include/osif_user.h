@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -61,10 +61,8 @@
 
 #   define OS_IF_INVALID_HANDLE -1
 
-#   define OS_IF_SET_NOTIFY_PARAM  void (*callback) (canNotifyData *), \
-    __stdcall void (*callback2)(int handle, void *context, unsigned int notifyEvent)
 
-#   define OS_IF_IS_CLOSE_ERROR(x) (1 == x)
+#   define OS_IF_IS_CLOSE_ERROR(x) (0 != x)
 #   define OS_IF_CLOSE_HANDLE close
 #   define OS_IF_ALLOC_MEM(s) malloc(s)
 #   define OS_IF_FREE_MEM(a)  free(a)

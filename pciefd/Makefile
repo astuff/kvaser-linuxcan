@@ -1,8 +1,5 @@
 #
-# Makefile pciefd
-#
-#
-#                 Copyright 2012 by Kvaser AB, Mölndal, Sweden
+#              Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 #                         http://www.kvaser.com
 #
 #  This software is dual licensed under the following two licenses:
@@ -51,6 +48,9 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 #  ---------------------------------------------------------------------------
+
+#
+# Makefile pciefd
 #
 
 -include $(PWD)/../kveyes.mak

@@ -1,5 +1,5 @@
 /*
-**                Copyright 2014 by Kvaser AB, Mölndal, Sweden
+**                Copyright 2014 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -54,9 +54,7 @@
 
 #include <linux/types.h>
 
-#ifdef HYDRA_PRIVATE
 #   include "hydra_host_private_cmds.h"
-#endif
 
 #define CMD_RX_STD_MESSAGE                12
 #define CMD_TX_CAN_MESSAGE                33
@@ -636,6 +634,8 @@ typedef struct hcanErrorFrameData_s {
 #define MSGFLAG_EXTENDED_ID         0x20        // Extended id.
 #define MSGFLAG_TX                  0x40        // TX acknowledge
 #define MSGFLAG_TXRQ                0x80        // TX request
+#define MSGFLAG_SSM_NACK        0x001000        // Single shot transmission failed. 
+#define MSGFLAG_ABL             0x002000        // Single shot transmission failed due to ArBitration Loss. 
 #define MSGFLAG_EDL             0x010000        // Obsolete, use MSGFLAG_FDF instead
 #define MSGFLAG_FDF             0x010000        // Message is an FD message (CAN FD)
 #define MSGFLAG_BRS             0x020000        // Message is sent/received with bit rate switch (CAN FD)
@@ -743,9 +743,11 @@ typedef struct hcanErrorFrameData_s {
 
 // Use these message flags with cmdSetAutoTxBuffer.flags
 #define AUTOTXBUFFER_MSG_REMOTE_FRAME     0x10    // Msg is a remote frame
+#define AUTOTXBUFFER_MSG_SINGLE_SHOT      0x40    // single shot capable
 #define AUTOTXBUFFER_MSG_EXT              0x80    // Extended identifier
 #define AUTOTXBUFFER_MSG_FDF              0x100   // msg is canfd
 #define AUTOTXBUFFER_MSG_BRS              0x200   // msg is canfd and brs
+
 
 // For CMD_SOFTSYNC_ONOFF
 #define SOFTSYNC_OFF          0
@@ -1508,6 +1510,7 @@ typedef struct {
 #define CAP_SUB_CMD_ERRFRAME                 3
 #define CAP_SUB_CMD_BUS_STATS                4
 #define CAP_SUB_CMD_ERRCOUNT_READ            5
+#define CAP_SUB_CMD_SINGLE_SHOT              6
 
 
 typedef struct {
@@ -1536,6 +1539,8 @@ typedef struct {
     hchannelCap32_t errframeCap; // CAP_SUB_CMD_ERRFRAME
     hchannelCap32_t busstatCap;  // CAP_SUB_CMD_BUS_STATS
     hchannelCap32_t errcountCap; // CAP_SUB_CMD_ERRCOUNT_READ    
+    hchannelCap32_t singleshotCap; // CAP_SUB_CMD_SINGLE_SHOT    
+    
   };
 } hcmdCapabilitiesResp;
    
@@ -1793,9 +1798,7 @@ typedef struct hydraHostCmd {
     hcmdCapabilitiesReq           capabilitiesReq;
     hcmdCapabilitiesResp          capabilitiesResp;
 
-#ifdef HYDRA_PRIVATE
     hcmdHydraOtherCommand        o;
-#endif
 
   } ;
 } hydraHostCmd;

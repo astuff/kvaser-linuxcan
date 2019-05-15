@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -67,22 +67,22 @@
 #include "debug.h"
 
 #include <stdio.h>
-#   include <sys/types.h>
-#   include <sys/stat.h>
-#   include <fcntl.h>
-#   include <unistd.h>
-#   include <errno.h>
-#   include <signal.h>
-#   include <pthread.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <signal.h>
+#include <pthread.h>
 
 #include <string.h>
 
 
-#   if DEBUG
-#      define DEBUGPRINT(args) printf args
-#   else
-#      define DEBUGPRINT(args)
-#   endif
+#if DEBUG
+#   define DEBUGPRINT(args) printf args
+#else
+#   define DEBUGPRINT(args)
+#endif
 
 #define MFGNAME_ASCII "KVASER AB"
 
@@ -229,7 +229,9 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser PCIEcan 2xHS v2",                            {0x30008618, 0x00073301}},
           {"Kvaser PCIEcan HS v2",                              {0x30008663, 0x00073301}},
           {"Kvaser USBcan Pro 2xHS v2 CB",                      {0x30008779, 0x00073301}},
-          {"Kvaser Leaf Light HS v2 M12",                       {0x30008816, 0x00073301}}
+          {"Kvaser Leaf Light HS v2 M12",                       {0x30008816, 0x00073301}},
+          {"Kvaser USBcan R v2",                                {0x30009202, 0x00073301}},
+          {"Kvaser Leaf Light R v2",                            {0x30009219, 0x00073301}}
 };
 
 static canStatus check_bitrate (const CanHandle hnd, unsigned int bitrate);
@@ -244,7 +246,6 @@ canStatus getDevParams (int channel, char devName[], int *devChannel,
   // For now, we just count the number of /dev/%s%d files (see dev_name),
   // where %d is numbers between 0 and 255.
   // This is slow!
-  // qqq Maybe we can read the dev names from some struct?
 
   int         chanCounter = 0;
   int         devCounter  = 0;
@@ -280,8 +281,6 @@ canStatus getDevParams (int channel, char devName[], int *devChannel,
             ChannelsOnCard = 1;
           } else {
             ChannelNoOnCard = 0;
-             // qqq, CardNo for a given card will decrease if
-             //      a card with lower No is removed.
             CardNo++;
           }
         } else {
@@ -294,6 +293,7 @@ canStatus getDevParams (int channel, char devName[], int *devChannel,
           sprintf(officialName, "KVASER %s channel %d", off_name[n], devCounter);
           *devChannel = ChannelNoOnCard;
 
+          errno = 0; // Calling stat() may set errno.
           return canOK;
         }
       }
@@ -312,9 +312,6 @@ canStatus getDevParams (int channel, char devName[], int *devChannel,
   return canERR_NOTFOUND;
 }
 
-
-
-
 //
 // API FUNCTIONS
 //
@@ -327,6 +324,13 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags)
   canStatus          status;
   HandleData         *hData;
   CanHandle          hnd;
+  const int validFlags = canOPEN_EXCLUSIVE      | canOPEN_REQUIRE_EXTENDED |
+                         canOPEN_ACCEPT_VIRTUAL | canOPEN_ACCEPT_LARGE_DLC |
+                         canOPEN_CAN_FD         | canOPEN_CAN_FD_NONISO;
+
+  if ((flags & ~validFlags) != 0) {
+    return canERR_PARAM;
+  }
 
   hData = (HandleData *)OS_IF_ALLOC_MEM(sizeof(HandleData));
   if (hData == NULL) {
@@ -340,12 +344,14 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags)
   hData->readIsBlock      = 1;
   hData->writeIsBlock     = 1;
   hData->isExtended       = flags & canOPEN_REQUIRE_EXTENDED;
+
   if (flags & canOPEN_CAN_FD_NONISO)
     hData->fdMode = OPEN_AS_CANFD_NONISO;
   else if (flags & canOPEN_CAN_FD)
     hData->fdMode = OPEN_AS_CANFD_ISO;
   else
     hData->fdMode = OPEN_AS_CAN;
+
   hData->acceptLargeDlc   = ((flags & canOPEN_ACCEPT_LARGE_DLC) != 0);
   hData->wantExclusive    = flags & canOPEN_EXCLUSIVE;
   hData->acceptVirtual    = flags & canOPEN_ACCEPT_VIRTUAL;
@@ -496,6 +502,10 @@ canSetBusParams (const CanHandle hnd, long freq, unsigned int tseg1,
   long freq_brs;
   unsigned int tseg1_brs, tseg2_brs, sjw_brs;
 
+  if ((noSamp != 3) && (noSamp != 1) && (noSamp != 0)) {
+    return canERR_PARAM;
+  }
+
   hData = findHandle(hnd);
   if (hData == NULL) {
     return canERR_INVHANDLE;
@@ -513,7 +523,7 @@ canSetBusParams (const CanHandle hnd, long freq, unsigned int tseg1,
   if (ret != canOK) {
     return ret;
   }
-  
+
   ret = hData->canOps->getBusParams(hData, NULL, NULL, NULL, NULL, NULL,
                                     &freq_brs, &tseg1_brs, &tseg2_brs,
                                     &sjw_brs, NULL);
@@ -546,7 +556,7 @@ canSetBusParamsFd (const CanHandle hnd, long freq_brs, unsigned int tseg1_brs,
   if ((OPEN_AS_CANFD_ISO != hData->fdMode) && (OPEN_AS_CANFD_NONISO != hData->fdMode)) {
     return canERR_INVHANDLE;
   }
-  
+
   ret = hData->canOps->getBusParams(hData, &freq, &tseg1, &tseg2, &sjw, &noSamp,
                                     NULL, NULL, NULL, NULL, &syncmode);
   if (ret != canOK) {
@@ -565,7 +575,7 @@ canSetBusParamsFd (const CanHandle hnd, long freq_brs, unsigned int tseg1_brs,
   if (ret != canOK) {
     return ret;
   }
-  
+
   ret = hData->canOps->setBusParams(hData, freq, tseg1, tseg2, sjw, noSamp,
                                     freq_brs, tseg1_brs, tseg2_brs, sjw_brs,
                                     syncmode);
@@ -591,7 +601,7 @@ canSetBusParamsC200 (const CanHandle hnd, unsigned char btr0, unsigned char btr1
             (tseg1 + tseg2 + 1);
 
   ret = check_bitrate (hnd, (unsigned int)bitrate);
-  
+
   if (ret != canOK) {
     return ret;
   }
@@ -670,6 +680,10 @@ canGetBusOutputControl (const CanHandle hnd, unsigned int * drivertype)
 {
   HandleData *hData;
 
+  if (drivertype == NULL) {
+    return canERR_PARAM;
+  }
+
   hData = findHandle(hnd);
   if (hData == NULL) {
     return canERR_INVHANDLE;
@@ -715,6 +729,25 @@ canStatus CANLIBAPI canReadStatus (const CanHandle hnd,
 
 
 //******************************************************
+// Request chip status
+//******************************************************
+canStatus CANLIBAPI canRequestChipStatus (const CanHandle hnd)
+{
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  // canRequestChipStatus is not needed in Linux, but in order to make code
+  // portable between Windows and Linux, a dummy function returning canOK
+  // was added.
+  return hData->canOps->requestChipStatus(hData);
+}
+
+
+//******************************************************
 // Read the error counters
 //******************************************************
 canStatus CANLIBAPI canReadErrorCounters (const CanHandle hnd,
@@ -741,6 +774,11 @@ canWrite (const CanHandle hnd, long id, void *msgPtr,
 {
   HandleData *hData;
 
+  // If msgPtr is NULL then dlc must be 0, unless it is a remote frame.
+  if ((msgPtr == NULL) && (dlc != 0) && ((flag & canMSG_RTR) == 0)) {
+    return canERR_PARAM;
+  }
+
   hData = findHandle(hnd);
   if (hData == NULL) {
     return canERR_INVHANDLE;
@@ -758,6 +796,11 @@ canWriteWait (const CanHandle hnd, long id, void *msgPtr,
               unsigned int dlc, unsigned int flag, unsigned long timeout)
 {
   HandleData *hData;
+
+  // If msgPtr is NULL then dlc must be 0, unless it is a remote frame.
+  if ((msgPtr == NULL) && (dlc != 0) && ((flag & canMSG_RTR) == 0)) {
+    return canERR_PARAM;
+  }
 
   hData = findHandle(hnd);
   if (hData == NULL) {
@@ -805,6 +848,69 @@ canRead (const CanHandle hnd, long *id, void *msgPtr, unsigned int *dlc,
   }
 }
 
+//*********************************************************
+// Reads a message with the specified identifier (if available). Any
+// preceeding message not matching the specified identifier will be retained
+// in the queue.
+//*********************************************************
+canStatus CANLIBAPI
+canReadSpecific(const CanHandle hnd,
+                long            id,
+                void            *msgPtr,
+                unsigned int    *dlc,
+                unsigned int    *flag,
+                unsigned long   *time)
+{
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  return hData->canOps->readSpecific(hData, id, msgPtr, dlc, flag, time);
+}
+
+//*********************************************************
+// Waits until the receive buffer contains a message with the specified
+// id, or a timeout occurs.
+//*********************************************************
+canStatus CANLIBAPI
+canReadSyncSpecific(const CanHandle hnd,
+                    long            id,
+                    unsigned long   timeout)
+{
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  return hData->canOps->readSyncSpecific(hData, id, timeout);
+}
+
+//*********************************************************
+// Reads a message with a specified id from the receive buffer. Any
+// preceeding message not matching the specified identifier will be skipped.
+//*********************************************************
+canStatus CANLIBAPI
+canReadSpecificSkip(const CanHandle hnd,
+                    long            id,
+                    void            *msgPtr,
+                    unsigned int    *dlc,
+                    unsigned int    *flag,
+                    unsigned long   *time)
+{
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  return hData->canOps->readSpecificSkip(hData, id, msgPtr, dlc, flag, time);
+}
 
 //*********************************************************
 // Read can message or wait until one appears or timeout
@@ -879,6 +985,7 @@ canReadSync(const CanHandle hnd, unsigned long timeout)
     return canOK;
   }
 }
+
 //****************************************************************
 // Wait until all can messages on a circuit are sent or timeout
 //****************************************************************
@@ -940,50 +1047,58 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
                                       unsigned int *const nosamp,
                                       unsigned int *const syncMode)
 {
+  if (!freq || !tseg1 || !tseg2 || !sjw  || !nosamp) {
+    return canERR_PARAM;
+  }
+
+  if (syncMode != NULL) {
+    *syncMode = 0;
+  }
+
+  *nosamp = 1;
+
   switch (*freq) {
 
   case canFD_BITRATE_8M_60P:
-      *freq     = 8000000L;
-      *tseg1    = 2;
-      *tseg2    = 2;
-      *sjw      = 1;
-      break;
+    *freq     = 8000000L;
+    *tseg1    = 2;
+    *tseg2    = 2;
+    *sjw      = 1;
+    break;
 
   case canFD_BITRATE_4M_80P:
-      *freq     = 4000000L;
-      *tseg1    = 7;
-      *tseg2    = 2;
-      *sjw      = 2;
-      break;
+    *freq     = 4000000L;
+    *tseg1    = 7;
+    *tseg2    = 2;
+    *sjw      = 2;
+    break;
 
   case canFD_BITRATE_2M_80P:
-      *freq     = 2000000L;
-      *tseg1    = 15;
-      *tseg2    = 4;
-      *sjw      = 4;
-      break;
+    *freq     = 2000000L;
+    *tseg1    = 15;
+    *tseg2    = 4;
+    *sjw      = 4;
+    break;
 
   case canFD_BITRATE_1M_80P:
-      *freq     = 1000000L;
-      *tseg1    = 31;
-      *tseg2    = 8;
-      *sjw      = 8;
-      break;
+    *freq     = 1000000L;
+    *tseg1    = 31;
+    *tseg2    = 8;
+    *sjw      = 8;
+    break;
 
   case canFD_BITRATE_500K_80P:
-      *freq     = 500000L;
-      *tseg1    = 63;
-      *tseg2    = 16;
-      *sjw      = 16;
-      break;
+    *freq     = 500000L;
+    *tseg1    = 63;
+    *tseg2    = 16;
+    *sjw      = 16;
+    break;
 
   case BAUD_1M:
     *freq     = 1000000L;
     *tseg1    = 5;
     *tseg2    = 2;
     *sjw      = 1;
-    *nosamp   = 1;
-    *syncMode = 0;
     break;
 
   case BAUD_500K:
@@ -991,8 +1106,6 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
     *tseg1    = 5;
     *tseg2    = 2;
     *sjw      = 1;
-    *nosamp   = 1;
-    *syncMode = 0;
     break;
 
   case BAUD_250K:
@@ -1000,8 +1113,6 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
     *tseg1    = 5;
     *tseg2    = 2;
     *sjw      = 1;
-    *nosamp   = 1;
-    *syncMode = 0;
     break;
 
   case BAUD_125K:
@@ -1009,8 +1120,6 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
     *tseg1    = 11;
     *tseg2    = 4;
     *sjw      = 1;
-    *nosamp   = 1;
-    *syncMode = 0;
     break;
 
   case BAUD_100K:
@@ -1018,8 +1127,6 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
     *tseg1    = 11;
     *tseg2    = 4;
     *sjw      = 1;
-    *nosamp   = 1;
-    *syncMode = 0;
     break;
 
   case canBITRATE_83K:
@@ -1027,8 +1134,6 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
     *tseg1    = 5;
     *tseg2    = 2;
     *sjw      = 2;
-    *nosamp   = 1;
-    *syncMode = 0;
     break;
 
   case BAUD_62K:
@@ -1036,8 +1141,6 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
     *tseg1    = 11;
     *tseg2    = 4;
     *sjw      = 1;
-    *nosamp   = 1;
-    *syncMode = 0;
     break;
 
   case BAUD_50K:
@@ -1045,8 +1148,6 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
     *tseg1    = 11;
     *tseg2    = 4;
     *sjw      = 1;
-    *nosamp   = 1;
-    *syncMode = 0;
     break;
 
   case canBITRATE_10K:
@@ -1054,8 +1155,6 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
     *tseg1    = 11;
     *tseg2    = 4;
     *sjw      = 1;
-    *nosamp   = 1;
-    *syncMode = 0;
     break;
 
   default:
@@ -1072,25 +1171,28 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
 canStatus CANLIBAPI
 canGetErrorText (canStatus err, char *buf, unsigned int bufsiz)
 {
+  canStatus stat = canOK;
   signed char code;
 
   code = (signed char)(err & 0xFF);
 
   if (!buf || bufsiz == 0) {
-    return canOK;
+    return canERR_PARAM;
   }
   if ((code <= 0) && ((unsigned)(-code) < sizeof(errorStrings) / sizeof(char *))) {
     if (errorStrings [-code] == NULL) {
       snprintf(buf, bufsiz, "Unknown error (%d)", (int)code);
+      stat = canERR_PARAM;
     } else {
       strncpy(buf, errorStrings[-code], bufsiz);
     }
   } else {
     strncpy(buf, "This is not an error code", bufsiz);
+    stat = canERR_PARAM;
   }
   buf[bufsiz - 1] = '\0';
 
-  return canOK;
+  return stat;
 }
 
 
@@ -1116,6 +1218,10 @@ canStatus CANLIBAPI canGetNumberOfChannels (int *channelCount)
   int cardNr;
   char filename[DEVICE_NAME_LEN];
   unsigned n = 0;
+
+  if (channelCount == NULL) {
+    return canERR_PARAM;
+  }
 
   for(n = 0; n < sizeof(dev_name) / sizeof(*dev_name); n++) {
     // There are 256 minor inode numbers
@@ -1181,6 +1287,10 @@ getHandleData (HandleData *hData, int item, void *buffer, const size_t bufsize)
   canStatus status;
   unsigned int ean[2];
   int cap = 0;
+
+  if ((buffer == NULL) || (bufsize == 0)) {
+    return canERR_PARAM;
+  }
 
   switch(item) {
   case canCHANNELDATA_CHANNEL_NAME:
@@ -1346,22 +1456,18 @@ canObjBufWrite (const CanHandle hnd, int idx, int id, void *msg,
                 unsigned int dlc, unsigned int flags)
 {
   HandleData *hData;
-  unsigned int canio_flags = 0;
+
+  // If msgPtr is NULL then dlc must be 0, unless it is a remote frame.
+  if ((msg == NULL) && (dlc != 0) && ((flags & canMSG_RTR) == 0)) {
+    return canERR_PARAM;
+  }
 
   hData = findHandle(hnd);
   if (hData == NULL) {
     return canERR_INVHANDLE;
   }
 
-
-  if (flags & canMSG_EXT) {
-    id |= EXT_MSG;
-  }
-  if (flags & canMSG_RTR) {
-    canio_flags |= VCAN_MSG_FLAG_REMOTE_FRAME;
-  }
-
-  return hData->canOps->objbufWrite(hData, idx, id, msg, dlc, canio_flags);
+  return hData->canOps->objbufWrite(hData, idx, id, msg, dlc, flags);
 }
 
 
@@ -1502,6 +1608,42 @@ canFlushTransmitQueue (const CanHandle hnd)
   return hData->canOps->ioCtl(hData, canIOCTL_FLUSH_TX_BUFFER, NULL, 0);
 }
 
+//******************************************************
+// Request bus statistics
+//******************************************************
+canStatus CANLIBAPI
+canRequestBusStatistics(const CanHandle hnd)
+{
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  return hData->canOps->reqBusStats(hData);
+}
+
+//******************************************************
+// Read bus statistics
+//******************************************************
+canStatus CANLIBAPI canGetBusStatistics (const CanHandle hnd,
+                                         canBusStatistics *stat,
+                                         size_t bufsiz)
+{
+  HandleData *hData;
+
+  if ((stat == NULL) || (bufsiz != sizeof(canBusStatistics))) {
+    return canERR_PARAM;
+  }
+
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  return hData->canOps->getBusStats(hData, stat);
+}
 
 
 
@@ -1518,6 +1660,12 @@ canSetNotify (const CanHandle hnd, void (*callback)(canNotifyData *),
 //
 {
   HandleData *hData;
+  const int validFlags = canNOTIFY_RX | canNOTIFY_TX | canNOTIFY_ERROR |
+                         canNOTIFY_STATUS | canNOTIFY_ENVVAR;
+
+  if (notifyFlags & ~validFlags) {
+    return canERR_PARAM;
+  }
 
   hData = findHandle(hnd);
   if (hData == NULL) {
@@ -1551,6 +1699,12 @@ kvStatus CANLIBAPI kvSetNotifyCallback(const CanHandle hnd,
                                        unsigned int notifyFlags)
 {
   HandleData *hData;
+  const unsigned int validFlags = canNOTIFY_RX | canNOTIFY_TX | canNOTIFY_ERROR |
+                                  canNOTIFY_STATUS | canNOTIFY_ENVVAR;
+
+  if (notifyFlags & ~validFlags) {
+    return canERR_PARAM;
+  }
 
   hData = findHandle(hnd);
   if (hData == NULL) {
@@ -1600,7 +1754,7 @@ static canStatus check_bitrate (const CanHandle hnd, unsigned int bitrate)
   if (ret != canOK) {
     return ret;
   }
-  
+
   if (max_bitrate) {
     if (bitrate > max_bitrate) {
       return canERR_PARAM;

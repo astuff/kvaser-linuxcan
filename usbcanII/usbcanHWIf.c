@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -517,7 +517,6 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
     }
 
     case CMD_GET_BUSPARAMS_RESP:
-      // qqq Should this only be implemented in leaf?
       DEBUGPRINT(4, (TXT("CMD_GET_BUSPARAMS_RESP - Ignored\n")));
       break;
 
@@ -615,7 +614,6 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
       break;
 
     case CMD_GET_CARD_INFO_RESP:
-      // qqq Should this only be implemented in leaf?
       DEBUGPRINT(4, (TXT("CMD_GET_CARD_INFO_RESP - Ignored\n")));
       break;
 
@@ -624,7 +622,6 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
       break;
 
     case CMD_GET_SOFTWARE_INFO_RESP:
-      // qqq Should this only be implemented in leaf?
       DEBUGPRINT(4, (TXT("CMD_GET_SOFTWARE_INFO_RESP - Ignored\n")));
       break;
 
@@ -672,12 +669,11 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
           e->timeStamp = (cmd->txRequest.time + vCard->timeHi) /
                          USBCANII_TICKS_PER_10US;
           os_if_spin_unlock_irqrestore(&dev->timeHi_lock, irqFlags);
-          e->tagData.msg.flags &= ~VCAN_MSG_FLAG_TXACK;  // qqq TXACK/RQ???
+          e->tagData.msg.flags &= ~VCAN_MSG_FLAG_TXACK;
           vCanDispatchEvent(vChan, e);
         }
       }
       //else {
-        // qqq Can this happen? what if it does?
       //}
       break;
     }
@@ -709,9 +705,8 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
           os_if_spin_lock_irqsave(&dev->timeHi_lock, &irqFlags);
           e->timeStamp = (cmd->txAck.time + vCard->timeHi) / USBCANII_TICKS_PER_10US;
           os_if_spin_unlock_irqrestore(&dev->timeHi_lock, irqFlags);
-          e->tagData.msg.flags &= ~VCAN_MSG_FLAG_TXRQ; // qqq TXRQ???
+          e->tagData.msg.flags &= ~VCAN_MSG_FLAG_TXRQ;
 
-          // qqq Are the lowspeed transceiver NERR things related to leaf only?
           vCanDispatchEvent(vChan, e);
         }
 
@@ -761,7 +756,7 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
       // <windows> Known problem: if the error counters of both channels
       // are max then there is no way of knowing which channel got an errorframe
       // </windows>
-      VCanChanData *vChd = vCard->chanData[0]; // qqq chan??
+      VCanChanData *vChd = vCard->chanData[0];
 
       DEBUGPRINT(4, (TXT("CMD_CAN_ERROR_EVENT\n")));
 
@@ -952,7 +947,6 @@ static void usbcan_handle_command (heliosCmd *cmd, VCanCardData *vCard)
 //
 static int usbcan_get_trans_id (heliosCmd *cmd)
 {
-  // qqq Why not check if (cmd->head.cmdNo == CMD_GET_BUSPARAMS_REQ) ?
   //     for example: cmdAutoTxBufferReq does not have a transId
   if (cmd->head.cmdNo > CMD_TX_EXT_MESSAGE) {
 
@@ -998,8 +992,6 @@ static void usbcan_send (OS_IF_TASK_QUEUE_HANDLE *work)
     return;
   }
 
-  // Wait for a previous write to finish up; we don't use a timeout
-  // and so a nonresponsive device can delay us indefinitely. qqq
   os_if_down_sema(&dev->write_finished);
 
   if (!dev->present) {
@@ -1026,8 +1018,6 @@ static void usbcan_send (OS_IF_TASK_QUEUE_HANDLE *work)
         continue;
       }
 
-      // Test if queue is empty or Leaf has sent "queue high"qqq?
-      // (TX_CHAN_BUF_SIZE is from vcanosif)
       qLen = queue_length(&vChan->txChanQueue);
 
       DEBUGPRINT(5, (TXT("Transmit queue%d length: %d\n"), i, qLen));
@@ -1088,7 +1078,7 @@ static void usbcan_translate_can_msg (VCanChanData *vChan,
   // Save a copy of the message.
   transId = atomic_read(&vChan->transId);
   if (((UsbcanChanData *)vChan->hwChanData)->current_tx_message[transId - 1].user_data) {
-    DEBUGPRINT(1, (TXT("In use: %x %d   %x %d\n"), 
+    DEBUGPRINT(1, (TXT("In use: %x %d   %x %d\n"),
                    ((UsbcanChanData *)vChan->hwChanData)->current_tx_message[transId - 1].id, transId,
                    can_msg->id, ((UsbcanChanData *)vChan->hwChanData)->outstanding_tx));
   }
@@ -1267,7 +1257,6 @@ static int usbcan_fill_usb_buffer (VCanCardData *vCard, unsigned char *buffer,
                      command.head.cmdNo, len, msg_bwp));
       DEBUGPRINT(5, (TXT("x\n")));
 
-      /// qqq, not really atomic (but that should not matter)
       if ((atomic_read(&vChan->transId) + 1u) > dev->max_outstanding_tx) {
         atomic_set(&vChan->transId, 1);
       }
@@ -1322,7 +1311,7 @@ static int usbcan_transmit (VCanCardData *vCard /*, void *cmd*/)
   if (retval) {
     DEBUGPRINT(1, (TXT("%s - failed submitting write urb, error %d"),
                    __FUNCTION__, retval));
-    retval = -1; // qqq, VCAN_STAT_FAIL ???
+    retval = -1;
   }
   else {
     // The semaphore is released on successful transmission
@@ -1349,7 +1338,6 @@ static void DEVINIT usbcan_get_card_info (VCanCardData* vCard)
   cmd.cmdNo   = CMD_GET_SOFTWARE_INFO_REQ;
   cmd.transId = CMD_GET_SOFTWARE_INFO_REQ;
 
-  // qqq Should this perhaps do the same as leaf?
   usbcan_send_and_wait_reply(vCard, (heliosCmd *)&cmd, &reply,
                              CMD_GET_SOFTWARE_INFO_RESP, cmd.transId);
   dev->max_outstanding_tx     =  reply.getSoftwareInfoResp.maxOutstandingTx;
@@ -1469,7 +1457,6 @@ static int usbcan_send_and_wait_reply (VCanCardData *vCard, heliosCmd *cmd,
 
   ret = usbcan_queue_cmd(vCard, cmd, USBCAN_Q_CMD_WAIT_TIME);
   if (ret) {
-    // qqq Write lock?
     os_if_spin_lock_irqsave(&dev->replyWaitListLock, &irqFlags);
     list_del(&waitNode.list);
     os_if_spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
@@ -1507,7 +1494,6 @@ static int usbcan_send_and_wait_reply (VCanCardData *vCard, heliosCmd *cmd,
 //  Put the command in the command queue
 //
 // The unrolled sleep is used to catch a missing position in the queue
-// qqq Protect the filling of the buffer with a semaphore
 static int usbcan_queue_cmd (VCanCardData *vCard, heliosCmd *cmd,
                              unsigned int timeout)
 {
@@ -1915,7 +1901,6 @@ static void DEVEXIT usbcan_deallocate (VCanCardData *vCard)
 
   os_if_spin_lock(&driverData.canCardsLock);
 
-  // qqq Check for open files
   local_vCard = driverData.canCards;
 
   // Identify the card to remove in the global list
@@ -2068,12 +2053,13 @@ static int usbcan_set_busparams (VCanChanData *vChan, VCanBusParams *par)
   cmd.setBusparamsReq.tseg1   = (unsigned char)par->tseg1;
   cmd.setBusparamsReq.tseg2   = (unsigned char)par->tseg2;
   cmd.setBusparamsReq.channel = (unsigned char)vChan->channel;
-  cmd.setBusparamsReq.noSamp  = 1; // qqq Can't be trusted: (BYTE) pi->chip_param.samp3
+  cmd.setBusparamsReq.noSamp  = 1;
 
   // Check bus parameters
   tmp = par->freq * (par->tseg1 + par->tseg2 + 1);
-  if (tmp == 0) {
-    DEBUGPRINT(1, (TXT("usbcan: _set_busparams() tmp == 0!\n")));
+  if ((tmp == 0) || (par->tseg1 == 0) || (par->tseg2 == 0) || (par->sjw == 0) ||
+      (par->tseg1 > 0xFF) || (par->tseg2 > 0xFF) || (par->sjw > 0xFF)) {
+    DEBUGPRINT(1, (TXT("usbcan: _set_busparams() bad parameters\n")));
     return VCAN_STAT_BAD_PARAMETER;
   }
   if ((8000000 / tmp) > 16) {
@@ -2162,7 +2148,6 @@ static int usbcan_set_silent (VCanChanData *vChan, int silent)
 //
 static int usbcan_set_trans_type (VCanChanData *vChan, int linemode, int resnet)
 {
-  // qqq Not implemented
   DEBUGPRINT(3, (TXT("usbcan: _set_trans_type is NOT implemented!\n")));
 
   return VCAN_STAT_OK;
@@ -2303,7 +2288,6 @@ static int usbcan_flush_tx_buffer (VCanChanData *vChan)
   // Otherwise, the transmit code could be in the process of sending
   // a message from the queue, increasing outstanding_tx after our clear.
   // With a cleared queue, the transmit code will not be doing anything.
-  // qqq Consider a different handle being used to transmit.
   queue_reinit(&vChan->txChanQueue);
   os_if_spin_lock(&usbChan->outTxLock);
   usbChan->outstanding_tx = 0;

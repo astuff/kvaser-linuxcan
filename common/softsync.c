@@ -1,6 +1,6 @@
 /*
 **                         Copyright 2015 by Kvaser AB
-**                        Aminogatan 24, Mölndal, Sweden
+**                        Aminogatan 24, Molndal, Sweden
 **                          WWW: http://www.kvaser.com
 **
 ** This software is furnished under a license and may be used and copied

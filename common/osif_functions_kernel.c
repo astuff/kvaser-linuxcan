@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -213,7 +213,6 @@ EXPORT_SYMBOL(os_if_wait_for_event_timeout_simple);
 //////////////////////////////////////////////////////////////////////
 void os_if_wait_for_event (OS_IF_WAITQUEUE_HEAD *handle)
 {
-  // qqq Do a proper wait for event.
   schedule();
 }
 
@@ -375,9 +374,9 @@ EXPORT_SYMBOL(os_if_spin_lock_remove);
 //////////////////////////////////////////////////////////////////////
 void os_if_irq_disable (OS_IF_LOCK *lock)
 {
-// qqq should work for 2_4 too!
   spin_lock_irq(lock);
 }
+EXPORT_SYMBOL(os_if_irq_disable);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_irq_enable
@@ -387,6 +386,7 @@ void os_if_irq_enable (OS_IF_LOCK *lock)
 {
   spin_unlock_irq(lock);
 }
+EXPORT_SYMBOL(os_if_irq_enable);
 
 //////////////////////////////////////////////////////////////////////
 // os_if_irq_save

@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -123,6 +123,12 @@
 #define VCAN_IOC_SSP_SET            _IO(VCAN_IOC_MAGIC,156)
 #define VCAN_IOC_GET_CHAN_CAP_MASK  _IO(VCAN_IOC_MAGIC,160)
 #define VCAN_IOC_GET_MAX_BITRATE    _IO(VCAN_IOC_MAGIC,161)
+#define VCAN_IOC_REQ_BUS_STATS      _IO(VCAN_IOC_MAGIC,162)
+#define VCAN_IOC_GET_BUS_STATS      _IO(VCAN_IOC_MAGIC,163)
+#define VCAN_IOC_RESET_OVERRUN_COUNT _IO(VCAN_IOC_MAGIC,164)
+#define VCAN_IOC_RECVMSG_SPECIFIC    _IO(VCAN_IOC_MAGIC,165)
+#define VCAN_IOC_SET_READ_SPECIFIC    _IO(VCAN_IOC_MAGIC,166)
+
 
 #define MAX_IOCTL_CARD_NAME       31
 #define MAX_IOCTL_DRIVER_NAME     31
@@ -149,6 +155,7 @@
 #define VCAN_CHANNEL_CAP_CANFD                  0x00800000  // Device (channel) supports CAN-FD
 #define VCAN_CHANNEL_CAP_CANFD_NONISO           0x01000000  // Device (channel) supports non-ISO CAN-FD
 #define VCAN_CHANNEL_CAP_SILENTMODE             0x02000000  // Device is capable of silentmode
+#define VCAN_CHANNEL_CAP_SINGLE_SHOT            0x04000000  // Device is capable of Single Shot
 
 #define VCAN_CHANNEL_STATUS_TIME_SYNC_ENABLED   0x00000001
 #define VCAN_CHANNEL_STATUS_TIME_SYNC_RUNNING   0x00000002

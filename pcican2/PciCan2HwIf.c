@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -143,7 +143,7 @@ static int pciCanInSync (VCanChanData *vChd);
 static int EXIT pciCanCloseAllDevices(void);
 static int pciCanProcRead (struct seq_file* m, void* v);
 static int pciCanRequestChipState (VCanChanData *vChd);
-static unsigned long pciCanTxQLen(VCanChanData *vChd); 
+static unsigned long pciCanTxQLen(VCanChanData *vChd);
 static void pciCanRequestSend (VCanCardData *vCard, VCanChanData *vChan);
 static int pciCanTime(VCanCardData *vCard, unsigned long *time);
 static int pciCanFlushSendBuffer (VCanChanData *vChan);
@@ -331,6 +331,13 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
     unsigned long tmp;
     int ret;
 
+    if ((par->tseg1 == 0) || (par->tseg2 == 0) || (par->sjw == 0) ||
+        ((unsigned int)par->tseg1 > 0xffu) ||
+        ((unsigned int)par->tseg2 > 0xffu) ||
+        ((unsigned int)par->sjw   > 0xffu)) {
+        return VCAN_STAT_BAD_PARAMETER;
+    }
+
     cmd.setBusparamsReq.cmdNo   = CMD_SET_BUSPARAMS_REQ;
     cmd.setBusparamsReq.cmdLen  = sizeof(cmdSetBusparamsReq);
     cmd.setBusparamsReq.bitRate = (unsigned long)par->freq;
@@ -410,7 +417,6 @@ static int pciCanSetOutputMode (VCanChanData *vChd, int silent)
 static int pciCanSetTranceiverMode (VCanChanData *vChd, int linemode, int resnet)
 {
     vChd->lineMode = linemode;
-    // qqq
     return VCAN_STAT_OK;
 } // pciCanSetTranceiverMode
 
@@ -458,7 +464,7 @@ static int pciCanBusOn (VCanChanData *vChd)
         atomic_set(&hChd->outstanding_tx, 0);
         memset(hChd->current_tx_message, 0, sizeof(hChd->current_tx_message));
 
-        vChd->overrun = 0;         // qqq Overrun not used
+        vChd->overrun = 0;
         vChd->isOnBus = 1;
 
         pciCanRequestChipState(vChd);
@@ -491,7 +497,7 @@ static int pciCanBusOff (VCanChanData *vChd)
 
         vChd->isOnBus = 0;
         vChd->chipState.state = CHIPSTAT_BUSOFF;
-        vChd->overrun = 0;         // qqq overrun not used
+        vChd->overrun = 0;
 
         pciCanRequestChipState(vChd);
     }
@@ -514,7 +520,7 @@ static void pciCanInterrupts (VCanCardData *vCard, int enable)
 
     if (enable) {
         tmp &= ~(DPRAM_INTERRUPT_DISABLE | DPRAM_INTERRUPT_ACK);
-    } else { 
+    } else {
         tmp |= DPRAM_INTERRUPT_DISABLE;
     }
     iowrite32(tmp, addr + DPRAM_INTERRUPT_REG);
@@ -621,7 +627,7 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
 
                     vCanDispatchEvent(vChd, &e);
                 } else {
-                    DEBUGPRINT(1, "QQQ: CMD_RX_STD_MESSAGE, dlc = %d flags = %x, chan = %d\n",
+                    DEBUGPRINT(1, "CMD_RX_STD_MESSAGE, dlc = %d flags = %x, chan = %d\n",
                                cmd.rxCanMessage.rawMessage[5] & 0x0F,
                                cmd.rxCanMessage.flags,chan);
                 }
@@ -665,7 +671,7 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
                 }
                 else
                 {
-                    DEBUGPRINT(1, "QQQ: CMD_RX_EXT_MESSAGE, dlc = %d flags = %x, chan = %d\n",
+                    DEBUGPRINT(1, "CMD_RX_EXT_MESSAGE, dlc = %d flags = %x, chan = %d\n",
                                cmd.rxCanMessage.rawMessage[5] & 0x0F,
                                cmd.rxCanMessage.flags,chan);
                 }
@@ -935,7 +941,6 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
                 break;
             }
 
-            // qqq Not done
             case CMD_GET_TRANSCEIVER_INFO_RESP:
             {
                 unsigned int chan = cmd.getTransceiverInfoResp.channel;
@@ -1116,11 +1121,11 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
             }
             case 0:
                 // This means we have read corrupted data
-                DEBUGPRINT(1, "ERROR: Corrupt data. QQQ\n");
+                DEBUGPRINT(1, "ERROR: Corrupt data.\n");
                 return;
 
             default:
-                DEBUGPRINT(1, "Unknown command %d received. QQQ\n", cmd.head.cmdNo);
+                DEBUGPRINT(1, "Unknown command %d received.\n", cmd.head.cmdNo);
                 break;
         }
 
@@ -1209,7 +1214,7 @@ static int pciCanTransmitMessage (VCanChanData *vChd, CAN_MSG *m)
     transId = atomic_read(&vChd->transId);
 
     if (hChd->current_tx_message[transId - 1].user_data) {
-        DEBUGPRINT(1, "In use: %x %d   %x %d\n", 
+        DEBUGPRINT(1, "In use: %x %d   %x %d\n",
                    hChd->current_tx_message[transId - 1].id, transId,
                    m->id, atomic_read(&hChd->outstanding_tx));
     }
@@ -1297,7 +1302,6 @@ static unsigned long pciCanTxQLen (VCanChanData *vChd)
 
 //======================================================================
 //  Clear send buffer on card
-//  qqq Shouldn't this be atomic?
 //======================================================================
 static int pciCanFlushSendBuffer (VCanChanData *vChan)
 {
@@ -1498,7 +1502,7 @@ static void pciCanRequestSend (VCanCardData *vCard, VCanChanData *vChan)
         } else {
           DEBUGPRINT(2, "Nothing in queue\n");
           queue_release(&vChan->txChanQueue);
-        } 
+        }
 #endif
     }
 #if DEBUG
@@ -1923,7 +1927,6 @@ static int INIT pciCanInitAllDevices (void)
 //======================================================================
 static int EXIT pciCanCloseAllDevices (void)
 {
-    // qqq check for open files
     DEBUGPRINT(1, "pciCanCloseAllDevices\n");
     pci_unregister_driver(&pcican_tbl);
 

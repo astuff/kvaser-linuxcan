@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -70,34 +70,35 @@ void check (char* id, canStatus stat)
 
 /* Set bus parameters and read them back */
 
-int main (int argc, char *argv[])
+int main(int argc, char *argv[])
 
 {
   long freq;
   unsigned int tseg1, tseg2, sjw, noSamp, syncmode;
-  int ret = -1;
+  canStatus stat = -1;
   int j;
-  canHandle h [2];
-  
+  canHandle hnd[2];
+
   (void)argc; // Unused.
   (void)argv; // Unused.
-  
+
   for(j = 0 ; j < 2 ; j++) {
-    h[j] = canOpenChannel(j, canOPEN_EXCLUSIVE | canOPEN_REQUIRE_EXTENDED);
-    if (h[j] < 0) {
+    hnd[j] = canOpenChannel(j, canOPEN_EXCLUSIVE | canOPEN_REQUIRE_EXTENDED);
+    if (hnd[j] < 0) {
       printf("canOpenChannel (%d) failed\n", j);
       return -1;
     }
-    ret = canSetBusParams(h[j], 500000, 4, 3, 1, 1, 0);
-    check("canSetBusParams", ret);
+    stat = canSetBusParams(hnd[j], 500000, 4, 3, 1, 1, 0);
+    check("canSetBusParams", stat);
   }
 
   printf("\n");
   for (j = 0; j < 2; j++){
-    ret = canGetBusParams(h[j], &freq, &tseg1, &tseg2, &sjw, &noSamp, &syncmode);
-    printf("H[%d]:freq %ld, tseg1 %d, tseg2 %d, sjw %d, noSamp %d, syncmode %d\n ",
+    stat = canGetBusParams(hnd[j], &freq, &tseg1, &tseg2, &sjw, &noSamp, &syncmode);
+    printf("hnd[%d]:freq %ld, tseg1 %u, tseg2 %u, sjw %u, noSamp %u, syncmode %u\n ",
            j, freq, tseg1, tseg2, sjw, noSamp, syncmode);
+    check("canGetBusParams", stat);
   }
- 
+
   return 0;
 }

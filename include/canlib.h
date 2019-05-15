@@ -103,8 +103,6 @@ typedef struct canNotifyData {
 } canNotifyData;
 
 
-/** Notify message sent to the application window */
-# define WM__CANLIB 648
 
 /**
  * \name canOPEN_xxx
@@ -332,7 +330,6 @@ typedef struct canNotifyData {
 //
 #ifndef CANLIBAPI
 #   define CANLIBAPI
-#   define __stdcall
 #endif
 
 
@@ -612,7 +609,7 @@ canStatus CANLIBAPI canGetBusParamsFd(const CanHandle hnd,
  * \note Not all CAN driver types are supported on all cards.
  *
  * \param[in]  hnd         A handle to an open circuit.
- * \param[out] drivertype  Can driver type, \ref canDRIVER_xxx)
+ * \param[in]  drivertype  Can driver type, \ref canDRIVER_xxx)
  *
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
@@ -646,10 +643,10 @@ canStatus CANLIBAPI canSetBusOutputControl (const CanHandle hnd,
  *
  * \note Silent Mode is not supported by all CAN controllers.
  *
- * \param[in] hnd         An open handle to a CAN circuit.
- * \param[in] drivertype  A pointer to an unsigned int which receives the
- *                        current driver type. The driver type can be either
- *                        \ref canDRIVER_NORMAL or \ref canDRIVER_SILENT.
+ * \param[in]  hnd         An open handle to a CAN circuit.
+ * \param[out] drivertype  A pointer to an unsigned int which receives the
+ *                         current driver type. The driver type can be either
+ *                         \ref canDRIVER_NORMAL or \ref canDRIVER_SILENT.
  *
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
@@ -695,8 +692,10 @@ canStatus CANLIBAPI canGetBusOutputControl (const CanHandle hnd,
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref page_user_guide_misc_code_and_mask,
- *     \ref page_user_guide_send_recv_filters,
+ * \sa \ref page_user_guide_send_recv_filters,
+\win_start
+ *     \ref page_user_guide_misc_code_and_mask,
+\win_end
  *     \ref page_code_snippets_examples
  */
 canStatus CANLIBAPI canAccept (const CanHandle hnd,
@@ -797,7 +796,9 @@ canStatus CANLIBAPI canReadErrorCounters (const CanHandle hnd,
  * \param[in]  dlc       The length of the message in bytes.<br>
                          For Classic CAN dlc can be at most 8, unless \ref canOPEN_ACCEPT_LARGE_DLC is used.<br>
                          For CAN FD dlc can be one of the following 0-8, 12, 16, 20, 24, 32, 48, 64.
- * \param[in]  flag      A combination of message flags, \ref canMSG_xxx.
+ * \param[in]  flag      A combination of message flags, \ref canMSG_xxx
+ *                       (including \ref canFDMSG_xxx if the CAN FD protocol is
+ *                       enabled).
  *                       Use this parameter to send extended (29-bit) frames
  *                       and/or remote frames. Use \ref canMSG_EXT and/or
  *                       \ref canMSG_RTR for this purpose.
@@ -886,11 +887,14 @@ canStatus CANLIBAPI canWriteSync (const CanHandle hnd, unsigned long timeout);
  * \return \ref canERR_NOMSG (negative) if there was no message available.
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref page_user_guide_send_recv_reading, \ref
- * page_user_guide_send_recv_mailboxes, \ref page_code_snippets_examples,
+ * \sa \ref page_user_guide_send_recv_reading,
+\win_start
+ * \ref page_user_guide_send_recv_mailboxes,
+\win_end
+ * \ref page_code_snippets_examples,
  * \ref page_user_guide_time_accuracy_and_resolution
- * \sa \win_start \ref canReadSpecific(), \ref canReadSpecificSkip(),\win_end \ref canReadSync(),
- *     \win_start \ref canReadSyncSpecific(),\win_end \ref canReadWait()
+ * \sa \ref canReadSpecific(), \ref canReadSpecificSkip(), \ref canReadSync(),
+ *     \ref canReadSyncSpecific(), \ref canReadWait()
  *
  */
 canStatus CANLIBAPI canRead (const CanHandle hnd,
@@ -943,8 +947,8 @@ canStatus CANLIBAPI canRead (const CanHandle hnd,
  * \return \ref canERR_NOMSG (negative) if there was no message available.
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref canRead(),\win_start \ref canReadSpecific(), \ref canReadSpecificSkip(),
- *  \ref canReadSyncSpecific(),\win_end \ref canReadSync()
+ * \sa \ref canRead(), \ref canReadSpecific(), \ref canReadSpecificSkip(),
+ *  \ref canReadSyncSpecific(), \ref canReadSync()
  *
  * \sa \ref page_user_guide_time_accuracy_and_resolution
  */
@@ -957,6 +961,59 @@ canStatus CANLIBAPI canReadWait (const CanHandle hnd,
                                  unsigned long timeout);
 
 #if defined(CANLIB_DECLARE_ALL)
+/**
+ * \ingroup CAN
+ *
+ * \source_cs       <b>static Canlib.canStatus canReadSpecific(int handle, int id, byte[] msg, out int dlc, out int flag, out long time);</b>
+ *
+ * \source_delphi   <b>function canReadSpecific(handle: canHandle; id: Longint; msg: Pointer; var dlc: Cardinal; var flag: Cardinal; var time: Longint): canStatus;     </b>
+ * \source_end
+ *
+ * Reads a message with a specified identifier from the receive buffer. Any
+ * preceding message not matching the specified identifier will be kept
+ * in the receive buffer. If no message with the specified identifier is
+ * available, the function returns immediately with an error code.
+ *
+ * If you are using the same channel via multiple handles, note that the
+ * default behaviour is that the different handles will "hear" each other just as
+ * if each handle referred to a channel of its own. If you open, say, channel 0
+ * from thread A and thread B and then send a message from thread A, it will be
+ * "received" by thread B.
+ * This behaviour can be changed using \ref canIOCTL_SET_LOCAL_TXECHO.
+ *
+ * It is allowed to pass \c NULL as the value of \a msg, \a dlc, \a
+ * flag, and \a time.
+ *
+ * \note Use \ref canReadSpecific only if you for some reason must keep the unread
+ *       messages in the queue. If this is not the case, consider using
+ *       \ref canReadSpecificSkip() or \ref canRead() for better performance.
+ *
+ * \param[in]   hnd    A handle to an open circuit.
+ * \param[in]   id     The desired CAN identifier.
+ * \param[out]  msg    Pointer to the buffer which receives the message data.
+ *                     This buffer must be large enough (i.e. 8 bytes.).
+ * \param[out]  dlc    Pointer to a buffer which receives the message length.
+ * \param[out]  flag   Pointer to a buffer which receives the message flags,
+ *                     which is a combination of the \ref canMSG_xxx and
+ *                     \ref canMSGERR_xxx values.
+ * \param[out] time    Pointer to a buffer which receives the message time stamp.
+ *
+ * \return \ref canOK (zero) if a message was read.
+ * \return \ref canERR_NOMSG (negative) if a matching message was not found.
+ *         There might be other messages in the queue, though.
+ * \return \ref canERR_xxx (negative) if failure
+ *
+\win_start * \sa \ref page_user_guide_send_recv_mailboxes \ref \win_end
+ * page_user_guide_send_recv_reading \ref
+ * page_user_guide_time_accuracy_and_resolution
+ * \sa \ref canRead(), \ref canReadSpecificSkip(), \ref canReadSync(), \ref canReadSyncSpecific(),
+ * \ref canReadWait()
+ *
+ */
+canStatus CANLIBAPI canReadSpecific (const CanHandle hnd, long id, void * msg,
+                                     unsigned int * dlc, unsigned int * flag,
+                                     unsigned long * time);
+
 /**
  * \ingroup CAN
  *
@@ -984,17 +1041,99 @@ canStatus CANLIBAPI canReadWait (const CanHandle hnd,
  *         arrived.
  * \return \ref canERR_xxx (negative) if the call fails.
  *
- * \sa \ref canRead(), \win_start \ref canReadSpecific(), \ref canReadSpecificSkip(),
- * \ref canReadSyncSpecific(),\win_end \ref canReadWait()
+ * \sa \ref canRead(), \ref canReadSpecific(), \ref canReadSpecificSkip(),
+ * \ref canReadSyncSpecific(), \ref canReadWait()
  */
 canStatus CANLIBAPI canReadSync (const CanHandle hnd, unsigned long timeout);
-
-#endif
 
 /**
  * \ingroup CAN
  *
- * \todo Rewrite, this is just guessing from windows version
+ * \source_cs       <b>static Canlib.canStatus canReadSyncSpecific(int handle, int id, long timeout);</b>
+ *
+ * \source_delphi   <b>function canReadSyncSpecific(handle: canHandle; id, timeout: Longint): canStatus;  </b>
+ * \source_end
+ *
+ * Waits until the receive queue contains a message with the specified id, or a
+ * timeout occurs..
+ *
+ * If you are using the same channel via multiple handles, note that the
+ * default behaviour is that the different handles will "hear" each other just as
+ * if each handle referred to a channel of its own. If you open, say, channel 0
+ * from thread A and thread B and then send a message from thread A, it will be
+ * "received" by thread B.
+ * This behaviour can be changed using \ref canIOCTL_SET_LOCAL_TXECHO.
+ *
+ * \param[in]  hnd      A handle to an open circuit.
+ * \param[in]  id       The desired message identifier.
+ * \param[in]  timeout  The timeout in milliseconds. 0xFFFFFFFF gives an
+ *                      infinite timeout.
+ *
+ * \return \ref canOK (zero) if the queue contains the desired message.
+ * \return \ref canERR_TIMEOUT (negative) if a timeout occurs before the specified
+ *         message arrived.
+ * \return \ref canERR_xxx (negative) if the call fails.
+ *
+ * \sa \ref canRead(), \ref canReadSpecific(), \ref canReadSpecificSkip(),
+ * \ref canReadSync(), \ref canReadWait()
+ */
+canStatus CANLIBAPI canReadSyncSpecific (const CanHandle hnd,
+                                         long id,
+                                         unsigned long timeout);
+
+/**
+ * \ingroup CAN
+ *
+ * \source_cs       <b>static Canlib.canStatus canReadSpecificSkip(int hnd, int id, byte[] msg, out int dlc, out int flag, out long time);</b>
+ *
+ * \source_delphi   <b>function canReadSpecificSkip(handle: canHandle; id: Longint; msg: Pointer; var dlc: Cardinal; var flag: Cardinal; var time: Longint): canStatus;     </b>
+ * \source_end
+ *
+ * Reads a message with a specified identifier from the receive buffer. Any
+ * preceding message not matching the specified identifier will be removed
+ * in the receive buffer. If no message with the specified identifier is
+ * available, the function returns immediately with an error code.
+ *
+ * If you are using the same channel via multiple handles, note that the
+ * default behaviour is that the different handles will "hear" each other just as
+ * if each handle referred to a channel of its own. If you open, say, channel 0
+ * from thread A and thread B and then send a message from thread A, it will be
+ * "received" by thread B.
+ * This behaviour can be changed using \ref canIOCTL_SET_LOCAL_TXECHO.
+ *
+ * It is allowed to pass \c NULL as the value of \a msg, \a dlc, \a
+ * flag, and \a time.
+ *
+ * \param[in]   hnd    A handle to an open circuit.
+ * \param[in]   id     The desired CAN identifier.
+ * \param[out]  msg    Pointer to the buffer which receives the message data.
+ *                     This buffer must be large enough (i.e. 8 bytes.).
+ * \param[out]  dlc    Pointer to a buffer which receives the message length.
+ * \param[out]  flag   Pointer to a buffer which receives the message flags,
+ *                     which is a combination of the \ref canMSG_xxx and
+ *                     \ref canMSGERR_xxx values.
+ * \param[out] time    Pointer to a buffer which receives the message time stamp.
+ *
+ * \return \ref canOK (zero) if a matching message was found.
+ * \return \ref canERR_NOMSG if there was no matching message available. All other
+           messages (if any!) were discarded.
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref page_user_guide_send_recv_reading, \ref
+ * page_user_guide_time_accuracy_and_resolution
+ * \sa \ref canRead(), \ref canReadSpecific(), \ref canReadSync(),
+ * \ref canReadSyncSpecific(), \ref canReadWait()
+ */
+canStatus CANLIBAPI canReadSpecificSkip (const CanHandle hnd,
+                                         long id,
+                                         void * msg,
+                                         unsigned int * dlc,
+                                         unsigned int * flag,
+                                         unsigned long * time);
+#endif
+
+/**
+ * \ingroup CAN
  *
  * \source_cs       <b>static Canlib.canStatus canSetNotify(int handle, IntPtr win_handle, int aNotifyFlags);</b>
  *
@@ -1047,19 +1186,20 @@ canStatus CANLIBAPI canGetRawHandle (const CanHandle hnd, void *pvFd);
  * before the sampling point. \a TSeg2 is the number of quanta after the
  * sampling point.
  *
- * \param[in]  freq      A pointer to a \c DWORD which contains the \ref canBITRATE_xxx
- *                       constant to translate
- * \param[in]  tseg1     A pointer to a buffer which receives the Time segment 1,
- *                       that is, the number of quanta from (but not including)
- *                       the Sync Segment to the sampling point.
- * \param[in]  tseg2     A pointer to a buffer which receives the Time segment 2,
- *                       that is, the number of quanta from the sampling point to
- *                       the end of the bit.
- * \param[in]  sjw       A pointer to a buffer which receives the Synchronization
- *                       Jump Width.
- * \param[in]  nosamp    A pointer to a buffer which receives the number of
- *                       sampling points; can be 1 or 3.
- * \param[in]  syncMode  Unsupported, always read as zero.
+ * \param[in,out] freq      A pointer to a \c DWORD which contains the \ref canBITRATE_xxx
+ *                          constant to translate. The bitrate constant value is
+ *                          overwritten with the frequency value.
+ * \param[out]    tseg1     A pointer to a buffer which receives the Time segment 1,
+ *                          that is, the number of quanta from (but not including)
+ *                          the Sync Segment to the sampling point.
+ * \param[out]    tseg2     A pointer to a buffer which receives the Time segment 2,
+ *                          that is, the number of quanta from the sampling point to
+ *                          the end of the bit.
+ * \param[out]    sjw       A pointer to a buffer which receives the Synchronization
+ *                          Jump Width.
+ * \param[out]    nosamp    A pointer to a buffer which receives the number of
+ *                          sampling points.
+ * \param[out]    syncMode  Unsupported, always read as zero. May be set to NULL.
  *
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
@@ -1085,7 +1225,7 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
  * to a human-readable, English text.
  *
  * \param[in]     err     The error code.
- * \param[in,out] buf     The buffer which is to receive the text, which is a
+ * \param[out]    buf     The buffer which is to receive the text, which is a
  *                        zero-terminated string (provided the buffer is large enough.)
  * \param[in]     bufsiz  The length of the input buffer.
  *
@@ -1299,7 +1439,7 @@ canStatus CANLIBAPI canGetNumberOfChannels (int *channelCount);
  * \param[in]  item  This parameter specifies what data to obtain for the
  *                        specified channel. The value is one of the constants
  *                        \ref canCHANNELDATA_xxx.
- * \param[in,out] buffer  The address of a buffer which is to receive the data.
+ * \param[out] buffer     The address of a buffer which is to receive the data.
  * \param[in]  bufsize    The size of the buffer to which the buffer parameter
  *                        points.
  *
@@ -1901,7 +2041,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * mentioned below refers to this functions argument.
    *
    * \a buffer points to a 32-bit unsigned integer that receives the
-   * capabilities mask of the CAN channel. This mask specifies 
+   * capabilities mask of the CAN channel. This mask specifies
    * which capabilities corresponding device is guaranteed
    * to support/not support at the moment, see \ref canCHANNEL_CAP_xxx
    * for info about flags.
@@ -1911,6 +2051,16 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 
 
 #endif
+
+  /**
+   * This define is used in \ref canGetChannelData(), \a buffer
+   * mentioned below refers to this functions argument.
+   *
+   * \a buffer is a user supplied byte array of length 'bufsize' (at
+   * least one byte long) to which the null terminated UTF-8 coded
+   * channel name will be placed.
+   */
+#define canCHANNELDATA_CUST_CHANNEL_NAME  39
 
  /** @} */
 
@@ -2012,6 +2162,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canCHANNEL_CAP_CAN_FD            0x00080000L ///< CAN-FD ISO compliant channel
 #define canCHANNEL_CAP_CAN_FD_NONISO     0x00100000L ///< CAN-FD NON-ISO compliant channel
 #define canCHANNEL_CAP_SILENT_MODE       0x00200000L ///< Channel supports Silent mode
+#define canCHANNEL_CAP_SINGLE_SHOT       0x00400000L ///< Channel supports Single Shot messages
 
 /** @} */
 
@@ -2060,30 +2211,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * and are not affected by this call.
    */
 #define canIOCTL_PREFER_STD             2
-// 3,4 reserved.
-
-  /**
-   * This define is used in \ref canIoCtl(), \a buf and \a buflen refers to this
-   * functions arguments.
-   *
-   * Tells CANLIB to clear the CAN error counters. The contents of \a buf and \a
-   * buflen are ignored.
-   *
-   * \note Not all CAN controllers support this operation (and if they don't,
-   * nothing will happen.)
-   */
-#define canIOCTL_CLEAR_ERROR_COUNTERS   5
-
-  /**
-   * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
-   * functions argument.
-   *
-   * \a buf points to a DWORD which contains the desired time-stamp clock
-   * resolution in microseconds. The default value is 1000 microseconds, i.e.
-   * one millisecond.
-   *
-   * \note The accuracy of the clock isn't affected.
-   */
+// 3-5 is reserved.
 #define canIOCTL_SET_TIMER_SCALE        6
 
   /**
@@ -2434,6 +2562,13 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    */
 #  define canIOCTL_SET_BRLIMIT                            43
 
+  /**
+   * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
+   * functions argument.
+   *
+   * This ioctl resets overrun count and flags, \sa \ref canReadStatus \sa \ref canGetBusStatistics
+   */
+#  define canIOCTL_RESET_OVERRUN_COUNT                          44
 #endif
  /** @} */
 
@@ -2630,7 +2765,7 @@ canStatus CANLIBAPI canObjBufWrite (const CanHandle hnd,
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure
  *
- * \sa \ref page_user_guide_misc_code_and_mask,
+ * \sa \win_start \ref page_user_guide_misc_code_and_mask, \win_end
  *     \ref page_user_guide_send_recv_obj_buf
  */
 canStatus CANLIBAPI canObjBufSetFilter (const CanHandle hnd,
@@ -2922,6 +3057,122 @@ canStatus CANLIBAPI canFlushReceiveQueue (const CanHandle hnd);
  */
 canStatus CANLIBAPI canFlushTransmitQueue (const CanHandle hnd);
 
+/**
+ * \ingroup CAN
+ *
+ * \source_cs       <b>static Canlib.canStatus canRequestChipStatus(int hnd);</b>
+ *
+ * \source_delphi   <b>function canRequestChipStatus(handle: canHandle): canStatus;     </b>
+ * \source_end
+ *
+ * \win_start
+ * The canRequestChipStatus function requests that the hardware report the chip
+ * status (bus on/error passive status etc.) to the driver. The chip status can
+ * later be retrieved using the \ref canReadStatus() function.
+ *
+ * \note The \ref canRequestChipStatus() function is asynchronous, that is, it
+ * completes before the answer is returned from the hardware.  The time between
+ * a call to \ref canRequestChipStatus() and the point in time where the chip status
+ * is actually available via a call to \ref canReadStatus() is not
+ * defined. \ref canReadStatus() always returns the latest data reported by the
+ * hardware.
+ * \win_end
+ * \linux_start
+ * This function is a dummy implementation for code portability. The Linux
+ * implementation of \ref canReadStatus() will return the latest status without
+ * need of an additional call to canRequestChipStatus(), unlike the Windows
+ * counterpart.
+ * \linux_end
+ *
+ * \param[in] hnd An open handle to a CAN channel.
+ *
+ * \win_start
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ * \win_end
+ * \linux_start
+ * \return \ref canOK (zero)
+ * \linux_end
+ *
+ * \sa \ref canReadStatus()
+ */
+canStatus CANLIBAPI canRequestChipStatus (const CanHandle hnd);
+
+/**
+ * \ingroup CAN
+ *
+ * \source_cs       <b>static Canlib.canStatus canRequestBusStatistics(int hnd);</b>
+ *
+ * \source_delphi   <b>function canRequestBusStatistics(handle: canHandle): canStatus;     </b>
+ * \source_end
+ *
+ * The \ref canRequestBusStatistics function requests bus statistics from the
+ * hardware. The bus statistics figures can be retrieved later by a call to the
+ * \ref canGetBusStatistics function.
+ *
+ * \note The time between a call to \ref canRequestBusStatistics() and the point in
+ * time where the bus statistics is actually available via a call to
+ * \ref canGetBusStatistics() is not defined. Typically, you would call
+ * \ref canRequestBusStatistics() from your application periodically (for example,
+ * once per second) to request the data from the driver and then call
+ * \ref canGetBusStatistics() with the same rate to obtain the latest reported data.
+ *
+ * \param[in] hnd   An open handle to a CAN channel.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref canGetBusStatistics()
+ */
+canStatus CANLIBAPI canRequestBusStatistics (const CanHandle hnd);
+
+  /**
+   * \ingroup CAN
+   * This struct is returned by \ref canGetBusStatistics()
+   *
+   * The values are cleared when the corresponding channel goes on bus.
+   */
+typedef struct canBusStatistics_s {
+  unsigned long  stdData;   ///< Number of received standard (11-bit identifiers) data frames.
+  unsigned long  stdRemote; ///< Number of received standard (11-bit identifiers) remote frames.
+  unsigned long  extData;   ///< Number of received extended (29-bit identifiers) data frames.
+  unsigned long  extRemote; ///< Number of received extended (29-bit identifiers) remote frames.
+  unsigned long  errFrame;  ///< Number of error frames
+
+  /**
+   * The bus load, expressed as an integer in the interval 0 - 10000
+   * representing 0.00% - 100.00% bus load.
+   */
+  unsigned long  busLoad;
+  unsigned long  overruns;  ///< The number of overruns detected by the hardware, firmware or driver.
+} canBusStatistics;
+
+/**
+ * \ingroup CAN
+ *
+ * \source_cs       <b>static Canlib.canStatus canGetBusStatistics(int hnd, out Canlib.canBusStatistics stat);</b>
+ *
+ * \source_delphi   <b>function canGetBusStatistics(handle: canHandle; var stat: canBusStatistics; bufsiz: Cardinal): canStatus;     </b>
+ * \source_end
+ *
+ * The \ref canGetBusStatistics() function retrieves the latest bus statistics
+ * figures reported by the driver.  You request the bus statistics from the
+ * driver by calling the \ref canRequestBusStatistics() function.
+ *
+ * \param[in]  hnd     An open handle to a CAN channel.
+ * \param[out] stat    A pointer to a \ref canBusStatistics struct that will receive
+ *                     the bus statistics figures.
+ * \param[in]  bufsiz  The size, in bytes, of the stat buffer.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ * \sa \ref canRequestBusStatistics()
+ */
+canStatus CANLIBAPI canGetBusStatistics (const CanHandle hnd,
+                                         canBusStatistics *stat,
+                                         size_t bufsiz);
+
 
 /**
  * \ingroup CAN
@@ -2984,9 +3235,9 @@ typedef struct kvTimeDomainData_s {
  *
  * \note A time domain is a set of channels with a common time base.
  *
- * \param[in] domain  A pointer to a caller allocated, opaque variable of type
- *                    \ref kvTimeDomain that holds data to identify a particlar
- *                    time domain.
+ * \param[out] domain  A pointer to a caller allocated, opaque variable of type
+ *                     \ref kvTimeDomain that holds data to identify a particlar
+ *                     time domain.
  *
  * \return \ref canOK (zero) if success
  * \return \ref canERR_xxx (negative) if failure

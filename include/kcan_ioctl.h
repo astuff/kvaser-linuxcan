@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -66,7 +66,6 @@
 #define METHOD_BUFFERED  0     // dummy
 #define FILE_ANY_ACCESS  0
 
-// qqq This likely is not a good idea!
 
 #define CTL_CODE(x,i,y,z) _IO(KCAN_IOC_MAGIC, (i))
 
@@ -92,6 +91,7 @@
 
 
 #define KCAN_IOCTL_SET_BRLIMIT                  CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 72, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define KCAN_IOCTL_GET_CUST_CHANNEL_NAME        CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 73, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 #define KCAN_CARDFLAG_FIRMWARE_BETA       0x01  // Firmware is beta
 #define KCAN_CARDFLAG_FIRMWARE_RC         0x02  // Firmware is release candidate
@@ -127,6 +127,11 @@ typedef struct {
   int status; // CAN_CANFD_MATCHING, CAN_CANFD_MISMATCH
   unsigned int unused[8];
 } KCAN_IOCTL_CANFD_T;
+
+typedef struct {
+  unsigned int  status;     // !0 => no name found for this channel.
+  unsigned char data[64];   // Transfered bytes between user space and kernel space
+} KCAN_IOCTL_GET_CUST_CHANNEL_NAME_T;
 
 #endif /* KCANIO_H */
 

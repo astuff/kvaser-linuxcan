@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -52,10 +52,9 @@
 
 #include "osif_functions_user.h"
 
-#   include <sys/ioctl.h>
-#   include <unistd.h>
-#   include <sys/io.h>
-#   include <fcntl.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 
 // Common

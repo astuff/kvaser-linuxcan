@@ -1,8 +1,6 @@
 #!/bin/sh
-# Kvaser CAN driver
-# pciefd.sh - start/stop pciefd and create/delete device files
-#
-#                 Copyright 2012 by Kvaser AB, Mölndal, Sweden
+
+#              Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 #                         http://www.kvaser.com
 #
 #  This software is dual licensed under the following two licenses:
@@ -51,7 +49,10 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 #  ---------------------------------------------------------------------------
-#
+
+# Kvaser CAN driver
+# pciefd.sh - start/stop pciefd and create/delete device files
+
 
 LOG=`which logger`
 

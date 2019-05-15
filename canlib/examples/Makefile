@@ -1,15 +1,13 @@
-# Kvaser Linux Canlib
-# Examples Makefile
-# 
-#                 Copyright 2012 by Kvaser AB, Mölndal, Sweden
+#
+#              Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 #                         http://www.kvaser.com
-# 
+#
 #  This software is dual licensed under the following two licenses:
 #  BSD-new and GPLv2. You may use either one. See the included
 #  COPYING file for details.
-# 
+#
 #  License: BSD-new
-#  ===============================================================================
+# ===============================================================================
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are met:
 #      * Redistributions of source code must retain the above copyright
@@ -20,7 +18,7 @@
 #      * Neither the name of the <organization> nor the
 #        names of its contributors may be used to endorse or promote products
 #        derived from this software without specific prior written permission.
-# 
+#
 #  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 #  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 #  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,26 +29,26 @@
 #  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
-# 
+#
+#
 #  License: GPLv2
-#  ===============================================================================
+# ===============================================================================
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU General Public License
 #  as published by the Free Software Foundation; either version 2
 #  of the License, or (at your option) any later version.
-# 
+#
 #  This program is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-# 
-#  ---------------------------------------------------------------------------
-# 
+#
+
+# Kvaser Linux Canlib Examples Makefile
 
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -O2  -D_REENTRANT $(XTRA_CFLAGS) -I../../include
@@ -60,11 +58,14 @@ OBJS =\
 	busparms\
 	cancount\
 	canmonitor\
+	canfdmonitor\
+	canfdwrite\
 	listChannels\
 	readTimerTest\
 	simplewrite\
 	timedomains\
 	writeloop\
+	busstat\
 
 ifeq ($(KV_DEBUG_ON),1)
   KV_XTRA_CFLAGS_DEBUG= -D_DEBUG=1 -DDEBUG=1 
@@ -74,6 +75,8 @@ else
   KV_XTRA_CFLAGS_DEBUG= -D_DEBUG=0 -DDEBUG=0
   CFLAGS += $(KV_XTRA_CFLAGS_DEBUG)
 endif
+
+CHECKLOG_FILE = checklog.txt
 
 sub:	$(OBJS)	
 	@echo --------------------------------------------------------------------
@@ -89,6 +92,14 @@ install:
 	mkdir -p /usr/doc/canlib
 	cp -r . /usr/doc/canlib/examples
 
+uninstall:
+	rm -rf /usr/doc/canlib/examples
+
 clean:	
 	rm -f $(OBJS) *.o *~
 
+check:
+	@echo --------------------------------------------------------------------
+	cppcheck -I ../../include/ -I ../../../Tmp  -I /usr/include -I /usr/include/linux --enable=all --suppress=toomanyconfigs . > $(CHECKLOG_FILE) 2>&1
+	@cat $(CHECKLOG_FILE)
+	@echo --------------------------------------------------------------------

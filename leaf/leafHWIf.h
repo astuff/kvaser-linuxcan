@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -103,7 +103,6 @@ typedef struct LeafChanData
 
   OBJECT_BUFFER          *objbufs;
 
-  // qqq Max_outstanding_tx is received from the card
   CAN_MSG          current_tx_message[DEMETER_MAX_OUTSTANDING_TX];
 
   } LeafChanData;
@@ -141,13 +140,11 @@ typedef struct LeafCardData {
   unsigned char *         bulk_in_buffer;      // the buffer to receive data
   size_t                  bulk_in_size;        // the size of the receive buffer
   __u8                    bulk_in_endpointAddr;// the address of the bulk in endpoint
-// qqq, why is bulk_in_MaxPacketSize unsigned in Linux and signed otherwise?
   unsigned int            bulk_in_MaxPacketSize;
 
   unsigned char *         bulk_out_buffer;     // the buffer to send data
   size_t                  bulk_out_size;       // the size of the send buffer
 
-// qqq, why is bulk_out_MaxPacketSize unsigned in Linux and signed otherwise?
   unsigned int            bulk_out_MaxPacketSize;
 
   struct urb *            write_urb;           // the urb used to send data

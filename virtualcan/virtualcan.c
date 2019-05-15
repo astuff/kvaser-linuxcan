@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -127,7 +127,7 @@ static int virtualTxAvailable (VCanChanData *vChd);
 static int EXIT virtualCloseAllDevices(void);
 static int virtualProcRead (struct seq_file* m, void* v);
 static int virtualRequestChipState (VCanChanData *vChd);
-static unsigned long virtualTxQLen(VCanChanData *vChd); 
+static unsigned long virtualTxQLen(VCanChanData *vChd);
 static void virtualRequestSend (VCanCardData *vCard, VCanChanData *vChan);
 
 static int virtualTransmitMessage (VCanChanData *vChd, CAN_MSG *m);
@@ -230,7 +230,7 @@ static int virtualProbe (VCanCardData *vCd)
                           0xFFFFFFFF,
                           0xFFFFFFFF,
                           NR_CHANNELS);
-    
+
     vCd->hw_type      = HWTYPE_VIRTUAL;
 
     return 0;
@@ -255,12 +255,24 @@ static void virtualResetErrorCounter (VCanChanData *vChd)
 static int virtualSetBusParams (VCanChanData *vChd, VCanBusParams *par)
 {
     virtualChanData *virtualChan = (virtualChanData *)vChd->hwChanData;
+
+    if ((vChd->canFdMode != OPEN_AS_CAN) && ((par->freq_brs == 0) || (par->sjw_brs == 0) || (par->tseg1_brs == 0) ||
+        (par->tseg2_brs == 0)) ) {
+        DEBUGPRINT(1, "virtualSetBusParams(%i, %u, %u, %u)\n", par->freq_brs, par->sjw_brs, par->tseg1_brs, par->tseg2_brs);
+      return VCAN_STAT_BAD_PARAMETER;
+    }
+
     // Save busparams
     virtualChan->busparams.freq  = par->freq;
     virtualChan->busparams.sjw   = par->sjw;
     virtualChan->busparams.tseg1 = par->tseg1;
     virtualChan->busparams.tseg2 = par->tseg2;
     virtualChan->busparams.samp3 = par->samp3;
+
+    virtualChan->busparams.freq_brs  = par->freq_brs;
+    virtualChan->busparams.sjw_brs   = par->sjw_brs;
+    virtualChan->busparams.tseg1_brs = par->tseg1_brs;
+    virtualChan->busparams.tseg2_brs = par->tseg2_brs;
 
     return 0;
 } // virtualSetBusParams
@@ -279,6 +291,11 @@ static int virtualGetBusParams (VCanChanData *vChd, VCanBusParams *par)
     par->tseg2 = virtualChan->busparams.tseg2;
     par->samp3 = virtualChan->busparams.samp3;
 
+    par->freq_brs  = virtualChan->busparams.freq_brs;
+    par->sjw_brs   = virtualChan->busparams.sjw_brs;
+    par->tseg1_brs = virtualChan->busparams.tseg1_brs;
+    par->tseg2_brs = virtualChan->busparams.tseg2_brs;
+
     return 0;
 } // virtualGetBusParams
 
@@ -290,9 +307,9 @@ static int virtualSetOutputMode (VCanChanData *vChd, int silent)
 {
     virtualChanData *virtualChan = vChd->hwChanData;
     VCanCardData    *vCard       = vChd->vCard;
-    int             i;
 
     if (virtualChan->silentmode && (silent == 1)) {
+        int i;
         virtualChan->silentmode = silent;
 
         // Try sending all unsent messages on all channels,
@@ -320,7 +337,6 @@ static int virtualSetOutputMode (VCanChanData *vChd, int silent)
 //======================================================================
 static int virtualSetTranceiverMode (VCanChanData *vChd, int linemode, int resnet)
 {
-    // qqq what to do here?
     return 0;
 } // virtualSetTranceiverMode
 
@@ -330,7 +346,17 @@ static int virtualSetTranceiverMode (VCanChanData *vChd, int linemode, int resne
 //======================================================================
 static int virtualRequestChipState (VCanChanData *vChd)
 {
-    // qqq what here?
+    VCAN_EVENT e;
+    VCanCardData *vCard = vChd->vCard;
+
+    e.tag = V_CHIP_STATE;
+    e.timeStamp = getTime(vCard);
+    e.transId = 0;
+    e.tagData.chipState.busStatus      = vChd->chipState.state;
+    e.tagData.chipState.txErrorCounter = vChd->chipState.txerr;
+    e.tagData.chipState.rxErrorCounter = vChd->chipState.rxerr;
+    vCanDispatchEvent(vChd, &e);
+
     return 0;
 } // virtualRequestChipState
 
@@ -343,21 +369,26 @@ static int virtualBusOn (VCanChanData *vChd)
     virtualChanData *virtualChan = vChd->hwChanData;
     VCanCardData    *vCard       = vChd->vCard;
     int i;
+    int isStateChanged = !vChd->isOnBus;
 
-    vChd->isOnBus = 1;
-    vChd->overrun = 0;
-    atomic_set(&virtualChan->outstanding_tx, 0);
-    virtualResetErrorCounter(vChd);
-    vChd->chipState.state = CHIPSTAT_ERROR_ACTIVE;
+    if (isStateChanged) {
+        vChd->isOnBus = 1;
+        vChd->overrun = 0;
+        atomic_set(&virtualChan->outstanding_tx, 0);
+        virtualResetErrorCounter(vChd);
+        vChd->chipState.state = CHIPSTAT_ERROR_ACTIVE;
 
-    //  Try sending all unsent messages on all channels except the specified channel
-    for (i = 0; i < vCard->nrChannels; i++) {
-        //se if other chans have stuff to send now that we are on bus...
-         if ((vCard->chanData[i] != NULL) && (vCard->chanData[i] != vChd) &&
-             (vCard->chanData[i]->isOnBus)) {
-            DEBUGPRINT(2, "virtualsend from bus on. %d\n", vChd->channel);
-            virtualSend((void *)vCard->chanData[i]);
+        //  Try sending all unsent messages on all channels except the specified channel
+        for (i = 0; i < vCard->nrChannels; i++) {
+            //se if other chans have stuff to send now that we are on bus...
+             if ((vCard->chanData[i] != NULL) && (vCard->chanData[i] != vChd) &&
+                 (vCard->chanData[i]->isOnBus)) {
+                DEBUGPRINT(2, "virtualsend from bus on. %d\n", vChd->channel);
+                virtualSend((void *)vCard->chanData[i]);
+            }
         }
+
+        virtualRequestChipState(vChd);
     }
 
     return 0;
@@ -369,9 +400,14 @@ static int virtualBusOn (VCanChanData *vChd)
 //======================================================================
 static int virtualBusOff (VCanChanData *vChd)
 {
-    vChd->isOnBus = 0;
+    int isStateChanged = vChd->isOnBus;
 
-    virtualRequestChipState(vChd);
+    if (isStateChanged) {
+        vChd->isOnBus = 0;
+        vChd->chipState.state = CHIPSTAT_BUSOFF;
+
+        virtualRequestChipState(vChd);
+    }
 
     return 0;
 } // virtualBusOff
@@ -382,7 +418,7 @@ static int virtualBusOff (VCanChanData *vChd)
 //======================================================================
 static int virtualGetTxErr (VCanChanData *vChd)
 {
-    return 0; // qqq what do we do....
+    return vChd->chipState.txerr;
 }
 
 
@@ -391,7 +427,7 @@ static int virtualGetTxErr (VCanChanData *vChd)
 //======================================================================
 static int virtualGetRxErr (VCanChanData *vChd)
 {
-    return 0; // qqq what do we do....
+    return vChd->chipState.rxerr;
 }
 
 
@@ -468,23 +504,48 @@ static int virtualTransmitMessage (VCanChanData *vChd, CAN_MSG *m)
     int               isDispatched  = 0;
     virtualChanData   *virtualChan  = NULL;
 
-    // qqq is it ok to just pass the ptr on?
-    VCAN_EVENT *e = (VCAN_EVENT *)m;
+    {
+        VCAN_EVENT e = *(VCAN_EVENT *)m;
 
-    // Fake reception
-    e->tag       = V_RECEIVE_MSG;
-    e->timeStamp = getTime(vCard);
-    for (i = 0; i < vCard->nrChannels; i++) {
-        // Distribute the msgs to all valid channels on a specific card 
-        // (not ourselves though).
-        if ((vCard->chanData[i] != NULL) && (vCard->chanData[i] != vChd) &&
-            (vCard->chanData[i]->isOnBus)) {
-            vCanDispatchEvent(vCard->chanData[i], e);
-            virtualChan = vCard->chanData[i]->hwChanData;
-            if (!virtualChan->silentmode) {
-                isDispatched++;
+        // Fake reception
+        e.tag       = V_RECEIVE_MSG;
+        e.timeStamp = getTime(vCard);
+        for (i = 0; i < vCard->nrChannels; i++) {
+            // Distribute the msgs to all valid channels on a specific card
+            // (not ourselves though).
+            if ((vCard->chanData[i] != NULL) && (vCard->chanData[i] != vChd) &&
+                (vCard->chanData[i]->isOnBus)) {
+                // Add error flag if trying to send an FD frame between
+                // channels that are not both opened as FD capable.
+                if ((e.tagData.msg.flags & VCAN_MSG_FLAG_FDF) && (vChd->canFdMode != vCard->chanData[i]->canFdMode)) {
+                    e.tagData.msg.flags |= VCAN_MSG_FLAG_ERROR_FRAME;
+                }
+                e.tagData.msg.flags &= ~(VCAN_MSG_FLAG_TXACK | VCAN_MSG_FLAG_TXRQ);
+                vCanDispatchEvent(vCard->chanData[i], &e);
+                virtualChan = vCard->chanData[i]->hwChanData;
+                if (!virtualChan->silentmode) {
+                    isDispatched++;
+                }
             }
         }
+    }
+
+    if (m->flags & VCAN_MSG_FLAG_TXRQ) {
+      // Copy CAN_MSG to VCAN_EVENT.
+      VCAN_EVENT e = *(VCAN_EVENT*)m;
+      e.tag = V_RECEIVE_MSG;
+      e.timeStamp = getTime(vCard);
+      e.tagData.msg.flags &= ~VCAN_MSG_FLAG_TXACK;
+      vCanDispatchEvent(vChd, &e);
+    }
+
+    if (m->flags & VCAN_MSG_FLAG_TXACK) {
+      // Copy CAN_MSG to VCAN_EVENT.
+      VCAN_EVENT e = *(VCAN_EVENT*)m;
+      e.tag = V_RECEIVE_MSG;
+      e.timeStamp = getTime(vCard);
+      e.tagData.msg.flags &= ~VCAN_MSG_FLAG_TXRQ;
+      vCanDispatchEvent(vChd, &e);
     }
 
     virtualChan = vChd->hwChanData;     // Point virtualChan to sending chan
@@ -510,6 +571,15 @@ static int virtualInitData (VCanCardData *vCard)
         virtualChanData *hChd;
         hChd = vCard->chanData[chNr]->hwChanData;
         hChd->silentmode = 0;
+        hChd->busparams.freq = 500000L;
+        hChd->busparams.tseg1 = 63;
+        hChd->busparams.tseg2 = 16;
+        hChd->busparams.sjw = 16;
+        hChd->busparams.samp3 = 1;
+        hChd->busparams.freq_brs = 500000L;
+        hChd->busparams.tseg1_brs = 63;
+        hChd->busparams.tseg2_brs = 16;
+        hChd->busparams.sjw_brs = 16;
     }
 
     return 0;
@@ -588,7 +658,6 @@ static void virtualRemoveOne (VCanCardData *vCard)
   VCanChanData *vChan;
   int chNr;
 
-  // qqq Mark as not working somehow!
 
   for (chNr = 0; chNr < vCard->nrChannels; chNr++) {
     vChan = vCard->chanData[chNr];

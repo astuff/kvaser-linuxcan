@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -74,6 +74,7 @@
 #include "queue.h"
 
 #include "softsync.h"
+#include "ticks.h"
 
 
 /*****************************************************************************/
@@ -204,7 +205,9 @@ typedef struct VCanChanData
 
     unsigned int            capabilities;
     unsigned int            capabilities_mask;
-
+    
+    VCanBusStatistics       busStats;
+    
     struct VCanCardData    *vCard;
 } VCanChanData;
 
@@ -262,6 +265,7 @@ typedef struct VCanCardData
     OS_IF_SEMAPHORE         open;
 
     unsigned long           timestamp_offset;
+    ticks_class             ticks;
     uint32_t                default_max_bitrate;
     uint32_t                current_max_bitrate;
     unsigned char           sysdbg_he;
@@ -271,6 +275,7 @@ typedef struct VCanCardData
 
 typedef struct
 {
+    OS_IF_LOCK              rcvLock;
     int                     bufHead;
     int                     bufTail;
 #if DEBUG
@@ -278,6 +283,7 @@ typedef struct
     int                     lastNotEmpty;
 #endif
     VCAN_EVENT              fileRcvBuffer[FILE_RCV_BUF_SIZE];
+    uint8_t                 valid[FILE_RCV_BUF_SIZE];
     int                     size;
     OS_IF_WAITQUEUE_HEAD    rxWaitQ;
 } VCanReceiveData;
@@ -305,6 +311,7 @@ typedef struct VCanOpenFileNode {
     OBJECT_BUFFER           *objbuf;
     atomic_t                objbufActive;
     uint32_t                overruns;
+    VCanReadSpecific        read_specific;
     struct VCanOpenFileNode *next;
 } VCanOpenFileNode;
 
@@ -318,6 +325,7 @@ typedef struct VCanHWInterface {
     int (*setTranceiverMode)    (VCanChanData *chd, int linemode, int resnet);
     int (*busOn)                (VCanChanData *chd);
     int (*busOff)               (VCanChanData *chd);
+    int (*reqBusStats)          (VCanChanData *chd);
     int (*txAvailable)          (VCanChanData *chd);
     int (*procRead)             (struct seq_file* m, void* v);
     int (*closeAllDevices)      (void);
@@ -347,8 +355,15 @@ typedef struct VCanHWInterface {
     int (*objbufSendBurst)      (VCanChanData *chd, int bufType, int bufNo,
                                  int burstLen);
     int (*tx_interval)          (VCanChanData *chd, unsigned int *interval);
+    int (*getCustChannelName)   (const VCanChanData * const chd, 
+                                 unsigned char * const data, 
+                                 const unsigned int data_size,
+                                 unsigned int *status);
 } VCanHWInterface;
 
+#define SKIP_ERROR_EVENT 0
+#define DETECT_ERROR_EVENT 1
+#define ERROR_EVENT_DETECTED 2
 
 typedef struct WaitNode {
   struct list_head list;
@@ -358,6 +373,7 @@ typedef struct WaitNode {
   unsigned char    transId;
   unsigned char    timedOut;
   unsigned char    check_trans_id; //when not 0, check that transid matches
+  unsigned char    error_event;    //used to detect that we have got an "CMD_ERROR_EVENT"
 } WaitNode;
 
 

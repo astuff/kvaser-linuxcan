@@ -432,6 +432,11 @@ typedef enum {
 #define canMSGERR_OVERRUN       0x0600      ///< Any overrun condition.
 #define canMSGERR_BIT           0xC000      ///< Any bit error.
 #define canMSGERR_BUSERR        0xF800      ///< Any RX error
+
+// single shot flags: 
+#define canMSG_SINGLE_SHOT      0x1000000      ///< Message is Single Shot, try to send once, no retransmission (only tx)
+#define canMSG_TXNACK           0x2000000      ///< Message is a failed Single Shot, message was not sent (only rx)
+#define canMSG_ABL              0x4000000      ///< Only together with canMSG_TXNACK, Single shot message was not sent because arbitration was lost (only rx)
 /** @} */
 
 /**

@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -55,9 +55,9 @@
 #include "vcan_ioctl.h"
 #include "hydra_host_cmds.h"
 
-static void set_capability (uint32_t *self, uint32_t cap, uint32_t to, uint32_t channel)
+static void set_capability (uint32_t *self, uint32_t cap, uint32_t to)
 {
-  if ((1 << channel) & to) {
+  if (to) {
     *self |= cap;
   } else {
     *self &= ~cap;
@@ -66,11 +66,11 @@ static void set_capability (uint32_t *self, uint32_t cap, uint32_t to, uint32_t 
 
 void set_capability_value (VCanCardData *vCard, uint32_t cap, uint32_t to, uint32_t channel_mask, uint32_t n_channels_max)
 {
-  unsigned int i;
+  uint32_t i;
   for (i = 0; i < n_channels_max; i++) {
     if ((1 << i) & channel_mask) {
       VCanChanData *vChd = vCard->chanData[i];
-      set_capability (&vChd->capabilities, cap, to, i);
+      set_capability (&vChd->capabilities, cap, to);
     }
   }
 }
@@ -78,11 +78,11 @@ EXPORT_SYMBOL(set_capability_value);
 
 void set_capability_mask (VCanCardData *vCard, uint32_t cap, uint32_t to, uint32_t channel_mask, uint32_t n_channels_max)
 {
-  unsigned int i;
+  uint32_t i;
   for (i = 0; i < n_channels_max; i++) {
     if ((1 << i) & channel_mask) {
       VCanChanData *vChd = vCard->chanData[i];
-      set_capability (&vChd->capabilities_mask, cap, to, i);
+      set_capability (&vChd->capabilities_mask, cap, to);
     }
   }
 }
@@ -94,6 +94,7 @@ uint8_t convert_vcan_to_hydra_cmd (uint32_t vcan_cmd) {
     case VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES:   return CAP_SUB_CMD_ERRFRAME; break;
     case VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION: return CAP_SUB_CMD_BUS_STATS; break;
     case VCAN_CHANNEL_CAP_ERROR_COUNTERS:      return CAP_SUB_CMD_ERRCOUNT_READ; break;
+    case VCAN_CHANNEL_CAP_SINGLE_SHOT:         return CAP_SUB_CMD_SINGLE_SHOT; break;
     default: return 0; break;
   }
 }

@@ -1,5 +1,47 @@
 #
-# CONFIG MAKEFILE
+#              Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
+#                         http://www.kvaser.com
+#
+#  License: BSD-new
+# ===============================================================================
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are met:
+#      * Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#      * Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in the
+#        documentation and/or other materials provided with the distribution.
+#      * Neither the name of the <organization> nor the
+#        names of its contributors may be used to endorse or promote products
+#        derived from this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+#  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+#  DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+#  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+#  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+#  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+#  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+#
+#  License: GPLv2
+# ===============================================================================
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; either version 2
+#  of the License, or (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
 DEPMOD=`which depmod`
@@ -55,12 +97,15 @@ KV_NDEBUGFLAGS = -D_DEBUG=0 -DDEBUG=0
 
 #----------------------------------------
 # Select kernel source folder
-KERNEL_SOURCE_DIR=/lib/modules/`uname -r`/build
-KV_KERNEL_SRC_DIR:=$(KERNEL_SOURCE_DIR)
+KDIR ?= /lib/modules/`uname -r`/build
+KV_KERNEL_SRC_DIR := $(KDIR)
 
 #---------------------------------------------------------------------------
 # export these flags to compilation
-KV_XTRA_COMMON_FLAGS = -DLINUX=1 -D_LINUX=1 $(foreach INC,$(INCLUDES),-I$(INC)) -Werror -Wno-date-time
+KV_XTRA_COMMON_FLAGS = -DLINUX=1 $(foreach INC,$(INCLUDES),-I$(INC)) -Werror -Wno-date-time -Wall \
+                       -Wclobbered -Wempty-body -Wignored-qualifiers \
+                       -Wmissing-parameter-type -Wold-style-declaration -Woverride-init -Wtype-limits \
+                       -Wuninitialized
 
 export KV_XTRA_CFLAGS       = $(KV_XTRA_COMMON_FLAGS) $(KV_NDEBUGFLAGS) -DWIN32=0
 export KV_XTRA_CFLAGS_DEBUG = $(KV_XTRA_COMMON_FLAGS) $(KV_DEBUGFLAGS)  -DWIN32=0
@@ -102,9 +147,9 @@ check:
 # Install cppcheck with 'sudo apt-get install cppcheck'
 	@echo --------------------------------------------------------------------
 ifeq ($(CHECK_SUPPRESS),)
-		cppcheck -I ../include/ -I ../../Tmp  -I /usr/include -I /usr/include/linux --enable=all --suppress=toomanyconfigs . > $(CHECK_LOGFILE) 2>&1
+		cppcheck -I ../include/ -I ../../Tmp  -I /usr/include -I /usr/include/linux --enable=all --suppress=toomanyconfigs . 2> $(CHECK_LOGFILE)
 else
-		cppcheck -I ../include/ -I ../../Tmp  -I /usr/include -I /usr/include/linux --enable=all --suppressions-list=$(CHECK_SUPPRESS) --suppress=toomanyconfigs . > $(CHECK_LOGFILE) 2>&1
+		cppcheck -I ../include/ -I ../../Tmp  -I /usr/include -I /usr/include/linux --enable=all --suppressions-list=$(CHECK_SUPPRESS) --suppress=toomanyconfigs . 2> $(CHECK_LOGFILE)
 endif
 	@cat $(CHECK_LOGFILE)
 	@echo --------------------------------------------------------------------
@@ -112,12 +157,13 @@ endif
 clean:
 	@echo --------------------------------------------------------------------
 	@echo "Cleaning $(KV_MODULE_NAME)" $(IS_DEBUG)
-	rm -f $(foreach suffix, o mod.o ko mod.c, $(KV_MODULE_NAME).$(suffix))
-	rm -f $(foreach suffix, o.cmd mod.o.cmd ko.cmd, \.$(KV_MODULE_NAME).$(suffix))
-	rm -f modules.order Module.symvers new_modules.conf
+	rm -f $(foreach suffix, o mod.o ko mod.c, $(KV_MODULE_NAME).$(suffix))                \
+	      $(foreach suffix, o.cmd mod.o.cmd ko.cmd, .$(KV_MODULE_NAME).$(suffix))         \
+	      modules.order Module.symvers new_modules.conf                                   \
+	      $(SRCS:%.c=%.o)                                                                 \
+	      $(join $(dir $(SRCS)),$(addprefix .,$(notdir $(patsubst %.c,%.o.cmd,$(SRCS))))) \
+	      $(join $(dir $(SRCS)),$(addprefix .,$(notdir $(patsubst %.c,%.o.d,$(SRCS)))))
 	rm -rf .tmp_versions
-	rm -f $(SRCS:%.c=%.o)
-	rm -f $(join $(dir $(SRCS)),$(addprefix \.,$(notdir $(patsubst %.c,%.o.cmd,$(SRCS)))))
 	@echo --------------------------------------------------------------------
 
 

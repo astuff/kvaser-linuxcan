@@ -1,6 +1,6 @@
 # Main Makefile for the Kvaser Linux drivers.
 #
-#                 Copyright 2012 by Kvaser AB, Mölndal, Sweden
+#             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 #                         http://www.kvaser.com
 #
 #  This software is dual licensed under the following two licenses:
@@ -60,11 +60,13 @@ USERLIBS  += linlib
 DRIVERS   += common
 DRIVERS   += leaf
 DRIVERS   += mhydra
-DRIVERS   += pcican
-DRIVERS   += pcican2
 DRIVERS   += usbcanII
 DRIVERS   += virtualcan
+ifndef KV_NO_PCI
+DRIVERS   += pcican
+DRIVERS   += pcican2
 DRIVERS   += pciefd
+endif
 
 #---------------------------------
 # Debug levels are defined in config.mak
@@ -74,9 +76,11 @@ export KV_DEBUG_ON
 #---------------------------------
 SUBDIRS   = $(USERLIBS) $(DRIVERS)
 
+reverse=$(if $(1),$(call reverse,$(wordlist 2,$(words $(1)),$(1)))) $(firstword $(1))
+
 #---------------------------------------------------------------------------
 # RULES
-.PHONY: debug canlib linlib common leaf mhydra pcican pcican2 usbcanII virtualcan pciefd install clean check
+.PHONY: debug canlib linlib common leaf mhydra pcican pcican2 usbcanII virtualcan pciefd install uninstall clean check load
 
 all:  $(SUBDIRS)
 
@@ -99,10 +103,10 @@ usbcanII:
 	@cd ./usbcanII; $(MAKE) kv_module
 
 leaf:
-	@cd ./leaf; $(MAKE) kv_module
+	@cd ./leaf; $(MAKE) common; $(MAKE) kv_module
 
 mhydra:
-	@cd ./mhydra; $(MAKE) kv_module
+	@cd ./mhydra; $(MAKE) common; $(MAKE) kv_module
 
 virtualcan:
 	@cd ./virtualcan; $(MAKE) kv_module
@@ -111,7 +115,19 @@ pciefd:
 	@cd ./pciefd; $(MAKE) kv_module
 
 install: $(DRIVERS)
-	@for dir in $(DRIVERS) ; do cd $$dir; echo Installing $$dir;./installscript.sh; cd ..; done
+	@for dir in $(DRIVERS) ; do cd $$dir; echo Installing $$dir;./installscript.sh || exit 1; cd ..; done
+	$(MAKE) -C canlib install
+	$(MAKE) -C linlib install
+
+uninstall:
+	@for dir in $(call reverse,$(DRIVERS)) ; do cd $$dir; echo Uninstalling $$dir;./uninstallscript.sh || exit 1; cd ..; done
+	$(MAKE) -C canlib uninstall
+	$(MAKE) -C linlib uninstall
+	rm -f /etc/udev/rules.d/10-kvaser.rules
+	rm -f /etc/modules-load.d/kvaser.conf
+
+load: $(DRIVERS)
+	@for dir in $(DRIVERS) ; do cd $$dir; echo Installing $$dir;./installscript.sh load || exit 1; cd ..; done
 	$(MAKE) -C canlib install
 	$(MAKE) -C linlib install
 

@@ -34,12 +34,12 @@
  * Author Aaron Ferrucci, adapted from code originally written by PRR.         *
  *                                                                             *
  ******************************************************************************/
-
 #include "inc/io.h"
 
 #include "HAL/inc/altera_avalon_epcs_flash_controller.h"
 #include "HAL/inc/altera_avalon_spi.h"
 #include "HAL/inc/epcs_commands.h"
+
 
 static int alt_epcs_flash_query(alt_flash_epcs_dev* flash);
 
@@ -47,16 +47,20 @@ static int alt_epcs_flash_query(alt_flash_epcs_dev* flash);
  * alt_epcs_flash_init
  *
  */
-int alt_epcs_flash_init(alt_flash_epcs_dev* flash, void* base)
+int alt_epcs_flash_init(alt_flash_epcs_dev* flash, volatile void * base)
 {
   int ret_code = 0;
-
+  
+  /* flash->dev.name        = name##_NAME; */
+  /* flash->dev.open        = NULL; */
+  /* flash->dev.close       = NULL; */
   flash->dev.write       = alt_epcs_flash_write;
   flash->dev.read        = alt_epcs_flash_read;
   flash->dev.get_info    = alt_epcs_flash_get_info;
   flash->dev.erase_block = alt_epcs_flash_erase_block;
   flash->dev.write_block = alt_epcs_flash_write_block;
-  flash->register_base   = SERIALFLASH_REGISTER_OFFSET + base;
+  //  flash->dev.base_addr   = (void*)base;
+  flash->register_base   =  (unsigned char *)base + SERIALFLASH_REGISTER_OFFSET;
 
   /* Set up function pointers and/or data structures as needed. */
   ret_code = alt_epcs_flash_query(flash);
@@ -80,7 +84,7 @@ static int alt_epcs_flash_query(alt_flash_epcs_dev* flash)
   int ret_code = 0;
 
   /* Decide if an epcs flash device is attached.
-   *
+   *  
    * ret_code = -ENODEV = No device found!
    */
 
@@ -126,21 +130,21 @@ static int alt_epcs_flash_query(alt_flash_epcs_dev* flash)
     }
   else
     {
-      /*
-       * Read electronic signature doesn't work for the EPCS128; try
+      /* 
+       * Read electronic signature doesn't work for the EPCS128; try 
        * the "Read Device ID" command" before giving up.
        */
       flash->silicon_id = epcs_read_device_id(flash->register_base);
-
+    
       if(flash->silicon_id == 0x18) /* EPCS128 */
         {
           flash->dev.region_info[0].region_size = 128 * 1024 * 1024 / 8;
           flash->dev.region_info[0].number_of_blocks = 64;
-          flash->dev.region_info[0].block_size = 262144;
+          flash->dev.region_info[0].block_size = 262144;     
         }
-      else
+      else 
         {
-          ret_code = -ENODEV; /* No known device found! */
+          ret_code = -ENODEV; /* No known device found! */ 
         }
     }
 
@@ -154,23 +158,23 @@ static int alt_epcs_flash_query(alt_flash_epcs_dev* flash)
 }
 
 int alt_epcs_flash_memcmp( alt_flash_dev* flash_info,
-                           const void* src_buffer,
-                           int offset,
-                           size_t n )
+                                  const void* src_buffer,
+                                  int offset,
+                                  size_t n )
 {
   /*
    * Compare chunks of memory at a time, for better serial-flash
    * read efficiency.
    */
   uint8_t chunk_buffer[32];
-  const int chunk_size = sizeof(chunk_buffer) / sizeof(*chunk_buffer);
+  const unsigned int chunk_size = sizeof(chunk_buffer) / sizeof(*chunk_buffer);
   int current_offset = 0;
 
   while (n > 0)
     {
       int this_chunk_size = n > chunk_size ? chunk_size : n;
       int this_chunk_cmp;
-
+      
       if ( alt_epcs_flash_read( flash_info,
                                 offset + current_offset,
                                 chunk_buffer,
@@ -315,6 +319,7 @@ int alt_epcs_flash_get_info(alt_flash_fd* fd, flash_region** info,
 
 
 /* This might be a candidate for optimization.  Precompute the last-address? */
+//static ALT_INLINE int alt_epcs_test_address(alt_flash_dev* flash_info, int offset)
 static int alt_epcs_test_address(alt_flash_dev* flash_info, int offset)
 {
   int ret_code = 0;
@@ -324,7 +329,7 @@ static int alt_epcs_test_address(alt_flash_dev* flash_info, int offset)
   alt_flash_epcs_dev *f = (alt_flash_epcs_dev*)flash_info;
 
   const uint32_t last_region_index = f->dev.number_of_regions - 1;
-  uint32_t last_device_address =
+  int last_device_address =
     -1 +
     f->dev.region_info[last_region_index].offset +
     f->dev.region_info[last_region_index].region_size;

@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, M�lndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -136,7 +136,7 @@ typedef struct MhydraCardData {
 
   uint8_t   *bulk_in_buffer;            // the buffer to receive data
   size_t    bulk_in_size;               // the size of the receive buffer
-  __u8      bulk_in_endpointAddr;       // the address of the bulk in endpoint
+  uint8_t   bulk_in_endpointAddr;       // the address of the bulk in endpoint
 
   uint32_t  bulk_in_MaxPacketSize;
 
@@ -146,7 +146,7 @@ typedef struct MhydraCardData {
   uint32_t  bulk_out_MaxPacketSize;
 
   struct urb *write_urb;                // the urb used to send data
-  __u8        bulk_out_endpointAddr;    // the address of the bulk out endpoint
+  uint8_t    bulk_out_endpointAddr;    // the address of the bulk out endpoint
   OS_IF_SEMAPHORE   write_finished;     // wait for the write to finish
 
   int32_t  present;                     // if the device is not disconnected
@@ -160,7 +160,7 @@ typedef struct MhydraCardData {
   uint64_t  time_offset_valid;
 
   uint32_t max_bitrate;
-  uint8_t rxCmdBuffer[sizeof(hydraHostCmdExt)];
+  uint8_t  rxCmdBuffer[sizeof(hydraHostCmdExt)];
   uint32_t rxCmdBufferLevel;
 
 } MhydraCardData;

@@ -1,4 +1,3 @@
-#ifndef __ALT_FLASH_DEV_H__
 /******************************************************************************
 *                                                                             *
 * License Agreement                                                           *
@@ -44,38 +43,55 @@
 * Author PRR                                                                  *
 *                                                                             *
 ******************************************************************************/
+#ifndef __ALT_FLASH_DEV_H__
 #define __ALT_FLASH_DEV_H__
 
 #include "alt_flash_types.h"
+//#include "sys/alt_llist.h"
+//#include "priv/alt_dev_llist.h"
+//#include "alt_types.h"
 
-typedef struct alt_flash_dev alt_flash_dev;
+typedef struct alt_flash_dev alt_flash_dev; 
 typedef alt_flash_dev alt_flash_fd;
 
-typedef alt_flash_dev* (*alt_flash_open)(alt_flash_dev* flash,
+/* static ALT_INLINE int alt_flash_device_register( alt_flash_fd* fd) */
+/* { */
+/*   extern alt_llist alt_flash_dev_list; */
+
+/*   return alt_dev_llist_insert ((alt_dev_llist*) fd, &alt_flash_dev_list); */
+/* } */
+
+typedef alt_flash_dev* (*alt_flash_open)(alt_flash_dev* flash, 
                                          const char* name );
 typedef int (*alt_flash_close)(alt_flash_dev* flash_info);
 
-typedef int (*alt_flash_write)( alt_flash_dev* flash, int offset,
+typedef int (*alt_flash_write)( alt_flash_dev* flash, int offset, 
                                 const void* src_addr, int length );
 
-typedef int (*alt_flash_get_flash_info)( alt_flash_dev* flash, flash_region** info,
+typedef int (*alt_flash_get_flash_info)( alt_flash_dev* flash, flash_region** info, 
                                           int* number_of_regions);
-typedef int (*alt_flash_write_block)( alt_flash_dev* flash, int block_offset,
-                                      int data_offset, const void* data,
+typedef int (*alt_flash_write_block)( alt_flash_dev* flash, int block_offset, 
+                                      int data_offset, const void* data, 
                                       int length);
 typedef int (*alt_flash_erase_block)( alt_flash_dev* flash, int offset);
-typedef int (*alt_flash_read)(alt_flash_dev* flash, int offset,
+typedef int (*alt_flash_read)(alt_flash_dev* flash, int offset, 
                               void* dest_addr, int length );
 
 struct alt_flash_dev
 {
+  //  alt_llist                 llist;
+  //  const char*               name;
+  //  alt_flash_open            open;
+  //  alt_flash_close           close;
   alt_flash_write           write;
   alt_flash_read            read;
   alt_flash_get_flash_info  get_info;
   alt_flash_erase_block     erase_block;
   alt_flash_write_block     write_block;
+  //  void*                     base_addr;
+  //  int                       length;
   int                       number_of_regions;
-  flash_region              region_info[ALT_MAX_NUMBER_OF_FLASH_REGIONS];
+  flash_region              region_info[ALT_MAX_NUMBER_OF_FLASH_REGIONS]; 
 };
 
 #endif /* __ALT_FLASH_DEV_H__ */

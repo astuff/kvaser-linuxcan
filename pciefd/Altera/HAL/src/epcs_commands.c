@@ -31,7 +31,7 @@
 #include "HAL/inc/epcs_commands.h"
 #include "HAL/inc/altera_avalon_spi.h"
 
-uint8_t epcs_read_status_register(void *base)
+uint8_t epcs_read_status_register(volatile void * base)
 {
   const uint8_t rdsr = epcs_rdsr;
   uint8_t status;
@@ -48,12 +48,12 @@ uint8_t epcs_read_status_register(void *base)
   return status;
 }
 
-static int epcs_test_wip(void *base)
+static int epcs_test_wip(volatile void * base)
 {
   return epcs_read_status_register(base) & 1;
 }
 
-static void epcs_await_wip_released(void *base)
+static void epcs_await_wip_released(volatile void * base)
 {
   /* Wait until the WIP bit goes low. */
   while (epcs_test_wip(base))
@@ -61,14 +61,14 @@ static void epcs_await_wip_released(void *base)
     }
 }
 
-void epcs_sector_erase(void *base, uint32_t offset)
+void epcs_sector_erase(volatile void * base, uint32_t offset)
 {
   uint8_t se[4];
-
+  
   se[0] = epcs_se;
-  se[1] = (offset >> 16) & 0xFF;
-  se[2] = (offset >> 8) & 0xFF;
-  se[3] = offset & 0xFF;
+  se[1] = (uint8_t)((offset >> 16) & 0xFF);
+  se[2] = (uint8_t)((offset >> 8) & 0xFF);
+  se[3] =(uint8_t) (offset & 0xFF);
 
   alt_avalon_spi_command(
                          base,
@@ -83,15 +83,18 @@ void epcs_sector_erase(void *base, uint32_t offset)
   epcs_await_wip_released(base);
 }
 
-int32_t epcs_read_buffer(void *base, int offset, uint8_t *dest_addr, int length)
+int32_t epcs_read_buffer(volatile void * base, int offset, uint8_t *dest_addr, int length)
 {
   uint8_t read_command[4];
-
+  
   read_command[0] = epcs_read;
   read_command[1] = (offset >> 16) & 0xFF;
   read_command[2] = (offset >> 8) & 0xFF;
   read_command[3] = offset & 0xFF;
 
+  /* I don't know why this is necessary, since I call await-wip after
+   * all writing commands.
+   */
   epcs_await_wip_released(base);
 
   alt_avalon_spi_command(
@@ -107,7 +110,7 @@ int32_t epcs_read_buffer(void *base, int offset, uint8_t *dest_addr, int length)
   return length;
 }
 
-void epcs_write_enable(void *base)
+void epcs_write_enable(volatile void * base)
 {
   const uint8_t wren = epcs_wren;
   alt_avalon_spi_command(
@@ -121,10 +124,10 @@ void epcs_write_enable(void *base)
                          );
 }
 
-void epcs_write_status_register(void *base, uint8_t value)
+void epcs_write_status_register(volatile void * base, uint8_t value)
 {
   uint8_t wrsr[2];
-
+  
   wrsr[0] = epcs_wrsr;
   wrsr[1] = value;
 
@@ -142,10 +145,10 @@ void epcs_write_status_register(void *base, uint8_t value)
 }
 
 /* Write a partial or full page, assuming that page has been erased */
-int32_t epcs_write_buffer(void *base, int offset, const uint8_t* src_addr, int length)
+int32_t epcs_write_buffer(volatile void * base, int offset, const uint8_t* src_addr, int length)
 {
   uint8_t pp[4];
-
+  
   pp[0] = epcs_pp;
   pp[1] = (offset >> 16) & 0xFF;
   pp[2] = (offset >> 8) & 0xFF;
@@ -188,7 +191,7 @@ int32_t epcs_write_buffer(void *base, int offset, const uint8_t* src_addr, int l
 }
 
 
-uint8_t epcs_read_electronic_signature(void *base)
+uint8_t epcs_read_electronic_signature(volatile void * base)
 {
   const uint8_t res_cmd[] = {epcs_res, 0, 0, 0};
   uint8_t res;
@@ -206,7 +209,7 @@ uint8_t epcs_read_electronic_signature(void *base)
   return res;
 }
 
-uint8_t epcs_read_device_id(void *base)
+uint8_t epcs_read_device_id(volatile void * base)
 {
   const uint8_t rd_id_cmd[] = {epcs_rdid, 0, 0};
   uint8_t res;

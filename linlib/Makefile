@@ -121,6 +121,12 @@ install: linlib
 #	mkdir -p /usr/doc/linlib
 #	cp -r ../doc/HTMLhelp /usr/doc/linlib
 
+uninstall:
+	rm -f /usr/lib/$(LIBNAME)   \
+	      /usr/lib/$(SONAME)    \
+	      /usr/lib/$(LIBRARY)   \
+	      /usr/include/linlib.h
+
 clean:	
 	rm -f $(OBJS) $(LIBRARY) $(DEPS) $(LIBNAME) $(LIBRARY) $(SONAME) $(TARBALL) *~
 #	$(MAKE) -C examples clean

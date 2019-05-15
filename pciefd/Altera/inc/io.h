@@ -1,6 +1,3 @@
-#ifndef __IO_H__
-#define __IO_H__
-
 /******************************************************************************
  *                                                                             *
  * License Agreement                                                           *
@@ -32,6 +29,9 @@
  * Altera does not recommend, suggest or require that this reference design    *
  * file be used in conjunction or combination with any other product.          *
  ******************************************************************************/
+
+#ifndef __IO_H__
+#define __IO_H__
 
 /* IO Header file for Nios II Toolchain */
 #include <asm/io.h>

@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, M�lndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -77,6 +77,8 @@
 #include "fpgacan_packet_defs.h"
 #include "util.h"
 #include "capabilities.h"
+#include "dlc.h"
+#include "ticks.h"
 
 // Get a minor range for your devices from the usb maintainer
 // Use a unique set for each driver
@@ -114,6 +116,7 @@ static int mhydra_set_silent(VCanChanData *vChd, int silent);
 static int mhydra_set_trans_type(VCanChanData *vChd, int linemode, int resnet);
 static int mhydra_bus_on(VCanChanData *vChd);
 static int mhydra_bus_off(VCanChanData *vChd);
+static int mhydra_req_bus_stats(VCanChanData *vChd);
 static int mhydra_get_tx_err(VCanChanData *vChd);
 static int mhydra_get_rx_err(VCanChanData *vChd);
 static int mhydra_outstanding_sync(VCanChanData *vChan);
@@ -144,6 +147,10 @@ static int mhydra_objbuf_send_burst(VCanChanData *chd, int bufType, int bufNo,
 
 static int mhydra_tx_interval (VCanChanData *chd, unsigned int *interval);
 static int mhydra_capabilities (VCanCardData *vCard, uint32_t vcan_cmd);
+static int mhydra_get_cust_channel_name(const VCanChanData * const vChan,
+                                        unsigned char * const data,
+                                        const unsigned int data_size,
+                                        unsigned int * const status);
 
 static VCanDriverData driverData;
 
@@ -155,6 +162,7 @@ static VCanHWInterface hwIf = {
   .setTranceiverMode = mhydra_set_trans_type,
   .busOn             = mhydra_bus_on,
   .busOff            = mhydra_bus_off,
+  .reqBusStats       = mhydra_req_bus_stats,
   .txAvailable       = mhydra_outstanding_sync,            // This isn't really a function thats checks if tx is available!
   .procRead          = mhydra_proc_read,
   .closeAllDevices   = mhydra_close_all,
@@ -175,7 +183,8 @@ static VCanHWInterface hwIf = {
   .objbufSetPeriod   = mhydra_objbuf_set_period,
   .objbufSetMsgCount = mhydra_objbuf_set_msg_count,
   .objbufSendBurst   = mhydra_objbuf_send_burst,
-  .tx_interval       = mhydra_tx_interval
+  .tx_interval       = mhydra_tx_interval,
+  .getCustChannelName = mhydra_get_cust_channel_name,
 };
 
 
@@ -183,39 +192,20 @@ static VCanHWInterface hwIf = {
 //======================================================================
 // Static declarations
 
-
 // USB packet size
 #define MAX_PACKET_OUT      3072        // To device
 #define MAX_PACKET_IN       3072        // From device
 
-#define TS_AS_UINT64(X, DEV) \
-  div_u64(((X) & 0x0000ffffffffffffUL) * 1000, (DEV)->hires_timer_fq)
-
-#define TIMESTAMP_AS_UINT64(X, DEV) \
-  TS_AS_UINT64(*(uint64_t *)(X), (DEV))
-
-#define EXT_TIMESTAMP_AS_UINT64(X, DEV) \
-  TS_AS_UINT64(X.fpga_timestamp, DEV)
-
-
-//===========================================================================
-static uint64_t timestamp_in_10us(VCanCardData *vCard,
-                                       unsigned short *ticks)
+static unsigned long ticks_to_10us (VCanCardData *vCard,
+                                    uint64_t      ticks)
 {
-  MhydraCardData *dev = vCard->hwCardData;
-  uint64_t timestamp = TIMESTAMP_AS_UINT64(ticks, dev);
+  MhydraCardData *dev       = vCard->hwCardData;
+  uint64_t        timestamp = ticks_to_64bit_ns (&vCard->ticks, ticks, (uint32_t)dev->hires_timer_fq);
+  unsigned long   retval;
 
 
-  return div_u64(timestamp + 4999, 10000) - vCard->timestamp_offset;
-}
-
-
-//===========================================================================
-static uint64_t timestamp_in_10us_fd(VCanCardData *vCard,
-                                    uint64_t ticks)
-{
-
-  return div_u64(ticks + 4999, 10000) - vCard->timestamp_offset;
+  retval = div_u64 (timestamp + 4999, 10000) - vCard->timestamp_offset;
+  return retval;
 }
 
 
@@ -241,16 +231,16 @@ static int    mhydra_start(VCanCardData *vCard);
 
 static int    mhydra_tx_available(VCanChanData *vChan);
 static int    mhydra_transmit(VCanCardData *vCard);
-static int    mhydra_send_and_wait_reply(VCanCardData *vCard, hydraHostCmd *cmd,
-                                       hydraHostCmd *replyPtr,
-                                       unsigned char cmdNr,
-                                       unsigned char transId);
+static int    mhydra_send_and_wait_reply (VCanCardData *vCard, hydraHostCmd *cmd,
+                                          hydraHostCmd *replyPtr,
+                                          unsigned char cmdNr,
+                                          unsigned char transId,
+                                          unsigned char error_event);
+
 static int    mhydra_queue_cmd(VCanCardData *vCard, hydraHostCmd *cmd,
                              unsigned int timeout);
 
 static size_t mhydra_cmd_size(hydraHostCmd *cmd);
-static uint8_t dlcToBytes(uint32_t dlc);
-static uint8_t dlcToBytesFd(uint32_t dlc);
 static void mhydra_handle_command(hydraHostCmd *cmd, VCanCardData *vCard);
 static void mhydra_handle_extended_command (hydraHostCmdExt *extCmd, VCanCardData *vCard, VCanChanData *vChan);
 static void mhydra_handle_cmd_tx_acknowledge(hydraHostCmd *cmd, VCanCardData *vCard, uint32_t flags);
@@ -808,50 +798,6 @@ static size_t mhydra_cmd_size(hydraHostCmd *cmd)
 
 //===========================================================================
 //
-// bytesToDlcFd
-// Returns the size in bytes of a CAN FD dlc pattern.
-//
-
-
-//===========================================================================
-//
-// dlcToBytes
-// Returns the size in bytes of a CAN FD dlc pattern in case CAN FD is
-// disabled.
-//
-static uint8_t dlcToBytes(uint32_t dlc)
-{
-  dlc &= 0xfU;
-  if (dlc > MAX_DLC_CAN) return MAX_DLC_CAN;
-  return (uint8_t)dlc;
-} /* dlcToBytes  */
-
-
-//===========================================================================
-//
-// dlcToBytesFd
-// Returns the size in bytes of a CAN FD dlc pattern in case CAN FD is
-// disabled.
-//
-static uint8_t dlcToBytesFd(uint32_t dlc)
-{
-  dlc &= 0xfU;
-
-  switch (dlc) {
-    case  9: return 12U;
-    case 10: return 16U;
-    case 11: return 20U;
-    case 12: return 24U;
-    case 13: return 32U;
-    case 14: return 48U;
-    case 15: return 64U;
-    default: return (uint8_t)dlc;
-  }
-} /* dlcToBytesFd */
-
-
-//===========================================================================
-//
 // mhydra_handle_cmd_tx_acknowledge
 // Handles a Tx acknowledge command.
 //
@@ -884,16 +830,29 @@ static void mhydra_handle_cmd_tx_acknowledge(hydraHostCmd *cmd, VCanCardData *vC
       goto error_exit;
     }
 
-    if (((MhydraChanData *)vChan->hwChanData)->current_tx_message[transId - 1].flags & VCAN_MSG_FLAG_TXACK) {
+    if (((MhydraChanData *)vChan->hwChanData)->current_tx_message[transId - 1].flags & VCAN_MSG_FLAG_TX_NOTIFY) {
+
       // Copy CAN_MSG to VCAN_EVENT.
       VCAN_EVENT e = *((VCAN_EVENT *)&((MhydraChanData *)vChan->hwChanData)->current_tx_message[transId - 1]);
       e.tag = V_RECEIVE_MSG;
       if (isExtendedCmd) {
         hydraHostCmdExt *extCmd = (hydraHostCmdExt *)cmd;
-        e.timeStamp = timestamp_in_10us_fd(vCard, EXT_TIMESTAMP_AS_UINT64(extCmd->txAckFd, dev));
+        e.timeStamp = ticks_to_10us (vCard, extCmd->txAckFd.fpga_timestamp);
+
+        if (flags & MSGFLAG_SSM_NACK) {
+          if (flags & MSGFLAG_ABL) {
+            e.tagData.msg.flags |= VCAN_MSG_FLAG_SSM_NACK_ABL;
+          } else {
+            e.tagData.msg.flags |= VCAN_MSG_FLAG_SSM_NACK;
+          }
+        }
+        else {
+          e.tagData.msg.flags &= ~VCAN_MSG_FLAG_SSM_NACK;
+        }
+        e.tagData.msg.flags &= ~VCAN_MSG_FLAG_SINGLE_SHOT;
       }
       else {
-        e.timeStamp = timestamp_in_10us(vCard, cmd->txAck.time);
+        e.timeStamp = ticks_to_10us(vCard, *(uint64_t*)cmd->txAck.time);
       }
 
       if (!(e.tagData.msg.flags & VCAN_MSG_FLAG_ERROR_FRAME)) {
@@ -908,7 +867,7 @@ static void mhydra_handle_cmd_tx_acknowledge(hydraHostCmd *cmd, VCanCardData *vC
         DEBUGPRINT(6, (TXT("txack flag=%x\n"), flags));
       }
 
-      DEBUGPRINT(2, (TXT("CMD_TX_ACKNOWLEDGE flags %d\n"), e.tagData.msg.flags));
+      DEBUGPRINT(2, (TXT("CMD_TX_ACKNOWLEDGE flags 0x%x\n"), e.tagData.msg.flags));
 
       vCanDispatchEvent(vChan, &e);
     }
@@ -975,7 +934,6 @@ static void mhydra_handle_cmd_tx_acknowledge_fd(hydraHostCmdExt *cmdExt, VCanCar
 //
 static void mhydra_handle_cmd_rx_message_fd(hydraHostCmdExt *extCmd, VCanCardData *vCard, VCanChanData *vChan)
 {
-  MhydraCardData *dev = vCard->hwCardData;
   VCAN_EVENT vEvent = { 0 };
   int isExtFdMsg = ((extCmd->rxCanMessageFd.flags & MSGFLAG_FDF) != 0);
   uint8_t length = 0;
@@ -983,7 +941,7 @@ static void mhydra_handle_cmd_rx_message_fd(hydraHostCmdExt *extCmd, VCanCardDat
   DEBUGPRINT(4, (TXT("CMD_RX_MESSAGE_FD\n")));
 
   vEvent.tag = V_RECEIVE_MSG;
-  vEvent.timeStamp = timestamp_in_10us_fd(vCard, EXT_TIMESTAMP_AS_UINT64(extCmd->rxCanMessageFd, dev));
+  vEvent.timeStamp = ticks_to_10us (vCard, extCmd->rxCanMessageFd.fpga_timestamp);
 
   if (extCmd->rxCanMessageFd.flags & MSGFLAG_ERROR_FRAME) {
     vEvent.tagData.msg.id = VCAN_MSG_ID_UNDEF;
@@ -1029,11 +987,11 @@ static void mhydra_handle_cmd_rx_message_fd(hydraHostCmdExt *extCmd, VCanCardDat
       if (extCmd->rxCanMessageFd.flags & MSGFLAG_ESI) {
         vEvent.tagData.msg.flags |= VCAN_MSG_FLAG_ESI;
       }
-      length = dlcToBytesFd(dlc);
+      length = dlc_dlc_to_bytes_fd(dlc);
       vEvent.tagData.msg.dlc = (uint8_t)dlc;
     }
     else {
-      length = dlcToBytes(dlc);
+      length = dlc_dlc_to_bytes_classic(dlc);
       vEvent.tagData.msg.dlc = (uint8_t)dlc;
     }
   }
@@ -1087,7 +1045,7 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
 
   srcHE = (cmd->cmdIOP.srcChannel << 4) | cmd->cmdIOPSeq.srcHE;
 
-  DEBUGPRINT(8, (TXT("*** mhydra_handle_command %d\n"), cmd->cmdNo));
+  //DEBUGPRINT(8, (TXT("*** mhydra_handle_command %d\n"), cmd->cmdNo));
   switch (cmd->cmdNo) {
 
     case CMD_GET_BUSPARAMS_RESP:
@@ -1161,7 +1119,7 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
         }
 
         e.tag       = V_CHIP_STATE;
-        e.timeStamp = timestamp_in_10us(vCard, cmd->chipStateEvent.time);
+        e.timeStamp = ticks_to_10us (vCard, *(uint64_t*)cmd->chipStateEvent.time);
         e.transId   = 0;
         e.tagData.chipState.busStatus      = (unsigned char)vChd->chipState.state;
         e.tagData.chipState.txErrorCounter = (unsigned char)vChd->chipState.txerr;
@@ -1237,7 +1195,16 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
     }
 
     case CMD_GET_BUSLOAD_RESP:
-      DEBUGPRINT(4, (TXT("CMD_GET_BUSLOAD_RESP - Ignored\n")));
+      if (cmd->getBusLoadResp.delta_t != 0) {
+        unsigned int  chan = dev->he2channel[srcHE];
+        VCanChanData *vChd = vCard->chanData[chan];
+        __u64 load = (cmd->getBusLoadResp.active_samples * cmd->getBusLoadResp.sample_interval * 10) /
+                     (cmd->getBusLoadResp.delta_t);
+        vChd->busStats.busLoad = (__u32) (load & 0xFFFF);
+        if (vChd->busStats.busLoad > 10000) {
+          vChd->busStats.busLoad = 10000;
+        }
+      }
       break;
 
     case CMD_RESET_STATISTICS:
@@ -1278,7 +1245,7 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
           // Copy CAN_MSG to VCAN_EVENT.
           VCAN_EVENT e = *((VCAN_EVENT *)&((MhydraChanData *)vChan->hwChanData)->current_tx_message[transId - 1]);
           e.tag = V_RECEIVE_MSG;
-          e.timeStamp = timestamp_in_10us(vCard, cmd->txRequest.time);
+          e.timeStamp = ticks_to_10us(vCard, *(uint64_t*)cmd->txRequest.time);
           e.tagData.msg.flags &= ~VCAN_MSG_FLAG_TXACK;
           DEBUGPRINT(4, (TXT("CMD_TX_REQUEST flags (0x%04X\n"), e.tagData.msg.flags));
           vCanDispatchEvent(vChan, &e);
@@ -1349,7 +1316,7 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
 
       e.tag = V_CHIP_STATE;
 
-      e.timeStamp = timestamp_in_10us(vCard, cmd->canErrorEvent.time);
+      e.timeStamp = ticks_to_10us(vCard, *(uint64_t*)cmd->canErrorEvent.time);
 
       e.transId = 0;
       e.tagData.chipState.busStatus      = vChan->chipState.state;
@@ -1360,7 +1327,7 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
       if (errorCounterChanged) {
         e.tag               = V_RECEIVE_MSG;
         e.transId           = 0;
-        e.timeStamp = timestamp_in_10us(vCard, cmd->canErrorEvent.time);
+        e.timeStamp = ticks_to_10us(vCard, *(uint64_t*)cmd->canErrorEvent.time);
 
         e.tagData.msg.id    = 0;
         e.tagData.msg.flags = VCAN_MSG_FLAG_ERROR_FRAME;
@@ -1399,7 +1366,7 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
 
         e.tag               = V_RECEIVE_MSG;
         e.transId           = 0;
-        e.timeStamp         = timestamp_in_10us(vCard, cmd->logMessage.time);
+        e.timeStamp         = ticks_to_10us(vCard, *(uint64_t*)cmd->logMessage.time);
 
         e.timeStamp        += ((MhydraChanData *)vChd->hwChanData)->timestamp_correction_value;
         e.tagData.msg.id    = cmd->logMessage.id;
@@ -1543,6 +1510,10 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
       break;
     }
 
+    case CMD_GET_CAPABILITIES_RESP:
+      // this is handled below, waking those who are waiting.
+      break;
+
     case CMD_EXTENDED:
     {
       unsigned int  chan = dev->he2channel[srcHE];
@@ -1560,6 +1531,10 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
       }
       break;
     }
+
+    case CMD_PARAMETER_READ:
+      DEBUGPRINT(4, (TXT("CMD_PARAMETER_READ - Ignore\n")));
+      break;
 
     case CMD_UNKNOWN_COMMAND:
       DEBUGPRINT(2, (TXT("[%s,%d] CMD_UNKNOWN_COMMAND - %d\n"), __FILE__, __LINE__, cmd->unknownCommandResp.unknownCmd));
@@ -1594,24 +1569,17 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
   list_for_each_safe(currHead, tmpHead, &dev->replyWaitList)
   {
     currNode = list_entry(currHead, WaitNode, list);
-      if (currNode->cmdNr == cmd->cmdNo &&
-          mhydra_get_trans_id(cmd) == (currNode->transId & SEQ_MASK)) {
+    if (mhydra_get_trans_id(cmd) == (currNode->transId & SEQ_MASK)) {
+      if (currNode->cmdNr == cmd->cmdNo) {
         memcpy(currNode->replyPtr, cmd, mhydra_cmd_size(cmd));
-        DEBUGPRINT(4, (TXT ("Match: cN->cmdNr(%d) == cmd->cmdNo(%d) && ")
-                       TXT2("_get_trans_id(%d) == cN->transId(%d) size(%zu)\n"),
-                       currNode->cmdNr, cmd->cmdNo,
-                       mhydra_get_trans_id(cmd), (currNode->transId & SEQ_MASK), mhydra_cmd_size(cmd)));
         os_if_up_sema(&currNode->waitSemaphore);
+      } else if (cmd->cmdNo == CMD_ERROR_EVENT) {
+        if (currNode->error_event == DETECT_ERROR_EVENT) {
+          currNode->error_event = ERROR_EVENT_DETECTED;
+          os_if_up_sema(&currNode->waitSemaphore);
+        }
       }
-#if DEBUG
-      else {
-        DEBUGPRINT(4, (TXT ("No match: cN->cmdNr(%d) == cmd->cmdNo(%d) && ")
-                       TXT2("_get_trans_id(%d) == cN->transId(%d) size(%zu)\n"),
-                       currNode->cmdNr, cmd->cmdNo,
-                       mhydra_get_trans_id(cmd), (currNode->transId & SEQ_MASK), mhydra_cmd_size(cmd)));
-      }
-#endif
-
+    }
   }
   os_if_spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
 } // _handle_command
@@ -1767,7 +1735,7 @@ static uint32_t mhydra_translate_can_msg (VCanChanData *vChan,
   // if we send CAN FD messages or not.
   if (vCard->card_flags & DEVHND_CARD_HYDRA_EXT) {
     uint8_t dlc = can_msg->length;
-    uint8_t nbr_of_bytes = min(dlc, (uint8_t)MAX_DLC_CAN);
+    uint8_t nbr_of_bytes = dlc_dlc_to_bytes_classic (dlc);
 
     if (can_msg->flags & VCAN_MSG_FLAG_FDF) {
       if (can_msg->flags & VCAN_MSG_FLAG_REMOTE_FRAME) {
@@ -1775,7 +1743,7 @@ static uint32_t mhydra_translate_can_msg (VCanChanData *vChan,
         can_msg->flags &= ~VCAN_MSG_FLAG_REMOTE_FRAME;
       }
       dlc = can_msg->length;
-      nbr_of_bytes = dlcToBytesFd(can_msg->length);
+      nbr_of_bytes = dlc_dlc_to_bytes_fd(can_msg->length);
     }
     hydra_msg_ext->cmdNo = CMD_EXTENDED;
     hydra_msg_ext->cmdNoExt = CMD_TX_CAN_MESSAGE_FD;
@@ -1807,12 +1775,14 @@ static uint32_t mhydra_translate_can_msg (VCanChanData *vChan,
                                                    RTPACKET_BRS(can_msg->flags & VCAN_MSG_FLAG_BRS ? 1:0)  |
                                                    RTPACKET_FDF(can_msg->flags & VCAN_MSG_FLAG_FDF ? 1:0)  |
                                                    RTPACKET_SEQ(0) |
+                                                   TPACKET_SSM(can_msg->flags & VCAN_MSG_FLAG_SINGLE_SHOT ? 1:0)  |
                                                    TPACKET_AREQ(1);
     } else {
       hydra_msg_ext->txCanMessageFd.fpga_control = RTPACKET_DLC(dlc) |
                                                    RTPACKET_BRS(0)   |
                                                    RTPACKET_FDF(0)   |
                                                    RTPACKET_SEQ(0)   |
+                                                   TPACKET_SSM(can_msg->flags & VCAN_MSG_FLAG_SINGLE_SHOT ? 1:0)  |
                                                    TPACKET_AREQ(1);
     }
 
@@ -2050,7 +2020,7 @@ static int mhydra_map_channels (VCanCardData* vCard) {
     setSEQ(&cmd, transId);
 
     r = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
-        CMD_MAP_CHANNEL_RESP, getSEQ(&cmd));
+                                   CMD_MAP_CHANNEL_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
 
     if (r != VCAN_STAT_OK) {
       DEBUGPRINT(2, (TXT("1 CMD_MAP_CHANNEL_REQ - failed, chan=%d, stat=%d\n"),
@@ -2073,19 +2043,19 @@ static int mhydra_map_channels (VCanCardData* vCard) {
   strcpy (cmd.mapChannelReq.name, "SYSDBG");
 
   r = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
-                                 CMD_MAP_CHANNEL_RESP, getSEQ(&cmd));
-  
+                                 CMD_MAP_CHANNEL_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
+
   if (r != VCAN_STAT_OK) {
     DEBUGPRINT(2, (TXT("2 CMD_MAP_CHANNEL_REQ - failed, chan=%d, stat=%d\n"),
                    i, r));
     return r;
   }
-  
+
   DEBUGPRINT(2, (TXT("2 Map he address 0x%02X position %d flags 0x%02X\n"),
                  reply.mapChannelResp.heAddress,
                  reply.mapChannelResp.position,
                  reply.mapChannelResp.flags));
-  
+
   return VCAN_STAT_OK;
 }
 
@@ -2113,7 +2083,7 @@ static int mhydra_get_card_info_dummy (VCanCardData* vCard)
   setDST(&cmd, ILLEGAL_HE);
 
   ret = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
-                                   CMD_GET_CARD_INFO_RESP, getSEQ(&cmd));
+                                   CMD_GET_CARD_INFO_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
   if (ret != VCAN_STAT_OK)
     goto error_exit;
 
@@ -2127,7 +2097,7 @@ static int mhydra_get_card_info_dummy (VCanCardData* vCard)
   setDST(&cmd, ILLEGAL_HE);
 
   ret = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
-      CMD_GET_SOFTWARE_INFO_RESP, getSEQ(&cmd));
+                                   CMD_GET_SOFTWARE_INFO_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
   if (ret != VCAN_STAT_OK)
     goto error_exit;
 
@@ -2138,7 +2108,7 @@ static int mhydra_get_card_info_dummy (VCanCardData* vCard)
   setDST(&cmd, ILLEGAL_HE);
 
   ret = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
-      CMD_GET_SOFTWARE_DETAILS_RESP, getSEQ(&cmd));
+                                   CMD_GET_SOFTWARE_DETAILS_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
   if (ret != VCAN_STAT_OK)
     goto error_exit;
 
@@ -2152,7 +2122,7 @@ static int mhydra_get_card_info_dummy (VCanCardData* vCard)
     cmd.autoTxBufferReq.requestType = AUTOTXBUFFER_CMD_GET_INFO;
 
     ret = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
-                        CMD_AUTO_TX_BUFFER_RESP, getSEQ(&cmd));
+                                     CMD_AUTO_TX_BUFFER_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
     if (ret != VCAN_STAT_OK)
       goto error_exit;
 
@@ -2183,7 +2153,7 @@ static void mhydra_response_timer (unsigned long voidWaitNode)
 //
 static int mhydra_send_and_wait_reply (VCanCardData *vCard, hydraHostCmd *cmd,
                                      hydraHostCmd *replyPtr, unsigned char cmdNr,
-                                     unsigned char transId)
+                                       unsigned char transId, unsigned char error_event)
 {
   MhydraCardData     *dev;
   struct timer_list  waitTimer;
@@ -2208,7 +2178,8 @@ static int mhydra_send_and_wait_reply (VCanCardData *vCard, hydraHostCmd *cmd,
   waitNode.cmdNr     = cmdNr;
   waitNode.transId   = transId;
 
-  waitNode.timedOut  = 0;
+  waitNode.timedOut    = 0;
+  waitNode.error_event = error_event;
 
   // Add to card's list of expected responses
   os_if_spin_lock_irqsave(&dev->replyWaitListLock, &irqFlags);
@@ -2242,6 +2213,8 @@ static int mhydra_send_and_wait_reply (VCanCardData *vCard, hydraHostCmd *cmd,
     DEBUGPRINT(2, (TXT("WARNING: waiting for response(%d) timed out! \n"),
                    waitNode.cmdNr));
     return VCAN_STAT_TIMEOUT;
+  } else if (waitNode.error_event == ERROR_EVENT_DETECTED) {
+    return VCAN_STAT_BAD_PARAMETER;
   }
 
   return VCAN_STAT_OK;
@@ -2338,7 +2311,6 @@ static int mhydra_plugin (struct usb_interface *interface,
   int                             retval = -ENOMEM;
   VCanCardData                    *vCard;
   MhydraCardData                    *dev;
-  int                             r;
 
   DEBUGPRINT(3, (TXT("mhydra: _plugin\n")));
 
@@ -2421,6 +2393,7 @@ static int mhydra_plugin (struct usb_interface *interface,
   os_if_init_sema(&((MhydraCardData *)vCard->hwCardData)->sem);
   dev->udev = udev;
   dev->interface = interface;
+  ticks_init (&vCard->ticks);
 
   // Set up the endpoint information
   // Check out the endpoints
@@ -2518,9 +2491,9 @@ static int mhydra_plugin (struct usb_interface *interface,
 
 
   // Start up vital stuff
-  r = mhydra_start(vCard);
-  if (r != VCAN_STAT_OK)
+  if (mhydra_start(vCard) != VCAN_STAT_OK) {
     goto error;
+  }
 
 
   // Let the user know what node this device is now attached to
@@ -2599,19 +2572,22 @@ static int mhydra_start (VCanCardData *vCard)
 
   if (vCard->card_flags & DEVHND_CARD_EXTENDED_CAPABILITIES) {
     int stat;
-    
+
     // silently fail, beacuse this isn't a fatal error
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_SILENTMODE);
     if (stat != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_SILENTMODE\n")));
-    
+
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES);
     if (stat != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES\n")));
-    
+
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION);
     if (stat != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION\n")));
-    
+
     stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_ERROR_COUNTERS);
     if (stat != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_ERROR_COUNTERS\n")));
+
+    stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_SINGLE_SHOT);
+    if (stat != VCAN_STAT_OK) DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_SINGLE_SHOT\n")));
   }
 
   set_capability_value (vCard,
@@ -2623,6 +2599,19 @@ static int mhydra_start (VCanCardData *vCard)
                         0xFFFFFFFF,
                         0xFFFFFFFF,
                         HYDRA_MAX_CARD_CHANNELS);
+
+  // Set all channels in normal mode by default.
+  for (i = 0; i < HYDRA_MAX_CARD_CHANNELS; i++) {
+    int r;
+    hydraHostCmd cmd;
+
+    cmd.cmdNo = CMD_SET_DRIVERMODE_REQ;
+    setDST(&cmd, dev->channel2he[i]);
+    cmd.setDrivermodeReq.driverMode = DRIVERMODE_NORMAL;
+
+    r = mhydra_queue_cmd(vCard, &cmd, 5);
+    if (r != VCAN_STAT_OK) return r;
+  }
 
 
   return ret;
@@ -2868,8 +2857,22 @@ static int mhydra_set_busparams (VCanChanData *vChan, VCanBusParams *par)
 {
   hydraHostCmd    cmd, reply;
   uint32_t        tmp;
-  int             ret;
+  int             retval;
   MhydraCardData *dev = vChan->vCard->hwCardData;
+  unsigned int    quantaPerCycle;
+
+  if ((par->tseg1 == 0) || (par->tseg2 == 0) || (par->sjw == 0) ||
+      ((unsigned int)par->tseg1 > (unsigned char)par->tseg1) ||
+      ((unsigned int)par->tseg2 > (unsigned char)par->tseg2) ||
+      ((unsigned int)par->sjw   > (unsigned char)par->sjw)) {
+    return VCAN_STAT_BAD_PARAMETER;
+  }
+
+  quantaPerCycle = par->tseg1 + par->tseg2 + 1;
+  tmp = par->freq * quantaPerCycle;
+  if (tmp == 0) {
+    return VCAN_STAT_BAD_PARAMETER;
+  }
 
   DEBUGPRINT(4, (TXT("mhydra: _set_busparam\n")));
   memset(&cmd, 0, sizeof(cmd));
@@ -2883,15 +2886,8 @@ static int mhydra_set_busparams (VCanChanData *vChan, VCanBusParams *par)
   cmd.setBusparamsReq.tseg2   = (unsigned char)par->tseg2;
   cmd.setBusparamsReq.noSamp  = 1;
 
-  if ((vChan->canFdMode == OPEN_AS_CAN) || (par->freq_brs == 0)) {
+  if (vChan->canFdMode == OPEN_AS_CAN) {
     cmd.cmdNo = CMD_SET_BUSPARAMS_REQ;
-
-    // Check bus parameters
-    tmp = par->freq * (par->tseg1 + par->tseg2 + 1);
-    if (tmp == 0) {
-      DEBUGPRINT(1, (TXT("mhydra: _set_busparams() tmp == 0!\n")));
-      return VCAN_STAT_BAD_PARAMETER;
-    }
 
     DEBUGPRINT(5, (TXT ("mhydra_set_busparams: Chan(%d): Freq (%d) SJW (%d) TSEG1 (%d) TSEG2 (%d) ")
                    TXT2("Samp (%d)\n"),
@@ -2902,17 +2898,30 @@ static int mhydra_set_busparams (VCanChanData *vChan, VCanBusParams *par)
                    cmd.setBusparamsReq.tseg2,
                    cmd.setBusparamsReq.noSamp));
 
-    ret = mhydra_send_and_wait_reply(vChan->vCard, (hydraHostCmd *)&cmd, &reply,
-                                    CMD_SET_BUSPARAMS_RESP, getSEQ(&cmd));
+    retval = mhydra_send_and_wait_reply(vChan->vCard, (hydraHostCmd *)&cmd, &reply,
+                                     CMD_SET_BUSPARAMS_RESP, getSEQ(&cmd), DETECT_ERROR_EVENT);
   }
   else {
+    unsigned int quantaPerCycleBrs = par->tseg1_brs + par->tseg2_brs + 1;
+
+    if ((par->tseg1_brs == 0) || (par->tseg2_brs == 0) || (par->sjw_brs == 0) ||
+        ((unsigned int) par->tseg1_brs > (unsigned char)par->tseg1_brs) ||
+        ((unsigned int) par->tseg2_brs > (unsigned char)par->tseg2_brs) ||
+        ((unsigned int) par->sjw_brs   > (unsigned char)par->sjw_brs)) {
+      return VCAN_STAT_BAD_PARAMETER;
+    }
+    tmp = par->freq_brs * quantaPerCycleBrs;
+    if (tmp == 0) {
+      return VCAN_STAT_BAD_PARAMETER;
+    }
+
     cmd.cmdNo = CMD_SET_BUSPARAMS_FD_REQ;
 
-    cmd.setBusparamsReq.bitRateFd = (uint32_t) par->freq_brs;
-    cmd.setBusparamsReq.tseg1Fd = par->tseg1_brs;
-    cmd.setBusparamsReq.tseg2Fd = par->tseg2_brs;
-    cmd.setBusparamsReq.sjwFd = par->sjw_brs;
-    cmd.setBusparamsReq.noSampFd = 1U;
+    cmd.setBusparamsReq.bitRateFd     = (uint32_t) par->freq_brs;
+    cmd.setBusparamsReq.tseg1Fd       = par->tseg1_brs;
+    cmd.setBusparamsReq.tseg2Fd       = par->tseg2_brs;
+    cmd.setBusparamsReq.sjwFd         = par->sjw_brs;
+    cmd.setBusparamsReq.noSampFd      = 1U;
     cmd.setBusparamsReq.open_as_canfd = vChan->canFdMode;
 
     DEBUGPRINT(5, (TXT ("mhydra_set_busparams: Chan(%d): Freq (%d) SJW (%d) TSEG1 (%d) TSEG2 (%d) ")
@@ -2932,13 +2941,12 @@ static int mhydra_set_busparams (VCanChanData *vChan, VCanBusParams *par)
                    cmd.setBusparamsReq.noSampFd,
                    cmd.setBusparamsReq.open_as_canfd));
 
-    ret = mhydra_send_and_wait_reply(vChan->vCard, (hydraHostCmd *)&cmd, &reply,
-                                     CMD_SET_BUSPARAMS_FD_RESP, getSEQ(&cmd));
+    retval = mhydra_send_and_wait_reply(vChan->vCard, (hydraHostCmd *)&cmd, &reply,
+                                     CMD_SET_BUSPARAMS_FD_RESP, getSEQ(&cmd), DETECT_ERROR_EVENT);
   }
 
-  return ret;
+  return retval;
 } // _set_busparams
-
 
 
 //======================================================================
@@ -2961,7 +2969,7 @@ static int mhydra_get_busparams (VCanChanData *vChan, VCanBusParams *par)
   setSEQ(&cmd, (unsigned char)atomic_read(&vChan->transId));
 
   ret = mhydra_send_and_wait_reply(vChan->vCard, (hydraHostCmd *)&cmd, &reply,
-                                  CMD_GET_BUSPARAMS_RESP, getSEQ(&cmd));
+                                   CMD_GET_BUSPARAMS_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
 
   if (ret == VCAN_STAT_OK) {
     DEBUGPRINT(5, (TXT ("Chan(%d): Freq (%d) SJW (%d) TSEG1 (%d) TSEG2 (%d)\n"),
@@ -2981,7 +2989,7 @@ static int mhydra_get_busparams (VCanChanData *vChan, VCanBusParams *par)
   par->tseg1  = reply.getBusparamsResp.tseg1;
   par->tseg2  = reply.getBusparamsResp.tseg2;
   par->samp3  = reply.getBusparamsResp.noSamp;
-  
+
   if ((vChan->canFdMode == OPEN_AS_CANFD_ISO) || (vChan->canFdMode == OPEN_AS_CANFD_NONISO)) {
     cmd.cmdNo = CMD_GET_BUSPARAMS_REQ;
     cmd.getBusparamsReq.param_type = BUSPARAM_FLAG_CANFD;
@@ -2989,7 +2997,7 @@ static int mhydra_get_busparams (VCanChanData *vChan, VCanBusParams *par)
     setSEQ(&cmd, (unsigned char)atomic_read(&vChan->transId));
 
     ret = mhydra_send_and_wait_reply(vChan->vCard, (hydraHostCmd *)&cmd, &reply,
-                                    CMD_GET_BUSPARAMS_RESP, getSEQ(&cmd));
+                                     CMD_GET_BUSPARAMS_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
 
     if (ret == VCAN_STAT_OK) {
       DEBUGPRINT(5, (TXT ("Chan(%d): Freq BRS (%d) SJW (%d) TSEG1 (%d) TSEG2 (%d)\n"),
@@ -3077,7 +3085,7 @@ static int mhydra_get_chipstate (VCanChanData *vChan)
 
   ret = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
                                  CMD_CHIP_STATE_EVENT,
-                                 getSEQ(&cmd));
+                                   getSEQ(&cmd), SKIP_ERROR_EVENT);
 
   return ret;
 } // _get_chipstate
@@ -3110,7 +3118,7 @@ static int mhydra_bus_on (VCanChanData *vChan)
   setSEQ(&cmd, (unsigned char)atomic_read(&vChan->transId));
 
   ret = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
-      CMD_CHIP_STATE_EVENT, getSEQ(&cmd));
+                                   CMD_CHIP_STATE_EVENT, getSEQ(&cmd), SKIP_ERROR_EVENT);
 
   if (ret == VCAN_STAT_OK) {
     vChan->isOnBus = 1;
@@ -3143,7 +3151,7 @@ static int mhydra_bus_off (VCanChanData *vChan)
   setSEQ(&cmd, (unsigned char)atomic_read(&vChan->transId));
 
   ret = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
-      CMD_CHIP_STATE_EVENT, getSEQ(&cmd));
+                                   CMD_CHIP_STATE_EVENT, getSEQ(&cmd), SKIP_ERROR_EVENT);
 
   if (ret == VCAN_STAT_OK) {
     ret = mhydra_get_chipstate(vChan);
@@ -3165,6 +3173,21 @@ static int mhydra_bus_off (VCanChanData *vChan)
 } // _bus_off
 
 
+//======================================================================
+//
+//  Request bus statistics
+//
+static int mhydra_req_bus_stats (VCanChanData *vChan)
+{
+  VCanCardData *vCard = vChan->vCard;
+  MhydraCardData *dev = vChan->vCard->hwCardData;
+  hydraHostCmd cmd;
+
+  cmd.cmdNo = CMD_GET_BUSLOAD_REQ;
+  setDST(&cmd, dev->channel2he[vChan->channel]);
+
+  return mhydra_queue_cmd(vCard, &cmd, MHYDRA_Q_CMD_WAIT_TIME);
+} // _req_bus_stats
 
 //======================================================================
 //
@@ -3197,7 +3220,7 @@ static int mhydra_flush_tx_buffer (VCanChanData *vChan)
 //  ret = mhydra_queue_cmd(vChan->vCard, &cmd, 5 /* There is no response */);
 
   ret = mhydra_send_and_wait_reply(vChan->vCard, (hydraHostCmd *)&cmd, &reply,
-                                  CMD_FLUSH_QUEUE_RESP, getSEQ(&cmd));
+                                   CMD_FLUSH_QUEUE_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
 
 
   if (ret == VCAN_STAT_OK) {
@@ -3412,9 +3435,9 @@ static int mhydra_get_time (VCanCardData *vCard, unsigned long *time)
 
   // CMD_READ_CLOCK_RESP seem to always return 0 as transid
   ret = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
-                                 CMD_READ_CLOCK_RESP, getSEQ(&cmd));
+                                   CMD_READ_CLOCK_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
   if (ret == VCAN_STAT_OK) {
-    *time = timestamp_in_10us(vCard, reply.readClockResp.time);
+    *time = ticks_to_10us(vCard, *(uint64_t*)reply.readClockResp.time);
   }
 
   return ret;
@@ -3501,6 +3524,8 @@ static int mhydra_objbuf_alloc (VCanChanData *chd, int bufType, int *bufNo)
     if (!mhydraChan->objbufs) {
       return VCAN_STAT_NO_MEMORY;
     }
+
+    memset(mhydraChan->objbufs, 0, sizeof(OBJECT_BUFFER) * dev->autoTxBufferCount);
   }
 
   for (i = 0; i < dev->autoTxBufferCount; i++) {
@@ -3515,16 +3540,18 @@ static int mhydra_objbuf_alloc (VCanChanData *chd, int bufType, int *bufNo)
 }
 
 
+// align on 4-byte boundry
+#define CEIL4(x) ((((x)+(3))>>2)<<2)
 /***************************************************************************/
 /* Write data to an object buffer */
 static int mhydra_objbuf_write (VCanChanData *chd, int bufType, int bufNo,
-                              int id, int flags, int dlc, unsigned char *data)
+                                int id, int flags, int dlc, unsigned char *data)
 {
   int ret;
-  hydraHostCmd cmd;
+  hydraHostCmdExt cmd;
   MhydraChanData  *mhydraChan = chd->hwChanData;
-  VCanCardData  *vCard    = chd->vCard;
-  MhydraCardData  *dev      = vCard->hwCardData;
+  VCanCardData  *vCard        = chd->vCard;
+  MhydraCardData  *dev        = vCard->hwCardData;
 
   if (bufType != OBJBUF_TYPE_PERIODIC_TX) {
     return VCAN_STAT_BAD_PARAMETER;
@@ -3548,30 +3575,69 @@ static int mhydra_objbuf_write (VCanChanData *chd, int bufType, int bufNo,
   mhydraChan->objbufs[bufNo].msg.id     = id;
   mhydraChan->objbufs[bufNo].msg.flags  = (unsigned char)flags;
   mhydraChan->objbufs[bufNo].msg.length = (unsigned char)dlc;
-  memcpy(mhydraChan->objbufs[bufNo].msg.data, data, (dlc > 8) ? 8 : dlc);
+  memcpy(mhydraChan->objbufs[bufNo].msg.data, data, dlc);
 
-  memset(&cmd, 0, sizeof(cmd));
+  if (flags & VCAN_AUTOTX_MSG_FLAG_FDF) {
+    memset(&cmd, 0, sizeof(hydraHostCmdExt));
+    setDST(&cmd, dev->channel2he[chd->channel]);
 
-  cmd.cmdNo = CMD_AUTO_TX_BUFFER_REQ;
-  setDST(&cmd, dev->channel2he[chd->channel]);
+    cmd.cmdNo     = CMD_EXTENDED;
+    cmd.cmdNoExt  = CMD_AUTOTX_MESSAGE_FD;
+    cmd.cmdLen    = CEIL4(8 /* hydraHostCmdExt head */ + 16 /*autoTxMessageFd.requestType->id*/ + dlc);
 
-  cmd.autoTxBufferReq.bufNo   = (unsigned char)bufNo;
-  cmd.autoTxBufferReq.flags = 0;
+    cmd.autoTxMessageFd.requestType = AUTOTXBUFFER_CMD_SET_BUFFER;
+    cmd.autoTxMessageFd.dlc         = (unsigned char)dlc_bytes_to_dlc_fd ((unsigned int)dlc);
+    cmd.autoTxMessageFd.bufNo       = (unsigned char)bufNo;
+    cmd.autoTxMessageFd.id          = (unsigned long)id;
+    cmd.autoTxMessageFd.databytes   = (unsigned char)dlc;
 
-  if (id & EXT_MSG) {
-    cmd.autoTxBufferReq.flags        |= AUTOTXBUFFER_MSG_EXT;
+    memcpy(cmd.autoTxMessageFd.data, data, sizeof(cmd.autoTxMessageFd.data));
+
+    cmd.autoTxMessageFd.flags |= AUTOTXBUFFER_MSG_FDF;
+
+    if (id & EXT_MSG) {
+      cmd.autoTxMessageFd.flags |= AUTOTXBUFFER_MSG_EXT;
+    }
+    if (flags & VCAN_AUTOTX_MSG_FLAG_REMOTE_FRAME) {
+      cmd.autoTxMessageFd.flags |= AUTOTXBUFFER_MSG_REMOTE_FRAME;
+    }
+
+    if (flags & VCAN_AUTOTX_MSG_FLAG_BRS) {
+      cmd.autoTxMessageFd.flags |= AUTOTXBUFFER_MSG_BRS;
+    }
+
+    if (flags & VCAN_MSG_FLAG_SINGLE_SHOT) {
+      cmd.autoTxMessageFd.flags |= AUTOTXBUFFER_MSG_SINGLE_SHOT;
+    }
+
+  } else {
+    hydraHostCmd *msg = (hydraHostCmd*)&cmd;
+
+    memset(msg, 0, sizeof(hydraHostCmd));
+    setDST(msg, dev->channel2he[chd->channel]);
+
+    msg->cmdNo                       = CMD_AUTO_TX_BUFFER_REQ;
+    msg->autoTxBufferReq.requestType = AUTOTXBUFFER_CMD_SET_BUFFER;
+
+    msg->autoTxBufferReq.bufNo   = (unsigned char)bufNo;
+    msg->autoTxBufferReq.id      = (unsigned int)id;
+    msg->autoTxBufferReq.dlc     = (unsigned char)dlc;
+    memcpy(msg->autoTxBufferReq.data, data, 8);
+
+    if (id & EXT_MSG) {
+      msg->autoTxBufferReq.flags |= AUTOTXBUFFER_MSG_EXT;
+    }
+
+    if (flags & VCAN_AUTOTX_MSG_FLAG_REMOTE_FRAME) {
+      msg->autoTxBufferReq.flags |= AUTOTXBUFFER_MSG_REMOTE_FRAME;
+    }
+
+    if (flags & VCAN_MSG_FLAG_SINGLE_SHOT) {
+      msg->autoTxBufferReq.flags |= AUTOTXBUFFER_MSG_SINGLE_SHOT;
+    }
   }
 
-  cmd.autoTxBufferReq.id = id;
-  cmd.autoTxBufferReq.dlc = dlc & 0x0F;
-  cmd.autoTxBufferReq.requestType = AUTOTXBUFFER_CMD_SET_BUFFER;
-  memcpy(&cmd.autoTxBufferReq.data, data, 8);
-
-  if (flags & MSGFLAG_REMOTE_FRAME) {
-    cmd.autoTxBufferReq.flags |= AUTOTXBUFFER_MSG_REMOTE_FRAME;
-  }
-
-  ret = mhydra_queue_cmd(vCard, &cmd, MHYDRA_Q_CMD_WAIT_TIME);
+  ret = mhydra_queue_cmd(vCard, (hydraHostCmd*)&cmd, MHYDRA_Q_CMD_WAIT_TIME);
 
   return (ret != VCAN_STAT_OK) ? VCAN_STAT_NO_MEMORY : VCAN_STAT_OK;
 }
@@ -3709,7 +3775,7 @@ static int mhydra_objbuf_set_period (VCanChanData *chd, int bufType, int bufNo,
     return VCAN_STAT_BAD_PARAMETER;
   }
 
-  ret = 0;
+  ret = VCAN_STAT_OK;
   interval = (period + dev->autoTxBufferResolution / 2) /
              dev->autoTxBufferResolution;
   if (interval == 0) {
@@ -3865,14 +3931,15 @@ static int mhydra_tx_interval (VCanChanData *chd, unsigned int *interval) {
   setDST(&cmd, dev->channel2he[chd->channel]);
   cmd.txInterval.interval = *interval;
   cmd.txInterval.channel = (unsigned char)chd->channel;
-  r = mhydra_send_and_wait_reply(vCard, &cmd, &reply, CMD_HYDRA_TX_INTERVAL_RESP, getSEQ(&cmd));
+  r = mhydra_send_and_wait_reply(vCard, &cmd, &reply,
+                                 CMD_HYDRA_TX_INTERVAL_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
 
-  if (r != 0)
+  if (r != VCAN_STAT_OK)
     return r;
 
   if (reply.txInterval.status != VCAN_STAT_OK)
     return VCAN_STAT_BAD_PARAMETER;
-  
+
   *interval = reply.txInterval.interval;
   return r;
 }
@@ -3895,11 +3962,12 @@ static int mhydra_capabilities (VCanCardData *vCard, uint32_t vcan_cmd) {
   cmd.capabilitiesReq.subCmdNo = sub_cmd;
   setDST(&cmd, vCard->sysdbg_he);
 
-  r = mhydra_send_and_wait_reply(vCard, &cmd, &reply, CMD_GET_CAPABILITIES_RESP, getSEQ(&cmd));
+  r = mhydra_send_and_wait_reply(vCard, &cmd, &reply, CMD_GET_CAPABILITIES_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
+
   if (r != VCAN_STAT_OK) return r;
-  
+
   if (reply.capabilitiesResp.status == CAP_STATUS_OK) {
-    switch (reply.capabilitiesResp.subCmdNo) 
+    switch (reply.capabilitiesResp.subCmdNo)
     {
       case CAP_SUB_CMD_SILENT_MODE:
         value = reply.capabilitiesResp.silentMode.value;
@@ -3916,6 +3984,10 @@ static int mhydra_capabilities (VCanCardData *vCard, uint32_t vcan_cmd) {
       case CAP_SUB_CMD_ERRCOUNT_READ:
         value = reply.capabilitiesResp.errcountCap.value;
         mask  = reply.capabilitiesResp.errcountCap.mask;
+        break;
+      case CAP_SUB_CMD_SINGLE_SHOT:
+        value = reply.capabilitiesResp.singleshotCap.value;
+        mask  = reply.capabilitiesResp.singleshotCap.mask;
         break;
       default:
         value = 0;
@@ -3934,6 +4006,115 @@ static int mhydra_capabilities (VCanCardData *vCard, uint32_t vcan_cmd) {
   return VCAN_STAT_OK;
 }
 
+
+
+/***************************************************************************/
+#define ID_HW                   (unsigned short)0xfff0
+
+static int mhydra_read_parameter(const VCanChanData * const vChan,
+                                 unsigned int * const status,
+                                 const unsigned int userNo,
+                                 const unsigned int paramNo,
+                                 const unsigned int paramLen,
+                                 unsigned char * const data)
+{
+  hydraHostCmd cmd;
+  hydraHostCmd reply;
+  int r = VCAN_STAT_OK;
+
+  memset(&cmd, 0, sizeof(cmd));
+  cmd.cmdNo = CMD_PARAMETER_READ;
+  setDST(&cmd, ILLEGAL_HE);
+
+  if (userNo == ID_HW) {
+    cmd.o.parameterReadReq.subcmd = PARAMETER_SUBCMD_READ_HW;
+  } else if (userNo > 0) {
+    cmd.o.parameterReadReq.subcmd = PARAMETER_SUBCMD_READ;
+  } else {
+    cmd.o.parameterReadReq.subcmd = PARAMETER_SUBCMD_READ_WITH_UID;
+  }
+
+  cmd.o.parameterReadReq.userId     = (uint16_t)userNo;
+  cmd.o.parameterReadReq.paramNo    = (uint16_t)paramNo;
+  cmd.o.parameterReadReq.len        = (unsigned char)paramLen;
+
+  if (status) {
+    *status = 0;
+  }
+
+  r = mhydra_send_and_wait_reply(vChan->vCard, (hydraHostCmd *)&cmd, &reply,
+                                 CMD_PARAMETER_READ, getSEQ(&cmd), SKIP_ERROR_EVENT);
+  if (r != VCAN_STAT_OK) {
+    return r;
+  }
+
+  if (reply.o.parameterReadResp.status == 0) {
+    unsigned int copySize = (paramLen <= sizeof(reply.o.parameterReadResp.data)) ?
+      paramLen : sizeof(reply.o.parameterReadResp.data);
+    memcpy(data, reply.o.parameterReadResp.data, copySize);
+  }
+
+  if (status) {
+    *status = reply.o.parameterReadResp.status;
+  }
+
+  return r;
+}
+
+/***************************************************************************/
+#define PARAM_USER_FIRST                (1)
+#define CHANNEL_NAME_NBR_OF_PARAMS      (2)
+#define CHANNEL_NAME_ID                 (199)
+#define CHANNEL_NAME_PARAM_INDEX_FIRST  (PARAM_USER_FIRST + 1)
+#define PARAMETER_MAX_SIZE              (FIRMWARE_PARAMETER_MAX_SIZE - 6)
+
+static int mhydra_get_cust_channel_name(const VCanChanData * const vChan,
+                                        unsigned char * const data,
+                                        const unsigned int data_size,
+                                        unsigned int * const status)
+{
+  const unsigned int channel = vChan->channel;
+  int r = VCAN_STAT_OK;
+  unsigned char tempdata[PARAMETER_MAX_SIZE];
+  unsigned int nbr_of_bytes_to_copy;
+  unsigned int bytes_copied = 0;
+  unsigned int param_index = CHANNEL_NAME_PARAM_INDEX_FIRST + channel * CHANNEL_NAME_NBR_OF_PARAMS;
+  unsigned int i;
+
+  DEBUGPRINT(1, (TXT("[%s,%d]\n"), __FUNCTION__, __LINE__));
+
+  nbr_of_bytes_to_copy = PARAMETER_MAX_SIZE * CHANNEL_NAME_NBR_OF_PARAMS;
+  if (data_size < nbr_of_bytes_to_copy) {
+    nbr_of_bytes_to_copy = data_size;
+  }
+
+  for (i = 0; i < CHANNEL_NAME_NBR_OF_PARAMS; i++) {
+    unsigned chunk_size;
+
+    r = mhydra_read_parameter(vChan, status, CHANNEL_NAME_ID, param_index + i, sizeof(tempdata), tempdata);
+    DEBUGPRINT(1, (TXT("[%s,%d] - %d:%u\n"), __FUNCTION__, __LINE__, r, *status));
+    if (*status) {
+      r = VCAN_STAT_FAIL;
+    }
+    if (r) {
+      return r;
+    }
+
+    chunk_size = nbr_of_bytes_to_copy < sizeof(tempdata) ? nbr_of_bytes_to_copy : sizeof(tempdata);
+    memcpy(&data[bytes_copied], tempdata, chunk_size);
+    nbr_of_bytes_to_copy -= chunk_size;
+    bytes_copied += chunk_size;
+    if (!nbr_of_bytes_to_copy) {
+      break;
+    }
+  }
+
+  // Assure null termination.
+  data[data_size - 1] = 0;
+  *status = 0;
+
+  return r;
+}
 
 
 INIT int init_module (void)

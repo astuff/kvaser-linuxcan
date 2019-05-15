@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -50,8 +50,8 @@
 ** ---------------------------------------------------------------------------
 **/
 
-/* Kvaser CAN driver virtual hardware specific parts                    
-** virtual definitions                                                    
+/* Kvaser CAN driver virtual hardware specific parts
+** virtual definitions
 */
 
 #ifndef _VIRTUAL_HW_IF_H_

@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -72,7 +72,7 @@ typedef LinkedList HandleList;
 
 #define LAPCAN_TICKS_PER_MS 125
 
-#define OPEN_AS_CAN          0 
+#define OPEN_AS_CAN          0
 #define OPEN_AS_CANFD_ISO    1
 #define OPEN_AS_CANFD_NONISO 2
 
@@ -113,6 +113,7 @@ typedef struct HandleData
   unsigned int       syncFlag;
   unsigned long      syncTime;
   int                valid;
+  uint32_t           capabilities;
 } HandleData;
 
 
@@ -126,23 +127,29 @@ typedef struct CANOps
    */
   canStatus (*openChannel)(HandleData *);
   /* Read a callback function and flags that defines which events triggers it */
-  canStatus (*setNotify)(HandleData *,
-             /*void (*callback)(canNotifyData *)*/
-             OS_IF_SET_NOTIFY_PARAM, unsigned int);
+  canStatus (*setNotify)(HandleData *hData, void (*callback) (canNotifyData *),
+                         kvCallback_t callback2, unsigned int notifyFlags);
   canStatus (*busOn)(HandleData *);
   canStatus (*busOff)(HandleData *);
-  canStatus (*setBusParams)(HandleData *hData, long freq, unsigned int tseg1, 
+  canStatus (*setBusParams)(HandleData *hData, long freq, unsigned int tseg1,
                             unsigned int tseg2, unsigned int sjw, unsigned int noSamp,
-                            long freq_brs, unsigned int tseg1_brs, unsigned int tseg2_brs, 
+                            long freq_brs, unsigned int tseg1_brs, unsigned int tseg2_brs,
                             unsigned int sjw_brs, unsigned int syncmode);
-  canStatus (*getBusParams)(HandleData *hData, long *freq, unsigned int *tseg1, 
+  canStatus (*getBusParams)(HandleData *hData, long *freq, unsigned int *tseg1,
                             unsigned int *tseg2, unsigned int *sjw, unsigned int *noSamp,
                             long *freq_brs, unsigned int *tseg1_brs, unsigned int *tseg2_brs,
                             unsigned int *sjw_brs, unsigned int *syncmode);
+  canStatus (*reqBusStats) (HandleData *hData);
+  canStatus (*getBusStats) (HandleData *hData, canBusStatistics *stat);
   canStatus (*read)(HandleData *, long *, void *, unsigned int *,
                     unsigned int *, unsigned long *);
   canStatus (*readWait)(HandleData *, long *, void *, unsigned int *,
                         unsigned int *, unsigned long *, long);
+  canStatus (*readSpecific)(HandleData *, long, void *, unsigned int *,
+                        unsigned int *, unsigned long *);
+  canStatus (*readSpecificSkip)(HandleData *, long, void *, unsigned int *,
+                        unsigned int *, unsigned long *);
+  canStatus (*readSyncSpecific)(HandleData *, long, unsigned long);
   canStatus (*setBusOutputControl)(HandleData *, unsigned int);
   canStatus (*getBusOutputControl)(HandleData *, unsigned int *);
   canStatus (*accept)(HandleData *, const long, const unsigned int);
@@ -155,6 +162,7 @@ typedef struct CANOps
   canStatus (*readErrorCounters)(HandleData *, unsigned int *,
                                  unsigned int *, unsigned int *);
   canStatus (*readStatus)(HandleData *, unsigned long *);
+  canStatus (*requestChipStatus)(HandleData *);
   canStatus (*getChannelData)(char *, int, void *, size_t);
   canStatus (*ioCtl)(HandleData * , unsigned int, void *, size_t);
   canStatus (*objbufFreeAll)(HandleData *hData);

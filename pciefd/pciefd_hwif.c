@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -141,10 +141,15 @@ MODULE_DESCRIPTION("PCIe CAN module.");
 #define PCIEFD_2HS_ID     (0x000e)
 #define PCIEFD_HS_ID      (0x000f)
 
-#define MAX_NB_PARAMETERS 256
-#define PARAM_MAGIC       0xCAFEF00D
+#define MAX_NB_PARAMETERS   256
+#define PARAM_MAGIC         0xCAFEF00D
+#define PARAMETER_MAX_SIZE  (24)
 
 #define PARAM_SYSTEM_VERSION 1
+
+#define PARAM_USER_FIRST                (1)
+#define CHANNEL_NAME_NBR_OF_PARAMS      (1)
+#define CHANNEL_NAME_PARAM_INDEX_FIRST  (PARAM_USER_FIRST + 1)
 
 #define CANFD_MAX_PRESCALER_VALUE   2U
 
@@ -171,6 +176,10 @@ static int pciCanProcRead (struct seq_file* m, void* v);
 static int pciCanRequestChipState (VCanChanData *vChd);
 static unsigned long pciCanTxQLen(VCanChanData *vChd);
 static void pciCanRequestSend (VCanCardData *vCard, VCanChanData *vChan);
+static int pciCanGetCustChannelName(const VCanChanData * const vChan,
+                                    unsigned char * const data,
+                                    const unsigned int data_size,
+                                    unsigned int * const status);
 
 static VCanDriverData driverData;
 
@@ -192,6 +201,7 @@ static VCanHWInterface hwIf = {
   .txQLen             = pciCanTxQLen,
   .requestChipState   = pciCanRequestChipState,
   .requestSend        = pciCanRequestSend,
+  .getCustChannelName = pciCanGetCustChannelName,
 };
 
 
@@ -232,7 +242,7 @@ typedef struct {
   uint32_t   magic;  //PARAM_MAGIC indicate used
   uint32_t   param_number;
   uint32_t   param_len;
-  uint8_t    data[24];
+  uint8_t    data[PARAMETER_MAX_SIZE];
 } kcc_param_t;
 
 typedef struct {
@@ -241,6 +251,9 @@ typedef struct {
   uint32_t crc;
   kcc_param_t param[MAX_NB_PARAMETERS];
 } kcc_param_image_t;
+
+typedef unsigned char cust_channel_name_t[PARAMETER_MAX_SIZE];
+static cust_channel_name_t cust_channel_name[MAX_CARD_CHANNELS];
 
 //======================================================================
 // DMA
@@ -969,7 +982,7 @@ static int verifyParamImage(unsigned char * param_image)
     DEBUGPRINT(1,"ERROR: verifyParamImage incorrect crc should be 0x%08x, is 0x%08x\n", p->crc, calculateCRC32(p->param,sizeof(p->param)));
     return -6;
   }
-  return 0;
+  return VCAN_STAT_OK;
 }
 
 
@@ -1022,7 +1035,7 @@ int readParameter (unsigned char * param_image,
 
   if(param_image == NULL)
   {
-   return -1;
+   return VCAN_STAT_FAIL;
   }
 
   if(paramNo < MAX_NB_PARAMETERS)
@@ -1033,17 +1046,17 @@ int readParameter (unsigned char * param_image,
       if (paramLen < p->param[paramNo].param_len)
       {
         DEBUGPRINT(1,"Error: readParameter paramNo=%d paramLen=%d, actual_paramlen=%d\n", paramNo, paramLen, p->param[paramNo].param_len);
-        return -1;
+        return VCAN_STAT_FAIL;
       }
       else
       {
         memcpy(data,p->param[paramNo].data, paramLen);
-       return 0;
+       return VCAN_STAT_OK;
       }
     }
   }
 
-  return -1;
+  return VCAN_STAT_FAIL;
 }
 
 
@@ -1088,6 +1101,7 @@ static int DEVINIT getCardInfo(VCanCardData *vCard)
 
   alt_flash_dev *epcsFlashDev;
   unsigned char * param_image;
+  unsigned int i;
 
   epcsFlashDev = &(hCard->epcsFlashDev.dev);
 
@@ -1139,6 +1153,11 @@ static int DEVINIT getCardInfo(VCanCardData *vCard)
         if(vCard->nrChannels > 3) {
           readParameter(param_image, PARAM_CHANNEL_D_TRANS_TYPE, &vCard->chanData[3]->transType, PARAM_CHANNEL_TRANS_TYPE_LEN);
           INITPRINT("    * Transceiver type ch D: %u\n",vCard->chanData[3]->transType);
+        }
+
+        for (i = 0; i < MAX_CARD_CHANNELS; i++) {
+          readParameter(param_image, CHANNEL_NAME_PARAM_INDEX_FIRST + i, cust_channel_name[i], sizeof(cust_channel_name[i]));
+          INITPRINT("    * Cust channel name [%u]: %s\n", i, cust_channel_name[i]);
         }
 
         os_if_kernel_free(param_image);
@@ -1200,6 +1219,7 @@ static int DEVINIT pciCanProbe (VCanCardData *vCard)
                         0xFFFFFFFF,
                         MAX_CARD_CHANNELS);
 
+  vCard->nrChannels = KCAN_SYSID_NUM_CHAN_GET(IORD_SYSID_VERSION(hCard->sysidBase));
   if(vCard->nrChannels > MAX_CARD_CHANNELS) {
     vCard->nrChannels = MAX_CARD_CHANNELS;
   }
@@ -1230,6 +1250,7 @@ static int DEVINIT pciCanProbe (VCanCardData *vCard)
 #endif
 
   INITPRINT( "    * Max read buffer support %u\n", fifoPacketCountRxMax(hCard->canRxBuffer));
+  INITPRINT( "    * number of channels %d\n", vCard->nrChannels);
 
   for (i = 0; i < vCard->nrChannels; i++) {
     VCanChanData   *vChd = vCard->chanData[i];
@@ -1246,28 +1267,39 @@ static int DEVINIT pciCanProbe (VCanCardData *vCard)
 
       vChd->channel  = i;
 
-      // Test if a CAN controller is present at given address
-      if (IORD_PCIEFD_UNDEF(hChd->canControllerBase) == 0xdeadbeef) {
-        INITPRINT( "    -----------------------------------------------------------\n");
-        INITPRINT( "    Channel %u\n", i);
-        INITPRINT( "    -----------------------------------------------------------\n");
+      INITPRINT( "    -----------------------------------------------------------\n");
+      INITPRINT( "    Channel %u\n", i);
+      INITPRINT( "    -----------------------------------------------------------\n");
 
-        if (hwSupportCanFD(hChd->canControllerBase)) {
-          INITPRINT( "        * CAN FD supported\n");
-        }
-        INITPRINT( "        * Max write buffer support %u\n",fifoPacketCountTxMax(hChd->canControllerBase));
+      if (hwSupportCanFD(hChd->canControllerBase)) {
+        INITPRINT( "        * CAN FD supported\n");
+      }
 
-        if (fifoPacketCountTxMax(hChd->canControllerBase) < MAX_OUTSTANDING_TX) {
-          DEBUGPRINT(1, "        * Error, MAX_OUTSTANDING_TX=%u larger than buffer\n", MAX_OUTSTANDING_TX);
-          return VCAN_STAT_NO_MEMORY;
-        }
+      if (hwSupportCAP(hChd->canControllerBase)) {
+        set_capability_value (vCard,
+                              VCAN_CHANNEL_CAP_SINGLE_SHOT,
+                              1,
+                              (1 << i),
+                              vCard->nrChannels);
+
+        set_capability_mask (vCard,
+                             VCAN_CHANNEL_CAP_SINGLE_SHOT,
+                             1,
+                             (1 << i),
+                             vCard->nrChannels);
+
+        INITPRINT( "        * SINGLE SHOT supported\n");
       }
-      else {
-        vCard->nrChannels = i;
+
+      INITPRINT( "        * Max write buffer support %u\n",fifoPacketCountTxMax(hChd->canControllerBase));
+
+      if (fifoPacketCountTxMax(hChd->canControllerBase) < MAX_OUTSTANDING_TX) {
+        DEBUGPRINT(1, "        * Error, MAX_OUTSTANDING_TX=%u larger than buffer\n", MAX_OUTSTANDING_TX);
+        return VCAN_STAT_NO_MEMORY;
       }
-    }
-    else {
-      vCard->nrChannels = i;
+    } else {
+      vCard->cardPresent = 0;
+      return VCAN_STAT_NO_DEVICE;
     }
   }
 
@@ -1345,6 +1377,10 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
   tseg2 = par->tseg2;
 
   quantaPerCycle = tseg1 + tseg2 + 1;
+  // Detect overflow.
+  if ((quantaPerCycle < tseg1) || (quantaPerCycle < tseg2)) {
+    return VCAN_STAT_BAD_PARAMETER;
+  }
 
   DEBUGPRINT(2, "Set CAN/Arbitration params: bitrate:%lu, tseg1:%u, tseg2:%u, sjw:%u\n",
              freq, tseg1, tseg2, sjw);
@@ -1374,8 +1410,12 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
     tseg2 = par->tseg2_brs;
 
     quantaPerCycle = tseg1 + tseg2 + 1;
+    // Detect overflow.
+    if ((quantaPerCycle < tseg1) || (quantaPerCycle < tseg2)) {
+      return VCAN_STAT_BAD_PARAMETER;
+    }
 
-    if (quantaPerCycle == 0 || freq == 0) {
+    if (freq == 0) {
       DEBUGPRINT(1,"Error: Bad parameter\n");
       return VCAN_STAT_BAD_PARAMETER;
     }
@@ -1420,7 +1460,7 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
 
     pciCanRequestChipState(vChd);
 
-    return VCAN_STAT_OK;//FAIL; // Should be fail //FIXME QQQ
+    return VCAN_STAT_OK;
   }
 
   os_if_spin_lock_irqsave(&hChd->lock, &irqFlags);
@@ -1602,7 +1642,7 @@ static int pciCanRequestChipState (VCanChanData *vChd)
   // Add to card's list of expected responses
   os_if_write_lock_irqsave(&hCard->replyWaitListLock, &irqFlags);
 
-  os_if_spin_lock_irqsave(&hChd->lock, &irqFlags);
+  os_if_spin_lock(&hChd->lock);
 
   active_id = statPendingRequest(hChd->canControllerBase);
 
@@ -1618,7 +1658,7 @@ static int pciCanRequestChipState (VCanChanData *vChd)
     hChd->debug.requested_status++;
   }
 
-  os_if_spin_unlock_irqrestore(&hChd->lock, irqFlags);
+  os_if_spin_unlock(&hChd->lock);
 
   list_add(&waitNode.list, &hCard->replyWaitList);
   os_if_write_unlock_irqrestore(&hCard->replyWaitListLock, irqFlags);
@@ -1654,13 +1694,14 @@ static int pciCanRequestChipState (VCanChanData *vChd)
 //  Wait functions for Bus On/Off
 //======================================================================
 
-static int waitForIdleMode(int loopmax, VCanChanData *vChd,
-                           unsigned long irqFlags)
+static int waitForIdleMode(int loopmax, VCanChanData *vChd)
 /* Make sure that unit is in reset mode before starting flush.
  *
  * Waits a maximum of approximately loopmax ms for unit to reach idle state.
  * Returns number of turns in waiting loop if less than loopmax, otherwise
  * returns -1 to indicate timeout.
+ *
+ * Only call with spinlock held and interrupts disabled.
  */
 {
   PciCanChanData *hChd = vChd->hwChanData;
@@ -1668,12 +1709,12 @@ static int waitForIdleMode(int loopmax, VCanChanData *vChd,
 
   while ( loopcount && !statIdle(hChd->canControllerBase) )
   {
-    os_if_spin_unlock_irqrestore(&hChd->lock, irqFlags);
+    os_if_irq_enable(&hChd->lock);
 
     os_if_set_task_uninterruptible();
     os_if_wait_for_event_timeout_simple(1); // Wait 1 ms
 
-    os_if_spin_lock_irqsave(&hChd->lock, &irqFlags);
+    os_if_irq_disable(&hChd->lock);
 
     --loopcount;
   }
@@ -1686,14 +1727,15 @@ static int waitForIdleMode(int loopmax, VCanChanData *vChd,
 }
 
 
-static int waitForAbort(int loopmax, VCanChanData *vChd,
-                        unsigned long irqFlags)
+static int waitForAbort(int loopmax, VCanChanData *vChd)
 /* Wait for abort to complete before continuing.
  *
  * Waits a maximum of approximately loopmax ms for abort command to finish.
  * Returns number of turns in waiting loop if less than loopmax, otherwise
  * returns -1 to indicate timeout.
- */
+ *
+ * Only call with spinlock held and interrupts disabled.
+*/
 {
   PciCanChanData *hChd = vChd->hwChanData;
   int loopcount = loopmax;
@@ -1706,12 +1748,12 @@ static int waitForAbort(int loopmax, VCanChanData *vChd,
     } else {
       DEBUGPRINT(4,"Abort Busy CH:%u\n",vChd->channel);
 
-      os_if_spin_unlock_irqrestore(&hChd->lock, irqFlags);
+      os_if_irq_enable(&hChd->lock);
 
       os_if_set_task_uninterruptible();
       os_if_wait_for_event_timeout_simple(1); // Wait 1 ms
 
-      os_if_spin_lock_irqsave(&hChd->lock, &irqFlags);
+      os_if_irq_disable(&hChd->lock);
     }
 
     if ( statFlushRequest(hChd->canControllerBase) ) {
@@ -1741,13 +1783,14 @@ static int waitForAbort(int loopmax, VCanChanData *vChd,
 }
 
 
-static int waitForFlush(int loopmax, VCanChanData *vChd,
-                        unsigned long irqFlags)
+static int waitForFlush(int loopmax, VCanChanData *vChd)
 /* Wait for flush to complete before continuing.
  *
  * Waits a maximum of approximately loopmax ms for packet flush to finish.
  * Returns number of turns in waiting loop if less than loopmax, otherwise
  * returns -1 to indicate timeout.
+ *
+ * Only call with spinlock held and interrupts disabled.
  */
 {
   PciCanChanData *hChd = vChd->hwChanData;
@@ -1767,12 +1810,12 @@ static int waitForFlush(int loopmax, VCanChanData *vChd,
                level, vChd->channel,
                IORD_PCIEFD_STAT(hChd->canControllerBase));
 
-    os_if_spin_unlock_irqrestore(&hChd->lock, irqFlags);
+    os_if_irq_enable(&hChd->lock);
 
     os_if_set_task_uninterruptible();
     os_if_wait_for_event_timeout_simple(1); // Wait 1 ms
 
-    os_if_spin_lock_irqsave(&hChd->lock, &irqFlags);
+    os_if_irq_disable(&hChd->lock);
 
     --loopcount;
   }
@@ -1787,13 +1830,14 @@ static int waitForFlush(int loopmax, VCanChanData *vChd,
 }
 
 
-static int waitForBusOn(int loopmax, VCanChanData *vChd,
-                        unsigned long irqFlags)
+static int waitForBusOn(int loopmax, VCanChanData *vChd)
 /* Wait for bus on
  *
  * Waits a maximum of approximately loopmax ms for card to go bus on.
  * Returns number of turns in waiting loop if less than loopmax, otherwise
  * returns -1 to indicate timeout.
+ *
+ * Never call with spinlock held or interrupts disabled.
  */
 {
   int loopcount = loopmax;
@@ -1879,7 +1923,7 @@ static int pciCanBusOn (VCanChanData *vChd)
 
   // Make sure that unit is in reset mode before starting flush
   loopmax = 100; // Wait a maximum of 100 ms
-  stat = waitForIdleMode(loopmax, vChd, irqFlags);
+  stat = waitForIdleMode(loopmax, vChd);
 
   if ( stat < 0 ) {
     tmp = IORD_PCIEFD_STAT(hChd->canControllerBase);
@@ -1904,11 +1948,11 @@ static int pciCanBusOn (VCanChanData *vChd)
 
   // Wait for abort done signal
   loopmax = 100; // Wait a maximum of 100 ms
-  stat = waitForAbort(loopmax, vChd, irqFlags);
+  stat = waitForAbort(loopmax, vChd);
 
   // Wait for flush to finish
   loopmax = 10; // Wait a maximum of 10 ms
-  stat = waitForFlush(loopmax, vChd, irqFlags);
+  stat = waitForFlush(loopmax, vChd);
 
   // Write a flush recovery control word
   IOWR_PCIEFD_CONTROL(hChd->canControllerBase, PCIEFD_CONTROL_END_FLUSH);
@@ -1916,8 +1960,6 @@ static int pciCanBusOn (VCanChanData *vChd)
   // Enable bus load packets
   IOWR_PCIEFD_BLP(hChd->canControllerBase, hChd->bus_load_prescaler);
 
-  // qqqcd: There are several writes to mode register here.
-  //        Move them all into one wrapper function?
   if (OPEN_AS_CANFD_NONISO == vChd->canFdMode) {
     enableNonIsoMode(hChd->canControllerBase);
   }
@@ -1940,13 +1982,13 @@ static int pciCanBusOn (VCanChanData *vChd)
 
   vChd->chipState.state = CHIPSTAT_ERROR_ACTIVE;
 
-  os_if_spin_unlock_irqrestore(&hChd->lock, irqFlags);
+  os_if_irq_enable(&hChd->lock);
 
   // Wait for bus on
   loopmax = 1000; // Wait a maximum of 1000 ms
-  stat = waitForBusOn(loopmax, vChd, irqFlags);
+  stat = waitForBusOn(loopmax, vChd);
 
-  os_if_spin_lock_irqsave(&hChd->lock, &irqFlags);
+  os_if_irq_disable(&hChd->lock);
 
   ledOn(hChd->canControllerBase);
 
@@ -1988,7 +2030,7 @@ static int pciCanBusOff (VCanChanData *vChd)
 
   // Make sure that unit is in reset mode before starting flush
   loopmax = 100;
-  stat = waitForIdleMode(loopmax, vChd, irqFlags);
+  stat = waitForIdleMode(loopmax, vChd);
 
   if ( stat < 0 ) {
     tmp = IORD_PCIEFD_STAT(hChd->canControllerBase);
@@ -2209,7 +2251,6 @@ static void receivedPacketHandler (VCanCardData *vCard)
       // Copy command and wakeup those who are waiting for this reply.
       struct list_head *currHead, *tmpHead;
       WaitNode *currNode;
-      unsigned long irqFlags;
 
       DEBUGPRINT(4,"CH:%u Status (%x)\n",chid, packet->id);
 
@@ -2302,11 +2343,13 @@ static void receivedPacketHandler (VCanCardData *vCard)
   else if ( isAckPacket(packet) || isEFrameAckPacket(packet))
     {
       unsigned int transId = getAckSeqNo(packet);
+      int isAck = 0;
 
       if (isAckPacket(packet))
         {
           DEBUGPRINT(4,"CH:%u Ack Packet, ID %u, Outstanding %d\n",
                      chid, transId, atomic_read(&hChd->outstanding_tx));
+          isAck = 1;
         }
       else
         {
@@ -2330,33 +2373,46 @@ static void receivedPacketHandler (VCanCardData *vCard)
           e->timeStamp = timestamp_to_ticks(vCard, packet->timestamp);
           e->tagData.msg.flags &= ~VCAN_MSG_FLAG_TXRQ;
           e->tagData.msg.flags |= VCAN_MSG_FLAG_TXACK;
+
+          if (isAck && isNack(packet)) {
+
+            if (isABL(packet)) {
+              printk (KERN_INFO "pci abl\n");
+              e->tagData.msg.flags |= VCAN_MSG_FLAG_SSM_NACK_ABL;
+            } else {
+              printk (KERN_INFO "pci nack\n");
+              e->tagData.msg.flags |= VCAN_MSG_FLAG_SSM_NACK;
+            }
+          } else {
+            printk (KERN_INFO "pci ack\n");
+          }
+
           vCanDispatchEvent(vChd, e);
 
+          hChd->current_tx_message[transId - 1].user_data = 0;
 
-        hChd->current_tx_message[transId - 1].user_data = 0;
-
-        // Wake up those who are waiting for all sending to finish
-        if (atomic_add_unless(&hChd->outstanding_tx, -1, 0)) {
-          // Is anyone waiting for this ack?
-          if ( (atomic_read(&hChd->outstanding_tx) == 0)
-               && queue_empty(&vChd->txChanQueue)
-               && test_and_clear_bit(0, &vChd->waitEmpty) )
-            {
-              os_if_wake_up_interruptible(&vChd->flushQ);
+          // Wake up those who are waiting for all sending to finish
+          if (atomic_add_unless(&hChd->outstanding_tx, -1, 0)) {
+            // Is anyone waiting for this ack?
+            if ( (atomic_read(&hChd->outstanding_tx) == 0)
+                 && queue_empty(&vChd->txChanQueue)
+                 && test_and_clear_bit(0, &vChd->waitEmpty) )
+              {
+                os_if_wake_up_interruptible(&vChd->flushQ);
+              }
+            if (!queue_empty(&vChd->txChanQueue))
+              {
+                pciCanRequestSend(vCard, vChd);
+              } else {
+              DEBUGPRINT(4, "Queue empty\n");
             }
-          if (!queue_empty(&vChd->txChanQueue))
+          }
+          else
             {
-              pciCanRequestSend(vCard, vChd);
-            } else {
-            DEBUGPRINT(4, "Queue empty\n");
-          }
+              DEBUGPRINT(4, "TX ACK when not waiting for one\n");
+            }
+          ++hChd->debug.ack_packet_count;
         }
-        else
-          {
-            DEBUGPRINT(4, "TX ACK when not waiting for one\n");
-          }
-        ++hChd->debug.ack_packet_count;
-      }
     }
   // +----------------------------------------------------------------------
   // | TXRQ Packet
@@ -2936,6 +2992,10 @@ static int pciCanTransmitMessage (VCanChanData *vChd, CAN_MSG *m)
 
     if (ident & VCAN_EXT_MSG_ID) { /* Extended CAN */
       setExtendedId(&packet);
+    }
+
+    if (flags & VCAN_MSG_FLAG_SINGLE_SHOT) {
+      setSingleShotMode(&packet);
     }
 
     memcpy(packet.data, msg, nbytes);
@@ -3763,6 +3823,33 @@ static int EXIT pciCanCloseAllDevices (void)
 } // pciCanCloseAllDevices
 
 
+
+static int pciCanGetCustChannelName(const VCanChanData * const vChan,
+                                    unsigned char * const data,
+                                    const unsigned int data_size,
+                                    unsigned int * const status)
+{
+  const unsigned int channel = vChan->channel;
+  unsigned int nbr_of_bytes_to_copy;
+
+  DEBUGPRINT(1, "[%s,%d]\n", __FUNCTION__, __LINE__);
+
+  nbr_of_bytes_to_copy = PARAMETER_MAX_SIZE;
+  if (data_size < nbr_of_bytes_to_copy) {
+    nbr_of_bytes_to_copy = data_size;
+  }
+
+  if (cust_channel_name[channel][0] != 0) {
+    memcpy(data, cust_channel_name[channel], nbr_of_bytes_to_copy);
+    data[nbr_of_bytes_to_copy - 1] = 0;
+    *status = VCAN_STAT_OK;
+  }
+  else {
+    *status = VCAN_STAT_FAIL;
+  }
+
+  return *status;
+}
 
 INIT int init_module (void)
 {

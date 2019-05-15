@@ -1,6 +1,3 @@
-#ifndef __ALT_AVALON_SPI_H__
-#define __ALT_AVALON_SPI_H__
-
 /******************************************************************************
  *                                                                             *
  * License Agreement                                                           *
@@ -30,7 +27,12 @@
  * of California and by the laws of the United States of America.              *
  *                                                                             *
  ******************************************************************************/
+#ifndef __ALT_AVALON_SPI_H__
+#define __ALT_AVALON_SPI_H__
+
 #include <stddef.h>
+
+//#include "alt_types.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -62,7 +64,7 @@ extern "C"
 #define ALT_AVALON_SPI_COMMAND_TOGGLE_SS_N (0x02)
 
 
-  int alt_avalon_spi_command(void *base, uint32_t slave,
+  int alt_avalon_spi_command(volatile void * base, uint32_t slave,
                              uint32_t write_length, const uint8_t * write_data,
                              uint32_t read_length, uint8_t * read_data,
                              uint32_t flags);

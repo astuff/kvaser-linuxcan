@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -85,7 +85,6 @@ bit12 set mutual exclusion. (when high)
 // 10-11        M16c tx pointer LOW
 // 12-13        M16c tx pointer HIGH
 
-// qq This is not the case anymore.
 // 000c - 05ff  Receive buffer (read by host, written by M16C)
 // 0600 - 0bff  Transmit buffer (written by host, read by M16C)
 // 0c00 - 0c03  Timer

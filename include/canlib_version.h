@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -57,7 +57,7 @@
 #define CANLIB_VERSION_H
 
 #define CANLIB_MAJOR_VERSION (8 - 3)
-#define CANLIB_MINOR_VERSION 16
+#define CANLIB_MINOR_VERSION 17
 
 
 #endif

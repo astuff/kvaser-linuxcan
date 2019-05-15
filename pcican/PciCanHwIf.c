@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -535,15 +535,6 @@ static int DEVINIT pciCanProbe (VCanCardData *vCd)
                 DEBUGPRINT(1, "Channel %d strange piggy type %d\n", i, buf[9]);
             }
 
-            // qqq The following fields should probably also be filled in:
-            // unsigned int  transceiver_type;
-            // unsigned int  transceiver_state;
-            // unsigned long serial_number_low,
-            // serial_number_high;
-            // unsigned long transceiver_capabilities;
-            // char          ean[16];
-            // unsigned int  linemode,
-            // resnet;
 
             memset(vChd->ean, 0, sizeof(vChd->ean));
             memset(vCd->ean, 0, sizeof(vCd->ean));
@@ -634,12 +625,9 @@ static void pciCanSetupTransceiver (VCanChanData *vChd)
             tmp &= 0xe1;
             tmp |= 0x18;
             iowrite8(tmp, hChd->xilinxAddressCtrl);
-            // qqq we should implement a "sticky" input register in the Xilinx
-            // qqq so we can see if HVOLT has gone low.
             break;
 
             //
-            // The 252/1053 code is not yet tested. qqq
             //
         case VCAN_TRANSCEIVER_TYPE_252:
         case VCAN_TRANSCEIVER_TYPE_1054_OPTO:
@@ -647,8 +635,6 @@ static void pciCanSetupTransceiver (VCanChanData *vChd)
             tmp &= 0xe1;
             tmp |= 0x1c;
             iowrite8(tmp, hChd->xilinxAddressCtrl);
-            // qqq we should implement a "sticky" input register in the Xilinx
-            // qqq so we can see if NERR has gone low.
             break;
         case VCAN_TRANSCEIVER_TYPE_GAL:
         {
@@ -662,7 +648,6 @@ static void pciCanSetupTransceiver (VCanChanData *vChd)
         }
         break;
         default:
-            // qqq unsupported piggy
             DEBUGPRINT(1, "PCIcan: unknown piggy on chan %d\n", vChd->channel);
             break;
     }
@@ -948,8 +933,6 @@ static int pciCanRequestChipState_internal (VCanChanData *vChd)
     }
 
     if (cr & PCAN_RM) {
-        // It's in reset mode. We report BUSOFF but should really be
-        // reporting "inactive" or so. qqq
         vChd->chipState.state = CHIPSTAT_BUSOFF;
     }
 
@@ -1281,8 +1264,6 @@ static void pciCanBusErrorIsr (VCanChanData *vChd)
     r = vCanDispatchEvent(vChd, &e);
 
     // Muffle the sja1000 if we get too many errors.
-    // qqq this is not done right
-    //
 
     vChd->errorCount++;
     if (vChd->errorCount == MAX_ERROR_COUNT / 2) {
@@ -1340,7 +1321,7 @@ OS_IF_INTR_HANDLER pciCanInterrupt (int irq, void *dev_id)
             // Kill the card.
             DEBUGPRINT(1, "PCIcan runaway, shutting down card!!");
             pciCanResetCard(vCard);
-            return IRQ_HANDLED; // qqq ???
+            return IRQ_HANDLED;
         }
 
         // Handle all channels
@@ -1903,7 +1884,6 @@ static void DEVEXIT pciCanRemoveOne (struct pci_dev *dev)
 
   free_irq(hCd->irq, vCard);
 
-  // qqq Mark as not working somehow!
 
   for (chNr = 0; chNr < vCard->nrChannels; chNr++) {
     vChan = vCard->chanData[chNr];
@@ -1974,7 +1954,6 @@ static int INIT pciCanInitAllDevices (void)
 //======================================================================
 static int EXIT pciCanCloseAllDevices (void)
 {
-    // qqq check for open files
     DEBUGPRINT(1, "pciCanCloseAllDevices\n");
     pci_unregister_driver(&pcican_tbl);
 

@@ -8,6 +8,7 @@ var NAVTREE =
       [ "CANLIB Core API Calls", "page_core_api_calls.html", null ]
     ] ],
     [ "Related Pages", "pages.html", [
+      [ "Porting from older CANLIB APIs", "page_porting_code_older.html", null ],
       [ "User's Guide", "page_user_guide.html", [
         [ "Introduction", "page_user_guide_intro.html", [
           [ "What is CANLIB?", "page_user_guide_intro_what.html", null ],
@@ -18,8 +19,7 @@ var NAVTREE =
           [ "Library Initialization", "page_user_guide_init_lib_init.html", null ],
           [ "Library Deinitialization and Cleanup", "page_user_guide_init_lib_deinit.html", null ],
           [ "Chips and Channels", "page_user_guide_init_sel_channel.html", null ],
-          [ "Bit Rate and Other Bus Parameters", "page_user_guide_init_bit_rate.html", null ],
-          [ "CAN Driver Modes", "page_user_guide_init_driver_modes.html", null ]
+          [ "Bit Rate and Other Bus Parameters", "page_user_guide_init_bit_rate.html", null ]
         ] ],
         [ "Sending and Receiving", "page_user_guide_send_recv.html", [
           [ "Bus On / Bus Off", "page_user_guide_send_recv_bus_on_off.html", null ],
@@ -56,12 +56,9 @@ var NAVTREE =
         [ "Support", "page_user_guide_support.html", null ],
         [ "Miscellaneous Topics", "page_user_guide_misc.html", [
           [ "Message Flags", "page_user_guide_misc_message_flags.html", null ],
-          [ "Bit Rate Constants", "page_user_guide_misc_bitrate.html", null ],
-          [ "Code and Mask Format", "page_user_guide_misc_code_and_mask.html", null ]
+          [ "Bit Rate Constants", "page_user_guide_misc_bitrate.html", null ]
         ] ]
       ] ],
-      [ "Message Mailboxes", "page_user_guide_send_recv_mailboxes.html", null ],
-      [ "Accessing the Databases", "page_user_guide_lin_candb.html", null ],
       [ "Code snippets", "page_code_snippets.html", [
         [ "Code Examples", "page_code_snippets_examples.html", null ],
         [ "Bit Rate Examples", "page_code_snippets_bit_rate.html", null ]
@@ -84,6 +81,7 @@ var NAVTREE =
       ] ],
       [ "CAN", "group___c_a_n.html", [
         [ "Typedefs", "group___c_a_n.html", [
+          [ "canBusStatistics", "group___c_a_n.html#ga2bb3bba2f57c8222ace214f3f005c39c", null ],
           [ "canNotifyData", "group___c_a_n.html#ga58db5be8859c14cd8a0c0f6963c64f26", null ]
         ] ],
         [ "Functions", "group___c_a_n.html", [
@@ -96,15 +94,21 @@ var NAVTREE =
           [ "canGetBusOutputControl", "group___c_a_n.html#ga1683419d56af8afdbfc9184678c82fdd", null ],
           [ "canGetBusParams", "group___c_a_n.html#gaf2a734c0486030610389331685a3827a", null ],
           [ "canGetBusParamsFd", "group___c_a_n.html#gab620a5cd6249e2e53cf2a0099e7e8685", null ],
+          [ "canGetBusStatistics", "group___c_a_n.html#ga8d78ccbef4e6038ff63662f06b7cde65", null ],
           [ "canGetHandleData", "group___c_a_n.html#ga909e5c14b09fe76bad280475138d503e", null ],
           [ "canGetRawHandle", "group___c_a_n.html#gaa1229ae7635c051a8f7fe545d9d8007a", null ],
           [ "canOpenChannel", "group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300", null ],
           [ "canRead", "group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8", null ],
           [ "canReadErrorCounters", "group___c_a_n.html#gadb3a712bd123317043cb73e1008075c8", null ],
+          [ "canReadSpecific", "group___c_a_n.html#gafb5e475233ef14ccf9084f610caba560", null ],
+          [ "canReadSpecificSkip", "group___c_a_n.html#ga0eecb6695653d4dc6a4c0bb884a1b261", null ],
           [ "canReadStatus", "group___c_a_n.html#gaca3da209fe673b3838a50a3abe831855", null ],
           [ "canReadSync", "group___c_a_n.html#ga16356f4d646240ff2e640773d21f4d76", null ],
+          [ "canReadSyncSpecific", "group___c_a_n.html#ga4b21a0e2547c1435c378d13e6803acef", null ],
           [ "canReadTimer", "group___c_a_n.html#ga04c2f80a23b992bf17591749192e8d48", null ],
           [ "canReadWait", "group___c_a_n.html#gac01f98e282609b5f6aaf2b1eabfb83ec", null ],
+          [ "canRequestBusStatistics", "group___c_a_n.html#gaf7358e5ef5143e39c10b46d9cb592485", null ],
+          [ "canRequestChipStatus", "group___c_a_n.html#gaba3573e69435d87047c190520efdf5e5", null ],
           [ "canResetBus", "group___c_a_n.html#gaecc8b56e75cf68548af53b2d432079af", null ],
           [ "canSetBusOutputControl", "group___c_a_n.html#gafca31590718ac7101d065b0c18b2410e", null ],
           [ "canSetBusParams", "group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301", null ],
@@ -117,7 +121,8 @@ var NAVTREE =
           [ "canWriteWait", "group___c_a_n.html#ga47d03bfcc31e290284e65211b61f15f3", null ]
         ] ],
         [ "Data Structures", "group___c_a_n.html", [
-          [ "canNotifyData", "structcan_notify_data.html", null ]
+          [ "canNotifyData", "structcan_notify_data.html", null ],
+          [ "canBusStatistics_s", "structcan_bus_statistics__s.html", null ]
         ] ]
       ] ],
       [ "Object buffers", "group___object_buffers.html", [
@@ -196,6 +201,7 @@ var NAVTREE =
       ] ]
     ] ],
     [ "Data Structures", "annotated.html", [
+      [ "canBusStatistics_s", "structcan_bus_statistics__s.html", null ],
       [ "canNotifyData", "structcan_notify_data.html", null ],
       [ "canUserIoPortData", "structcan_user_io_port_data.html", null ],
       [ "kvTimeDomainData_s", "structkv_time_domain_data__s.html", null ],
@@ -211,9 +217,10 @@ var NAVTREE =
     [ "Examples", "examples.html", [
       [ "busparms.c", "busparms_8c-example.html", null ],
       [ "cancount.c", "cancount_8c-example.html", null ],
+      [ "canfdmonitor.c", "canfdmonitor_8c-example.html", null ],
+      [ "canfdwrite.c", "canfdwrite_8c-example.html", null ],
       [ "canmonitor.c", "canmonitor_8c-example.html", null ],
       [ "listChannels.c", "list_channels_8c-example.html", null ],
-      [ "opentest.c", "opentest_8c-example.html", null ],
       [ "readTimerTest.c", "read_timer_test_8c-example.html", null ],
       [ "simplewrite.c", "simplewrite_8c-example.html", null ],
       [ "writeloop.c", "writeloop_8c-example.html", null ]

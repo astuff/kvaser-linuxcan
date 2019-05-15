@@ -1,6 +1,5 @@
-# Kvaser Linux Canlib library Makefile 
-# 
-#                 Copyright 2012 by Kvaser AB, Mölndal, Sweden
+
+#              Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 #                         http://www.kvaser.com
 # 
 #  This software is dual licensed under the following two licenses:
@@ -49,7 +48,8 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # 
 #  ---------------------------------------------------------------------------
-# 
+
+# Kvaser Linux Canlib library Makefile
 
 -include ../kveyes.mak
 
@@ -64,6 +64,7 @@ CFLAGS  += -Wall -Werror -Wextra  -DCPU=$(ARCH) -DCANLIB_NAME_STRING=\"$(LIBRARY
 CFLAGS  += -DSPLIT -DLINUX=1 -D_LINUX=1 # maybe remove in time
 CFLAGS  += $(ccflags-y)
 CFLAGS  += -I. -I../include
+CFLAGS  += -DUSER_SPACE
 
 # Flags for  reentrant, position independent code
 LIBCFLAGS = $(CFLAGS) -D_REENTRANT -fPIC
@@ -74,6 +75,7 @@ SRCS := canlib.c
 SRCS += linkedlist.c 
 SRCS += VCanFunctions.c
 SRCS += ../common/osif_functions_user.c
+SRCS += dlc.c
 
 OBJS := $(patsubst %.c, %.o, $(SRCS))
 OTHERDEPS := ../include/canlib.h
@@ -92,13 +94,16 @@ endif
 CHECKLOG_FILE = checklog.txt
 
 
-.PHONY:	all tarball rpm clean examples depend canlib check
+.PHONY:	all tarball rpm uninstall clean examples depend canlib check
 
 all: $(LIBRARY) examples
 
+dlc.c: ../common/dlc.c
+	cp -p ../common/dlc.c .
+
 canlib: $(LIBRARY)
 
-$(LIBRARY): $(DEPS) $(OTHERDEPS) $(OBJS)
+$(LIBRARY):  $(DEPS) $(OTHERDEPS) $(OBJS)
 	@echo --------------------------------------------------------------------
 	@echo "Building $(LIBRARY) $(IS_DEBUG)"
 	$(CC) $(CFLAGS) -shared -Wl,-soname,$(SONAME) -o $@ $(OBJS) $(LDFLAGS)
@@ -110,11 +115,11 @@ examples: canlib
 	$(MAKE) -C examples KV_DEBUG_ON=$(KV_DEBUG_ON) sub
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(LIBCFLAGS)  -c -o $@ $< 
+	$(CC) $(CFLAGS) $(LIBCFLAGS)  -c -o $@ $<
+
 
 %.d: %.c
-	$(CC) -M $(CFLAGS) $< > $@ 
-	$(CC) -M $(CFLAGS) $< | sed s/\\.o/.d/> $@ 
+	$(CC) $(CFLAGS) $(LIBCFLAGS) -MM $< > $@
 
 install: canlib examples
 	$(MAKE) -C examples install
@@ -129,6 +134,13 @@ install: canlib examples
 	mkdir -p /usr/doc/canlib
 	cp -r ../doc/HTMLhelp /usr/doc/canlib
 
+uninstall:
+	$(MAKE) -C examples uninstall
+	rm -f /usr/lib/$(LIBNAME) /usr/lib/$(SONAME) /usr/lib/$(LIBRARY)
+	/sbin/ldconfig
+	rm -f /usr/include/canlib.h /usr/include/canstat.h
+	rm -rf /usr/doc/canlib
+
 clean:	
 	rm -f $(OBJS) $(LIBRARY) $(DEPS) $(LIBNAME) $(LIBRARY) $(SONAME) $(TARBALL) *~
 	$(MAKE) -C examples clean
@@ -141,4 +153,4 @@ check:
 
 depend: $(DEPS)
 
--include $DEPS	 
+-include $(DEPS)

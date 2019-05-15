@@ -1,5 +1,5 @@
 /*
-**                Copyright 2016 by Kvaser AB, Mölndal, Sweden
+**                Copyright 2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -116,12 +116,17 @@
 #define TPACKET_TREQ_GET(value)         get(TPACKET_TREQ, value)
 #define TPACKET_TREQ(value)             field(TPACKET_TREQ, value)
 
+#define TPACKET_SSM_LSHIFT             16
+#define TPACKET_SSM_NBITS              1
+#define TPACKET_SSM_MSK                mask(TPACKET_SSM)
+#define TPACKET_SSM_GET(value)         get(TPACKET_SSM, value)
+#define TPACKET_SSM(value)             field(TPACKET_SSM, value)
+
 #define RPACKET_PTYPE_LSHIFT            28
 #define RPACKET_PTYPE_NBITS             4
 #define RPACKET_PTYPE_MSK               mask(RPACKET_PTYPE)
 #define RPACKET_PTYPE_GET(value)        get(RPACKET_PTYPE, value)
 
-// TODO: add glitch report packet type
 #define RPACKET_PTYPE_DATA              0
 #define RPACKET_PTYPE_ACK               1
 #define RPACKET_PTYPE_TXRQ              2
@@ -218,6 +223,18 @@
 #define APACKET_FLUSHED_NBITS           1
 #define APACKET_FLUSHED_MSK             mask(APACKET_FLUSHED)
 #define APACKET_FLUSHED_GET(value)      get(APACKET_FLUSHED, value)
+
+// single shot Not sent
+#define APACKET_NACK_LSHIFT             10
+#define APACKET_NACK_NBITS              1
+#define APACKET_NACK_MSK                mask(APACKET_NACK)
+#define APACKET_NACK_GET(value)         get(APACKET_NACK, value)
+
+// arbitration lost 
+#define APACKET_ABL_LSHIFT             11
+#define APACKET_ABL_NBITS              1
+#define APACKET_ABL_MSK                mask(APACKET_ABL)
+#define APACKET_ABL_GET(value)         get(APACKET_ABL, value)
 
 #define APACKET_CONTROL_ACK_LSHIFT      9
 #define APACKET_CONTROL_ACK_NBITS       1

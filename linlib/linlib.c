@@ -79,7 +79,7 @@
 #else
 #  include <pthread.h>
 
-#  define canOPEN_REQUIRE_INIT_ACCESS 0    // qqq Not available in Linux
+#  define canOPEN_REQUIRE_INIT_ACCESS 0
 #  define FALSE                       0
 #  define TRUE                        (!FALSE)
 #  define OutputDebugString(buf)
@@ -988,7 +988,7 @@ LinStatus LINLIBAPI linReadMessage(LinHandle h, unsigned int *id,
   // Check if it is a LINLEAF or LAPCAN
   //stat = canGetChannelData(lh->ch, canCHANNELDATA_CARD_TYPE, &hwtype, sizeof (hwtype));
   //if (stat != canOK)
-  //   return linERR_INVHANDLE; // QQQ
+  //   return linERR_INVHANDLE;
 
   linFlags = 0;
   for (;;) {
@@ -1325,7 +1325,6 @@ LinStatus LINLIBAPI linGetTransceiverData(int channel,
     return linERR_NOTFOUND;
   }
 
-  // qqq There is no equivalent to this in the current Linux driver!
 #if WIN32
   hnd = canOpenChannel(channel, 0);
   if (hnd < 0) {

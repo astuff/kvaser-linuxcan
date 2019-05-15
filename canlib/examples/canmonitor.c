@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+               Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -61,105 +61,158 @@
 #include <errno.h>
 #include <unistd.h>
 #include <time.h>
+#include "vcanevt.h"
 
-int i = 0;
-unsigned char willExit = 0;
-int last;
-time_t last_time = 0;
+#define READ_WAIT_INFINITE    (unsigned long)(-1)
+
+static unsigned int msgCounter = 0;
 
 
-void sighand (int sig)
+static void check(char* id, canStatus stat)
 {
-  switch (sig) {
-  case SIGINT:
-    willExit = 1;
-    alarm(0);
-    break;
+  if (stat != canOK) {
+    char buf[50];
+    buf[0] = '\0';
+    canGetErrorText(stat, buf, sizeof(buf));
+    printf("%s: failed, stat=%d (%s)\n", id, (int)stat, buf);
   }
 }
 
- 
-int main (int argc, char *argv[])
-
+static void printUsageAndExit(char *prgName)
 {
-  canHandle h;
-  int ret = -1;
-  long id; 
-  unsigned char msg[8];
-  unsigned int dlc;
-  unsigned int flag;
-  unsigned long t;
-  int channel = 0;
-  int bitrate = BAUD_1M;
-  unsigned j;
+  printf("Usage: '%s <channel>'\n", prgName);
+  exit(1);
+}
 
-  errno = 0;
-  if (argc != 2 || (channel = atoi(argv[1]), errno) != 0) {
-    printf("usage %s channel\n", argv[0]);
-    exit(1);
-  } else {
-    printf("Reading messages on channel %d\n", channel);
+static void sighand(int sig)
+{
+  (void)sig;
+}
+
+static char* busStatToStr(const unsigned long flag) {
+    char* tempStr = NULL;
+    #define MACRO2STR(x) case x: tempStr = #x; break
+    switch (flag) {
+        MACRO2STR( CHIPSTAT_BUSOFF        );
+        MACRO2STR( CHIPSTAT_ERROR_PASSIVE );
+        MACRO2STR( CHIPSTAT_ERROR_WARNING );
+        MACRO2STR( CHIPSTAT_ERROR_ACTIVE  );
+        default: tempStr = ""; break;
+    }
+    #undef MACRO2STR
+    return tempStr;
+}
+
+void notifyCallback(canNotifyData *data) {
+  switch (data->eventType) {
+  case canEVENT_STATUS:
+    printf("CAN Status Event: %s\n", busStatToStr(data->info.status.busStatus));
+    break;
+  case canEVENT_ERROR:
+    printf("CAN Error Event\n");
+    break;
+  case canEVENT_TX:
+    printf("CAN Tx Event\n");
+    break;
+  case canEVENT_RX:
+    printf("CAN Rx Event\n");
+    break;
+  }
+  return;
+}
+
+int main(int argc, char *argv[])
+{
+  canHandle hnd;
+  canStatus stat;
+  int channel;
+
+  if (argc != 2) {
+    printUsageAndExit(argv[0]);
   }
 
-  /* Use sighand as our signal handler */
-  signal(SIGALRM, sighand);
-  signal(SIGINT, sighand);
-  alarm(1);
+  {
+    char *endPtr = NULL;
+    errno = 0;
+    channel = strtol(argv[1], &endPtr, 10);
+    if ( (errno != 0) || ((channel == 0) && (endPtr == argv[1])) ) {
+      printUsageAndExit(argv[0]);
+    }
+  }
 
-  /* Allow signals to interrupt syscalls(in canReadBlock) */
+  printf("Reading messages on channel %d\n", channel);
+
+  /* Allow signals to interrupt syscalls */
+  signal(SIGINT, sighand);
   siginterrupt(SIGINT, 1);
-  
+
   /* Open channels, parameters and go on bus */
-  h = canOpenChannel(channel, canOPEN_EXCLUSIVE | canOPEN_REQUIRE_EXTENDED);
-  if (h < 0) {
-    printf("canOpenChannel %d failed\n", channel);
+  hnd = canOpenChannel(channel, canOPEN_EXCLUSIVE | canOPEN_REQUIRE_EXTENDED | canOPEN_ACCEPT_VIRTUAL);
+  if (hnd < 0) {
+    printf("canOpenChannel %d", channel);
+    check("", hnd);
     return -1;
   }
-    
-  canSetBusParams(h, bitrate, 4, 3, 1, 1, 0);
-  canSetBusOutputControl(h, canDRIVER_NORMAL);
-  canBusOn(h);
 
-  i = 0;
-  while (!willExit) {
-     
-    do { 
-      ret = canReadWait(h, &id, &msg, &dlc, &flag, &t, -1);
-      switch (ret) {
-      case 0:
-        printf("(%d) id:%ld dlc:%d data: ", i, id, dlc);
+  stat = canSetNotify(hnd, notifyCallback, canNOTIFY_RX | canNOTIFY_TX | canNOTIFY_ERROR | canNOTIFY_STATUS | canNOTIFY_ENVVAR, (char*)0);
+  check("canSetNotify", stat);
+
+  stat = canSetBusParams(hnd, canBITRATE_1M, 0, 0, 0, 0, 0);
+  check("canSetBusParams", stat);
+  if (stat != canOK) {
+    goto ErrorExit;
+  }
+  stat = canBusOn(hnd);
+  check("canBusOn", stat);
+  if (stat != canOK) {
+    goto ErrorExit;
+  }
+
+  do {
+    long id;
+    unsigned char msg[8];
+    unsigned int dlc;
+    unsigned int flag;
+    unsigned long time;
+
+    stat = canReadWait(hnd, &id, &msg, &dlc, &flag, &time, READ_WAIT_INFINITE);
+
+    if (stat == canOK) {
+      msgCounter++;
+      if (flag & canMSG_ERROR_FRAME) {
+        printf("(%d) ERROR FRAME", msgCounter);
+      }
+      else {
+        unsigned j;
+
+        printf("(%d) id:%ld dlc:%u data: ", msgCounter, id, dlc);
         if (dlc > 8) {
           dlc = 8;
         }
         for (j = 0; j < dlc; j++){
           printf("%2.2x ", msg[j]);
         }
-        printf(" flags:0x%x time:%ld\n", flag, t);
-        i++;
-	if (last_time == 0) {
-	  last_time = time(0);
-	} else if (time(0) > last_time) {
-	  last_time = time(0);
-	  if (i != last) {
-	    printf("rx : %d total: %d\n", i - last, i);
-	  }
-	  last = i;
-	}
-        break;
-      case canERR_NOMSG:
-        break;
-      default:
-        perror("canReadBlock error");
-        break;
       }
-    } while (ret == canOK);
-    willExit = 1;
-  }
-   
-  canClose(h);
-   
-  sighand(SIGALRM);
-  printf("Ready\n");
+      printf(" flags:0x%x time:%lu\n", flag, time);
+    }
+    else {
+      if (errno == 0) {
+        check("\ncanReadWait", stat);
+      }
+      else {
+        perror("\ncanReadWait error");
+      }
+    }
+
+  } while (stat == canOK);
+
+ErrorExit:
+
+  stat = canBusOff(hnd);
+  check("canBusOff", stat);
+  usleep(50*1000); // Sleep just to get the last notification.
+  stat = canClose(hnd);
+  check("canClose", stat);
 
   return 0;
 }

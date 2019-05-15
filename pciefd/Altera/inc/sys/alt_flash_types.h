@@ -1,4 +1,3 @@
-#ifndef __ALT_FLASH_TYPES_H__
 /******************************************************************************
 *                                                                             *
 * License Agreement                                                           *
@@ -44,6 +43,7 @@
 * Author PRR                                                                  *
 *                                                                             *
 ******************************************************************************/
+#ifndef __ALT_FLASH_TYPES_H__
 #define __ALT_FLASH_TYPES_H__
 
 #ifndef ALT_MAX_NUMBER_OF_FLASH_REGIONS

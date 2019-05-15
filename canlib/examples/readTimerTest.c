@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -59,37 +59,56 @@
 #include <canlib.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <errno.h>
+
+static void printUsageAndExit(char *prgName)
+{
+  printf("Usage: '%s <channel>'\n", prgName);
+  exit(1);
+}
 
 
-int main (int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   unsigned long time, last = 0, lastsys = 0;
-  char errorString[50];
-  canHandle h;
+  canHandle hnd;
   struct timeval tv;
+  int channel;
 
-  (void)argc; // Unused.
-  (void)argv; // Unused.
-  
-  h = canOpenChannel(1, 0);
-  if (h < 0) {
-    canGetErrorText(h, errorString, 50);
+  if (argc != 2) {
+    printUsageAndExit(argv[0]);
+  }
+
+  {
+    char *endPtr = NULL;
+    errno = 0;
+    channel = strtol(argv[1], &endPtr, 10);
+    if ( (errno != 0) || ((channel == 0) && (endPtr == argv[1])) ) {
+      printUsageAndExit(argv[0]);
+    }
+  }
+
+  hnd = canOpenChannel(channel, 0);
+  if (hnd < 0) {
+    char errorString[50];
+    canGetErrorText(hnd, errorString, 50);
     printf("%s\n", errorString);
-  } 
+    return -1;
+  }
 
   while (1) {
-    if (canReadTimer(h, &time) != canOK) {
+    if (canReadTimer(hnd, &time) != canOK) {
+      printf("canReadTimer failed\n");
       break;
     }
-    printf("Time=%ld ms (%ld)\n", time, time - last);
+    printf("Time=%lu ms (%lu)\n", time, time - last);
     gettimeofday(&tv, NULL);
     printf("system:%ld\n", tv.tv_sec * 1000 + tv.tv_usec / 1000 - lastsys);
     last = time;
     lastsys = tv.tv_sec * 1000 + tv.tv_usec / 1000;
     sleep(1);
   }
-  printf("canReadTimer failed\n");
-  canClose(h);
+  canClose(hnd);
 
   return 0;
 }

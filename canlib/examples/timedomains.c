@@ -1,5 +1,5 @@
 /*
-**                Copyright 2015 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2015-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -60,7 +60,7 @@
 
 
 #define NUMBER_OF_CHANNELS 5
-    
+
 int main (int argc, char *argv[])
 {
 

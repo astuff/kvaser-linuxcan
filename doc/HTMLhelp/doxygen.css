@@ -1,22 +1,126 @@
-/* The standard CSS for doxygen */
+/* 
+The standard CSS for doxygen 
+modified
+*/
 
 body, table, div, p, dl {
 	font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
 	font-size: 12px;
 }
 
+p, div, dl {
+	color:#3E3E3E;
+}
+
+div.memdoc p em
+{
+    color: #885656;
+    font-weight: bold;    
+    white-space: nowrap;    
+}
+
+dl.note dd , dl.return dd, dl.see dd{
+  padding-bottom: 8px;
+}
+
+dl.note, dl.warning, dl.attention, dl.pre, dl.post, dl.invariant, dl.deprecated, dl.todo, dl.test, dl.bug {
+    border-left: 4px solid;
+    padding: 0 0 0 6px;
+}
+
+dl.note 
+{
+  border-color: #D0D000;
+}
+
+
+dl.warning, dl.attention
+{
+        border-color: #FF0000;
+}
+
+dl.pre, dl.post, dl.invariant
+{
+        border-color: #00D000;
+}
+
+dl.deprecated
+{
+        border-color: #505050;
+}
+
+dl.todo
+{
+        border-color: #00C0E0;
+}
+
+dl.test
+{
+        border-color: #3030E0;
+}
+
+dl.bug
+{
+        border-color: #C08050;
+}
+
+ul { /*mh*/
+  list-style-image: url("indent_new.png");  
+}
+
+
+div.summary /*mh*/
+{
+	float: right;
+	font-size: 10pt;
+	padding-right: 5px;
+	width: 50%;
+	text-align: right;
+}  
+#projectname /*mh*/
+{
+	/*font: 125% arial,sans-serif;*/
+  font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
+  font-size: 20px;
+	margin: 0px;
+	padding: 0px;
+  font-style: bold;
+  /*
+  background-image: url("kvaser.gif");
+  background-repeat:no-repeat;
+  background-position:left top;
+  */
+}
+td.paramdir { /*mh**/
+padding-right: 10px
+}
+
+div.contents p {
+	
+	/*font-family:Monaco, courier;*/
+  font-size: 13px;
+	/* font-style: italic; */
+}
+
 /* @group Heading Levels */
 
 h1 {
-	font-size: 150%;
+	margin-bottom: 10px;
+	font-size: 18px;
+	padding: 15px 0px 20px 0px ;
+	border-bottom:1px dotted #E0E0E0;
 }
 
 h2 {
-	font-size: 120%;
+	padding-top: 30px;
+	font-size: 17px;
+	color:#42657B;
+	font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
 }
 
 h3 {
-	font-size: 100%;
+	font-size: 17px;
+	font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
 }
 
 dt {
@@ -59,12 +163,13 @@ span.legend {
 
 h3.version {
         font-size: 90%;
-        text-align: center;
+		padding-bottom:10px;
+		border-bottom:1px dotted #E0E0E0;
 }
 
 div.qindex, div.navtab{
-	background-color: #F2F3F7;
-	border: 1px solid #C0C8D8;
+	background-color: #e8eef2;
+	border: 1px solid #84b0c7;
 	text-align: center;
 	margin: 2px;
 	padding: 2px;
@@ -75,6 +180,59 @@ div.qindex, div.navpath {
 	line-height: 140%;
 }
 
+.navpath ul
+{
+	font-size: 11px;
+	background-image:url('tab_b.png');
+	background-repeat:repeat-x;
+	height:30px;
+	line-height:30px;
+	color:#8AA0CC;
+	border:solid 1px #C2CDE4;
+	overflow:hidden;
+	margin:0px;
+	padding:0px;
+}
+
+.navpath li
+{
+	list-style-type:none;
+	float:left;
+	padding-left:10px;
+	padding-right:15px;
+	background-image:url('bc_s.png');
+	background-repeat:no-repeat;
+	background-position:right;
+	color:#364D7C;
+}
+
+.navpath li.navelem a
+{
+	height:32px;
+	display:block;
+	text-decoration: none;
+	outline: none;
+}
+
+.navpath li.navelem a:hover
+{
+	color:#6884BD;
+}
+
+.navpath li.footer
+{
+        list-style-type:none;
+        float:right;
+        padding-left:10px;
+        padding-right:15px;
+        background-image:none;
+        background-repeat:no-repeat;
+        background-position:right;
+        color:#364D7C;
+        font-size: 8pt;
+}
+
+
 div.navtab {
 	margin-right: 15px;
 }
@@ -82,13 +240,13 @@ div.navtab {
 /* @group Link Styling */
 
 a {
-	color: #61759D;
+	color: #153788;
 	font-weight: normal;
 	text-decoration: none;
 }
 
 .contents a:visited {
-	color: #7385A8;
+	color: #1b77c5;
 }
 
 a:hover {
@@ -101,28 +259,37 @@ a.qindex {
 
 a.qindexHL {
 	font-weight: bold;
-	background-color: #BAC3D4;
+	background-color: #6666cc;
 	color: #ffffff;
-	border: 1px double #AAB5CA;
+	border: 1px double #9295C2;
 }
 
 .contents a.qindexHL:visited {
         color: #ffffff;
 }
 
+div.textblock ul li a.el, div.contents ul li a.el {
+/*ul li a.el {*/
+  line-height: 20px;
+}
+
 a.el {
 	font-weight: bold;
 }
+
+tablist.li {
+  padding-bottom: 33px;
+  }
 
 a.elRef {
 }
 
 a.code {
-	color: #7385A8;
+	color: #3030f0;
 }
 
 a.codeRef {
-	color: #7385A8;
+	color: #3030f0;
 }
 
 /* @end */
@@ -137,8 +304,8 @@ dl.el {
 }
 
 pre.fragment {
-	border: 1px solid #D7DCE6;
-	background-color: #FCFDFD;
+	border: 1px solid #CCCCCC;
+	background-color: #f5f5f5;
 	padding: 4px 6px;
 	margin: 4px 8px 4px 2px;
 	overflow: auto;
@@ -152,22 +319,13 @@ div.ah {
 	font-weight: bold;
 	color: #ffffff;
 	margin-bottom: 3px;
-	margin-top: 3px;
-	padding: 0.2em;
-	border: solid thin #333;
-	border-radius: 0.5em;
-	-webkit-border-radius: .5em;
-	-moz-border-radius: .5em;
-	box-shadow: 2px 2px 3px #999;
-	-webkit-box-shadow: 2px 2px 3px #999;
-	-moz-box-shadow: rgba(0, 0, 0, 0.15) 2px 2px 2px;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#000),color-stop(0.3, #444));
-	background-image: -moz-linear-gradient(center top, #eee 0%, #444 40%, #000);
+	margin-top: 3px
 }
 
 div.groupHeader {
 	margin-left: 16px;
 	margin-top: 12px;
+	margin-bottom: 6px;
 	font-weight: bold;
 }
 
@@ -179,32 +337,27 @@ div.groupText {
 body {
 	background: white;
 	color: black;
-        margin: 0;
-}
-
-div.contents {
-	margin-top: 10px;
-	margin-left: 10px;
-	margin-right: 10px;
+	margin-right: 20px;
+	margin-left: 20px;
 }
 
 td.indexkey {
-	background-color: #F2F3F7;
+	background-color: #F1F5F9;
 	font-weight: bold;
-	border: 1px solid #D7DCE6;
+	border: 1px solid #CCCCCC;
 	margin: 2px 0px 2px 0;
 	padding: 2px 10px;
 }
 
 td.indexvalue {
-	background-color: #F2F3F7;
-	border: 1px solid #D7DCE6;
+	background-color: #F1F5F9;
+	border: 1px solid #CCCCCC;
 	padding: 2px 10px;
 	margin: 2px 0px;
 }
 
 tr.memlist {
-	background-color: #F3F5F8;
+	background-color: #f0f0f0;
 }
 
 p.formulaDsp {
@@ -228,11 +381,6 @@ div.center {
 
 div.center img {
 	border: 0px;
-}
-
-address.footer {
-	text-align: right;
-	padding-right: 12px;
 }
 
 img.footer {
@@ -288,7 +436,6 @@ span.vhdllogic {
 
 /* @end */
 
-/*
 .search {
 	color: #003399;
 	font-weight: bold;
@@ -303,9 +450,8 @@ input.search {
 	font-size: 75%;
 	color: #000080;
 	font-weight: normal;
-	background-color: #e8eef2;
+	background-color: #F1F5F9;
 }
-*/
 
 td.tiny {
 	font-size: 75%;
@@ -314,35 +460,26 @@ td.tiny {
 .dirtab {
 	padding: 4px;
 	border-collapse: collapse;
-	border: 1px solid #C0C8D8;
+	border: 1px solid #84b0c7;
 }
 
 th.dirtab {
-	background: #F2F3F7;
+	background: #F1F5F9;
 	font-weight: bold;
 }
 
 hr {
-	height: 0px;
+	height: 0;
 	border: none;
-	border-top: 1px solid #798AAC;
-}
-
-hr.footer {
-	height: 1px;
+	border-top: 1px solid #666;
 }
 
 /* @group Member Descriptions */
 
-table.memberdecls {
-	border-spacing: 0px;
-	padding: 0px;
-}
-
 .mdescLeft, .mdescRight,
 .memItemLeft, .memItemRight,
 .memTemplItemLeft, .memTemplItemRight, .memTemplParams {
-	background-color: #FBFBFC;
+	background-color: #FAFAFA;
 	border: none;
 	margin: 4px;
 	padding: 1px 0 0 8px;
@@ -354,7 +491,9 @@ table.memberdecls {
 }
 
 .memItemLeft, .memItemRight, .memTemplParams {
-	border-top: 1px solid #D7DCE6;
+	border-top: 1px solid #ddd;
+	/*background-color: #e9e9e9;*/
+  background-color: #edf0fb;
 }
 
 .memItemLeft, .memTemplItemLeft {
@@ -362,7 +501,7 @@ table.memberdecls {
 }
 
 .memTemplParams {
-	color: #7385A8;
+	color: #606060;
         white-space: nowrap;
 }
 
@@ -374,14 +513,14 @@ table.memberdecls {
 
 .memtemplate {
 	font-size: 80%;
-	color: #7385A8;
+	color: #606060;
 	font-weight: normal;
-	margin-left: 9px;
+	margin-left: 3px;
 }
 
 .memnav {
-	background-color: #F2F3F7;
-	border: 1px solid #C0C8D8;
+	background-color: #F1F5F9;
+	border: 1px solid #84b0c7;
 	text-align: center;
 	margin: 2px;
 	margin-right: 15px;
@@ -390,62 +529,42 @@ table.memberdecls {
 
 .memitem {
 	padding: 0;
-	margin-bottom: 10px;
+	margin-bottom: 30px;
 }
 
 .memname {
-        white-space: nowrap;
-        font-weight: bold;
-        margin-left: 6px;
+	white-space: nowrap;
+	font-weight: bold;
+	/*color:#42657B;*/
+  color:#314959;
+	padding:3px 5px;
+  /*
+  font-family:Monaco, courier;  
+  font-weight: bold;
+  */
+}
+
+.memproto, .memdoc {
+	border: 1px solid #C0C0C0;
 }
 
 .memproto {
-        border-top: 1px solid #C3CBDA;
-        border-left: 1px solid #C3CBDA;
-        border-right: 1px solid #C3CBDA;
-        padding: 6px 0px 6px 0px;
-        color: #43506C;
-        font-weight: bold;
-        text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9);
-        /* opera specific markup */
-        box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
-        border-top-right-radius: 8px;
-        border-top-left-radius: 8px;
-        /* firefox specific markup */
-        -moz-box-shadow: rgba(0, 0, 0, 0.15) 5px 5px 5px;
-        -moz-border-radius-topright: 8px;
-        -moz-border-radius-topleft: 8px;
-        /* webkit specific markup */
+	padding: 0;
+	/*background-color: #E9E9E9;*/
+  background-color: #edf0fb;
+	font-weight: bold;
         -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
-        -webkit-border-top-right-radius: 8px;
-        -webkit-border-top-left-radius: 8px;
-        background-image:url('nav_f.png');
-        background-repeat:repeat-x;
-        background-color: #ECEEF3;
+        -moz-box-shadow: rgba(0, 0, 0, 0.15) 5px 5px 5px;
 
 }
 
 .memdoc {
-        border-bottom: 1px solid #C3CBDA;      
-        border-left: 1px solid #C3CBDA;      
-        border-right: 1px solid #C3CBDA; 
-        padding: 2px 5px;
-        background-color: #FCFDFD;
-        border-top-width: 0;
-        /* opera specific markup */
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 8px;
-        box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
-        /* firefox specific markup */
-        -moz-border-radius-bottomleft: 8px;
-        -moz-border-radius-bottomright: 8px;
-        -moz-box-shadow: rgba(0, 0, 0, 0.15) 5px 5px 5px;
-        background-image: -moz-linear-gradient(center top, #FFFFFF 0%, #FFFFFF 60%, #F9FAFB 95%, #F3F5F8);
-        /* webkit specific markup */
-        -webkit-border-bottom-left-radius: 8px;
-        -webkit-border-bottom-right-radius: 8px;
+	padding: 2px 20px 20px;
+	background-color: #FFFFFF;
+  margin-bottom: 50px;
+	border-top-width: 0;
         -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
-        background-image: -webkit-gradient(linear,center top,center bottom,from(#FFFFFF), color-stop(0.6,#FFFFFF), color-stop(0.60,#FFFFFF), color-stop(0.95,#F9FAFB), to(#F3F5F8));
+        -moz-box-shadow: rgba(0, 0, 0, 0.15) 5px 5px 5px;
 }
 
 .paramkey {
@@ -454,33 +573,47 @@ table.memberdecls {
 
 .paramtype {
 	white-space: nowrap;
+  padding-right: 14px;
 }
 
 .paramname {
-	color: #602020;
+	color: #885656;
 	white-space: nowrap;
+  padding-right: 10px;
+  font-weight: bold;
 }
 .paramname em {
 	font-style: normal;
 }
 
-.params, .retval, .exception, .tparams {
-        border-spacing: 6px 2px;
-}       
-
-.params .paramname, .retval .paramname {
-        font-weight: bold;
-        vertical-align: top;
+table.params tbody tr td
+{
+  /*olor: red;*/
+  padding-bottom: 8px;
+  vertical-align: top; 
 }
-        
-.params .paramtype {
-        font-style: italic;
-        vertical-align: top;
-}       
-        
-.params .paramdir {
-        font-family: "courier new",courier,monospace;
-        vertical-align: top;
+div.memdoc dl dd table tbody tr td 
+{
+padding-bottom: 12px;
+}
+
+div.memdoc dl dd table tbody tr td p
+{
+/*
+  color: red;
+  */
+  margin: 0px; 
+  
+  
+  vertical-align: top; 
+  /*background-color: blue;*/
+}
+
+div.memdoc dl dd table tbody tr td dl.note 
+{
+  margin-top: 6px;
+  margin-left: 10px;
+  border-color: #D0D000;
 }
 
 
@@ -494,7 +627,7 @@ table.memberdecls {
 
 .ftvtree {
 	font-family: sans-serif;
-	margin: 0px;
+	margin: 0.5em;
 }
 
 /* these are for tree view when used as main index */
@@ -502,7 +635,6 @@ table.memberdecls {
 .directory {
 	font-size: 9pt;
 	font-weight: bold;
-	margin: 5px;
 }
 
 .directory h3 {
@@ -580,13 +712,9 @@ proper pixel height of your image.
 
 /* @end */
 
-div.dynheader {
-        margin-top: 8px;
-}
-
 address {
 	font-style: normal;
-	color: #4A5977;
+	color: #333;
 }
 
 table.doxtable {
@@ -594,207 +722,33 @@ table.doxtable {
 }
 
 table.doxtable td, table.doxtable th {
-	border: 1px solid #4D5D7D;
+	border: 1px solid #153788;
 	padding: 3px 7px 2px;
 }
 
 table.doxtable th {
-	background-color: #5A6D92;
+	background-color: #254798;
 	color: #FFFFFF;
 	font-size: 110%;
 	padding-bottom: 4px;
 	padding-top: 5px;
 	text-align:left;
 }
-
-.tabsearch {
-	top: 0px;
-	left: 10px;
-	height: 36px;
-	background-image: url('tab_b.png');
-	z-index: 101;
-	overflow: hidden;
-	font-size: 13px;
+table.memname {
+padding: 10px;
 }
 
-.navpath ul
-{
-	font-size: 11px;
-	background-image:url('tab_b.png');
-	background-repeat:repeat-x;
-	height:30px;
-	line-height:30px;
-	color:#ADB7CC;
-	border:solid 1px #D5DBE5;
-	overflow:hidden;
-	margin:0px;
-	padding:0px;
+hr {
+	border-top:1px dotted #E0E0E0;
+	border-bottom:1px dotted #E0E0E0;
+	margin-top:30px;
+	padding-top:10px;
 }
 
-.navpath li
-{
-	list-style-type:none;
-	float:left;
-	padding-left:10px;
-	padding-right:15px;
-	background-image:url('bc_s.png');
-	background-repeat:no-repeat;
-	background-position:right;
-	color:#596B8F;
+.contents {
+	padding-top: 30px;
 }
 
-.navpath li.navelem a
-{
-	height:32px;
-	display:block;
-	text-decoration: none;
-	outline: none;
+.contents .dynsection {
+	margin-top:10px;
 }
-
-.navpath li.navelem a:hover
-{
-	color:#94A1BC;
-}
-
-.navpath li.footer
-{
-        list-style-type:none;
-        float:right;
-        padding-left:10px;
-        padding-right:15px;
-        background-image:none;
-        background-repeat:no-repeat;
-        background-position:right;
-        color:#596B8F;
-        font-size: 8pt;
-}
-
-
-div.summary
-{
-	float: right;
-	font-size: 8pt;
-	padding-right: 5px;
-	width: 50%;
-	text-align: right;
-}       
-
-div.summary a
-{
-	white-space: nowrap;
-}
-
-div.ingroups
-{
-	font-size: 8pt;
-	padding-left: 5px;
-	width: 50%;
-	text-align: left;
-}
-
-div.ingroups a
-{
-	white-space: nowrap;
-}
-
-div.header
-{
-        background-image:url('nav_h.png');
-        background-repeat:repeat-x;
-	background-color: #FBFBFC;
-	margin:  0px;
-	border-bottom: 1px solid #D7DCE6;
-}
-
-div.headertitle
-{
-	padding: 5px 5px 5px 10px;
-}
-
-dl
-{
-        padding: 0 0 0 10px;
-}
-
-dl.note, dl.warning, dl.attention, dl.pre, dl.post, dl.invariant, dl.deprecated, dl.todo, dl.test, dl.bug
-{
-        border-left:4px solid;
-        padding: 0 0 0 6px;
-}
-
-dl.note
-{
-        border-color: #D0D000;
-}
-
-dl.warning, dl.attention
-{
-        border-color: #FF0000;
-}
-
-dl.pre, dl.post, dl.invariant
-{
-        border-color: #00D000;
-}
-
-dl.deprecated
-{
-        border-color: #505050;
-}
-
-dl.todo
-{
-        border-color: #00C0E0;
-}
-
-dl.test
-{
-        border-color: #3030E0;
-}
-
-dl.bug
-{
-        border-color: #C08050;
-}
-
-#projectlogo
-{
-	text-align: center;
-	vertical-align: bottom;
-	border-collapse: separate;
-}
- 
-#projectlogo img
-{ 
-	border: 0px none;
-}
- 
-#projectname
-{
-	font: 300% arial,sans-serif;
-	margin: 0px;
-	padding: 0px;
-}
-    
-#projectbrief
-{
-	font: 120% arial,sans-serif;
-	margin: 0px;
-	padding: 0px;
-}
-
-#projectnumber
-{
-	font: 50% arial,sans-serif;
-	margin: 0px;
-	padding: 0px;
-}
-
-#titlearea
-{
-	padding: 0px;
-	margin: 0px;
-	width: 100%;
-	border-bottom: 1px solid #8493B3;
-}
-

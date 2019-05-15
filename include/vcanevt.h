@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -91,9 +91,6 @@ typedef unsigned char VeventTag;
 #define VCAN_EXT_MSG_ID             EXT_MSG
 #define VCAN_MSG_ID_UNDEF           0U
 
-#define MAX_DLC_CAN                 8U
-#define MAX_DLC_CAN_FD              64U
-
 #define VCAN_MSG_FLAG_ERROR_FRAME   0x01
 #define VCAN_MSG_FLAG_OVERRUN       0x02  /* Overrun in Driver or CAN Controller */
                                           /* special case: OVERRUN combined with TIMER
@@ -112,7 +109,16 @@ typedef unsigned char VeventTag;
 #define VCAN_MSG_FLAG_FDF           0x100  /* Extended Data Length (CAN FD) */
 #define VCAN_MSG_FLAG_BRS           0x200  /* Bit Rate Switch (CAN FD)  */
 #define VCAN_MSG_FLAG_ESI           0x400  /* Error Status Indication (CAN FD)  */
+#define VCAN_MSG_FLAG_SINGLE_SHOT   0x800  /* Send message as single shot (only tx) */
+#define VCAN_MSG_FLAG_SSM_NACK     0x1000  /* Single shot failed (only rx)  */
+#define VCAN_MSG_FLAG_SSM_NACK_ABL 0x2000  /* Single shot failed due to arbitration loss (only rx) */
 
+
+
+/* Used for objbuf write, we need these since the brs flag above is made to fit in flags2 BRS */
+#define VCAN_AUTOTX_MSG_FLAG_REMOTE_FRAME  0x10
+#define VCAN_AUTOTX_MSG_FLAG_FDF           0x20
+#define VCAN_AUTOTX_MSG_FLAG_BRS           0x40
 
 
 struct s_vcan_msg {  /* 14 Bytes */

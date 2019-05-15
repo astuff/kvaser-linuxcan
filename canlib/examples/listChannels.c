@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, M�lndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -64,36 +64,36 @@
  */
 
 
-int main (int argc, char* argv[])
+int main(int argc, char* argv[])
 {
   int chanCount = 0;
-  int stat, i;
+  canStatus stat;
+  int i;
   char name[256];
+  char custChanName[40];
   unsigned int ean[2], fw[2], serial[2];
 
   (void)argc; // Unused.
   (void)argv; // Unused.
-    
+
+  memset(name, 0, sizeof(name));
+  memset(custChanName, 0, sizeof(custChanName));
+  memset(ean, 0, sizeof(ean));
+  memset(fw, 0, sizeof(fw));
+  memset(serial, 0, sizeof(serial));
+
   stat = canGetNumberOfChannels(&chanCount);
-  if (stat < 0) {
+  if (stat != canOK) {
     printf("Error in canGetNumberOfChannels\n");
     exit(1);
   }
-  if (chanCount < 0 || chanCount > 64) {
-      printf("ChannelCount = %d but I don't believe it.\n", chanCount);
-      exit(1);
-  }
-  else {
-    if (chanCount == 1)
-      printf("Found %d channel.\n", chanCount);
-    else
-      printf("Found %d channels.\n", chanCount);
-  }
+  printf("Found %d channel(s).\n", chanCount);
 
   for (i = 0; i < chanCount; i++) {
+
     stat = canGetChannelData(i, canCHANNELDATA_DEVDESCR_ASCII,
                              &name, sizeof(name));
-    if (stat < 0) {
+    if (stat != canOK) {
       printf("Error in canGetChannelData - DEVDESCR_ASCII\n");
       exit(1);
     }
@@ -101,7 +101,7 @@ int main (int argc, char* argv[])
     if (strcmp(name, "Kvaser Unknown") == 0) {
       stat = canGetChannelData(i, canCHANNELDATA_CHANNEL_NAME,
                                &name, sizeof(name));
-      if (stat < 0) {
+      if (stat != canOK) {
         printf("Error in canGetChannelData - CHANNEL_NAME\n");
         exit(1);
       }
@@ -109,32 +109,36 @@ int main (int argc, char* argv[])
 
     stat = canGetChannelData(i, canCHANNELDATA_CARD_UPC_NO,
                              &ean, sizeof(ean));
-    if (stat < 0) {
+    if (stat != canOK) {
       printf("Error in canGetChannelData - CARD_UPC_NO\n");
       exit(1);
     }
 
     stat = canGetChannelData(i, canCHANNELDATA_CARD_SERIAL_NO,
                              &serial, sizeof(serial));
-    if (stat < 0) {
+    if (stat != canOK) {
       printf("Error in canGetChannelData - CARD_SERIAL_NO\n");
       exit(1);
     }
 
     stat = canGetChannelData(i, canCHANNELDATA_CARD_FIRMWARE_REV,
                              &fw, sizeof(fw));
-    if (stat < 0) {
+    if (stat != canOK) {
       printf("Error in canGetChannelData - CARD_FIRMWARE_REV\n");
       exit(1);
     }
 
-    printf("channel %d = %s, %x-%05x-%05x-%x, (%d)%d, %d.%d.%d.%d\n",
+    (void) canGetChannelData(i, canCHANNELDATA_CUST_CHANNEL_NAME,
+                             custChanName, sizeof(custChanName));
+
+    printf("channel %2.1d = %s,\t%x-%05x-%05x-%x, %u, %u.%u.%u.%u %s\n",
            i, name,
            (ean[1] >> 12), ((ean[1] & 0xfff) << 8) | ((ean[0] >> 24) & 0xff),
            (ean[0] >> 4) & 0xfffff, (ean[0] & 0x0f),
-           serial[1], serial[0],
-           fw[1] >> 16, fw[1] & 0xffff, fw[0] >> 16, fw[0] & 0xffff);
-  }    
+           serial[0],
+           fw[1] >> 16, fw[1] & 0xffff, fw[0] >> 16, fw[0] & 0xffff,
+           custChanName);
+  }
 
   return 0;
 }

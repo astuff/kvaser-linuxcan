@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -100,6 +100,19 @@ typedef struct {
     __u8 typeBlock;
 } VCanMsgFilter;
 
+typedef struct {
+    __u32  stdData;
+    __u32  stdRemote;
+    __u32  extData;
+    __u32  extRemote;
+    __u32  errFrame;
+    __u32  busLoad;
+    __u32  overruns;
+    __u32  bitCount;
+    __u32  timestamp;
+    __u32  bitTime100ns;
+} VCanBusStatistics;
+
 #define MAX_IOCTL_CARD_NAME     31
 #define MAX_IOCTL_DRIVER_NAME   31
 #define MAX_IOCTL_VENDOR_NAME     31
@@ -164,5 +177,18 @@ typedef struct {
   __u8 data[128]; // CAN FD/EF
   __u32 flags;
 } KCanObjbufBufferData;
+
+
+//data structure for read specific functions
+#define READ_SPECIFIC_NO_SKIP          0
+#define READ_SPECIFIC_SKIP_MATCHING    1
+#define READ_SPECIFIC_SKIP_PRECEEDING  2
+
+typedef struct
+{
+  long          id;
+  unsigned long timeout;
+  unsigned char skip;
+}VCanReadSpecific;
 
 #endif /* _CANIF_DATA_H_ */

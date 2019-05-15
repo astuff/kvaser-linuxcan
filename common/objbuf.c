@@ -1,5 +1,5 @@
 /*
-**                Copyright 2012 by Kvaser AB, Mölndal, Sweden
+**             Copyright 2012-2016 by Kvaser AB, Molndal, Sweden
 **                        http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -128,8 +128,6 @@ static void objbuf_write_all (OS_IF_TASK_QUEUE_HANDLE *work)
   // for a specific file descriptor.
   os_if_down_sema(&fileNodePtr->ioctl_mutex);
 
-  // qqq Would be good to check "present" here, but that is device specific!
-  // qqq The same for bus_on, perhaps.
   if (!fileNodePtr->objbuf) {
     // The device was unplugged before the file was released
     // We cannot deallocate here, it is too early and handled elsewhere
@@ -152,7 +150,6 @@ static void objbuf_write_all (OS_IF_TASK_QUEUE_HANDLE *work)
       continue;
     }
 
-    // qqq Would be good to check "present" here, but that is device specific!
 
     queuePos = queue_back(&vChan->txChanQueue);
     if (queuePos < 0) {
@@ -191,7 +188,6 @@ static void objbuf_write_all (OS_IF_TASK_QUEUE_HANDLE *work)
   if (active_mask != done_mask) {
     // Give ourselves a little extra work in case all the sends could not
     // be handled this time.
-    // qqq Should probably be delayed (or waiting until space)
     os_if_queue_task_not_default_queue(fileNodePtr->objbufTaskQ,
                                        &fileNodePtr->objbufWork);
   }

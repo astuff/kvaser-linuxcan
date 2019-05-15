@@ -1,4 +1,3 @@
-#ifndef __ALT_EPCS_FLASH_H__
 /******************************************************************************
  *                                                                             *
  * License Agreement                                                           *
@@ -38,8 +37,11 @@
  * Author Aaron Ferrucci, adapted from work by PRR                             *
  *                                                                             *
  ******************************************************************************/
+#ifndef __ALT_EPCS_FLASH_H__
 #define __ALT_EPCS_FLASH_H__
+//#include "alt_types.h"
 #include "inc/sys/alt_flash_dev.h"
+//#include "sys/alt_llist.h"
 
 #define SERIALFLASH_REGISTER_OFFSET (1024)
 
@@ -69,17 +71,50 @@ struct alt_flash_epcs_dev
 {
   alt_flash_dev dev;
 
-  void *register_base;
+  volatile void * register_base;
   uint32_t size_in_bytes;
   uint32_t silicon_id;
   uint32_t page_size;
 };
 
 /*
+ *   Macros used by alt_sys_init.c
+ *
+ * By default this driver is initialised in alt_sys_init. However if the
+ * "small driver" feature has been selected, or if fast simulation has been requested
+ * no initialisation is performed.
+ *
+ * This causes the driver to be excluded from the system (unless explicitly
+ * initialised by the user from main()), and therefore reduces code footprint.
+ *
+ */
+/*    ALT_LLIST_ENTRY,          \ */
+
+/* #define ALTERA_AVALON_EPCS_FLASH_CONTROLLER_INSTANCE(name, dev) \ */
+/* static alt_flash_epcs_dev dev =    \ */
+/* {                                 \ */
+/*   {                               \ */
+/*     name##_NAME,                  \ */
+/*     NULL,                         \ */
+/*     NULL,                         \ */
+/*     alt_epcs_flash_write,         \ */
+/*     alt_epcs_flash_read,          \ */
+/*     alt_epcs_flash_get_info,      \ */
+/*     alt_epcs_flash_erase_block,   \ */
+/*     alt_epcs_flash_write_block,   \ */
+/*     ((void*)(name##_BASE))        \ */
+/*   },                              \ */
+/*   (name##_REGISTER_OFFSET + name##_BASE)          \ */
+/* } */
+
+/* #define ALTERA_AVALON_EPCS_FLASH_CONTROLLER_INIT(name, dev) \ */
+/* alt_epcs_flash_init(&dev) */
+
+/*
  *  The initialisation function which reads the EPCS table and fills out
  *  the appropriate sections of the the alt_flash_epcs_dev structure
  */
-int alt_epcs_flash_init(alt_flash_epcs_dev* flash, void *base);
+int alt_epcs_flash_init(alt_flash_epcs_dev* flash, volatile void * base);
 
 /*
  *  Functions exported through the common Flash interface
@@ -95,12 +130,16 @@ int alt_epcs_flash_init(alt_flash_epcs_dev* flash, void *base);
  * want that functionality.
  */
 
+int alt_epcs_flash_memcmp( alt_flash_dev* flash_info,
+                                  const void* src_buffer,
+                                  int offset,
+                                  size_t n );
+ 
 int alt_epcs_flash_write(alt_flash_dev* flash_info, int offset,
                          const void* src_addr, int length);
 
 int alt_epcs_flash_read(alt_flash_dev* flash_info, int offset,
                         void* dest_addr, int length);
-
 int alt_epcs_flash_get_info(alt_flash_fd* fd, flash_region** info,
                             int*  );
 
@@ -109,10 +148,5 @@ int alt_epcs_flash_erase_block(alt_flash_dev* flash_info, int block_offset);
 int alt_epcs_flash_write_block(alt_flash_dev* flash, int block_offset,
                                int data_offset, const void* data,
                                int length);
-
-int alt_epcs_flash_memcmp(alt_flash_dev* flash_info,
-                          const void* src_buffer,
-                          int offset,
-                          size_t n );
 
 #endif /* __ALT_EPCS_FLASH_H__ */
