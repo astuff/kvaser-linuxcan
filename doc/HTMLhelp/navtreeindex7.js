@@ -1,5 +1,11 @@
 var NAVTREEINDEX7 =
 {
+"page_user_guide_send_recv.html#section_user_guide_misc_code_and_mask":[2,4,2,0],
+"page_user_guide_send_recv.html#section_user_guide_send_recv_bus_on_off":[2,4,0],
+"page_user_guide_send_recv.html#section_user_guide_send_recv_filters":[2,4,2],
+"page_user_guide_send_recv.html#section_user_guide_send_recv_obj_buf":[2,4,4],
+"page_user_guide_send_recv.html#section_user_guide_send_recv_reading":[2,4,1],
+"page_user_guide_send_recv.html#section_user_guide_send_recv_sending":[2,4,3],
 "page_user_guide_send_recv_asynch_not.html":[2,9],
 "page_user_guide_send_recv_asynch_not.html#section_user_guide_send_recv_asynch":[2,9,0],
 "page_user_guide_send_recv_asynch_not.html#section_user_guide_send_recv_asynch_callback":[2,9,1],

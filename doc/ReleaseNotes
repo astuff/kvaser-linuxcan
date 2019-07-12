@@ -62,7 +62,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.27  
+Release notes for linuxcan V5.28  
 ================================================================
 
 These release notes apply to both CANLIB SDK and the Linux drivers.
@@ -163,6 +163,11 @@ Known problems
 
    * kvmlib is currently missing support for
      Kvaser Memorator Light HS v2 (01058-1).
+
+
+New Features and Fixed Problems in V5.28   (12-MAY-2019)
+===========================================================================
+* Minor changes.
 
 
 New Features and Fixed Problems in V5.27   (03-MAR-2019)

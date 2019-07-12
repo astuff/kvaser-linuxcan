@@ -73,6 +73,7 @@
 #include "VCanFuncUtil.h"
 #include "lio_error.h"
 #include "dio_error.h"
+#include "debug.h"
 
 #if DEBUG
 #   define DEBUGPRINT(args) printf args

@@ -68,7 +68,6 @@
 
 //#   include <linux/ioctl.h>
 #   include <asm/ioctl.h>
-#   include "debug.h"
 #   include "compilerassert.h"
 
 #   define KCAN_IOC_MAGIC 'k'

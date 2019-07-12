@@ -68,7 +68,9 @@ var kva_db_lib_8h =
       [ "kvaDbErr_NoAttrib", "kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57afb95ae02d4a074fd25d9cc2cc2915ce3", null ],
       [ "kvaDbErr_OnlyOneAllowed", "kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57a2e6abe94cabd988083a9bff0917ad82c", null ],
       [ "kvaDbErr_WrongOwner", "kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57a0d58c63614683ccc7085893224806db6", null ],
-      [ "kvaDbErr_InUse", "kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57aa67dee2da991c9d854d167c7db921cf4", null ]
+      [ "kvaDbErr_InUse", "kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57aa67dee2da991c9d854d167c7db921cf4", null ],
+      [ "kvaDbErr_BufferSize", "kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57a67e1ef7a1005c3028a988105fcc1d122", null ],
+      [ "kvaDbErr_DbFileParse", "kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57a0fcaa7e1fa09f67719c429419afad009", null ]
     ] ],
     [ "kvaDbAddAttribute", "group__kvadb__attributes.html#ga260cd9cb2cccec515596389e51556f5b", null ],
     [ "kvaDbAddAttributeDefinition", "group__kvadb__attributes.html#gabbc2f38c6b7c0f437d1d679be2158d7f", null ],
@@ -128,6 +130,7 @@ var kva_db_lib_8h =
     [ "kvaDbGetFirstSignal", "group__kvadb__signals.html#gaeec680d3d20bddb57dd09389faacba9e", null ],
     [ "kvaDbGetFirstSignalAttribute", "group__kvadb__attributes.html#ga1698bce319bf3594798a940e1339235e", null ],
     [ "kvaDbGetFlags", "group__kvadb__database.html#ga04b35b1f5416157cb633cf7c44df396e", null ],
+    [ "kvaDbGetLastParseError", "group__kvadb__database.html#ga2b96a31d3ff595c861656bfd2ac43d55", null ],
     [ "kvaDbGetMsgAttributeByName", "group__kvadb__attributes.html#ga8dc2f474a745af37d128a7cca676fa4d", null ],
     [ "kvaDbGetMsgById", "group__kvadb__messages.html#ga732d691ed8ead650e4a49d18c8f7ffa2", null ],
     [ "kvaDbGetMsgByName", "group__kvadb__messages.html#ga9685fdb33257ac28e4cd989cfe8ca154", null ],

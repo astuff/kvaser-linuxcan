@@ -59,6 +59,7 @@ var searchData=
   ['kvadbgetfirstsignal',['kvaDbGetFirstSignal',['../group__kvadb__signals.html#gaeec680d3d20bddb57dd09389faacba9e',1,'kvaDbLib.h']]],
   ['kvadbgetfirstsignalattribute',['kvaDbGetFirstSignalAttribute',['../group__kvadb__attributes.html#ga1698bce319bf3594798a940e1339235e',1,'kvaDbLib.h']]],
   ['kvadbgetflags',['kvaDbGetFlags',['../group__kvadb__database.html#ga04b35b1f5416157cb633cf7c44df396e',1,'kvaDbLib.h']]],
+  ['kvadbgetlastparseerror',['kvaDbGetLastParseError',['../group__kvadb__database.html#ga2b96a31d3ff595c861656bfd2ac43d55',1,'kvaDbLib.h']]],
   ['kvadbgetmsgattributebyname',['kvaDbGetMsgAttributeByName',['../group__kvadb__attributes.html#ga8dc2f474a745af37d128a7cca676fa4d',1,'kvaDbLib.h']]],
   ['kvadbgetmsgbyid',['kvaDbGetMsgById',['../group__kvadb__messages.html#ga732d691ed8ead650e4a49d18c8f7ffa2',1,'kvaDbLib.h']]],
   ['kvadbgetmsgbyname',['kvaDbGetMsgByName',['../group__kvadb__messages.html#ga9685fdb33257ac28e4cd989cfe8ca154',1,'kvaDbLib.h']]],

@@ -102,6 +102,10 @@ Resolution</h1>
 <p>The resolution of the time stamps is, by default, 1 ms. It can be changed by calling <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a> with the <a class="el" href="canlib_8h.html#a5b5d43fc8968aa77e48ef8c8d3036c36">canIOCTL_SET_TIMER_SCALE</a> function code.</p>
 <h1><a class="anchor" id="section_user_guide_time_domain"></a>
 Time Domain</h1>
+<p>The time domain is a system to group a set of devices to a common time which can be useful for time synchronised applications between multiple devices.</p>
+<p>While all kvaser devices supports the use of time domains they can get out of sync over time, to avoid this some devices have support for MagiSync™ which will continuously apply an offset to their clocks to compensate for any drifting that may occur.</p>
+<p>After creating a time domain and adding handles to it, use <a class="el" href="group___time_domain_handling.html#gaf1857d6195e783c082b44a6e6cf9f745">kvTimeDomainResetTime()</a> to reset the time of the domain.</p>
+<dl class="section note"><dt>Note</dt><dd>For the time domain to function properly all devices that are part of it should be connected to the same root usb hub.</dd></dl>
 <ul>
 <li><a class="el" href="group___time_domain_handling.html#gaef2b34a7cd8ab01fc140aabe3a5f5539">kvTimeDomainCreate()</a></li>
 <li><a class="el" href="group___time_domain_handling.html#gaf42198d9685ffc7094fc4cd276ab1976">kvTimeDomainDelete()</a></li>
@@ -118,7 +122,7 @@ Time Domain</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li>
-    <li class="footer"> (canlib 5.27) Sun Mar 3 2019</li>
+    <li class="footer"> (canlib 5.28) Sun May 12 2019</li>
   </ul>
 </div>
 </body>

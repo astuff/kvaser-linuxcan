@@ -80,34 +80,19 @@ $(document).ready(function(){initNavTree('page_kvadblib.html','');});
 <div class="title">Database API (kvaDbLib) </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#section_user_guide_kvadblib_1">Description</a></li>
-<li class="level1"><a href="#section_user_guide_kvadblib_2">Naming convention</a></li>
-<li class="level1"><a href="#section_user_guide_kvadblib_3">Build an application</a></li>
-<li class="level1"><a href="#section_user_guide_kvadblib_where_to_go_from_here">Where to go from here</a></li>
-</ul>
-</div>
-<div class="textblock"><h1><a class="anchor" id="section_user_guide_kvadblib_1"></a>
-Description</h1>
-<p>The database library kvaDbLib is used for creating, reading, writing and modifying CAN databases that holds descriptions of packages that is received or sent on the CAN network.</p>
+<div class="textblock"><p>The database library kvaDbLib is used for creating, reading, writing and modifying CAN databases that holds descriptions of packages that is received or sent on the CAN network.</p>
 <p>A CAN database contains information about messages. Each message has (among other attributes) an identifier, a name and one or several signals. The kvaDbLib library is an API for these CAN databases.</p>
-<h1><a class="anchor" id="section_user_guide_kvadblib_2"></a>
-Naming convention</h1>
-<p>The function calls in the Kvaser Database API all have names starting with <b>kvaDb</b>, e.g <a class="el" href="group__kvadb__database.html#gacbcd92e8da46f1b756c72d25ab92d240">kvaDbOpen()</a>.</p>
-<h1><a class="anchor" id="section_user_guide_kvadblib_3"></a>
-Build an application</h1>
-<p>You will need to </p><div class="fragment"><div class="line"><span class="preprocessor">#include kvaDbLib.h</span></div></div><!-- fragment --><p>in your programs and link with kvaDbLib.dll on Windows and with libkvadblib.so on Linux.</p>
-<p><a class="el" href="page_user_guide_kvadblib_samples.html">Sample Programs (kvaDBLib)</a></p>
-<h1><a class="anchor" id="section_user_guide_kvadblib_where_to_go_from_here"></a>
-Where to go from here</h1>
-<p>For futher information check the kvaDbLib references in the Modules tab. </p>
+<ul>
+<li><a class="el" href="page_kvadblib_user_guide_intro.html">Introduction</a></li>
+<li><a class="el" href="page_kvadblib_example_load_database.html">Loading a CAN database from file</a> </li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.27) Sun Mar 3 2019</li>
+    <li class="footer"> (canlib 5.28) Sun May 12 2019</li>
   </ul>
 </div>
 </body>

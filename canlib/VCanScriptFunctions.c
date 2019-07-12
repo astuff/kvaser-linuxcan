@@ -72,7 +72,7 @@
 #include "VCanFuncUtil.h"
 #include "kcanio_script.h"
 #include "canstat.h"
-
+#include "debug.h"
 
 #if DEBUG
 #   define DEBUGPRINT(args) printf args

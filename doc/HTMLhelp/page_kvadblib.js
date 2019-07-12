@@ -1,8 +1,7 @@
 var page_kvadblib =
 [
-    [ "Description", "page_kvadblib.html#section_user_guide_kvadblib_1", null ],
-    [ "Naming convention", "page_kvadblib.html#section_user_guide_kvadblib_2", null ],
-    [ "Build an application", "page_kvadblib.html#section_user_guide_kvadblib_3", null ],
-    [ "Where to go from here", "page_kvadblib.html#section_user_guide_kvadblib_where_to_go_from_here", null ],
-    [ "Sample Programs (kvaDBLib)", "page_user_guide_kvadblib_samples.html", "page_user_guide_kvadblib_samples" ]
+    [ "Introduction", "page_kvadblib_user_guide_intro.html", "page_kvadblib_user_guide_intro" ],
+    [ "Loading a CAN database from file", "page_kvadblib_example_load_database.html", [
+      [ "Load an existing database file with kvaDbCreate", "page_kvadblib_example_load_database.html#section_load_database_with_kvadbcreate", null ]
+    ] ]
 ];
