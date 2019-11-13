@@ -156,6 +156,9 @@ Macros</h2></td></tr>
 <tr class="memitem:ad343e9fbc7747012d03edad213968e7b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#ad343e9fbc7747012d03edad213968e7b">kvlcERR_MIXED_ENDIANNESS</a>&#160;&#160;&#160;((<a class="el" href="kvlclib_8h.html#a0b9cf61f2cc7afc5765a9432153e6fa8">KvlcStatus</a>)-33)</td></tr>
 <tr class="memdesc:ad343e9fbc7747012d03edad213968e7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrong data type in MDF.  <a href="#ad343e9fbc7747012d03edad213968e7b">More...</a><br /></td></tr>
 <tr class="separator:ad343e9fbc7747012d03edad213968e7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b963aa088e98a68d497ba57a285b3dd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a5b963aa088e98a68d497ba57a285b3dd">kvlcERR_RESULT_TOO_BIG</a>&#160;&#160;&#160;((<a class="el" href="kvlclib_8h.html#a0b9cf61f2cc7afc5765a9432153e6fa8">KvlcStatus</a>)-34)</td></tr>
+<tr class="memdesc:a5b963aa088e98a68d497ba57a285b3dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Result is too big for an out-parameter.  <a href="#a5b963aa088e98a68d497ba57a285b3dd">More...</a><br /></td></tr>
+<tr class="separator:a5b963aa088e98a68d497ba57a285b3dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">FILE_FORMAT_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="FILE_FORMAT_xxx"></a> Format used for input and output, used in <a class="el" href="group__kvlc__converter.html#ga35c9e5d685d55d17308e7755dd96c35c">kvlcSetInputFile()</a>, <a class="el" href="group__kvlc__memorator.html#ga607112a97a47dc861595b8928f08839f">kvlcFeedSelectFormat()</a>.</p>
 <dl class="section note"><dt>Note</dt><dd>Not all formats are valid as both output and input format. </dd></dl>
@@ -340,6 +343,10 @@ Typedefs</h2></td></tr>
 <tr class="separator:a65349619e17d6a7f0eebd73e0ead78b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ac7d78d16323e3284c868eebad5816a"><td class="memItemLeft" align="right" valign="top">typedef int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a2ac7d78d16323e3284c868eebad5816a">time_int64</a></td></tr>
 <tr class="separator:a2ac7d78d16323e3284c868eebad5816a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7cde0074dfd288f2d70c0e035dacb28a"><td class="memItemLeft" align="right" valign="top">typedef int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a7cde0074dfd288f2d70c0e035dacb28a">int64</a></td></tr>
+<tr class="separator:a7cde0074dfd288f2d70c0e035dacb28a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc0f5bc07737e498f287334775dff2b6"><td class="memItemLeft" align="right" valign="top">typedef uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#abc0f5bc07737e498f287334775dff2b6">uint64</a></td></tr>
+<tr class="separator:abc0f5bc07737e498f287334775dff2b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -353,6 +360,8 @@ Functions</h2></td></tr>
 <tr class="separator:ga5ddcb1c5b06d99a047661ba1a1bcdacc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9dc12be7d0e933fb782bab86bca55666"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kvlclib_8h.html#a0b9cf61f2cc7afc5765a9432153e6fa8">KvlcStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvlc__converter.html#ga9dc12be7d0e933fb782bab86bca55666">kvlcEventCount</a> (<a class="el" href="kvlclib_8h.html#a7cd7d86b7a164190a08a811db633b38d">KvlcHandle</a> handle, unsigned int *count)</td></tr>
 <tr class="separator:ga9dc12be7d0e933fb782bab86bca55666"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaba482b32c00ae9776b8157ecc6c1d4b5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kvlclib_8h.html#a0b9cf61f2cc7afc5765a9432153e6fa8">KvlcStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvlc__converter.html#gaba482b32c00ae9776b8157ecc6c1d4b5">kvlcEventCountEx</a> (<a class="el" href="kvlclib_8h.html#a7cd7d86b7a164190a08a811db633b38d">KvlcHandle</a> handle, <a class="el" href="kvlclib_8h.html#a7cde0074dfd288f2d70c0e035dacb28a">int64</a> *count)</td></tr>
+<tr class="separator:gaba482b32c00ae9776b8157ecc6c1d4b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga865806d625b0154696bab9c045f04994"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kvlclib_8h.html#a0b9cf61f2cc7afc5765a9432153e6fa8">KvlcStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvlc__converter.html#ga865806d625b0154696bab9c045f04994">kvlcConvertEvent</a> (<a class="el" href="kvlclib_8h.html#a7cd7d86b7a164190a08a811db633b38d">KvlcHandle</a> handle)</td></tr>
 <tr class="separator:ga865806d625b0154696bab9c045f04994"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga35c9e5d685d55d17308e7755dd96c35c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kvlclib_8h.html#a0b9cf61f2cc7afc5765a9432153e6fa8">KvlcStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvlc__converter.html#ga35c9e5d685d55d17308e7755dd96c35c">kvlcSetInputFile</a> (<a class="el" href="kvlclib_8h.html#a7cd7d86b7a164190a08a811db633b38d">KvlcHandle</a> handle, const char *filename, int format)</td></tr>
@@ -1543,6 +1552,22 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a5b963aa088e98a68d497ba57a285b3dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b963aa088e98a68d497ba57a285b3dd">&#9670;&nbsp;</a></span>kvlcERR_RESULT_TOO_BIG</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvlcERR_RESULT_TOO_BIG&#160;&#160;&#160;((<a class="el" href="kvlclib_8h.html#a0b9cf61f2cc7afc5765a9432153e6fa8">KvlcStatus</a>)-34)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Result is too big for an out-parameter. </p>
+
+</div>
+</div>
 <a id="aa648da61033bb162c5a977eff01d21f6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa648da61033bb162c5a977eff01d21f6">&#9670;&nbsp;</a></span>kvlcERR_TIME_DECREASING</h2>
 
@@ -1622,6 +1647,21 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
+<a id="a7cde0074dfd288f2d70c0e035dacb28a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7cde0074dfd288f2d70c0e035dacb28a">&#9670;&nbsp;</a></span>int64</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef int64_t <a class="el" href="kvlclib_8h.html#a7cde0074dfd288f2d70c0e035dacb28a">int64</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Type definitions for converter </p>
+
+</div>
+</div>
 <a id="a7cd7d86b7a164190a08a811db633b38d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7cd7d86b7a164190a08a811db633b38d">&#9670;&nbsp;</a></span>KvlcHandle</h2>
 
@@ -1682,6 +1722,21 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="abc0f5bc07737e498f287334775dff2b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc0f5bc07737e498f287334775dff2b6">&#9670;&nbsp;</a></span>uint64</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef uint64_t <a class="el" href="kvlclib_8h.html#abc0f5bc07737e498f287334775dff2b6">uint64</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Type definitions for converter </p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
@@ -1689,7 +1744,7 @@ Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="kvlclib_8h.html">kvlclib.h</a></li>
-    <li class="footer"> (canlib 5.28) Sun May 12 2019</li>
+    <li class="footer"> (canlib 5.30) Tue Oct 8 2019</li>
   </ul>
 </div>
 </body>

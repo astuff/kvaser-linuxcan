@@ -232,5 +232,9 @@ typedef struct {
   VCAN_EVENT *msg;
 } VCAN_IOCTL_READ_T;
 
+typedef struct {
+  VCAN_EVENT *msg;
+} KCAN_IOCTL_SCRIPT_GET_TEXT_T;
+
 
 #endif /* _CANIF_DATA_H_ */

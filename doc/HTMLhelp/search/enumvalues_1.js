@@ -104,6 +104,7 @@ var searchData=
   ['kvmerr_5foccupied',['kvmERR_OCCUPIED',['../kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0a90f1729da84d3b35086e77520c9623fb',1,'kvmlib.h']]],
   ['kvmerr_5fparam',['kvmERR_PARAM',['../kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0a0083023e9d5b61f073900cfe6a529bde',1,'kvmlib.h']]],
   ['kvmerr_5fqueue_5ffull',['kvmERR_QUEUE_FULL',['../kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0a7f9934de3f6fd9d9ab4199e806fc2965',1,'kvmlib.h']]],
+  ['kvmerr_5fresult_5ftoo_5fbig',['kvmERR_RESULT_TOO_BIG',['../kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0aae0a3d4ae63abd409071ab639340702d',1,'kvmlib.h']]],
   ['kvmerr_5fsector_5ferased',['kvmERR_SECTOR_ERASED',['../kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0af90bd53a8ac2f686652c8d5df70c121f',1,'kvmlib.h']]],
   ['kvmerr_5fseq_5ferror',['kvmERR_SEQ_ERROR',['../kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0aedb9946db9ea579b12cff0d028ff17a9',1,'kvmlib.h']]],
   ['kvmerr_5ftimeout',['kvmERR_TIMEOUT',['../kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0a64b00fd3adfdedf9a0a73881b8fbc298',1,'kvmlib.h']]],

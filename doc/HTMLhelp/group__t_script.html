@@ -116,6 +116,10 @@ Functions</h2></td></tr>
 <tr class="separator:ga921d35535c61b11893252602d59c8397"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga14d0df6bf3a9eec3e17bef266b3d9ef9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__t_script.html#ga14d0df6bf3a9eec3e17bef266b3d9ef9">kvScriptLoadFile</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, int slotNo, char *filePathOnPC)</td></tr>
 <tr class="separator:ga14d0df6bf3a9eec3e17bef266b3d9ef9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga044da1984b0eae0e4f6950d6dcb5d0e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__t_script.html#ga044da1984b0eae0e4f6950d6dcb5d0e0">kvScriptRequestText</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int slot, unsigned int request)</td></tr>
+<tr class="separator:ga044da1984b0eae0e4f6950d6dcb5d0e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1e75e46d804d2cfaeecafca022eaef45"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__t_script.html#ga1e75e46d804d2cfaeecafca022eaef45">kvScriptGetText</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, int *slot, unsigned long *time, unsigned int *flags, char *buf, size_t bufsize)</td></tr>
+<tr class="separator:ga1e75e46d804d2cfaeecafca022eaef45"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gadcbe8f74ee454f27f22f9645ce0a144f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__t_script.html#gadcbe8f74ee454f27f22f9645ce0a144f">kvScriptStatus</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, int slot, unsigned int *status)</td></tr>
 <tr class="separator:gadcbe8f74ee454f27f22f9645ce0a144f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gafe38fc6634a1743f404001def0ffa392"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__t_script.html#gafe38fc6634a1743f404001def0ffa392">kvScriptGetMaxEnvvarSize</a> (int hnd, int *envvarSize)</td></tr>
@@ -134,6 +138,8 @@ Functions</h2></td></tr>
 <tr class="separator:ga6f7e3b5d2faf2556a40ec7818cd74c47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa5c82841a46a9ed78605120edb98cf23"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__t_script.html#gaa5c82841a46a9ed78605120edb98cf23">kvFileGetSystemData</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, int itemCode, int *result)</td></tr>
 <tr class="separator:gaa5c82841a46a9ed78605120edb98cf23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga40ce4dc39d01e0d33f4a1a8590e60a9d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__t_script.html#ga40ce4dc39d01e0d33f4a1a8590e60a9d">kvFileDiskFormat</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd)</td></tr>
+<tr class="separator:ga40ce4dc39d01e0d33f4a1a8590e60a9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Starting, stopping scripts, moving files to/from device. </p>
@@ -270,6 +276,34 @@ Functions</h2></td></tr>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__t_script.html#ga17b1093e1d294442635e5899120c548e">kvFileCopyToDevice()</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga40ce4dc39d01e0d33f4a1a8590e60a9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga40ce4dc39d01e0d33f4a1a8590e60a9d">&#9670;&nbsp;</a></span>kvFileDiskFormat()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a> kvFileDiskFormat </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a>&#160;</td>
+          <td class="paramname"><em>hnd</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The <a class="el" href="group__t_script.html#ga40ce4dc39d01e0d33f4a1a8590e60a9d">kvFileDiskFormat()</a> function is used for formating the disk, back to FAT32.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure </dd></dl>
 
 </div>
 </div>
@@ -430,7 +464,6 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>The <a class="el" href="group__t_script.html#ga30f88cbfc588c801f8bf4c81c094875c">kvScriptEnvvarClose()</a> function closes an open envvar.</p>
-<dl class="section note"><dt>Note</dt><dd>Not implemented in linux.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">eHnd</td><td>An open handle to an envvar.</td></tr>
@@ -570,7 +603,6 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>The <a class="el" href="group__t_script.html#gacf9775ec635485786a4afb3cb77ce94e">kvScriptEnvvarGetInt()</a> function retrieves the value of an <code>int</code> envvar.</p>
-<dl class="section note"><dt>Note</dt><dd>Not implemented in linux.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">eHnd</td><td>An open handle to an envvar. </td></tr>
@@ -634,7 +666,6 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>Not implemented in linux.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="canlib_8h.html#ac12ca60f6d6e18d9bd29acc00c8ea2ff">kvEnvHandle</a> handle (positive) to an envvar if success </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
@@ -770,7 +801,6 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>The <a class="el" href="group__t_script.html#gaef0cffb28882fa9a731cda884ea8332c">kvScriptEnvvarSetInt()</a> sets the value of an <code>int</code> envvar.</p>
-<dl class="section note"><dt>Note</dt><dd>Not implemented in linux.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">eHnd</td><td>An open handle to an envvar. </td></tr>
@@ -818,6 +848,73 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">envvarSize</td><td>The maximum size of an envvar.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure </dd></dl>
+
+</div>
+</div>
+<a id="ga1e75e46d804d2cfaeecafca022eaef45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1e75e46d804d2cfaeecafca022eaef45">&#9670;&nbsp;</a></span>kvScriptGetText()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a> kvScriptGetText </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a>&#160;</td>
+          <td class="paramname"><em>hnd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>slot</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned long *&#160;</td>
+          <td class="paramname"><em>time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int *&#160;</td>
+          <td class="paramname"><em>flags</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>buf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>bufsize</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The <a class="el" href="group__t_script.html#ga1e75e46d804d2cfaeecafca022eaef45">kvScriptGetText()</a> Reads a printf from a subscribed script slot. Set up a subscription with <a class="el" href="group__t_script.html#ga044da1984b0eae0e4f6950d6dcb5d0e0">kvScriptRequestText()</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">slot</td><td>The slot where the printf originated. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">time</td><td>The printf timestamp. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">flags</td><td>Printf flags. A combination of <a class="el" href="canstat_8h.html#canSTAT_xxx">canSTAT_xxx</a> flags. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">buf</td><td>Buffer to hold the printf string. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">bufsize</td><td>Size of the buffer.</td></tr>
   </table>
   </dd>
 </dl>
@@ -909,7 +1006,6 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>The <a class="el" href="group__t_script.html#ga921d35535c61b11893252602d59c8397">kvScriptLoadFileOnDevice()</a> function loads a compiled script file (.txe) stored on the device (SD card) into a script slot on the device.</p>
-<dl class="section note"><dt>Note</dt><dd>Not implemented in linux.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel. </td></tr>
@@ -924,6 +1020,52 @@ Functions</h2></td></tr>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_kvscript.html#section_user_guide_kvscript_loading">Load and Unload Script</a> </dd>
 <dd>
 <a class="el" href="group__t_script.html#ga14d0df6bf3a9eec3e17bef266b3d9ef9">kvScriptLoadFile()</a>, <a class="el" href="group__t_script.html#ga17b1093e1d294442635e5899120c548e">kvFileCopyToDevice()</a>, <a class="el" href="group__t_script.html#gabcba6dfd72c06214b4bac2059846b4d0">kvScriptStart()</a>, <a class="el" href="group__t_script.html#gaf07b9d776a3682f0093d1cfe4e26f31c">kvScriptStop()</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga044da1984b0eae0e4f6950d6dcb5d0e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga044da1984b0eae0e4f6950d6dcb5d0e0">&#9670;&nbsp;</a></span>kvScriptRequestText()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a> kvScriptRequestText </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a>&#160;</td>
+          <td class="paramname"><em>hnd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>slot</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>request</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The <a class="el" href="group__t_script.html#ga044da1984b0eae0e4f6950d6dcb5d0e0">kvScriptRequestText()</a> Sets up a printf subscription to a selected script slot. Read the printf messages with <a class="el" href="group__t_script.html#ga1e75e46d804d2cfaeecafca022eaef45">kvScriptGetText()</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">slot</td><td>The slot to subscribe to. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">request</td><td>Subscription request i.e. <a class="el" href="canlib_8h.html#kvSCRIPT_REQUEST_TEXT_xxx">kvSCRIPT_REQUEST_TEXT_xxx</a>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure </dd></dl>
 
 </div>
 </div>
@@ -1063,7 +1205,6 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>The <a class="el" href="group__t_script.html#gadcbe8f74ee454f27f22f9645ce0a144f">kvScriptStatus()</a> function reads the current status of a script slot.</p>
-<dl class="section note"><dt>Note</dt><dd>Not implemented in linux.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel. </td></tr>
@@ -1230,7 +1371,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.28) Sun May 12 2019</li>
+    <li class="footer"> (canlib 5.30) Tue Oct 8 2019</li>
   </ul>
 </div>
 </body>

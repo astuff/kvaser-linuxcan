@@ -159,13 +159,20 @@ CompilerAssert(KCANIO_SCRIPT_CTRL_ERR_NOT_IMPLEMENTED     == SCRIPT_CTRL_ERR_NOT
 #define M32C_BUS_PASSIVE              0x20U    // Chip is error passive
 #define M32C_BUS_OFF                  0x40U    // Chip is bus off
 
+ // 6 bits -> 64 entries
 #define MAX_HE_COUNT                  64U
+
+// Maximum number of scripts for a device of this type.
+#define HYDRA_MAX_SCRIPTS             16U
 
 #if DEBUG
 #   define MHYDRA_Q_CMD_WAIT_TIME     800
 #else
 #   define MHYDRA_Q_CMD_WAIT_TIME     200
 #endif
+
+
+	   
 
 /* Channel specific data */
 typedef struct MhydraChanData {
@@ -204,12 +211,74 @@ typedef struct MhydraWaitNode {
   unsigned char     *memo_buffer;
 } MhydraWaitNode;
 
+
+/****************************************************************************/
+
+typedef struct {
+  uint16_t length;    // Distance from this header to the next.
+  uint16_t seq;
+  uint64_t time;
+  uint8_t  he;        // Source HE address
+  uint8_t  type;      // TRAFFIC / DEBUG / ERROR
+  uint8_t  id;        // scriptNo  (0xff for not used)
+  uint8_t  padding;
+  // Data follows here.
+} dmHeader;
+
+#define DM_BUFFER_SIZE        4096
+
+//     smaller one being used if the first message heads says it's OK.
+#define TRP_BLOCK_SIZE        1024
+#define TRP_BLOCK_COUNT         16
+#define TRP_CONTAINERS_PER_HE    2
+#define TRP_CONTAINERS_EXTRA     8   // In case a HE ever needs more than 2
+#if (TRP_BLOCK_COUNT > 32)
+# error Current block allocation routing does not allow for > 32 blocks!
+#endif
+
+
+// contains one single printf message
+typedef struct
+{
+  uint8_t   payload[DM_BUFFER_SIZE];
+  uint16_t  payloadLen;
+} deviceMessage;
+
+
+typedef struct {
+  uint32_t  timeL;
+  uint32_t  timeH;
+  uint16_t  curLen;
+  uint16_t  len;
+  uint16_t  cmdIOPSeq;
+  uint8_t   cmdIOP;
+  uint8_t   occupied;
+  uint8_t   flags;
+  int8_t    index;
+} trpContainer;
+
+/****************************************************************************/
+
+
+
 /*  Cards specific data */
 typedef struct MhydraCardData {
   // Map channel (0,1,2,...) to HE (6-bit number meaningful only to fw)
   uint8_t   channel2he[HYDRA_MAX_CARD_CHANNELS];
   uint8_t   he2channel[MAX_HE_COUNT];
   uint8_t   sysdbg_he;
+  
+  // Other HEs
+  uint8_t   script2he[HYDRA_MAX_SCRIPTS];
+  uint8_t   he2script[MAX_HE_COUNT];
+
+  uint8_t      *dmBuffer;
+  int16_t      dmRead;
+  int16_t      dmWrite;
+  uint8_t      *trpBuffer[TRP_BLOCK_COUNT];
+  uint16_t     block_use;
+  trpContainer *truck;
+  
 
   uint32_t  max_outstanding_tx;
   int32_t   autoTxBufferCount;
@@ -286,6 +355,7 @@ int mhydra_queue_cmd(VCanCardData *vCard,
 #define TRP_DEST_CANHE 1
 uint16_t cmd_create_transId (hydraHostCmd *cmd);
 int32_t device_trp (VCanCardData *vCard, uint32_t dest, uint16_t pipe, uint8_t *buffer, uint32_t buflen);
+
 
 #ifdef MHYDRA_DEBUG
   extern int pc_debug;

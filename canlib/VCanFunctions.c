@@ -384,7 +384,7 @@ static void *vCanNotifyThread (void *arg)
 
   memset(&read, 0, sizeof(VCanRead));
 
-  read.timeout        = 1;  //1 ms
+  read.timeout        = 50;  //50 ms
   ioctl_read_arg.msg  = &msg;
   ioctl_read_arg.read = &read;
 
@@ -402,21 +402,6 @@ static void *vCanNotifyThread (void *arg)
       busoff = 0;
     }
   }
-  
-  //wait 1ms before we say that the thread is running in order to not miss any events
-  ret = ioctl(hData->notifyFd, VCAN_IOC_RECVMSG, &ioctl_read_arg);
-
-  hData->notifyThread_running = 1;
-
-  if (ret == 0) {
-    notify(hData, &msg, &busoff);
-  } else {
-    if (errno != EAGAIN) {
-      pthread_exit(0); // When this thread is cancelled, ioctl will be interrupted by a signal.
-    }
-  }
-
-  read.timeout = 50;
   
   while (1) {
     pthread_testcancel();
@@ -877,9 +862,8 @@ static canStatus vCanReadInternal (HandleData *hData, unsigned int iotcl_cmd,
         }
       }
 
-
-      // Copy data
-      if (msgPtr) {
+      // Copy data unless remote request
+      if (msgPtr && !(flags & canMSG_RTR)) {
         for (i = 0; i < count; i++)
           ((unsigned char *)msgPtr)[i] = msg.tagData.msg.data[i];
       }
@@ -1178,6 +1162,14 @@ static canStatus vCanFileCopyFromDevice(HandleData *hData, char *deviceFileName,
 }
 
 //======================================================================
+// vCanScriptStatus
+//======================================================================
+static canStatus vCanScriptStatus(HandleData *hData, int slotNo, unsigned int *status)
+{
+  return vCanScript_status(hData, slotNo, status);
+}
+
+//======================================================================
 // vCanScriptStart
 //======================================================================
 static canStatus vCanScriptStart(HandleData *hData, int slotNo)
@@ -1203,6 +1195,15 @@ static canStatus vCanScriptLoadFile(HandleData *hData, int slotNo,
 }
 
 //======================================================================
+// vCanScriptLoadFileOnDevice
+//======================================================================
+static canStatus vCanScriptLoadFileOnDevice(HandleData *hData, int slotNo,
+                                    char *localFile)
+{
+  return vCanScript_load_file_on_device(hData, slotNo, localFile);
+}
+
+//======================================================================
 // vCanScriptUnLoad
 //======================================================================
 static canStatus vCanScriptUnload(HandleData *hData, int slotNo)
@@ -1210,6 +1211,122 @@ static canStatus vCanScriptUnload(HandleData *hData, int slotNo)
   return vCanScript_unload(hData, slotNo);
 }
 
+//======================================================================
+// vCanScriptSendEvent
+//======================================================================
+static canStatus vCanScriptSendEvent(HandleData *hData,
+                                     int slotNo,
+                                     int eventType,
+                                     int eventNo,
+                                     unsigned int data)
+{
+  return vCanScript_send_event(hData, slotNo, eventType, eventNo, data);
+} 
+
+
+//======================================================================
+// vCanScriptEnvvarOpen
+//======================================================================
+static kvEnvHandle vCanScriptEnvvarOpen(HandleData *hData, 
+                                        char* envvarName,
+                                        int *envvarType,
+                                        int *envvarSize) // returns scriptHandle
+{
+  return vCanScript_envvar_open(hData, envvarName, envvarType, envvarSize); 
+}
+
+
+//======================================================================
+// vCanScriptEnvvarClose
+//======================================================================
+static canStatus vCanScriptEnvvarClose(HandleData *hData, int envvarIdx)  
+{
+  return vCanScript_envvar_close(hData, envvarIdx); 
+}
+
+
+//======================================================================
+// vCanScriptEnvvarSetInt
+//======================================================================
+static canStatus vCanScriptEnvvarSetInt(HandleData *hData, int envvarIdx, int val)
+{
+  return vCanScript_envvar_set_int(hData, envvarIdx, val);
+}
+
+
+//======================================================================
+// vCanScriptEnvvarGetInt
+//======================================================================
+static canStatus vCanScriptEnvvarGetInt(HandleData *hData, int envvarIdx, int *val)
+{
+  return vCanScript_envvar_get_int(hData, envvarIdx, val); 
+}
+
+
+//======================================================================
+// vCanScriptEnvvarSetFloat
+//======================================================================
+static canStatus vCanScriptEnvvarSetFloat(HandleData *hData, int envvarIdx, float val)
+{
+  return vCanScript_envvar_set_float(hData, envvarIdx, val);
+}
+
+//======================================================================
+// vCanScriptEnvvarGetFloat
+//======================================================================
+static canStatus vCanScriptEnvvarGetFloat(HandleData *hData, int envvarIdx, float *val)
+{
+  return vCanScript_envvar_get_float(hData, envvarIdx, val);
+}
+
+
+//======================================================================
+// vCanScriptEnvvarSetData
+//======================================================================
+static canStatus vCanScriptEnvvarSetData(kvEnvHandle eHnd, 
+                                         void *buf,
+                                         int start_index,
+                                         int data_len)
+{
+  return vCanScript_envvar_set_data(eHnd, buf, start_index, data_len); 
+}  
+
+
+//======================================================================
+// vCanScriptEnvvarGetData
+//======================================================================
+static canStatus vCanScriptEnvvarGetData(kvEnvHandle eHnd,
+                                         void *buf,
+                                         int start_index,
+                                         int data_len)
+{
+  return vCanScript_envvar_get_data(eHnd, buf, start_index, data_len);
+}
+
+
+//======================================================================
+// vCanScriptRequestText
+//======================================================================
+static canStatus vCanScriptRequestText(HandleData *hData,
+                                       unsigned int slot,
+                                       unsigned int request)
+{
+  return vCanScript_request_text(hData, slot, request);
+}
+
+//======================================================================
+// vCanScriptGetText
+//======================================================================  
+static canStatus vCanScriptGetText(HandleData *hData,
+                                   int  *slot,
+                                   unsigned long *time,
+                                   unsigned int  *flags,
+                                   char *buf,
+                                   size_t bufsize)
+{
+  return vCanScript_get_text(hData, slot, time, flags, buf, bufsize);
+}
+  
 //======================================================================
 // vCanAccept
 //======================================================================
@@ -2436,14 +2553,14 @@ static canStatus vCanGetCardInfo2 (HandleData *hData, KCAN_IOCTL_CARD_INFO_2 *ci
 
 CANOps vCanOps = {
   // VCan Functions
-  .setNotify           = vCanSetNotify,
-  .openChannel         = vCanOpenChannel,
-  .busOn               = vCanBusOn,
-  .busOff              = vCanBusOff,
-  .setBusParams        = vCanSetBusParams,
-  .getBusParams        = vCanGetBusParams,
-  .reqBusStats         = vCanReqBusStats,
-  .getBusStats         = vCanGetBusStats,
+  .setNotify                = vCanSetNotify,
+  .openChannel              = vCanOpenChannel,
+  .busOn                    = vCanBusOn,
+  .busOff                   = vCanBusOff,
+  .setBusParams             = vCanSetBusParams,
+  .getBusParams             = vCanGetBusParams,
+  .reqBusStats              = vCanReqBusStats,
+  .getBusStats              = vCanGetBusStats,
   .read                = vCanRead,
   .readSync            = vCanReadSync,
   .readWait            = vCanReadWait,
@@ -2458,11 +2575,24 @@ CANOps vCanOps = {
   .kvFileGetName       = vCanFileGetName,
   .kvFileDelete        = vCanFileDelete,
   .kvFileCopyToDevice  = vCanFileCopyToDevice,
-  .kvFileCopyFromDevice  = vCanFileCopyFromDevice,
+  .kvFileCopyFromDevice = vCanFileCopyFromDevice,
   .kvScriptStart       = vCanScriptStart,
   .kvScriptStop        = vCanScriptStop,
   .kvScriptLoadFile    = vCanScriptLoadFile,
+  .kvScriptLoadFileOnDevice = vCanScriptLoadFileOnDevice,
   .kvScriptUnload      = vCanScriptUnload,
+  .kvScriptSendEvent   = vCanScriptSendEvent,
+  .kvScriptEnvvarOpen  = vCanScriptEnvvarOpen,
+  .kvScriptEnvvarClose = vCanScriptEnvvarClose,
+  .kvScriptEnvvarSetInt = vCanScriptEnvvarSetInt,
+  .kvScriptEnvvarGetInt = vCanScriptEnvvarGetInt,
+  .kvScriptEnvvarSetFloat = vCanScriptEnvvarSetFloat,
+  .kvScriptEnvvarGetFloat = vCanScriptEnvvarGetFloat,
+  .kvScriptEnvvarSetData  = vCanScriptEnvvarSetData,  
+  .kvScriptEnvvarGetData  = vCanScriptEnvvarGetData,  
+  .kvScriptRequestText = vCanScriptRequestText,  
+  .kvScriptGetText     = vCanScriptGetText,  
+  .kvScriptStatus      = vCanScriptStatus,
   .accept              = vCanAccept,
   .write               = vCanWrite,
   .writeWait           = vCanWriteWait,
@@ -2487,8 +2617,8 @@ CANOps vCanOps = {
   .objbufSendBurst     = kCanObjbufSendBurst,
   .objbufEnable        = kCanObjbufEnable,
   .objbufDisable       = kCanObjbufDisable,
-  .resetClock          = vCanResetClock,
-  .setClockOffset      = vCanSetClockOffset,
-  .getCardInfo         = vCanGetCardInfo,
-  .getCardInfo2        = vCanGetCardInfo2,
+  .resetClock               = vCanResetClock,
+  .setClockOffset           = vCanSetClockOffset,
+  .getCardInfo              = vCanGetCardInfo,
+  .getCardInfo2             = vCanGetCardInfo2,
 };

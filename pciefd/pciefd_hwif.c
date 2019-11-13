@@ -189,6 +189,7 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par);
 static int pciCanGetBusParams (VCanChanData *vChd, VCanBusParams *par);
 static int pciCanSetOutputMode (VCanChanData *vChd, int silent);
 static int pciCanSetTranceiverMode (VCanChanData *vChd, int linemode, int resnet);
+static int pciCanReqBusStats (VCanChanData *vChan);
 static int pciCanBusOn (VCanChanData *vChd);
 static int pciCanBusOff(VCanChanData *vChd);
 static int pciCanGetTxErr(VCanChanData *vChd);
@@ -231,6 +232,7 @@ static VCanHWInterface hwIf = {
   .getCustChannelName = pciCanGetCustChannelName,
   .getCardInfo        = vCanGetCardInfo,
   .getCardInfo2       = vCanGetCardInfo2,
+  .reqBusStats        = pciCanReqBusStats,
 };
 
 
@@ -1923,6 +1925,17 @@ static int waitForBusOn(int loopmax, VCanChanData *vChd)
   }
 }
 
+//======================================================================
+// Reading bus stats, only bus load is read
+//======================================================================
+static int pciCanReqBusStats (VCanChanData *vChan)
+{
+        PciCanChanData *hChd = vChan->hwChanData;
+
+        vChan->busStats.busLoad = hChd->load;
+
+        return VCAN_STAT_OK;
+}
 
 //======================================================================
 //  Go bus on

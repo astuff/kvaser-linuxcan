@@ -114,7 +114,7 @@
  *
  * The CAN bus API (CANlib) is used to interact with Kvaser CAN devices
  * connected to your computer and the CAN bus. At its core you have functions
- * to set bus parameters (e.g. bit rate), go bus on/o and read/write CAN
+ * to set bus parameters (e.g. bit rate), go bus on/off and read/write CAN
  * messages. You can also use CANlib to download and start t programs on
  * supported devices. If you can see your device listed in the Kvaser Device
  * Guide tool, it is connected and you can communicate with it through CANlib.
@@ -125,6 +125,7 @@
  *  - \subpage page_user_guide_init
  *  - \subpage page_user_guide_device_and_channel
  *  - \subpage page_user_guide_chips_channels
+ *  - \subpage page_user_guide_can_frame_types_types
  *  - \subpage page_user_guide_send_recv
  *  - \subpage page_user_guide_bus_errors
  *  - \subpage page_user_guide_time
@@ -1619,7 +1620,9 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * This define is used in \ref canGetChannelData(), \a buffer
    * mentioned below refers to this functions argument.
    *
-   * \a buffer returns a combination of \ref canCHANNEL_IS_xxx flags.
+   * \a buffer points to a 32-bit unsigned integer that receives
+   * a combination of \ref canCHANNEL_IS_xxx flags.
+   *
    */
 #define canCHANNELDATA_CHANNEL_FLAGS              3   // available, etc
 
@@ -2066,7 +2069,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    *
    * \a buffer points to a 32-bit unsigned integer that receives the
    * capabilities mask of the CAN channel. This mask specifies
-   * which capabilities corresponding device is guaranteed
+   * which capabilities the corresponding device is guaranteed
    * to support/not support at the moment, see \ref canCHANNEL_CAP_xxx
    * for info about flags.
    */
@@ -2320,7 +2323,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * message with \ref canWrite() and don't specify \ref canMSG_EXT nor \ref
    * canMSG_STD, \ref canMSG_EXT will be assumed and the most significant bits
    * of the identifier will be cut off. The contents of \a buf and \a buflen
-   * are ignored. \ref canRead() et al will set \ref canMSG_EXT and/or \ref
+   * is ignored. \ref canRead() et al will set \ref canMSG_EXT and/or \ref
    * canMSG_STD as usual and are not affected by this call.
    *
    * \note Not implemented in linux.
@@ -2350,7 +2353,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * functions arguments.
    *
    * Tells CANlib to clear the CAN error counters. The contents of \a buf and \a
-   * buflen are ignored. CAN error counters on device side are NOT updated.
+   * buflen is ignored. CAN error counters on device side are NOT updated.
    *
    * \note It is recommended to use \ref canIOCTL_RESET_OVERRUN_COUNT to
    * reset overrun status.
@@ -2429,7 +2432,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * functions arguments.
    *
    * Discard the current contents of the RX queue. The values of \a buf and \a
-   * buflen are ignored.
+   * buflen is ignored.
    *
    * \note This is the same thing as calling \ref canFlushReceiveQueue()
    */
@@ -2440,7 +2443,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * functions arguments.
    *
    * Discard the current contents of the TX queue. The values of \a buf and \a
-   * buflen are ignored.
+   * buflen is ignored.
    *
    * \note This is the same thing as calling \ref canFlushTransmitQueue().
    */
@@ -2540,8 +2543,8 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
    * functions argument.
    *
-   * Connects the handle to the virtual bus number (0..31) which the \a buf
-   * points to.
+   * Connects the handle to a virtual bus.
+   * \a buf points to a unsigned int containing the virtual bus number (0..31).
    *
    * \note Not implemented in linux.
    */
@@ -2551,8 +2554,8 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
    * functions argument.
    *
-   * Disconnects the handle from the virtual bus number (0..31) which the \a buf
-   * points to.
+   * Disconnects the handle from a virtual bus.
+   * \a buf points to a unsigned int containing the virtual bus number (0..31).
    *
    * \note Not implemented in linux.
    */
@@ -2792,7 +2795,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * Some hardware have a bitrate limit, which must be met when using any of \a canSetBusParams(),
    * \a canSetBusParamsC200() and \a canSetBusParamsFd() functions.
    * The bitrate limit can be overridden with this IOCTL.
-   * \a buf points to a \c long value that contains a user defined bitrate.
+   * \a buf points to a \c unsigned long value that contains a user defined bitrate.
    * A value of 0 means that the device should use its own default bitrate limit.<br>
    * To find out which devices that have a bitrate limit, see \ref canCHANNELDATA_MAX_BITRATE.
    */
@@ -2848,7 +2851,8 @@ canStatus CANLIBAPI canGetChannelData (int channel,
    * This define is used in \ref canIoCtl(), \a buf mentioned below refers to this
    * functions argument.
    *
-   * This ioctl resets overrun count and flags, \sa \ref canReadStatus \sa \ref canGetBusStatistics
+   * This ioctl resets overrun count and flags, \sa \ref canReadStatus \sa \ref canGetBusStatistics.
+   * The contents of \a buf and \a buflen is ignored.
    */
 #  define canIOCTL_RESET_OVERRUN_COUNT                          44
 
@@ -4360,8 +4364,6 @@ kvStatus CANLIBAPI kvScriptSendEvent (const CanHandle hnd,
  * \param[out] envvarSize  A pointer to a 32-bit integer that will receive the
  *                         size of the envvar in bytes.
  *
- * \note Not implemented in linux.
- *
  * \return A \ref kvEnvHandle handle (positive) to an envvar if success
  * \return \ref canERR_xxx (negative) if failure
  *
@@ -4383,8 +4385,6 @@ kvEnvHandle CANLIBAPI kvScriptEnvvarOpen (const CanHandle hnd,
  *
  * The \ref kvScriptEnvvarClose() function closes an open envvar.
  *
- * \note Not implemented in linux.
- *
  * \param[in] eHnd  An open handle to an envvar.
  *
  * \return \ref canOK (zero) if success
@@ -4403,8 +4403,6 @@ kvStatus CANLIBAPI kvScriptEnvvarClose (kvEnvHandle eHnd);
  * \source_end
  *
  * The \ref kvScriptEnvvarSetInt() sets the value of an \c int envvar.
- *
- * \note Not implemented in linux.
  *
  * \param[in] eHnd  An open handle to an envvar.
  * \param[in] val   The new value.
@@ -4427,8 +4425,6 @@ kvStatus CANLIBAPI kvScriptEnvvarSetInt (kvEnvHandle eHnd, int val);
  * \source_end
  *
  * The \ref kvScriptEnvvarGetInt() function retrieves the value of an \c int envvar.
- *
- * \note Not implemented in linux.
  *
  * \param[in]  eHnd An open handle to an envvar.
  * \param[out] val  The current value.
@@ -4564,8 +4560,6 @@ kvStatus CANLIBAPI kvScriptEnvvarGetData (kvEnvHandle eHnd,
  * The \ref kvScriptLoadFileOnDevice() function loads a compiled script file (.txe)
  * stored on the device (SD card) into a script slot on the device.
  *
- * \note Not implemented in linux.
- *
  * \param[in] hnd        An open handle to a CAN channel.
  * \param[in] slotNo     The slot where to load the script.
  * \param[in] localFile  The script file name; a pointer to a \c NULL terminated
@@ -4615,6 +4609,88 @@ kvStatus CANLIBAPI kvScriptLoadFile (const CanHandle hnd,
                                      char *filePathOnPC);
 
 
+/**
+ * \ingroup can_general
+ * \name kvSCRIPT_REQUEST_TEXT_xxx
+ * \anchor kvSCRIPT_REQUEST_TEXT_xxx
+ *
+ * These defines are used in \ref kvScriptRequestText() for printf message subscribe/unsubscribe.
+ *
+ * @{
+ */
+
+/**
+ *  Cancel subscription of printf messages from script slots.
+ */
+#define kvSCRIPT_REQUEST_TEXT_UNSUBSCRIBE  1
+
+/**
+ *  Subscribe to printf messages from script slots.
+ */
+#define kvSCRIPT_REQUEST_TEXT_SUBSCRIBE    2
+
+/**
+ *  Select all script slots.
+ */
+#define kvSCRIPT_REQUEST_TEXT_ALL_SLOTS    255
+
+/** @} */
+
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptRequestText(int hnd, int slot, int request);</b>
+ *
+ * \source_delphi   <b>function kvScriptRequestText(hnd: canHandle; slotNo: cardinal; request: cardinal): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvScriptRequestText() Sets up a printf subscription to a
+ * selected script slot.
+ * Read the printf messages with \ref kvScriptGetText().
+ *
+ * \param[in] hnd          An open handle to a CAN channel.
+ * \param[in] slot         The slot to subscribe to.
+ * \param[in] request      Subscription request i.e. \ref kvSCRIPT_REQUEST_TEXT_xxx.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ */
+kvStatus CANLIBAPI kvScriptRequestText(const CanHandle hnd,
+                                       unsigned int slot,
+                                       unsigned int request);
+
+
+
+/**
+ * \ingroup tScript
+ *
+ * \source_cs       <b>static Canlib.canStatus kvScriptGetText(int hnd, out int slot, out ulong time, out int flags, out string buf);</b>
+ *
+ * \source_delphi   <b>function kvScriptGetText(hnd: canHandle; var slot: integer; var time: Cardinal; var flags: Cardinal; buf: PChar; bufsize: size_t): kvStatus;     </b>
+ * \source_end
+ *
+ * The \ref kvScriptGetText() Reads a printf from a subscribed script slot.
+ * Set up a subscription with \ref kvScriptRequestText().
+ *
+ * \param[in] hnd           An open handle to a CAN channel.
+ * \param[out] slot         The slot where the printf originated.
+ * \param[out] time         The printf timestamp.
+ * \param[out] flags        Printf flags. A combination of \ref canSTAT_xxx flags.
+ * \param[out] buf          Buffer to hold the printf string.
+ * \param[in] bufsize       Size of the buffer.
+ *
+ * \return \ref canOK (zero) if success
+ * \return \ref canERR_xxx (negative) if failure
+ *
+ */
+kvStatus CANLIBAPI kvScriptGetText(const CanHandle hnd,
+                                        int  *slot,
+                                        unsigned long *time,
+                                        unsigned int  *flags,
+                                        char *buf,
+                                        size_t bufsize);
 
 /**
  * Script status flag bits. Used by \ref kvScriptStatus().
@@ -4636,8 +4712,6 @@ kvStatus CANLIBAPI kvScriptLoadFile (const CanHandle hnd,
  * \source_end
  *
  * The \ref kvScriptStatus() function reads the current status of a script slot.
- *
- * \note Not implemented in linux.
  *
  * \param[in] hnd           An open handle to a CAN channel.
  * \param[in] slot          The slot which status we want.
@@ -4951,7 +5025,7 @@ kvStatus CANLIBAPI kvFileGetCount (const CanHandle hnd, int *count);
  *
  * \source_cs       <b>static Canlib.canStatus kvFileGetSystemData(int hnd, int itemCode, out int result);</b>
  *
- * \source_delphi   <b>function kvFileGetSystemData(hnd: canHandle; itemCode: Integer; var result: Integer): kvStatus;     </b>
+ * \source_delphi   <b>function kvFileGetSystemData(hnd: canHandle; itemCode: Integer; var result: Integer): kvStatus; </b>
  * \source_end
  *
  * The \ref kvFileGetSystemData() function is used for reading disk parameters,
@@ -4971,6 +5045,26 @@ kvStatus CANLIBAPI kvFileGetCount (const CanHandle hnd, int *count);
 kvStatus CANLIBAPI kvFileGetSystemData (const CanHandle hnd,
                                         int itemCode,
                                         int *result);
+
+/**
+* \ingroup tScript
+*
+* \source_cs    <b>static Canlib.canStatus  kvFileDiskFormat(int hnd);</b>
+*
+* \source_delphi <b>function kvFileDiskFormat(hnd: canHandle): kvStatus; </b> 
+* \source_end 
+*  
+* The \ref kvFileDiskFormat() function is used for formating the disk,  
+* back to FAT32.
+*
+*
+* \param[in] hnd       An open handle to a CAN channel.      
+*
+* \return \ref canOK (zero) if success 
+* \return \ref canERR_xxx (negative) if failure
+*
+*/
+kvStatus CANLIBAPI kvFileDiskFormat(const CanHandle hnd);
 
 /**
  * \ingroup can_general

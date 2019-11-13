@@ -96,21 +96,7 @@ Message Queue and Buffer Sizes</h1>
 <p>Many CAN boards from KVASER uses the SJA1000 CAN controller. This chip can buffer somewhere between 5 and 19 incoming messages. It does not buffer outgoing messages.</p>
 <p>CAN boards with an on-board microcontroller (LAPcan, LAPcan II, USBcan) typically buffer something like 500 incoming and outgoing messages.</p>
 <p>CAN boards using the M16C microcontroller (USBcan Rugged, USBcan II, PCIcan II) typically buffer some 100 incoming messages and around 50 outgoing messages.</p>
-<p>CANlib <em>drivers</em> will, by default, buffer 256 outgoing messages per channel and 1024 incoming messages per channel. You can use <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a> to adjust the size of the receive buffer.</p>
-<h1><a class="anchor" id="section_user_guide_send_recv_sending_different_types"></a>
-Different CAN Frame Types</h1>
-<h2>Remote Requests</h2>
-<p>You can send remote requests by passing the <a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3">canMSG_RTR</a> flag to <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>. Received remote frames are reported by <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead</a> et al using the same flag.</p>
-<h2>Error Frames</h2>
-<p>Nearly all hardware platforms support detection of error frames. If an error frame arrives, the flag <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a> is set in the flag argument of <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a>. The identifier is garbage if an error frame is received, but for LAPcan it happens to be 2048 plus the error code from the SJA1000.</p>
-<p>Many platforms (for example, LAPcan, Leaf, and USBcan II) support transmission of error frames as well. To send error frames, set the <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a> flag in the flag argument to <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>.</p>
-<h2>Overload Frames</h2>
-<p>These aren't used nowadays. Certain old CAN controllers (Intel 82526) used them to delay frame processing in certain cases.</p>
-<h2>Other frame features of interest</h2>
-<ul>
-<li>You can send wakeup frames (used for Single-Wire CAN) if your hardware supports it, for example, a LAPcan plus a DRVcan S. Just set the <a class="el" href="canstat_8h.html#a616183e2ed8ca81976463914e47b35e1">canMSG_WAKEUP</a> flag when calling <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>.</li>
-<li>For "low-speed CAN" (1053/1054 type transceivers), the <a class="el" href="canstat_8h.html#a1f53f2fdeeb263cd2bf5d374e1dd59a2">canMSG_NERR</a> flag is set if a frame is received in "fault-tolerant" mode. </li>
-</ul>
+<p>CANlib <em>drivers</em> will, by default, buffer 256 outgoing messages per channel and 1024 incoming messages per channel. You can use <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a> to adjust the size of the receive buffer. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
@@ -118,7 +104,7 @@ Different CAN Frame Types</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li>
-    <li class="footer"> (canlib 5.28) Sun May 12 2019</li>
+    <li class="footer"> (canlib 5.30) Tue Oct 8 2019</li>
   </ul>
 </div>
 </body>

@@ -268,7 +268,7 @@ canStatus vCanMemo_file_copy_to_device(HandleData *hData, char *hostFileName,
   }
 
   while (!status) {
-    size_t bytes;
+    uint32_t bytes;
 
     memset(&info, 0, sizeof(info));
     bytes = fread(&info.buffer[4], 1, 512, hFile);

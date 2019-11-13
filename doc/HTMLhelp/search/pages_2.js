@@ -8,5 +8,6 @@ var searchData=
   ['converter_20api_20_28kvlclib_29',['Converter API (kvlclib)',['../page_kvlclib.html',1,'']]],
   ['c_2b_2b_3a_20canlibtutorial_2c_20vs2017',['C++: CanlibTutorial, VS2017',['../page_tutorial_cpp_canlib_vs2017.html',1,'page_tutorial']]],
   ['c_23_20canlibtutorial_2c_20vs2017',['C# CanlibTutorial, VS2017',['../page_tutorial_csharp_canlib_vs2017.html',1,'page_tutorial']]],
-  ['compiling_20and_20compatibility',['Compiling and Compatibility',['../page_user_guide_build.html',1,'page_canlib']]]
+  ['compiling_20and_20compatibility',['Compiling and Compatibility',['../page_user_guide_build.html',1,'page_canlib']]],
+  ['can_20frame_20types',['CAN Frame Types',['../page_user_guide_can_frame_types_types.html',1,'page_canlib']]]
 ];

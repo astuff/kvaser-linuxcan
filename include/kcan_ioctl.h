@@ -82,6 +82,14 @@
 #define CANIO_DFS_READ                0x01
 #define CANIO_DFS_WRITE               0x02
 
+// request's
+#define KCAN_SCRIPT_REQUEST_TEXT_UNSUBSCRIBE  0x1
+#define KCAN_SCRIPT_REQUEST_TEXT_SUBSCRIBE    0x2
+
+// slots: secret for internal use
+#define KCAN_SCRIPT_ERROR_SLOT 0x30000000
+#define KCAN_SCRIPT_INFO_SLOT  0x20000000
+
 
 #define CTL_CODE(x,i,y,z) _IO(KCAN_IOC_MAGIC, (i))
 
@@ -122,6 +130,12 @@
 #define KCAN_IOCTL_SCRIPT_CONTROL        CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 80, METHOD_BUFFERED, FILE_ANY_ACCESS)
 #define KCAN_IOCTL_LIN_MODE              CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 81, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
+
+#define KCAN_IOCTL_DEVICE_MESSAGES_SUBSCRIPTION CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 89, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define KCAN_IOCTL_SCRIPT_GET_TEXT              CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 90, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define KCAN_IOCTL_SCRIPT_ENVVAR_CONTROL        CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 91, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define KCAN_IOCTL_SCRIPT_SET_ENVVAR            CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 92, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define KCAN_IOCTL_SCRIPT_GET_ENVVAR            CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 93, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 #define KCAN_CARDFLAG_FIRMWARE_BETA       0x01  // Firmware is beta
 #define KCAN_CARDFLAG_FIRMWARE_RC         0x02  // Firmware is release candidate
@@ -210,6 +224,58 @@ typedef struct s_kcan_ioctl_script_control {
     unsigned int scriptStatus;
   };
 } KCAN_IOCTL_SCRIPT_CONTROL_T;
+
+
+
+typedef struct {
+  uint32_t  slot;
+  uint32_t  requestFlags;
+} KCAN_IOCTL_DEVICE_MESSAGES_SUBSCRIPTION_T;
+
+#define CMD_ENVVAR_GET_INFO      1
+#define CMD_ENVVAR_GET_MAX_SIZE  2
+
+typedef union {
+  struct {    // CMD_ENVVAR_GET_INFO
+    unsigned int hash;
+    int type;
+    int length;
+  } envvar_info;
+
+  struct { // CMD_ENVVAR_GET_MAX_SIZE
+    unsigned int maxsize;
+  } envvar_maxsize;
+
+  struct {
+    char data[24]; // just make sure we have space for new stuff
+  } raw_data_access ;
+} envvar_payload;
+
+typedef struct s_kcan_ioctl_envvar_get_info {
+          unsigned int subcommand;
+          unsigned int channel;
+          unsigned int hash;
+          envvar_payload payload;
+          int payloadLen;
+          unsigned int envvar_status;
+        } KCAN_IOCTL_ENVVAR_GET_INFO_T;
+
+
+typedef struct s_kcan_ioctl_set_envvar {
+          unsigned int hash;
+          char data[4096];
+          int dataLen;
+          unsigned int envvar_status;
+        } KCAN_IOCTL_SCRIPT_SET_ENVVAR_T;
+
+typedef struct s_kcan_ioctl_get_envvar {
+          unsigned int hash;
+          char data[4096];
+          int dataLen;
+          int offset;
+          unsigned int envvar_status;
+        } KCAN_IOCTL_SCRIPT_GET_ENVVAR_T;
+
 
 // Get whatever info from a driver/card
 #define KCAN_IOCTL_MISC_INFO_SUBCMD_CHANNEL_REMOTE_INFO     1

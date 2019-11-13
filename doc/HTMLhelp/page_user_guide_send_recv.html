@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Send and Receive CAN Messages</title>
+<title>Send and Receive</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -77,7 +77,7 @@ $(document).ready(function(){initNavTree('page_user_guide_send_recv.html','');})
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Send and Receive CAN Messages </div>  </div>
+<div class="title">Send and Receive </div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
@@ -102,7 +102,8 @@ Bus On / Bus Off</h1>
 Reading Messages</h1>
 <p>Incoming messages are placed in a queue in the driver. In most cases the hardware does message buffering as well. You can read the first message in the queue by calling <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a>; it will return <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a734089f351bc421c230bf8b6cd9b1e8e">canERR_NOMSG</a> if there was no message available.</p>
 <p>The flag parameter of <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> contains a combination of the message flags <a class="el" href="canstat_8h.html#canMSG_xxx">canMSG_xxx</a>, including <a class="el" href="canstat_8h.html#canFDMSG_xxx">canFDMSG_xxx</a> if the CAN FD protocol is enabled, and error flags <a class="el" href="canstat_8h.html#canMSGERR_xxx">canMSGERR_xxx</a> which provides you with more information about the message; for example, a frame with a 29-bit identifier will have the <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> bit set, and a remote frame will have the <a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3">canMSG_RTR</a> bit set. Note that the flag argument is a combination of the <a class="el" href="canstat_8h.html#canMSG_xxx">canMSG_xxx</a> flags, so more than one bit might be set.</p>
-<p>The size of the queues in the driver and hardware is descibed in <a class="el" href="page_user_guide_send_recv_mailboxes.html#section_user_guide_send_recv_queue_and_buf_sizes">Message Queue and Buffer Sizes</a>.</p>
+<p>See <a class="el" href="page_user_guide_can_frame_types_types.html">CAN Frame Types</a> Different for more detailed information.</p>
+<p>The size of the queues in the driver and hardware is described in <a class="el" href="page_user_guide_send_recv_mailboxes.html#section_user_guide_send_recv_queue_and_buf_sizes">Message Queue and Buffer Sizes</a>.</p>
 <p>Sometimes it is desirable to have a peek into the more remote parts of the queue. Is there, for example, any message waiting that has a certain identifier?</p>
 <ul>
 <li><a class="el" href="group___c_a_n.html#gafb5e475233ef14ccf9084f610caba560">canReadSpecific()</a> - You can call <a class="el" href="group___c_a_n.html#gafb5e475233ef14ccf9084f610caba560">canReadSpecific()</a> to read that message. Messages not matching the specified identifier will be kept in the queue and will be returned on the next call to <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a>.</li>
@@ -131,6 +132,7 @@ Reading Messages</h1>
 Acceptance Filters</h1>
 <p>You can set filters to reduce the number of received messages. CANlib supports setting of the hardware filters on the CAN interface board. This is done with the <a class="el" href="group___c_a_n.html#gaa4ffd2fad1932ad5763c2c923a1a12d8">canAccept()</a> function.</p>
 <p>You set an acceptance code and an acceptance mask which together determine which CAN identifiers are accepted or rejected.</p>
+<p>If you want to remove a filter, call <a class="el" href="group___c_a_n.html#gaa4ffd2fad1932ad5763c2c923a1a12d8">canAccept()</a> with the mask set to 0.</p>
 <p><b>Example</b>. To set the mask to 0xF0 and the code to 0x60: </p><div class="fragment"><div class="line">stat = <a class="code" href="group___c_a_n.html#gaa4ffd2fad1932ad5763c2c923a1a12d8">canAccept</a>(hnd1, 0x0F0L, <a class="code" href="canlib_8h.html#a8665c92e40adccfacc238af38b39f37e">canFILTER_SET_MASK_STD</a>);</div><div class="line"><span class="keywordflow">if</span> (stat &lt; 0) printf(<span class="stringliteral">&quot;canAccept failed, stat = %d\n&quot;</span>, stat);</div><div class="line">stat = <a class="code" href="group___c_a_n.html#gaa4ffd2fad1932ad5763c2c923a1a12d8">canAccept</a>(hnd1, 0x060L, <a class="code" href="canlib_8h.html#a9485f417c3629b9eb72d673b3ff16a5f">canFILTER_SET_CODE_STD</a>);</div><div class="line"><span class="keywordflow">if</span> (stat &lt; 0) printf(<span class="stringliteral">&quot;canAccept failed, stat = %d\n&quot;</span>, stat);</div></div><!-- fragment --><p>or, alternatively,</p>
 <div class="fragment"><div class="line">stat = <a class="code" href="group___c_a_n.html#gabe5023aa5de3115de946a6a10232fe84">canSetAcceptanceFilter</a>(hnd1, 0x060, 0x0F0, FALSE);</div><div class="line"><span class="keywordflow">if</span> (stat &lt; 0) printf(<span class="stringliteral">&quot;canSetAcceptanceFilter failed, stat = %d\n&quot;</span>, stat);</div></div><!-- fragment --><p>This code snippet will cause all messages having a standard (11-bit) identifier with bit7-bit4 in the identifier equal to 0110 (binary) will pass through. Other messages with standard identifiers will be rejected.</p>
 <p><b>Example</b>. How acceptance filters can be used in a smaller project. </p><div class="fragment"><div class="line"><a class="code" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd;</div><div class="line"><span class="keywordtype">long</span> id;</div><div class="line"><span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> data[8];</div><div class="line"><span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> dlc, flags;</div><div class="line"><span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> timestamp;</div><div class="line"></div><div class="line"><span class="comment">// The acceptance filter only have to be called once for each handle.</span></div><div class="line">stat = <a class="code" href="group___c_a_n.html#gabe5023aa5de3115de946a6a10232fe84">canSetAcceptanceFilter</a>(hnd, 0x060, 0x0F0, FALSE);</div><div class="line"><span class="keywordflow">if</span> (stat &lt; 0) printf(<span class="stringliteral">&quot;canSetAcceptanceFilter failed, stat = %d\n&quot;</span>, stat);</div><div class="line"></div><div class="line"><span class="comment">// We can now run the rest of the program and the acceptance filter will reject unwanted CAN messages.</span></div><div class="line"><span class="keywordflow">while</span> (<span class="keyword">true</span>){</div><div class="line">    stat = <a class="code" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead</a>(hnd, &amp;<span class="keywordtype">id</span>, data, &amp;dlc, &amp;flags, &amp;timestamp);</div><div class="line">    <span class="keywordflow">if</span> (stat != <a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a734089f351bc421c230bf8b6cd9b1e8e">canERR_NOMSG</a>) {</div><div class="line">        printf(<span class="stringliteral">&quot;Failed, status == %d\n&quot;</span>, stat);</div><div class="line">    }</div><div class="line">}</div></div><!-- fragment --><h2><a class="anchor" id="section_user_guide_misc_code_and_mask"></a>
@@ -146,8 +148,6 @@ Code and Mask Format</h2>
 <dl class="section note"><dt>Note</dt><dd>You can set the extended code and mask only on CAN boards that support extended identifiers.</dd>
 <dd>
 Not all CAN boards support different masks for standard and extended CAN identifiers.</dd>
-<dd>
-If you want to remove a filter, call <a class="el" href="group___c_a_n.html#gaa4ffd2fad1932ad5763c2c923a1a12d8">canAccept()</a> with the mask set to 0.</dd>
 <dd>
 On some boards the acceptance filtering is done by the CAN hardware; on other boards (typically those with an embedded CPU,) the acceptance filtering is done by software. <a class="el" href="group___c_a_n.html#gaa4ffd2fad1932ad5763c2c923a1a12d8">canAccept()</a> behaves in the same way for all boards, however.</dd></dl>
 <h1><a class="anchor" id="section_user_guide_send_recv_sending"></a>
@@ -182,7 +182,7 @@ Object Buffers</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li>
-    <li class="footer"> (canlib 5.28) Sun May 12 2019</li>
+    <li class="footer"> (canlib 5.30) Tue Oct 8 2019</li>
   </ul>
 </div>
 </body>

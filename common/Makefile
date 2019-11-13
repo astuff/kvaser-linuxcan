@@ -90,3 +90,6 @@ endif
 CHECK_SUPPRESS = suppressions.txt
 
 include $(RUNDIR)/../config.mak
+
+KV_XTRA_CFLAGS       += -Wframe-larger-than=8192
+KV_XTRA_CFLAGS_DEBUG += -Wframe-larger-than=8192

@@ -62,7 +62,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.28  
+Release notes for linuxcan V5.30  
 ================================================================
 
 These release notes apply to both CANLIB SDK and the Linux drivers.
@@ -161,8 +161,59 @@ Known problems
      available if there is firmware support in the device.
      (This is the same as under Windows.)
 
-   * kvmlib is currently missing support for
-     Kvaser Memorator Light HS v2 (01058-1).
+
+New Features and Fixed Problems in V5.30   (08-OCT-2019)
+===========================================================================
+* Minor changes.
+
+
+New Features and Fixed Problems in V5.29   (13-SEP-2019)
+==========================================================================
+* SDK (canlib)
+  - The message data buffer is untouched when reading a remote request frame
+    as identified by the canMSG_RTR flag.
+  - canGetBusStatistics reports the same result if transmit acknowledge is 
+    off (0) or on (1). Transmit acknowledge is set by ioctl canIOCTL_SET_TXACK.
+  - Fixed a bug in kvFileCopyToDevice.
+
+  - Implemented the following tScript functions: 
+    kvScriptStatus and kvScriptLoadFileOnDevice.
+    kvScriptEnvvarOpen and kvScriptEnvvarClose.
+    kvScriptEnvvarSetInt and kvScriptEnvvarGetInt.
+    kvScriptEnvvarSetFloat and kvScriptEnvvarGetFloat.
+    kvScriptSendEvent.
+    kvScriptGetText and kvScriptRequestText.
+
+* SDK (kvlclib)
+  - Fixed a bug that, when a frame didn't have any signals in the dbc-file,
+    signal-names from other frames wheren't printed out.
+  - Added API function kvlcEventCountEx, handling the situation where the number
+    of events exceeds the size of an int.
+
+* SDK (kvadblib)
+  - Added API function GetLastParseError. Call GetLastParseError to get more
+    information if kvadblib encounters format issues when loading a database
+    from file.
+  - Fixed a bug where non J1939 frames was faulty determined as J1939 frames.
+  - Improved the behaviour when reading certain .dbc files with syntax errors
+    so as not to cause crashes.
+  - Flag KVADB_MESSAGE_J1939 is now set for J1939 frames in
+    call to kvaDbGetMsgFlags.
+
+* SDK (kvmlib)
+  - Added API functions kvmLogFileGetType.
+  - Added API functions kvmLogFileMountEx and kvmKmeCountEventsEx,
+    handling the situation where the number of events exceeds the size of an int.
+
+* Common
+  - fixed bug where a call to canIOCTL_TX_INTERVAL could cause a crash if 
+    TX_INTERVAL is unsupported by the device.
+  - BusStatistics increments between calls to canGetBusStatistics. Previously,
+    it was cleared. The function now has the same behavior as in Windows.
+
+* PCIEcan
+  - Implemented canGetBusStatistics for reading the busload value.
+  - BusStatistics now separates correctly on standard and extended id frames.
 
 
 New Features and Fixed Problems in V5.28   (12-MAY-2019)

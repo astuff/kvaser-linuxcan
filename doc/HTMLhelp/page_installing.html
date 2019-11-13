@@ -82,12 +82,14 @@ $(document).ready(function(){initNavTree('page_installing.html','');});
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#section_install_windows">Installing on Windows</a><ul><li class="level2"><a href="#section_install_driver_windows">Installing the Driver</a></li>
+<li class="level2"><a href="#section_install_virtual_device_windows">Installing Additional Virtual Devices</a></li>
 <li class="level2"><a href="#section_uninstall_driver_windows">Removing the driver</a></li>
 <li class="level2"><a href="#section_install_sdk_windows">Installing Kvaser CANlib SDK</a></li>
 <li class="level2"><a href="#section_uninstall_sdk_windows">Removing Kvaser CANlib SDK</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#section_install_linux">Installing on Linux</a><ul><li class="level2"><a href="#section_install_driver_linux">Installing the Driver</a></li>
+<li class="level2"><a href="#section_install_virtual_device_linux">Installing Virtual Devices</a></li>
 <li class="level2"><a href="#section_uninstall_driver_linux">Removing the driver</a></li>
 <li class="level2"><a href="#section_install_sdk_linux">Installing Kvaser CANlib SDK</a></li>
 <li class="level2"><a href="#section_uninstall_sdk_linux">Removing Kvaser CANlib SDK</a></li>
@@ -117,6 +119,24 @@ Installing the Driver</h2>
 <dd>
 For the PCI and PCI Express cards you may need to reload the driver manually or restart your computer to get the system to use the new driver.</dd></dl>
 <p>If you have trouble during installation, see <a class="el" href="page_user_guide_install.html#section_user_guide_build_installation_verification_3">Windows Installation troubleshooting</a>.</p>
+<h2><a class="anchor" id="section_install_virtual_device_windows"></a>
+Installing Additional Virtual Devices</h2>
+<p>By default, the Windows installer installs two Virtual Devices. If you need more, you can manually install additional Virtual Devices up to a maximum of 16. The first step is to increase the registry key "Computer\HKEY_LOCAL_MACHINE\SOFTWARE\KVASER AB\CANDriver 1.0\Drivers\kcanv\MaxCards" to the number of Virtual Devices needed.</p>
+<div class="image">
+<img src="reg_kcanv.png" alt="reg_kcanv.png"/>
+<div class="caption">
+Maximum number of allowed Virtual Devices is controlled by the MaxCards Registry Setting</div></div>
+<p> To increase the maximum number of allowed Virtual Devices to 8, copy the code below to a textfile, name it to "SetMaxKvaserVirtualDevices.reg", and execute the file by double clicking on it. You can also do the changes directly in the registry with Regedit.exe.</p>
+<div class="fragment"><div class="line">Windows Registry Editor Version 5.00</div><div class="line"></div><div class="line">[HKEY_LOCAL_MACHINE\SOFTWARE\KVASER AB\CANDriver 1.0\Drivers\kcanv]</div><div class="line"><span class="stringliteral">&quot;MaxCards&quot;</span>=dword:00000008</div><div class="line"><span class="stringliteral">&quot;DriverName&quot;</span>=<span class="stringliteral">&quot;kcanv&quot;</span></div></div><!-- fragment --><p>It is also possible to change the number of channels each Virtual Device has using the registry key "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\kcanv\Parameters\ChannelCount". By default, each Virtual Device has two channels.</p>
+<div class="fragment"><div class="line">Windows Registry Editor Version 5.00</div><div class="line"></div><div class="line">[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\kcanv\Parameters]</div><div class="line"><span class="stringliteral">&quot;ChannelCount&quot;</span>=dword:00000002</div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>A reboot of the system is required after changing the ChannelCount setting.</dd></dl>
+<p>To add a Virtual Device, start the "Hardware Wizard", by pressing "Win + R", type HDWWIZ and click OK. Go through the "Hardware Wizard" and select:</p>
+<ol type="1">
+<li>Select "Install the hardware that I manually select from a list (Advanced)", and click Next</li>
+<li>Select "CAN Hardware (Kvaser)", and click next</li>
+<li>Scroll down in the list of device driver and select "Kvaser Virtual CAN Driver", click Next</li>
+<li>Complete the installation by clicking Next and Finish.</li>
+</ol>
+<dl class="section note"><dt>Note</dt><dd>If you try and install more than 16 Kvaser Virtual CAN Drivers, the "Hardware Wizard" will notify you that "This device is not working properly because Windows cannot load the drivers required".</dd></dl>
 <h2><a class="anchor" id="section_uninstall_driver_windows"></a>
 Removing the driver</h2>
 <p>To remove the installed drivers, simply uninstall them using the Windows Control Panel.</p>
@@ -143,14 +163,18 @@ Installing the Driver</h2>
 <p>In Ubuntu e.g. installing header files is accomplished by issuing the command:</p>
 <div class="fragment"><div class="line">sudo apt-get install build-essential </div></div><!-- fragment --><p>On some systems you may need to install the Linux headers using something like:</p>
 <div class="fragment"><div class="line">sudo apt-get install linux-headers-`uname -r` </div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Having versions of the Linux headers installed other than that of the currently running kernel may cause conflicts and faulty drivers.</dd></dl>
-<p>To download and unpack the latest drivers you may use: </p><div class="fragment"><div class="line">wget --content-disposition <span class="stringliteral">&quot;https://www.kvaser.com/downloads-kvaser/?utm_source=software&amp;utm_ean=7330130980754&amp;utm_status=latest&quot;</span></div><div class="line">tar xvzf linuxcan.tar.gz</div><div class="line">cd linuxcan</div></div><!-- fragment --><p>To build (compile) all drivers use:</p>
+<p>To download and unpack the latest drivers you may use: </p><div class="fragment"><div class="line">wget --content-disposition <span class="stringliteral">&quot;https://www.kvaser.com/downloads-kvaser/?utm_source=software&amp;utm_ean=7330130980754&amp;utm_status=latest&quot;</span></div><div class="line">tar xvzf linuxcan.tar.gz</div><div class="line">cd linuxcan</div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Choose a path that doesn't contain any spaces for CANlib to build properly.</dd></dl>
+<p>To build (compile) all drivers use:</p>
 <div class="fragment"><div class="line">make </div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>It is advised to remove the old driver by calling <code>sudo make uninstall</code> before replacing the installed drivers.</dd></dl>
 <p>To install all drivers use:</p>
 <div class="fragment"><div class="line">sudo make install </div></div><!-- fragment --><p>To install and load, virtual and PCI drivers: </p><div class="fragment"><div class="line">sudo make load </div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Running <code>sudo make load</code> will also cause the virtual and PCI drivers to be loaded at boot time. This might be bad if experimenting with the device drivers.</dd>
 <dd>
 It is never required to manually install or load any modules, create or edit files. This is taken care of the Makefile, in the root of the linuxcan directory.</dd></dl>
 <p>More information can be found in the included README file.</p>
-<h2><a class="anchor" id="section_uninstall_driver_linux"></a>
+<h2><a class="anchor" id="section_install_virtual_device_linux"></a>
+Installing Virtual Devices</h2>
+<p>The driver named "virtualcan" controls the Virtual Devices. The number of channels each Virtual Device has, and the total number of Virtual Devices, is controlled by editing define statements in linuxcan\virtualcan\virtualcan.h.</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define NR_CHANNELS          2</span></div><div class="line"></div><div class="line"><span class="preprocessor">#define NR_VIRTUAL_DEV       1</span></div></div><!-- fragment --><h2><a class="anchor" id="section_uninstall_driver_linux"></a>
 Removing the driver</h2>
 <p>To unload and uninstall all drivers: </p><div class="fragment"><div class="line">sudo make uninstall </div></div><!-- fragment --><h2><a class="anchor" id="section_install_sdk_linux"></a>
 Installing Kvaser CANlib SDK</h2>
@@ -179,7 +203,7 @@ Hardware Installation</h1>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.28) Sun May 12 2019</li>
+    <li class="footer"> (canlib 5.30) Tue Oct 8 2019</li>
   </ul>
 </div>
 </body>

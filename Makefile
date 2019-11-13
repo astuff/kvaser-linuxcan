@@ -120,31 +120,31 @@ print_versions_start:
 canlib:
 	$(MAKE) -C canlib examples
 
-linlib:
+linlib: canlib
 	$(MAKE) -C linlib
 
 common:
 	@cd ./common; $(MAKE) kv_module
 
-pcican:
+pcican: common
 	@cd ./pcican; $(MAKE) kv_module
 
-pcican2:
+pcican2: common
 	@cd ./pcican2; $(MAKE) kv_module
 
-usbcanII:
+usbcanII: common
 	@cd ./usbcanII; $(MAKE) kv_module
 
-leaf:
+leaf: common
 	@cd ./leaf; $(MAKE) kv_module
 
-mhydra:
+mhydra: common
 	@cd ./mhydra; $(MAKE) kv_module
 
-virtualcan:
+virtualcan: common
 	@cd ./virtualcan; $(MAKE) kv_module
 
-pciefd:
+pciefd: common
 	@cd ./pciefd; $(MAKE) kv_module
 
 install:

@@ -97,6 +97,8 @@ Functions</h2></td></tr>
 <tr class="separator:ga4cb62b5a18c44a740b01f59548f5d2ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga689dc55a54efa5ba651a0f76422926ce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0">kvmStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvm__files.html#ga689dc55a54efa5ba651a0f76422926ce">kvmKmeCountEvents</a> (<a class="el" href="kvmlib_8h.html#a89789a9cbf53304f9818835b36edc6f7">kmeFileHandle</a> h, <a class="el" href="kvmlib_8h.html#acbd4acd0d29e2d6c43104827f77d9cd2">uint32</a> *eventCount)</td></tr>
 <tr class="separator:ga689dc55a54efa5ba651a0f76422926ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf1b07c3d80ebdca6f4d2ae96c98ae23f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0">kvmStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvm__files.html#gaf1b07c3d80ebdca6f4d2ae96c98ae23f">kvmKmeCountEventsEx</a> (<a class="el" href="kvmlib_8h.html#a89789a9cbf53304f9818835b36edc6f7">kmeFileHandle</a> h, <a class="el" href="kvlclib_8h.html#a7cde0074dfd288f2d70c0e035dacb28a">int64</a> *eventCount)</td></tr>
+<tr class="separator:gaf1b07c3d80ebdca6f4d2ae96c98ae23f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga63e7277573c63cec87c936635fc7d95c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0">kvmStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvm__files.html#ga63e7277573c63cec87c936635fc7d95c">kvmKmeCloseFile</a> (<a class="el" href="kvmlib_8h.html#a89789a9cbf53304f9818835b36edc6f7">kmeFileHandle</a> h)</td></tr>
 <tr class="separator:ga63e7277573c63cec87c936635fc7d95c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -147,6 +149,48 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="kvmlib_8h.html#acbd4acd0d29e2d6c43104827f77d9cd2">uint32</a> *&#160;</td>
+          <td class="paramname"><em>eventCount</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000007">Deprecated:</a></b></dt><dd>Use <a class="el" href="group__kvm__files.html#gaf1b07c3d80ebdca6f4d2ae96c98ae23f">kvmKmeCountEventsEx</a> instead.</dd></dl>
+<p>Count the number of events in a KME file.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>An open handle to a KME file. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">eventCount</td><td>Approximate number of events in a KME file.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0a9b0052303bcc63dc00ff1582a99dd52b">kvmOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="kvmlib_8h.html#kvmERR_xxx">kvmERR_xxx</a> (negative) if failure</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>if return value is <a class="el" href="kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0aae0a3d4ae63abd409071ab639340702d">kvmERR_RESULT_TOO_BIG</a>, use <a class="el" href="group__kvm__files.html#gaf1b07c3d80ebdca6f4d2ae96c98ae23f">kvmKmeCountEventsEx</a> instead.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvm__files.html#ga006f92f4fb82c0aad0351eda067b5d30">kvmKmeOpenFile()</a>, <a class="el" href="group__kvm__files.html#gae309647756ed973d31b8b1b01c1fa10d">kvmKmeCreateFile()</a> </dd></dl>
+
+</div>
+</div>
+<a id="gaf1b07c3d80ebdca6f4d2ae96c98ae23f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf1b07c3d80ebdca6f4d2ae96c98ae23f">&#9670;&nbsp;</a></span>kvmKmeCountEventsEx()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0">kvmStatus</a> kvmKmeCountEventsEx </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="kvmlib_8h.html#a89789a9cbf53304f9818835b36edc6f7">kmeFileHandle</a>&#160;</td>
+          <td class="paramname"><em>h</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="kvlclib_8h.html#a7cde0074dfd288f2d70c0e035dacb28a">int64</a> *&#160;</td>
           <td class="paramname"><em>eventCount</em>&#160;</td>
         </tr>
         <tr>
@@ -212,7 +256,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns an open handle to a KME file on success.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvm__files.html#ga4cb62b5a18c44a740b01f59548f5d2ff">kvmKmeWriteEvent()</a>, <a class="el" href="group__kvm__files.html#ga689dc55a54efa5ba651a0f76422926ce">kvmKmeCountEvents()</a>, <a class="el" href="group__kvm__files.html#ga63e7277573c63cec87c936635fc7d95c">kvmKmeCloseFile()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvm__files.html#ga4cb62b5a18c44a740b01f59548f5d2ff">kvmKmeWriteEvent()</a>, <a class="el" href="group__kvm__files.html#gaf1b07c3d80ebdca6f4d2ae96c98ae23f">kvmKmeCountEventsEx()</a>, <a class="el" href="group__kvm__files.html#ga63e7277573c63cec87c936635fc7d95c">kvmKmeCloseFile()</a> </dd></dl>
 
 </div>
 </div>
@@ -257,7 +301,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns an open handle to a KME file on success.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvm__files.html#ga2127d572c0e8cc83efaf6d8a6fe63f79">kvmKmeReadEvent()</a>, <a class="el" href="group__kvm__files.html#ga689dc55a54efa5ba651a0f76422926ce">kvmKmeCountEvents()</a>, <a class="el" href="group__kvm__files.html#ga63e7277573c63cec87c936635fc7d95c">kvmKmeCloseFile()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvm__files.html#ga2127d572c0e8cc83efaf6d8a6fe63f79">kvmKmeReadEvent()</a>, <a class="el" href="group__kvm__files.html#gaf1b07c3d80ebdca6f4d2ae96c98ae23f">kvmKmeCountEventsEx()</a>, <a class="el" href="group__kvm__files.html#ga63e7277573c63cec87c936635fc7d95c">kvmKmeCloseFile()</a> </dd></dl>
 
 </div>
 </div>
@@ -299,7 +343,7 @@ Functions</h2></td></tr>
 <a class="el" href="kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0a7330924117ebd8df015086b6cc6964f7">kvmERR_NOLOGMSG</a> on EOF </dd>
 <dd>
 <a class="el" href="kvmlib_8h.html#kvmERR_xxx">kvmERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvm__files.html#ga006f92f4fb82c0aad0351eda067b5d30">kvmKmeOpenFile()</a>, <a class="el" href="group__kvm__files.html#ga689dc55a54efa5ba651a0f76422926ce">kvmKmeCountEvents()</a>, <a class="el" href="group__kvm__files.html#ga63e7277573c63cec87c936635fc7d95c">kvmKmeCloseFile()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvm__files.html#ga006f92f4fb82c0aad0351eda067b5d30">kvmKmeOpenFile()</a>, <a class="el" href="group__kvm__files.html#gaf1b07c3d80ebdca6f4d2ae96c98ae23f">kvmKmeCountEventsEx()</a>, <a class="el" href="group__kvm__files.html#ga63e7277573c63cec87c936635fc7d95c">kvmKmeCloseFile()</a> </dd></dl>
 
 </div>
 </div>
@@ -379,7 +423,7 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0a9b0052303bcc63dc00ff1582a99dd52b">kvmOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="kvmlib_8h.html#kvmERR_xxx">kvmERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvm__files.html#gae309647756ed973d31b8b1b01c1fa10d">kvmKmeCreateFile()</a>, <a class="el" href="group__kvm__files.html#ga689dc55a54efa5ba651a0f76422926ce">kvmKmeCountEvents()</a>, <a class="el" href="group__kvm__files.html#ga63e7277573c63cec87c936635fc7d95c">kvmKmeCloseFile()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvm__files.html#gae309647756ed973d31b8b1b01c1fa10d">kvmKmeCreateFile()</a>, <a class="el" href="group__kvm__files.html#gaf1b07c3d80ebdca6f4d2ae96c98ae23f">kvmKmeCountEventsEx()</a>, <a class="el" href="group__kvm__files.html#ga63e7277573c63cec87c936635fc7d95c">kvmKmeCloseFile()</a> </dd></dl>
 
 </div>
 </div>
@@ -389,7 +433,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.28) Sun May 12 2019</li>
+    <li class="footer"> (canlib 5.30) Tue Oct 8 2019</li>
   </ul>
 </div>
 </body>

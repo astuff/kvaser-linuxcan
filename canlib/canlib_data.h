@@ -88,6 +88,27 @@ typedef LinkedList HandleList;
 
 struct CANops;
 
+
+typedef struct text_element_t { 
+  unsigned long  timeStamp;
+  unsigned char  slot;          // valid if flags = DM_FLAG_PRINTF
+  unsigned short flags;         // DM_FLAG_PRINTF, DM_FLAG_DEBUG, DM_FLAG_ERROR 
+  unsigned short total_payload;
+  char           *payload;      
+  unsigned short index;
+  
+  unsigned short state;
+  struct text_element_t *next;    
+} text_element_t;
+ 
+typedef struct {
+  text_element_t  *text_receiving;  // used to collect the text from the driver (state = 0 or 1)
+  text_element_t  *received_text_list;  // complete texts are moved from text_receiving to here (state = 2 or 3)
+  text_element_t  *last_received_text;  // point to the last received element in received_text_list; 
+  int             number_of_received_texts; // in received_text_list 
+} print_text_t;
+    
+
 // This struct is associated with each handle
 // returned by canOpenChannel
 typedef struct HandleData
@@ -121,6 +142,7 @@ typedef struct HandleData
   int                valid;
   uint32_t           capabilities;
   unsigned char      auto_reset;
+  print_text_t       print_text;  // printf text from scripts etc.
 } HandleData;
 
 
@@ -171,10 +193,24 @@ typedef struct CANOps
   canStatus (*kvFileDelete) (HandleData *, char *);
   canStatus (*kvFileCopyToDevice) (HandleData *, char *, char *);
   canStatus (*kvFileCopyFromDevice) (HandleData *, char *, char *);
+  canStatus (*kvScriptStatus) (HandleData *, int, unsigned int *);
   canStatus (*kvScriptStart) (HandleData *, int);
   canStatus (*kvScriptStop) (HandleData *, int, int);
   canStatus (*kvScriptLoadFile) (HandleData *, int, char *);
+  canStatus (*kvScriptLoadFileOnDevice) (HandleData *, int, char *);
   canStatus (*kvScriptUnload) (HandleData *, int);
+  canStatus (*kvScriptSendEvent) (HandleData *, int, int, int, unsigned int);
+  kvEnvHandle (*kvScriptEnvvarOpen) (HandleData *, char *, int *, int *);
+  canStatus (*kvScriptEnvvarClose) (HandleData *, int);
+  canStatus (*kvScriptEnvvarSetInt) (HandleData *, int, int); 
+  canStatus (*kvScriptEnvvarGetInt) (HandleData *, int, int *);
+  canStatus (*kvScriptEnvvarSetFloat) (HandleData *, int, float);
+  canStatus (*kvScriptEnvvarGetFloat) (HandleData *, int, float *);
+  canStatus (*kvScriptEnvvarSetData) (kvEnvHandle, void *, int, int);
+  canStatus (*kvScriptEnvvarGetData) (kvEnvHandle, void *, int, int);
+  canStatus (*kvScriptRequestText)  (HandleData *, unsigned int, unsigned int);
+  canStatus (*kvScriptGetText)  (HandleData *, int *, unsigned long *, unsigned int *, char *, size_t);
+
   canStatus (*accept)(HandleData *, const long, const unsigned int);
   canStatus (*write)(HandleData *, long, void *, unsigned int, unsigned int);
   canStatus (*writeWait)(HandleData *, long, void *,

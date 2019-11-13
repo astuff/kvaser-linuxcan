@@ -76,15 +76,18 @@
 
 /***************************************************************************/
 
+// If these values can't coexist (they can!!!), they ought to be contigues values instead
 enum e_vevent_type {
        V_NO_COMMAND            = 1,
-       V_RECEIVE_MSG           = 2,
+       V_RECEIVE_MSG           = 2,     // coexist with V_TRANSMIT_MSG and V_CHIP_STATE in filter.eventMask
        V_STATISTIC_STD         = 4,
        V_STATISTIC_EXT         = 8,
-       V_CHIP_STATE            = 16,
+       V_CHIP_STATE            = 16,    // (BusOn/BusOff) coexist with V_RECEIVE_MSG and V_TRANSMIT_MSG
        V_TRANSCEIVER           = 32,
        V_TIMER                 = 64,
-       V_TRANSMIT_MSG          = 128,
+       V_TRANSMIT_MSG          = 128,   // coexist with V_RECEIVE_MSG and V_CHIP_STATE
+	   V_ENVVAR_NOTIFY         = 5,     // new value 256 is too big if just 1 byte
+       V_PRINTF_MSG            = 9      // new value 512 is too big if just 1 byte
      };
 
 typedef unsigned char VeventTag;
@@ -132,7 +135,7 @@ struct s_vcan_msg {  /* 14 Bytes */
   uint32_t           id;
   unsigned short int flags;
   unsigned char      dlc;
-  unsigned char      data[MAX_MSG_LEN];
+  unsigned char      data[MAX_MSG_LEN];   // 128 bytes 
 };
 
 
@@ -171,7 +174,31 @@ struct s_vcan_statistic_ext {
 struct s_vcan_error {
          unsigned char code;
        };
+	   
 
+#define VCAN_EVT_PRINTF_HEADER 0
+#define VCAN_EVT_PRINTF_DATA   1
+
+// flags in printf_header
+#define DM_FLAG_PRINTF  0x8000
+#define DM_FLAG_DEBUG   0x4000
+#define DM_FLAG_ERROR   0x2000
+
+
+struct s_printf_msg {
+        unsigned char type;       // VCAN_EVT_PRINTF_HEADER or VCAN_EVT_PRINTF_DATA
+        union {
+          struct {
+            unsigned char  slot;  // valid if flags = DM_FLAG_PRINTF
+            unsigned short datalen;
+            unsigned short flags; // a combination of DM_FLAG_PRINTF, DM_FLAG_DEBUG, DM_FLAG_ERROR, DM_FLAG_FATAL, canSTAT_SW_OVERRUN, canSTAT_RX_PENDING
+          } printf_header;
+          struct {
+            char payload[13];
+          } printf_data;
+        };
+      };
+      
 
 /* Structure for SET_OUTPUT_MODE */
 #define OUTPUT_MODE_SILENT 0
@@ -217,6 +244,7 @@ union s_vcan_tag_data {
         struct s_vcan_statistic_std        statisticStd;
         struct s_vcan_statistic_ext        statisticExt;
         struct s_vcan_error                error;
+		    struct s_printf_msg                printfMsg;
       };
 
 
@@ -231,7 +259,7 @@ struct s_vcan_event {
                        tagData;         // 14 Bytes (_VMessage)
        };
                                         // --------
-                                        // 22 or 26 Bytes
+                                        // 22 or 26 Bytes   
 
 typedef struct s_vcan_event VCAN_EVENT, Vevent, *PVevent;
 

@@ -27,6 +27,8 @@ var kvmlib_8h =
     [ "kvmLOG_TYPE_MSG", "kvmlib_8h.html#a0b2af76c1e27843c5e38f4bfea9b34b5", null ],
     [ "kvmLOG_TYPE_TRIGGER", "kvmlib_8h.html#ae9f931597d0db1d586d596d5f23d1130", null ],
     [ "kvmLOG_TYPE_VERSION", "kvmlib_8h.html#a9806f64474224ff57bc79ceb5852cdc1", null ],
+    [ "kvmLogFileType_ALL", "kvmlib_8h.html#aad609602d533b2753f0877ad637c467a", null ],
+    [ "kvmLogFileType_ERR", "kvmlib_8h.html#abffb73d8a8966c9d43ade5e9a7ea2ac2", null ],
     [ "TRIGVAR_TYPE_DISK_FULL", "kvmlib_8h.html#a94460ad7c11dcd147dd48b79a3bf2630", null ],
     [ "TRIGVAR_TYPE_EXTERNAL", "kvmlib_8h.html#abdc8361fefcddc2ae8d776d387abef88", null ],
     [ "TRIGVAR_TYPE_MSG_DLC", "kvmlib_8h.html#aa94bbfc2b0128d0e7a06a9b2bea60d76", null ],
@@ -79,7 +81,8 @@ var kvmlib_8h =
       [ "kvmERR_USER_CANCEL", "kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0a125fb688529d3d7331e4c8f72a367a3d", null ],
       [ "kvmERR_FIRMWARE", "kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0a99999ed8b17616b36ac902fdbb1b7dcd", null ],
       [ "kvmERR_CONFIG_ERROR", "kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0ac97b3900c06622980cbde50a868bf2be", null ],
-      [ "kvmERR_WRITE_PROT", "kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0abbe3c46ebfc9e28a7b83ff302988613b", null ]
+      [ "kvmERR_WRITE_PROT", "kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0abbe3c46ebfc9e28a7b83ff302988613b", null ],
+      [ "kvmERR_RESULT_TOO_BIG", "kvmlib_8h.html#a9322852ff03e26fc018ce37afd28aab0aae0a3d4ae63abd409071ab639340702d", null ]
     ] ],
     [ "kvmClose", "group__kvm__connection.html#gacb9bdeb6c9325ee27543b51ee5f3e5b6", null ],
     [ "kvmDeviceDiskSize", "group__kvm__system__information.html#ga048e19e67784886e40d567afcb210d4d", null ],
@@ -98,6 +101,7 @@ var kvmlib_8h =
     [ "kvmInitialize", "group__kvm__initialization.html#ga59f41146c0cbea69a936edc1cdd6ebae", null ],
     [ "kvmKmeCloseFile", "group__kvm__files.html#ga63e7277573c63cec87c936635fc7d95c", null ],
     [ "kvmKmeCountEvents", "group__kvm__files.html#ga689dc55a54efa5ba651a0f76422926ce", null ],
+    [ "kvmKmeCountEventsEx", "group__kvm__files.html#gaf1b07c3d80ebdca6f4d2ae96c98ae23f", null ],
     [ "kvmKmeCreateFile", "group__kvm__files.html#gae309647756ed973d31b8b1b01c1fa10d", null ],
     [ "kvmKmeOpenFile", "group__kvm__files.html#ga006f92f4fb82c0aad0351eda067b5d30", null ],
     [ "kvmKmeReadEvent", "group__kvm__files.html#ga2127d572c0e8cc83efaf6d8a6fe63f79", null ],
@@ -118,6 +122,8 @@ var kvmlib_8h =
     [ "kvmLogFileGetCreatorSerial", "group__kvm__data__extraction.html#gab97303352868e3caa8d4dadae072a30b", null ],
     [ "kvmLogFileGetEndTime", "group__kvm__data__extraction.html#ga7f2f9c141e3a2c8e2feabfd134503607", null ],
     [ "kvmLogFileGetStartTime", "group__kvm__data__extraction.html#ga68a629a79c29a925274210a5acb3940c", null ],
+    [ "kvmLogFileGetType", "group__kvm__data__extraction.html#ga92a778d90d79e5f4df83f20e65557180", null ],
     [ "kvmLogFileMount", "group__kvm__data__extraction.html#ga8907a1d15397ebb55856c8eb1d6b9134", null ],
+    [ "kvmLogFileMountEx", "group__kvm__data__extraction.html#ga0554882347b158440d42ae0331d5ba1d", null ],
     [ "kvmLogFileReadEvent", "group__kvm__data__extraction.html#gafc50b92c12fda8d2fc7d40679d9d5b3c", null ]
 ];

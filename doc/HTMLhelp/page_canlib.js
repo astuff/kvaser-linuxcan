@@ -24,7 +24,15 @@ var page_canlib =
       [ "CAN Driver Modes", "page_user_guide_chips_channels.html#section_user_guide_init_driver_modes", null ],
       [ "Code Sample", "page_user_guide_chips_channels.html#code_sample", null ]
     ] ],
-    [ "Send and Receive CAN Messages", "page_user_guide_send_recv.html", [
+    [ "CAN Frame Types", "page_user_guide_can_frame_types_types.html", [
+      [ "CAN Data Frames", "page_user_guide_can_frame_types_types.html#section_user_guide_can_frame_types_data_frames", null ],
+      [ "CAN FD Data Frames", "page_user_guide_can_frame_types_types.html#section_user_guide_can_frame_types_fd_data_frames", null ],
+      [ "Error Frames", "page_user_guide_can_frame_types_types.html#section_user_guide_can_frame_types_error_frame", null ],
+      [ "Remote Requests", "page_user_guide_can_frame_types_types.html#section_user_guide_can_frame_types_remote_request", null ],
+      [ "Overload Frames", "page_user_guide_can_frame_types_types.html#section_user_guide_can_frame_types_overload_frames", null ],
+      [ "Other frame features of interest", "page_user_guide_can_frame_types_types.html#section_user_guide_can_frame_types_other", null ]
+    ] ],
+    [ "Send and Receive", "page_user_guide_send_recv.html", [
       [ "Bus On / Bus Off", "page_user_guide_send_recv.html#section_user_guide_send_recv_bus_on_off", null ],
       [ "Reading Messages", "page_user_guide_send_recv.html#section_user_guide_send_recv_reading", null ],
       [ "Acceptance Filters", "page_user_guide_send_recv.html#section_user_guide_send_recv_filters", [
@@ -74,8 +82,7 @@ var page_canlib =
       ] ]
     ] ],
     [ "Message Mailboxes", "page_user_guide_send_recv_mailboxes.html", [
-      [ "Message Queue and Buffer Sizes", "page_user_guide_send_recv_mailboxes.html#section_user_guide_send_recv_queue_and_buf_sizes", null ],
-      [ "Different CAN Frame Types", "page_user_guide_send_recv_mailboxes.html#section_user_guide_send_recv_sending_different_types", null ]
+      [ "Message Queue and Buffer Sizes", "page_user_guide_send_recv_mailboxes.html#section_user_guide_send_recv_queue_and_buf_sizes", null ]
     ] ],
     [ "User Data in Kvaser Devices", "page_user_guide_userdata.html", [
       [ "Trying out the concept", "page_user_guide_userdata.html#section_user_guide_userdata_trying", null ],

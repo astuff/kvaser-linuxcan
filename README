@@ -131,6 +131,8 @@ System requirements:
 
 Compilation:
 
+  NOTE! Choose a path that doesn't contain any spaces for CANlib to build properly.
+
 * To build all drivers:
 
     "make"

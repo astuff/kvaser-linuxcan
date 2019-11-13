@@ -150,7 +150,7 @@
 #define CMD_TRANSPORT_RESP                           92
 #define CMD_KDI                                      93
 
-// 94 can be used
+#define CMD_STORAGE                                  94
 
 #define CMD_GET_CAPABILITIES_REQ                     95
 #define CMD_GET_CAPABILITIES_RESP                    96
@@ -169,7 +169,11 @@
 #define CMD_LOG_TRIG                                107
 #define CMD_LOG_RTC_TIME                            108
 
-// 109 - 113 reserved
+#define CMD_SCRIPT_ENVVAR_CTRL_REQ                  109
+#define CMD_SCRIPT_ENVVAR_CTRL_RESP                 110
+#define CMD_SCRIPT_ENVVAR_TRANSFER_CTRL_REQ         111 // PC wants to set value in VM
+#define CMD_SCRIPT_ENVVAR_TRANSFER_CTRL_RESP        112 // PC wants to set value in VM
+#define CMD_SCRIPT_ENVVAR_TRANSFER_BULK             113 // PC wants to set value in VM
 
 #define CMD_SCRIPT_CTRL_REQ                         116
 #define CMD_SCRIPT_CTRL_RESP                        117
@@ -1924,6 +1928,26 @@ typedef struct {
   };
 } hcmdIOCmd;
 
+
+// Use with CMD_STORAGE
+#define STORAGE_SUBCMD_FORMAT_FAT32 1
+
+#define STORAGE_STATUS_OK                 1
+#define STORAGE_STATUS_NOT_IMPLEMENTED    2
+#define STORAGE_STATUS_ERROR              3
+
+typedef union {
+  uint8_t              buffer[24];
+} hstorageData;
+
+typedef struct {
+  uint8_t subCmdNo;       // STORAGE_SUBCMD_FORMAT etc
+  uint8_t status;         // STORAGE_STATUS...
+  uint8_t dioStatus;      // When applicable
+  uint8_t lioStatus;      // When applicable
+  hstorageData data;       // When applicable
+} hcmdStorageCmd;
+
 // Well-known HEs
 #define BROADCAST         0x0f
 #define BROADCAST_DEBUG   0x1f
@@ -2100,6 +2124,8 @@ typedef struct hydraHostCmd {
 
     hcmdKDICmd                    kdiCmd;
     hcmdIOCmd                     ioCmd;
+    
+    hcmdStorageCmd               storageCmd;
 
     hcmdHydraOtherCommand        o;
 
@@ -2219,5 +2245,8 @@ typedef struct {
     hcmdTxAckFd               txAckFd;
   };
 } hydraHostCmdExt;
+
+
+
 
 #endif //_HYDRA_HOST_CMDS_H_

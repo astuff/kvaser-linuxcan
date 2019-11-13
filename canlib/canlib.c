@@ -72,6 +72,7 @@
 #include "vcanevt.h"
 
 #include "VCanFunctions.h"
+#include "VCanScriptFunctions.h"
 #include "debug.h"
 
 
@@ -297,7 +298,7 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser Hybrid Pro 2xCAN/LIN",                       {0x30010420, 0x00073301}},
           {"Kvaser BlackBird Pro HS v2",                        {0x30009837, 0x00073301}},
           {"Kvaser Ethercan HS",                                {0x30009769, 0x00073301}},
-          {"Kvaser Memorator Light HS v2",                      {0x30010581, 0x00073301}}
+          {"Kvaser Memorator Light HS",                         {0x30010581, 0x00073301}}
 };
 
 static canStatus check_bitrate (const CanHandle hnd, unsigned int bitrate);
@@ -498,6 +499,8 @@ int CANLIBAPI canClose (const CanHandle hnd)
   if (close(hData->fd) != 0) {
     return canERR_INVHANDLE;
   }
+  
+  clear_print_text_data(hData);
 
   free(hData);
 
@@ -1360,7 +1363,7 @@ unsigned int CANLIBAPI canGetVersionEx(unsigned int itemCode)
           return (CANLIB_PRODUCT_MAJOR_VERSION << 8) + CANLIB_MINOR_VERSION;
 
       case canVERSION_CANLIB32_PRODVER32:
-          return (CANLIB_PRODUCT_MAJOR_VERSION << 16) +
+          return (CANLIB_MAJOR_VERSION << 16) +
                  (CANLIB_MINOR_VERSION << 8) +
                  prod_letter;
 
@@ -1950,13 +1953,16 @@ kvStatus CANLIBAPI kvReadDeviceCustomerData(const CanHandle hnd,
 
 /***************************************************************************/
 kvStatus CANLIBAPI kvScriptStatus(const CanHandle hnd,
-                                  int  slot,
+                                  int  slotNo,
                                   unsigned int *status)
 {
-  (void) hnd;
-  (void) slot;
-  (void) status;
-  return canERR_NOT_IMPLEMENTED;
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+  return hData->canOps->kvScriptStatus(hData, slotNo, status);
 }
 
 /***************************************************************************/
@@ -2002,13 +2008,48 @@ kvStatus CANLIBAPI kvScriptSendEvent(const CanHandle hnd,
                                       int eventNo,
                                       unsigned int data)
 {
-  (void) hnd;
-  (void) slotNo;
-  (void) eventType;
-  (void) eventNo;
-  (void) data;
-  return canERR_NOT_IMPLEMENTED;
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+  return hData->canOps->kvScriptSendEvent(hData, slotNo, eventType, eventNo, data);
 }
+
+/***************************************************************************/
+
+// Some functions dealing with the kvEnvHandle type
+
+// encode/decoce using ^
+
+#define HND_MASK 0x3141592658979323
+
+
+static int64_t EncodeHandle(int64_t ev) {
+  return (kvEnvHandle)(ev^HND_MASK);
+}
+
+static int64_t DecodeHandle(int64_t ev) {
+  return EncodeHandle(ev);
+}
+ 
+static canHandle GetCANLIBHandle(int64_t ev) {
+  int64_t hnd = DecodeHandle(ev);
+  return (hnd & 0xFFFFFFFF); 
+}
+
+static int GetENVVARHandle(int64_t ev) {
+  int64_t hnd = DecodeHandle(ev);
+  return (int)(hnd>>32);
+}
+
+/*
+static int GetENVVARHandle(int64_t ev) {
+  int64_t hnd = DecodeHandle(ev);
+  return (int)(hnd>>32);
+}
+*/ 
 
 /***************************************************************************/
 kvEnvHandle CANLIBAPI kvScriptEnvvarOpen(const CanHandle hnd,
@@ -2016,76 +2057,118 @@ kvEnvHandle CANLIBAPI kvScriptEnvvarOpen(const CanHandle hnd,
                                          int *envvarType,
                                          int *envvarSize)
 {
-  (void) hnd;
-  (void) envvarName;
-  (void) envvarType;
-  (void) envvarSize;
-  return canERR_NOT_IMPLEMENTED;
+  kvEnvHandle tmp;
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  tmp = hData->canOps->kvScriptEnvvarOpen(hData, envvarName, envvarType, envvarSize);
+
+  if (tmp < 0){
+    return tmp;
+  } else {
+    return EncodeHandle(tmp);
+  }
 }
 
 /***************************************************************************/
-kvStatus CANLIBAPI kvScriptEnvvarClose (kvEnvHandle eHnd)
+kvStatus CANLIBAPI kvScriptEnvvarClose(const kvEnvHandle eHnd)
 {
-  (void) eHnd;
-  return canERR_NOT_IMPLEMENTED;
+  HandleData *hData;
+
+  hData = findHandle(GetCANLIBHandle(eHnd));
+
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  return hData->canOps->kvScriptEnvvarClose(hData, GetENVVARHandle(eHnd));
 }
 
 /***************************************************************************/
-kvStatus CANLIBAPI kvScriptEnvvarSetInt(kvEnvHandle eHnd, int val)
+kvStatus CANLIBAPI kvScriptEnvvarSetInt(const kvEnvHandle eHnd, int val)
 {
-  (void) eHnd;
-  (void) val;
-  return canERR_NOT_IMPLEMENTED;
+  HandleData *hData;
+
+  hData = findHandle(GetCANLIBHandle(eHnd));
+
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  return hData->canOps->kvScriptEnvvarSetInt(hData, GetENVVARHandle(eHnd), val);
 }
 
 /***************************************************************************/
-kvStatus CANLIBAPI kvScriptEnvvarGetInt(kvEnvHandle eHnd, int *val)
+kvStatus CANLIBAPI kvScriptEnvvarGetInt(const kvEnvHandle eHnd, int *val)
 {
-  (void) eHnd;
-  (void) val;
-  return canERR_NOT_IMPLEMENTED;
+  HandleData *hData;
+
+  hData = findHandle(GetCANLIBHandle(eHnd));
+
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  return hData->canOps->kvScriptEnvvarGetInt(hData, GetENVVARHandle(eHnd), val);
 }
 
 /***************************************************************************/
-kvStatus CANLIBAPI kvScriptEnvvarSetFloat(kvEnvHandle eHnd, float val)
+kvStatus CANLIBAPI kvScriptEnvvarSetFloat(const kvEnvHandle eHnd, float val)
 {
-  (void) eHnd;
-  (void) val;
-  return canERR_NOT_IMPLEMENTED;
+  HandleData *hData;
+
+  hData = findHandle(GetCANLIBHandle(eHnd));
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+  return hData->canOps->kvScriptEnvvarSetFloat(hData, GetENVVARHandle(eHnd), val);
 }
 
 /***************************************************************************/
-kvStatus CANLIBAPI kvScriptEnvvarGetFloat(kvEnvHandle eHnd, float *val)
+kvStatus CANLIBAPI kvScriptEnvvarGetFloat(const kvEnvHandle eHnd, float *val)
 {
-  (void) eHnd;
-  (void) val;
-  return canERR_NOT_IMPLEMENTED;
+  HandleData *hData;
+
+  hData = findHandle(GetCANLIBHandle(eHnd));
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+  return hData->canOps->kvScriptEnvvarGetFloat(hData, GetENVVARHandle(eHnd), val);
 }
 
 /***************************************************************************/
-kvStatus CANLIBAPI kvScriptEnvvarSetData(kvEnvHandle eHnd,
+kvStatus CANLIBAPI kvScriptEnvvarSetData(const kvEnvHandle eHnd,
                                          void *buf,
                                          int start_index,
                                          int data_len)
 {
-  (void) eHnd;
-  (void) buf;
-  (void) start_index;
-  (void) data_len;
-  return canERR_NOT_IMPLEMENTED;
+  HandleData *hData;
+
+  hData = findHandle(GetCANLIBHandle(eHnd));
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+  return hData->canOps->kvScriptEnvvarSetData(eHnd, buf, start_index, data_len);
 }
 
 /***************************************************************************/
-kvStatus CANLIBAPI kvScriptEnvvarGetData(kvEnvHandle eHnd,
+kvStatus CANLIBAPI kvScriptEnvvarGetData(const kvEnvHandle eHnd,
                                          void *buf,
                                          int start_index,
                                          int data_len)
 {
-  (void) eHnd;
-  (void) buf;
-  (void) start_index;
-  (void) data_len;
-  return canERR_NOT_IMPLEMENTED;
+  HandleData *hData;
+
+  hData = findHandle(GetCANLIBHandle(eHnd));
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+  return hData->canOps->kvScriptEnvvarGetData(eHnd, buf, start_index, data_len);
 }
 
 /***************************************************************************/
@@ -2107,15 +2190,47 @@ kvStatus CANLIBAPI kvScriptLoadFileOnDevice(const CanHandle hnd,
                                             int slotNo,
                                             char *localFile)
 {
-  (void) hnd;
-  (void) slotNo;
-  (void) localFile;
-  return canERR_NOT_IMPLEMENTED;
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  return hData->canOps->kvScriptLoadFileOnDevice(hData, slotNo, localFile);
 }
 
 /***************************************************************************/
+kvStatus CANLIBAPI kvScriptRequestText(const CanHandle hnd,
+                                       unsigned int slot,
+                                       unsigned int request)
+{
+  HandleData *hData;
 
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+  return hData->canOps->kvScriptRequestText(hData, slot, request);
+}
+							
+/***************************************************************************/
+kvStatus CANLIBAPI kvScriptGetText(const CanHandle hnd,
+                                   int  *slot,
+                                   unsigned long *time,
+                                   unsigned int  *flags,
+                                   char *buf,
+                                   size_t bufsize)
+{
+  HandleData *hData;
 
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+  
+  return hData->canOps->kvScriptGetText(hData, slot, time, flags, buf, bufsize);
+}
 
 
 static void InitializeListHead (LIST_ENTRY *head)
@@ -2791,6 +2906,7 @@ kvStatus CANLIBAPI kvSetNotifyCallback(const CanHandle hnd,
 void CANLIBAPI canInitializeLibrary (void)
 {
   if (Initialized != TRUE) {
+    vCanScript_envvar_init();
     memset(&timeDomains, 0, sizeof(kvTimeDomainHead));
     if (pthread_mutex_init(&timeDomains.critSect, PTHREAD_PROCESS_PRIVATE)) {
       PRINTF_TIMEDOMAIN(("canInitializeLibrary: pthread_mutex_init failed\n"));

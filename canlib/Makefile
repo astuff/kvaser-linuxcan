@@ -90,6 +90,7 @@ SRCS += VCanFunctions.c
 SRCS += VCanFuncUtil.c
 SRCS += VCanMemoFunctions.c
 SRCS += VCanScriptFunctions.c
+SRCS += md5.c
 SRCS += txe.c
 SRCS += txe_fopen.c
 SRCS += dlc.c

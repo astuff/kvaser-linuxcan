@@ -73,6 +73,7 @@ INCLUDES := $(src)/../include/
 
 # source files
 SRCS := mhydraHWIf.c
+SRCS += mhydraHWIf_TRP.c
 SRCS += ioctl_handler.c
 
 ifneq ($(KERNELRELEASE),)

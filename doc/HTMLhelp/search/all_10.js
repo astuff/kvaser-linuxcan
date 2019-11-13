@@ -10,7 +10,7 @@ var searchData=
   ['sample_20programs_20_28canlib_29',['Sample Programs (CANlib)',['../page_user_guide_canlib_samples.html',1,'page_canlib']]],
   ['sample_20programs_20_28kvadblib_29',['Sample Programs (kvaDBLib)',['../page_user_guide_kvadblib_samples.html',1,'page_kvadblib_user_guide_intro']]],
   ['sample_20programs_20_28kvrlib_29',['Sample Programs (kvrlib)',['../page_user_guide_kvrlib_samples.html',1,'']]],
-  ['send_20and_20receive_20can_20messages',['Send and Receive CAN Messages',['../page_user_guide_send_recv.html',1,'page_canlib']]],
+  ['send_20and_20receive',['Send and Receive',['../page_user_guide_send_recv.html',1,'page_canlib']]],
   ['serialnumber',['serialNumber',['../structkvm_log_version_ex.html#a1f36efa76fac084b62745c8e8ed0a751',1,'kvmLogVersionEx']]],
   ['start_5fpos',['start_pos',['../structtag__token.html#a9715e2df77829e54cb078a298fd6c434',1,'tag_token']]],
   ['status',['status',['../structcan_notify_data.html#a345c20017f48fbb3fb2b3adada292f29',1,'canNotifyData']]],

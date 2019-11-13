@@ -98,6 +98,16 @@
 #define TX_CHAN_BUF_SIZE  500
 
 /*****************************************************************************/
+/* TXACK_<> used by modeTx. see canIOCTL_SET_TXACK for details.              */
+/*****************************************************************************/
+
+#define TXACK_OFF       0   // txack off, but still on for drivers internal usage
+#define TXACK_ON        1   // txack on
+#define TXACK_DISABLED  2   // txack completely disabled even for the drivers internal usage
+
+
+
+/*****************************************************************************/
 /*  From vcanio.h                                                            */
 /*****************************************************************************/
 
@@ -201,7 +211,8 @@ typedef struct VCanChanData
     unsigned char            driverMode;
     unsigned char            analyzerAttached;
     int                      linMode;  // _STATUS_LIN_MASTER or _STATUS_LIN_SLAVE
-
+		  
+		  
     /* Transmit buffer */
     CAN_MSG                  txChanBuffer[TX_CHAN_BUF_SIZE];
     Queue                    txChanQueue;
@@ -309,16 +320,18 @@ typedef struct
     int                     lastEmpty;
     int                     lastNotEmpty;
 #endif
+    wait_queue_head_t       rxWaitQ;
+    int                     size;
     VCAN_EVENT              fileRcvBuffer[FILE_RCV_BUF_SIZE];
     uint8_t                 valid[FILE_RCV_BUF_SIZE];
-    int                     size;
-    wait_queue_head_t       rxWaitQ;
 } VCanReceiveData;
+
 
 /* File pointer specific data */
 typedef struct VCanOpenFileNode {
     struct completion        ioctl_completion;
     VCanReceiveData          rcv;
+    VCanReceiveData          rcv_text;   // printf texts
     unsigned char            transId;
     struct file             *filp;
     struct VCanChanData     *chanData;
@@ -341,6 +354,12 @@ typedef struct VCanOpenFileNode {
     struct VCanOpenFileNode *next;
     uint8_t                  init_access;
     uint64_t                 time_start_10usec;
+	
+	  // for printf from scripts	
+    unsigned int  message_subscriptions_mask;
+    unsigned int  debug_subscriptions_mask;
+    unsigned int  error_subscriptions_mask;
+    unsigned int  printf_queue_overrun;	
 } VCanOpenFileNode;
 
 
@@ -411,6 +430,10 @@ typedef struct VCanHWInterface {
     int (*memoDiskIo)           (const VCanChanData *chd);
     int (*memoDiskIoFast)       (const VCanChanData *chd);
     int (*cleanUpHnd)           (VCanChanData *vChan);
+    int (*deviceMessagesSubscription) (VCanOpenFileNode *fileNodePtr, KCAN_IOCTL_DEVICE_MESSAGES_SUBSCRIPTION_T *sc);
+    int (*script_envvar_control) (const VCanChanData *chd, KCAN_IOCTL_ENVVAR_GET_INFO_T *sc);
+    int (*script_envvar_put)     (const VCanChanData *chd, KCAN_IOCTL_SCRIPT_SET_ENVVAR_T *sc);
+    int (*script_envvar_get)     (const VCanChanData *chd, KCAN_IOCTL_SCRIPT_GET_ENVVAR_T *sc);
 } VCanHWInterface;
 
 #define SKIP_ERROR_EVENT 0
@@ -449,6 +472,8 @@ void            kv_do_gettimeofday (struct timeval *tv);
 int             vCanInitData(VCanCardData *chd);
 int             vCanTime(VCanCardData *vCard, uint64_t *time);
 int             vCanDispatchEvent(VCanChanData *chd, VCAN_EVENT *e);
+int             vCanDispatchPrintfEvent (VCanCardData *vCard, VCanChanData *vChan,
+                                         VCAN_EVENT *printf_evHeader, char* data);
 int             vCanFlushSendBuffer(VCanChanData *chd);
 unsigned long   getQLen(unsigned long head, unsigned long tail, unsigned long size);
 int             vCanInit(VCanDriverData *, unsigned);
@@ -457,5 +482,7 @@ int             vCanGetCardInfo(VCanCardData *, VCAN_IOCTL_CARD_INFO *);
 int             vCanGetCardInfo2(VCanCardData *, KCAN_IOCTL_CARD_INFO_2 *);
 struct timeval  vCanCalc_dt(struct timeval *start); //returns now-start
 void            vCanCardRemoved(VCanChanData *chd);
+int             vCanPopReceiveBuffer (VCanReceiveData *rcv);
+int             vCanPushReceiveBuffer (VCanReceiveData *rcv);
 
 #endif /* _VCAN_OS_IF_H_ */

@@ -690,7 +690,7 @@ LinStatus LINLIBAPI linUpdateMessage(LinHandle h, unsigned int id, const void *m
   *
  * \param[in] h        A handle to an open LIN channel.
  * \param[in] id       The identifier of the LIN message.
- * \param[in] cFlags   One or more of the \ref LIN_MSG_DISTURB_xxx flags.
+ * \param[in] cFlags   One or more of the \ref LIN_MSG_DISTURB_xxx or \ref LIN_MSG_USE_xxx flags.
  * \param[in] delay    The delay parameter will result in a delay of this many
  *                     bittimes after the header and before the first data byte.
  *
@@ -725,11 +725,11 @@ LinStatus LINLIBAPI linSetupIllegalMessage(LinHandle h, unsigned int id,
  * @{
  */
 /**
- * Use enhanced (2.x) parity for the specified msg
+ * Use standard (1.x) parity for the specified msg
  */
 #define LIN_MSG_USE_STANDARD_PARITY 0x04
 /**
- * Use standard (1.x) parity for the specified msg
+ * Use enhanced (2.x) parity for the specified msg
  */
 #define LIN_MSG_USE_ENHANCED_PARITY 0x08
 /** @} */

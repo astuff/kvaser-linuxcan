@@ -185,7 +185,7 @@ var searchData=
   ['cangetrawhandle',['canGetRawHandle',['../group___c_a_n.html#gaa1229ae7635c051a8f7fe545d9d8007a',1,'canlib.h']]],
   ['cangetversion',['canGetVersion',['../group__can__general.html#gafb5688859c56ecb6f8d85705d3ec2f14',1,'canlib.h']]],
   ['cangetversionex',['canGetVersionEx',['../group__can__general.html#ga0803bc56e8695150563a48df2c14db5f',1,'canlib.h']]],
-  ['canhandle',['CanHandle',['../canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510',1,'CanHandle():&#160;canlib.h'],['../canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65',1,'canHandle():&#160;canlib.h']]],
+  ['canhandle',['canHandle',['../canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65',1,'canHandle():&#160;canlib.h'],['../canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510',1,'CanHandle():&#160;canlib.h']]],
   ['canhwtype_5facquisitor',['canHWTYPE_ACQUISITOR',['../canlib_8h.html#a51381247d42f9cd06d01c1e6b5cbc31d',1,'canlib.h']]],
   ['canhwtype_5fbagel',['canHWTYPE_BAGEL',['../canlib_8h.html#a84dac412ba62ca2ba041b62ba6d9b658',1,'canlib.h']]],
   ['canhwtype_5fblackbird',['canHWTYPE_BLACKBIRD',['../canlib_8h.html#ac2aa6e66455c7b4e50764652b3bd1876',1,'canlib.h']]],
@@ -443,5 +443,6 @@ var searchData=
   ['converter_20api_20_28kvlclib_29',['Converter API (kvlclib)',['../page_kvlclib.html',1,'']]],
   ['c_2b_2b_3a_20canlibtutorial_2c_20vs2017',['C++: CanlibTutorial, VS2017',['../page_tutorial_cpp_canlib_vs2017.html',1,'page_tutorial']]],
   ['c_23_20canlibtutorial_2c_20vs2017',['C# CanlibTutorial, VS2017',['../page_tutorial_csharp_canlib_vs2017.html',1,'page_tutorial']]],
-  ['compiling_20and_20compatibility',['Compiling and Compatibility',['../page_user_guide_build.html',1,'page_canlib']]]
+  ['compiling_20and_20compatibility',['Compiling and Compatibility',['../page_user_guide_build.html',1,'page_canlib']]],
+  ['can_20frame_20types',['CAN Frame Types',['../page_user_guide_can_frame_types_types.html',1,'page_canlib']]]
 ];
