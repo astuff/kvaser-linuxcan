@@ -188,6 +188,7 @@ static int pciCanInitAllDevices(void);
 static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par);
 static int pciCanGetBusParams (VCanChanData *vChd, VCanBusParams *par);
 static int pciCanSetOutputMode (VCanChanData *vChd, int silent);
+static int pciCanGetOutputMode (VCanChanData *vChd, int *silent);
 static int pciCanSetTranceiverMode (VCanChanData *vChd, int linemode, int resnet);
 static int pciCanReqBusStats (VCanChanData *vChan);
 static int pciCanBusOn (VCanChanData *vChd);
@@ -216,6 +217,7 @@ static VCanHWInterface hwIf = {
   .setBusParams       = pciCanSetBusParams,
   .getBusParams       = pciCanGetBusParams,
   .setOutputMode      = pciCanSetOutputMode,
+  .getOutputMode      = pciCanGetOutputMode,
   .setTranceiverMode  = pciCanSetTranceiverMode,
   .busOn              = pciCanBusOn,
   .busOff             = pciCanBusOff,
@@ -1602,6 +1604,7 @@ static int pciCanGetBusParams (VCanChanData *vChd, VCanBusParams *par)
 } // pciCanGetBusParams
 
 
+
 //======================================================================
 //  Set silent or normal mode
 //======================================================================
@@ -1633,6 +1636,28 @@ static int pciCanSetOutputMode (VCanChanData *vChd, int silent)
   return VCAN_STAT_OK;
 } // pciCanSetOutputMode
 
+
+//======================================================================
+//  Get silent or normal mode
+//======================================================================
+static int pciCanGetOutputMode (VCanChanData *vChd, int *silent)
+{
+  PciCanChanData *hChd = vChd->hwChanData;
+  unsigned long irqFlags;
+  uint32_t mode;
+
+  if (!vChd || !silent) return VCAN_STAT_BAD_PARAMETER;
+
+  spin_lock_irqsave(&hChd->lock, irqFlags);
+
+  mode = IORD_PCIEFD_MOD(hChd->canControllerBase);
+
+  *silent = !!(mode & PCIEFD_MOD_LOM_MSK);
+
+  spin_unlock_irqrestore(&hChd->lock, irqFlags);
+
+  return VCAN_STAT_OK;
+}
 
 //======================================================================
 //  Line mode

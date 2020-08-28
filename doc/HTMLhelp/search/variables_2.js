@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['data',['data',['../structkvm_log_msg_ex.html#a62823cfc5356727ed036cea88e873777',1,'kvmLogMsgEx']]],
-  ['dlc',['dlc',['../structkvm_log_msg_ex.html#a7d3cf80248d9011329b4b269f8b7d2c4',1,'kvmLogMsgEx']]]
+  ['calendartime',['calendarTime',['../structkvm_log_rtc_clock_ex.html#a144eaa57942f3e7ff88a173437737edf',1,'kvmLogRtcClockEx']]],
+  ['channel',['channel',['../structkvm_log_msg_ex.html#aeec5b590ec61f511a514428c6cb22937',1,'kvmLogMsgEx']]],
+  ['checksum',['checkSum',['../struct_lin_message_info.html#a0890e48334b4123d76276b8341d3d82c',1,'LinMessageInfo']]]
 ];

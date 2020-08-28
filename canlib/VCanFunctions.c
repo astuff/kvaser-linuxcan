@@ -592,15 +592,6 @@ static canStatus vCanOpenChannel (HandleData *hData)
     }
 
     hData->report_access_errors = 0;
-
-    if (my_arg.wants_init_access) {
-      canStatus status;
-      status = vCanSetBusOutputControl(hData, canDRIVER_NORMAL);
-      if (status < canOK) {
-        close(hData->fd);
-        return status;
-      }
-    }
   }
 
   ret = ioctl(hData->fd, VCAN_IOC_GET_CHAN_CAP, &capability);
@@ -1283,24 +1274,26 @@ static canStatus vCanScriptEnvvarGetFloat(HandleData *hData, int envvarIdx, floa
 //======================================================================
 // vCanScriptEnvvarSetData
 //======================================================================
-static canStatus vCanScriptEnvvarSetData(kvEnvHandle eHnd, 
+static canStatus vCanScriptEnvvarSetData(HandleData *hData,
+                                         int envvarIdx,
                                          void *buf,
                                          int start_index,
                                          int data_len)
 {
-  return vCanScript_envvar_set_data(eHnd, buf, start_index, data_len); 
-}  
+  return vCanScript_envvar_set_data(hData, envvarIdx, buf, start_index, data_len);
+}
 
 
 //======================================================================
 // vCanScriptEnvvarGetData
 //======================================================================
-static canStatus vCanScriptEnvvarGetData(kvEnvHandle eHnd,
+static canStatus vCanScriptEnvvarGetData(HandleData *hData,
+                                         int envvarIdx,
                                          void *buf,
                                          int start_index,
                                          int data_len)
 {
-  return vCanScript_envvar_get_data(eHnd, buf, start_index, data_len);
+  return vCanScript_envvar_get_data(hData, envvarIdx, buf, start_index, data_len);
 }
 
 

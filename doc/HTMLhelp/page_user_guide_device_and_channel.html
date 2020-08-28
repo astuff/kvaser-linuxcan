@@ -94,7 +94,7 @@ Identifying Devices and Channels</h1>
 <p><b>Example</b>. This code snippet prints the number of enumerated channels found in the PC.</p>
 <div class="fragment"><div class="line">stat = <a class="code" href="group__can__general.html#ga65169ca633cd30aa92b8a80e28a5378b">canGetNumberOfChannels</a>(&amp;chanCount);</div><div class="line"><span class="keywordflow">if</span> (stat &lt; 0) ... ;</div><div class="line"><span class="keywordflow">if</span> (chanCount &lt; 0 || chanCount &gt; 300) {</div><div class="line">    printf(<span class="stringliteral">&quot;ChannelCount = %d but I don&#39;t believe it.\n&quot;</span>, chanCount);</div><div class="line">    exit(1); <span class="comment">// Error</span></div><div class="line">} <span class="keywordflow">else</span> {</div><div class="line">    printf(<span class="stringliteral">&quot;%d channels.\n&quot;</span>, chanCount);</div><div class="line">}</div></div><!-- fragment --><h1><a class="anchor" id="section_user_guide_unique_device"></a>
 Channel Information</h1>
-<p>Use <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a> to obtain data for a specific channel, for example, the hardware type of the CAN interface.</p>
+<p>Use <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a> to obtain data for a specific channel, for example, the hardware type of the CAN interface. The same information can also be retrieved using <a class="el" href="group___c_a_n.html#ga909e5c14b09fe76bad280475138d503e">canGetHandleData()</a>, which instead takes an active <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a>.</p>
 <p>To uniquely identify a device, we need to look at both the <a class="el" href="canlib_8h.html#a9062beaa59d9787667bac6cbbc6b4e20">canCHANNELDATA_CARD_UPC_NO</a> and <a class="el" href="canlib_8h.html#a8b3b4903a766565c95afd7c90f76d994">canCHANNELDATA_CARD_SERIAL_NO</a>.</p>
 <p>Use <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a> to obtain various pieces of information for a specific handle, or to perform special operations.</p>
 <p><b>Example</b>. This code snippet loops through all known channels and prints the type of the CAN card they're on.</p>
@@ -110,7 +110,7 @@ Setting the device's Channel Name from inside Kvaser Device Guide</div></div>
 <h1><a class="anchor" id="section_user_guide_virtual"></a>
 Virtual Channels</h1>
 <p>CANlib supports virtual channels that you can use for development, test, or demonstration purposes when you don't have any hardware installed.</p>
-<p>For installation information, see <a class="el" href="page_installing.html#section_install_virtual_device_linux">Installing Virtual Devices</a> on Linux and <a class="el" href="page_installing.html#section_install_virtual_device_windows">Installing Additional Virtual Devices</a> for Windows.</p>
+<p>For installation information, see <a class="el" href="section_install_linux.html#section_install_virtual_device_linux">Installing Virtual Devices</a> on Linux and <a class="el" href="section_install_windows.html#section_install_virtual_device_windows">Installing Additional Virtual Devices</a> for Windows.</p>
 <p>There are 32 virtual busses on each virtual device, and you can connect any virtual channel to any virtual bus on the same virtual device. The default connection of a virtual device is that all of it's channels are connected to the same virtual bus.</p>
 <dl class="section note"><dt>Note</dt><dd>The virtual busses are not shared between the virtual devices.</dd></dl>
 <p>We can use <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a> with <a class="el" href="canlib_8h.html#a4d08b72dd42b68dbac4c3367ff5dc749">canIOCTL_DISCONNECT_FROM_VIRTUAL_BUS</a> to disconnect a virtual channel from a virtual bus. Similarly, <a class="el" href="canlib_8h.html#a313cdb4388e60d7ff769313694a153de">canIOCTL_CONNECT_TO_VIRTUAL_BUS</a> can be used to connect the now disconnected virtual channel to a new virtual bus.</p>
@@ -123,7 +123,7 @@ Virtual Channels</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li>
-    <li class="footer"> (canlib 5.30) Tue Oct 8 2019</li>
+    <li class="footer"> (canlib 5.31) Mon Feb 24 2020</li>
   </ul>
 </div>
 </body>

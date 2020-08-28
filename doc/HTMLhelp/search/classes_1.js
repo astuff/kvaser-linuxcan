@@ -1,6 +1,10 @@
 var searchData=
 [
   ['kvadbprotocolproperties',['KvaDbProtocolProperties',['../struct_kva_db_protocol_properties.html',1,'']]],
+  ['kviomoduleanalog',['kvIoModuleAnalog',['../structkv_io_module_analog.html',1,'']]],
+  ['kviomoduledigital',['kvIoModuleDigital',['../structkv_io_module_digital.html',1,'']]],
+  ['kviomoduleinternal',['kvIoModuleInternal',['../structkv_io_module_internal.html',1,'']]],
+  ['kviomodulerelay',['kvIoModuleRelay',['../structkv_io_module_relay.html',1,'']]],
   ['kvmlogeventex',['kvmLogEventEx',['../structkvm_log_event_ex.html',1,'']]],
   ['kvmlogmsgex',['kvmLogMsgEx',['../structkvm_log_msg_ex.html',1,'']]],
   ['kvmlogrtcclockex',['kvmLogRtcClockEx',['../structkvm_log_rtc_clock_ex.html',1,'']]],

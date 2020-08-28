@@ -112,6 +112,10 @@ Functions</h2></td></tr>
 <tr class="separator:ga209b5932e8abf5e085c778d0dcac78ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga78dd0cebc929d0c0d2b801943c6b0ddc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kv__io.html#ga78dd0cebc929d0c0d2b801943c6b0ddc">kvIoPinGetOutputAnalog</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int pin, float *value)</td></tr>
 <tr class="separator:ga78dd0cebc929d0c0d2b801943c6b0ddc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7a16c491567db189b36428fe1976364b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kv__io.html#ga7a16c491567db189b36428fe1976364b">kvIoGetModulePins</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int module, void *buffer, const unsigned int bufsize)</td></tr>
+<tr class="separator:ga7a16c491567db189b36428fe1976364b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga32257d2f426a766a67d689eef5336b81"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kv__io.html#ga32257d2f426a766a67d689eef5336b81">kvIoSetModulePins</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, unsigned int module, const void *buffer, const unsigned int bufsize)</td></tr>
+<tr class="separator:ga32257d2f426a766a67d689eef5336b81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Functions related to handling I/O pins. </p>
@@ -142,6 +146,65 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kv__io.html">I/O Pin Handling</a> </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Preliminary API that may change. </dd>
+<dd>
+Not implemented in Linux. </dd></dl>
+
+</div>
+</div>
+<a id="ga7a16c491567db189b36428fe1976364b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga7a16c491567db189b36428fe1976364b">&#9670;&nbsp;</a></span>kvIoGetModulePins()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> kvIoGetModulePins </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a>&#160;</td>
+          <td class="paramname"><em>hnd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>module</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>bufsize</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This function is used to read all the pins on one module in a single call.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">module</td><td>The module number, see <a class="el" href="canlib_8h.html#a615221bf13f09e226d9f2fc0a2bdf0ce">kvIO_INFO_GET_MODULE_NUMBER</a>. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">buffer</td><td>A pointer to a struct that receives the pin values of the module. The struct can be any one of the following depending on the module. The returned type is described in the first byte of the returned struct. See:<ul>
+<li><a class="el" href="structkv_io_module_digital.html">kvIoModuleDigital</a></li>
+<li><a class="el" href="structkv_io_module_analog.html">kvIoModuleAnalog</a></li>
+<li><a class="el" href="structkv_io_module_relay.html">kvIoModuleRelay</a> </li>
+</ul>
+</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">bufsize</td><td>The size of the struct pointed to by buffer</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kv__io.html#ga32257d2f426a766a67d689eef5336b81">kvIoSetModulePins()</a> </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Preliminary API that may change. </dd>
 <dd>
 Not implemented in Linux. </dd></dl>
@@ -690,13 +753,74 @@ Not implemented in Linux. </dd></dl>
 
 </div>
 </div>
+<a id="ga32257d2f426a766a67d689eef5336b81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga32257d2f426a766a67d689eef5336b81">&#9670;&nbsp;</a></span>kvIoSetModulePins()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> kvIoSetModulePins </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a>&#160;</td>
+          <td class="paramname"><em>hnd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>module</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned int&#160;</td>
+          <td class="paramname"><em>bufsize</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This function is used to set all the pins on one single module in a single call.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">module</td><td>The module number, see <a class="el" href="canlib_8h.html#a615221bf13f09e226d9f2fc0a2bdf0ce">kvIO_INFO_GET_MODULE_NUMBER</a>. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">buffer</td><td>A pointer to a struct that contains the module type and pin values to set. The struct can be any one of the following depending on the module.<ul>
+<li><a class="el" href="structkv_io_module_digital.html">kvIoModuleDigital</a></li>
+<li><a class="el" href="structkv_io_module_analog.html">kvIoModuleAnalog</a></li>
+<li><a class="el" href="structkv_io_module_relay.html">kvIoModuleRelay</a> </li>
+</ul>
+</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">bufsize</td><td>The size of the struct pointed to by buffer</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kv__io.html#ga7a16c491567db189b36428fe1976364b">kvIoGetModulePins()</a> </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Note The input Pins are ignored. </dd>
+<dd>
+Preliminary API that may change. </dd>
+<dd>
+Not implemented in Linux. </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.30) Tue Oct 8 2019</li>
+    <li class="footer"> (canlib 5.31) Mon Feb 24 2020</li>
   </ul>
 </div>
 </body>

@@ -10,7 +10,7 @@ var searchData=
   ['time_5fint64',['time_int64',['../kvlclib_8h.html#a2ac7d78d16323e3284c868eebad5816a',1,'kvlclib.h']]],
   ['time_5fuint64',['time_uint64',['../kvlclib_8h.html#a65349619e17d6a7f0eebd73e0ead78b9',1,'kvlclib.h']]],
   ['time_20domain_20handling',['Time Domain Handling',['../group___time_domain_handling.html',1,'']]],
-  ['timestamp',['timestamp',['../struct_lin_message_info.html#acba7776dcc1861edfe0e9c5736de4df8',1,'LinMessageInfo::timestamp()'],['../structkvm_log_msg_ex.html#aa1fa735b38f32cc201831ea72527ec37',1,'kvmLogMsgEx::timeStamp()'],['../structkvm_log_rtc_clock_ex.html#aa1fa735b38f32cc201831ea72527ec37',1,'kvmLogRtcClockEx::timeStamp()'],['../structkvm_log_trigger_ex.html#aa1fa735b38f32cc201831ea72527ec37',1,'kvmLogTriggerEx::timeStamp()']]],
+  ['timestamp',['timeStamp',['../structkvm_log_msg_ex.html#aa1fa735b38f32cc201831ea72527ec37',1,'kvmLogMsgEx::timeStamp()'],['../structkvm_log_rtc_clock_ex.html#aa1fa735b38f32cc201831ea72527ec37',1,'kvmLogRtcClockEx::timeStamp()'],['../structkvm_log_trigger_ex.html#aa1fa735b38f32cc201831ea72527ec37',1,'kvmLogTriggerEx::timeStamp()'],['../struct_lin_message_info.html#acba7776dcc1861edfe0e9c5736de4df8',1,'LinMessageInfo::timestamp()']]],
   ['token',['Token',['../kva_memo_lib_x_m_l_8h.html#a800eb995a1fb167d0bf534bf8e245416',1,'kvaMemoLibXML.h']]],
   ['trig',['trig',['../structkvm_log_event_ex.html#a5ba860ad33a6d0976c7f2e0a8ed80bba',1,'kvmLogEventEx']]],
   ['trigmask',['trigMask',['../structkvm_log_trigger_ex.html#a876ab506b9075d4f42219bd68ddbe4f4',1,'kvmLogTriggerEx']]],
@@ -28,5 +28,5 @@ var searchData=
   ['tutorial_5fcsharp_2etxt',['tutorial_csharp.txt',['../tutorial__csharp_8txt.html',1,'']]],
   ['tx',['tx',['../structcan_notify_data.html#a3fdd15457d2e2319e68feeb505375fe5',1,'canNotifyData']]],
   ['txerrorcounter',['txErrorCounter',['../structcan_notify_data.html#af474cc212c3fa114c32b574d8f9085e3',1,'canNotifyData']]],
-  ['type',['type',['../structkvm_log_trigger_ex.html#af5dcc482d7b811836ff61a4c408c3c78',1,'kvmLogTriggerEx::type()'],['../structkvm_log_event_ex.html#af356674bbaaf9bb782af79059eef1346',1,'kvmLogEventEx::type()'],['../structtag__token.html#ac765329451135abec74c45e1897abf26',1,'tag_token::type()']]]
+  ['type',['type',['../structkv_io_module_digital.html#ac765329451135abec74c45e1897abf26',1,'kvIoModuleDigital::type()'],['../structkv_io_module_internal.html#ac765329451135abec74c45e1897abf26',1,'kvIoModuleInternal::type()'],['../structkv_io_module_relay.html#ac765329451135abec74c45e1897abf26',1,'kvIoModuleRelay::type()'],['../structkv_io_module_analog.html#ac765329451135abec74c45e1897abf26',1,'kvIoModuleAnalog::type()'],['../structkvm_log_trigger_ex.html#af5dcc482d7b811836ff61a4c408c3c78',1,'kvmLogTriggerEx::type()'],['../structkvm_log_event_ex.html#af356674bbaaf9bb782af79059eef1346',1,'kvmLogEventEx::type()'],['../structtag__token.html#ac765329451135abec74c45e1897abf26',1,'tag_token::type()']]]
 ];

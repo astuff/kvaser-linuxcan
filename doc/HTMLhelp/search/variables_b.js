@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['raw',['raw',['../structkvm_log_event_ex.html#a2d78703fd9a85a4cb3ead816db9038bc',1,'kvmLogEventEx']]],
-  ['right',['right',['../structtag__token.html#afa54f74105f850a372148e16dde90651',1,'tag_token']]],
-  ['rtc',['rtc',['../structkvm_log_event_ex.html#a1f9964cb31c1515adcee1dc69c01d41b',1,'kvmLogEventEx']]],
-  ['rx',['rx',['../structcan_notify_data.html#a08ba82dcb2d1828a60a16863d4266189',1,'canNotifyData']]],
-  ['rxerrorcounter',['rxErrorCounter',['../structcan_notify_data.html#a575e147dffea7d8a2fc90141079a4fe3',1,'canNotifyData']]]
+  ['portno',['portNo',['../structcan_user_io_port_data.html#a3001cfa2429ae1926b29f0d14e7184e0',1,'canUserIoPortData']]],
+  ['portvalue',['portValue',['../structcan_user_io_port_data.html#acd5ef299b011d43a09b0f97f96edd444',1,'canUserIoPortData']]],
+  ['posttrigger',['postTrigger',['../structkvm_log_trigger_ex.html#a4e2487f0ee9f254009f623eaec4e8c40',1,'kvmLogTriggerEx']]],
+  ['pretrigger',['preTrigger',['../structkvm_log_trigger_ex.html#a1563d8fafddebf325c87f5d76482f403',1,'kvmLogTriggerEx']]]
 ];

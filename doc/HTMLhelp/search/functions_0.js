@@ -4,6 +4,7 @@ var searchData=
   ['canbusoff',['canBusOff',['../group___c_a_n.html#gaf1786cfbfd542b18b9c599d278837bd9',1,'canlib.h']]],
   ['canbuson',['canBusOn',['../group___c_a_n.html#ga99c7c99cc71580f8099a1407f4f9ea1a',1,'canlib.h']]],
   ['canclose',['canClose',['../group___c_a_n.html#ga49525373a4d08d93c651ec10f79dd36b',1,'canlib.h']]],
+  ['canenumhardwareex',['canEnumHardwareEx',['../group__can__general.html#ga2cf37192c855ce901fc0d69bfe72fbd5',1,'canlib.h']]],
   ['canflushreceivequeue',['canFlushReceiveQueue',['../group___c_a_n.html#ga7abcf8f512da6ab568850b9faa0bc28b',1,'canlib.h']]],
   ['canflushtransmitqueue',['canFlushTransmitQueue',['../group___c_a_n.html#ga52a17bb8012bf025d127b4d29e5f3aa8',1,'canlib.h']]],
   ['cangetbusoutputcontrol',['canGetBusOutputControl',['../group___c_a_n.html#ga1683419d56af8afdbfc9184678c82fdd',1,'canlib.h']]],

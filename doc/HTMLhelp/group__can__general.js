@@ -1,5 +1,6 @@
 var group__can__general =
 [
+    [ "canEnumHardwareEx", "group__can__general.html#ga2cf37192c855ce901fc0d69bfe72fbd5", null ],
     [ "canGetChannelData", "group__can__general.html#gab9552d1a588b0dbc144b097acba017b2", null ],
     [ "canGetErrorText", "group__can__general.html#ga01a7a415c95c579750bcdd95a1d245c4", null ],
     [ "canGetNumberOfChannels", "group__can__general.html#ga65169ca633cd30aa92b8a80e28a5378b", null ],

@@ -126,7 +126,7 @@ MODULE_DESCRIPTION("PCIcan CAN module.");
 //
 
 #ifdef PCICAN_DEBUG
-static int debug_level = PCICAN_DEBUG;
+int debug_level = PCICAN_DEBUG;
     MODULE_PARM_DESC(debug_level, "PCIcan debug level");
     module_param(debug_level, int, 0644);
 #   define DEBUGPRINT(n, args...) if (debug_level>=(n)) printk("<" #n ">" args)
@@ -454,6 +454,7 @@ static int pciCanProbe (VCanCardData *vCd)
                               VCAN_CHANNEL_CAP_ERROR_COUNTERS       |
                               VCAN_CHANNEL_CAP_EXTENDED_CAN         |
                               VCAN_CHANNEL_CAP_TXREQUEST            |
+                              VCAN_CHANNEL_CAP_SILENTMODE           |
                               VCAN_CHANNEL_CAP_TXACKNOWLEDGE,
                               0xFFFFFFFF,
                               0xFFFFFFFF,

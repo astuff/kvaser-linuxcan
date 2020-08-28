@@ -45,6 +45,7 @@ var searchData=
   ['kvio_5finfo_5fset_5fdi_5flow_5fhigh_5ffilter',['kvIO_INFO_SET_DI_LOW_HIGH_FILTER',['../canlib_8h.html#afa7572ee9ed7b364ed70002d3101dfdd',1,'canlib.h']]],
   ['kvio_5fmodule_5ftype_5fanalog',['kvIO_MODULE_TYPE_ANALOG',['../canlib_8h.html#af7a0f43fd1cf00fd220e21f3e6e3f4c9',1,'canlib.h']]],
   ['kvio_5fmodule_5ftype_5fdigital',['kvIO_MODULE_TYPE_DIGITAL',['../canlib_8h.html#aa7236356b4f86163b32e6f3b1f2a81e0',1,'canlib.h']]],
+  ['kvio_5fmodule_5ftype_5finternal',['kvIO_MODULE_TYPE_INTERNAL',['../canlib_8h.html#ac05269c6116dcf35be85879b0237399d',1,'canlib.h']]],
   ['kvio_5fmodule_5ftype_5frelay',['kvIO_MODULE_TYPE_RELAY',['../canlib_8h.html#a16ff8dcf16321da24929f0fb68a204f5',1,'canlib.h']]],
   ['kvio_5fpin_5fdirection_5fin',['kvIO_PIN_DIRECTION_IN',['../canlib_8h.html#a9e269996cbfabef79b05627e60bfb0f4',1,'canlib.h']]],
   ['kvio_5fpin_5fdirection_5fout',['kvIO_PIN_DIRECTION_OUT',['../canlib_8h.html#a32aebdbba25ff32662f8112e222af0a4',1,'canlib.h']]],

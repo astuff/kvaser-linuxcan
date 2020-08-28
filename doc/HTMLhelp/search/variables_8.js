@@ -1,9 +1,6 @@
 var searchData=
 [
-  ['name',['name',['../structtag__token.html#a5ac083a645d964373f022d03df4849c8',1,'tag_token']]],
-  ['next',['next',['../structtag__token.html#abbda7319715f980cc994d557e68e11e7',1,'tag_token::next()'],['../struct_kv_parse_handle.html#a68f64b5ffe49f617e182b80d771ae645',1,'KvParseHandle::next()']]],
-  ['nmagisyncedmembers',['nMagiSyncedMembers',['../structkv_time_domain_data__s.html#aadd2929832bd903c78ddf59c21feea05',1,'kvTimeDomainData_s']]],
-  ['nmagisyncgroups',['nMagiSyncGroups',['../structkv_time_domain_data__s.html#ab8dca255d18320cb7bd22b0448d78fb7',1,'kvTimeDomainData_s']]],
-  ['nnonmagisynccards',['nNonMagiSyncCards',['../structkv_time_domain_data__s.html#af00948e6feb807b210c69fd5945e7068',1,'kvTimeDomainData_s']]],
-  ['nnonmagisyncedmembers',['nNonMagiSyncedMembers',['../structkv_time_domain_data__s.html#a9cc0826be3a3477969cc862737e0f334',1,'kvTimeDomainData_s']]]
+  ['maxmessagedlc',['maxMessageDlc',['../struct_kva_db_protocol_properties.html#acea8c05d06bb3303dd71b41bec875533',1,'KvaDbProtocolProperties']]],
+  ['maxsignallength',['maxSignalLength',['../struct_kva_db_protocol_properties.html#a4f81fb4d85cd39f1658a64e087321245',1,'KvaDbProtocolProperties']]],
+  ['msg',['msg',['../structkvm_log_event_ex.html#ae3dbb7c786bd2bdd9d47bbaccbb17539',1,'kvmLogEventEx']]]
 ];

@@ -394,7 +394,9 @@ int vCanDispatchEvent (VCanChanData *chd, VCAN_EVENT *e)
     if (e->tag == V_RECEIVE_MSG) {
       // Update bus statistics
       if (msg_flags & VCAN_MSG_FLAG_ERROR_FRAME) {
-        if (!(msg_flags & VCAN_MSG_FLAG_TX_START)) {
+        if (!(msg_flags & VCAN_MSG_FLAG_TX_START) && 
+            !(msg_flags & VCAN_MSG_FLAG_TXACK)) //pciefd sends txack on error frames
+        {
           chd->busStats.bitCount += 16;
           chd->busStats.errFrame++;
         }
@@ -1325,6 +1327,8 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
         vCanFlushReceiveBuffer(fileNodePtr);
         spin_unlock_irqrestore(&fileNodePtr->rcv.rcvLock, rcvLock_irqFlags);
 
+        memset(&chd->busStats, 0, sizeof(chd->busStats));
+
         if (fileNodePtr->isBusOn) {
           fileNodePtr->chip_status.busStatus = CHIPSTAT_BUSOFF;
           wait_for_completion(&chd->busOnCountCompletion);
@@ -1628,9 +1632,24 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
       }
     //------------------------------------------------------------------
     case VCAN_IOC_GET_OUTPUT_MODE:
-      ArgPtrOut(sizeof(unsigned int));
-      put_user_ret(chd->driverMode, (unsigned int *)arg, -EFAULT);
-      break;
+    {
+      if (hwIf->getOutputMode == NULL)
+      {
+        // use cached value
+        put_user_ret(chd->driverMode, (unsigned int *)arg, -EFAULT);
+        break;
+      }
+      else
+      {
+        // use value from device
+        int silent;
+        vStat = hwIf->getOutputMode(chd, &silent);
+        if (VCAN_STAT_OK == vStat) {
+          put_user_ret(silent, (int *)arg, -EFAULT);
+        }
+        break;
+      }
+    }
 
     //------------------------------------------------------------------
     case VCAN_IOC_SET_DEVICE_MODE:
@@ -2911,7 +2930,7 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
     {
       KCAN_IOCTL_MISC_INFO cardInfoMisc;
       if (hwIf->getCardInfoMisc == NULL) {
-        return -EINVAL;
+        return -ENOSYS;
       }
       copy_from_user_ret(&cardInfoMisc, (KCAN_IOCTL_MISC_INFO *)arg, sizeof(cardInfoMisc), -EFAULT);
       vStat = hwIf->getCardInfoMisc(chd, &cardInfoMisc);

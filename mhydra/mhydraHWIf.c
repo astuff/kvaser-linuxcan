@@ -200,6 +200,7 @@ static int mhydra_cleanup_hnd (VCanChanData *vChan);
 static int mhydra_script_envvar_control (const VCanChanData *chd, KCAN_IOCTL_ENVVAR_GET_INFO_T   *sc);
 static int mhydra_script_envvar_put     (const VCanChanData *chd, KCAN_IOCTL_SCRIPT_SET_ENVVAR_T *sc);
 static int mhydra_script_envvar_get     (const VCanChanData *chd, KCAN_IOCTL_SCRIPT_GET_ENVVAR_T *sc);
+static int mhydra_get_silent (VCanChanData *vChan, int *silent);
 
 VCanDriverData driverData;
 
@@ -255,6 +256,7 @@ static VCanHWInterface hwIf = {
   .script_envvar_control = mhydra_script_envvar_control,
   .script_envvar_put     = mhydra_script_envvar_put,
   .script_envvar_get     = mhydra_script_envvar_get,
+  .getOutputMode         = mhydra_get_silent,
 };
 
 
@@ -264,7 +266,7 @@ static VCanHWInterface hwIf = {
 #define MAX_TRANSID 255
 #define MIN_TRANSID 1
 
-// transId's for channel/script/sysdbg-HE mapping 
+// transId's for channel/script/sysdbg-HE mapping
 #define TRANSID_CAN    0x40
 #define TRANSID_SCRIPT 0x50
 #define TRANSID_SYSDBG 0x60
@@ -372,6 +374,8 @@ static int mhydra_send_and_wait_reply_memo (VCanCardData  *vCard,
 #define USB_HYBRID_PRO_CANLIN_PRODUCT_ID      270 // Kvaser Hybrid Pro 2xCAN/LIN (01042-0)
 #define USB_BLACKBIRD_PRO_HS_V2_PRODUCT_ID    271 // Kvaser BlackBird Pro HS v2 (00983-7)
 #define USB_MEMO_LIGHT_HS_V2_PRODUCT_ID       272 // Kvaser Memorator Light HS v2 (01058-1)
+#define USB_U100_PRODUCT_ID                   273 // Kvaser U100 (01173-1)
+#define USB_U100P_PRODUCT_ID                  274 // Kvaser U100P (01174-8)
 
 // Table of devices that work with this driver
 static struct usb_device_id mhydra_table [] = {
@@ -390,7 +394,8 @@ static struct usb_device_id mhydra_table [] = {
   { USB_DEVICE(KVASER_VENDOR_ID, USB_HYBRID_PRO_CANLIN_PRODUCT_ID)},
   { USB_DEVICE(KVASER_VENDOR_ID, USB_BLACKBIRD_PRO_HS_V2_PRODUCT_ID)},
   { USB_DEVICE(KVASER_VENDOR_ID, USB_MEMO_LIGHT_HS_V2_PRODUCT_ID)},
-
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_U100_PRODUCT_ID)},
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_U100P_PRODUCT_ID)},
 
   { 0 }  // Terminating entry
 };
@@ -696,7 +701,7 @@ static int mhydra_rx_thread (void *context)
       result = -ENODEV;
       break;
     }
-    
+
     if (ret) {
       DEBUGPRINT(2, (TXT ("usb_bulk_msg error (%d)\n"), ret));
 
@@ -1035,19 +1040,19 @@ static void le_to_cpu (hydraHostCmd *cmd)
   case CMD_UNKNOWN_COMMAND:
     // Nothing to translate.
     break;
-	
-  case CMD_PRINTF: 
+
+  case CMD_PRINTF:
     le32_to_cpus(&cmd->printfMsg.timeL);
 	  le32_to_cpus(&cmd->printfMsg.timeH);
 	  le16_to_cpus(&cmd->printfMsg.len);
 	break;
-	
+
   case TRP_DATA:
     // Nothing to translate - trpDataMsg
     break;
-    
+
   case CMD_FATAL_ERROR:
-    // Nothing to translate - 
+    // Nothing to translate -
     break;
 
   case CMD_EXTENDED:
@@ -1371,6 +1376,7 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
 
   srcHE = (cmd->cmdIOP.srcChannel << 4) | cmd->cmdIOPSeq.srcHE;
 
+
   //DEBUGPRINT(8, (TXT("*** mhydra_handle_command %d\n"), cmd->cmdNo));
   switch (cmd->cmdNo) {
 
@@ -1682,16 +1688,16 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
       uint16_t transId;
       uint16_t script;
 
-      transId = getSEQ(cmd); 
-            
-      if (transId > 0x7f || transId < 0x40) {  
+      transId = getSEQ(cmd);
+
+      if (transId > 0x7f || transId < 0x40) {
         DEBUGPRINT(4, (TXT("ERROR: CMD_MAP_CHANNEL_RESP, invalid transId: 0x%x\n"),
                 cmd->transId));
         break;
       }
-    	  
-      switch (transId & 0xff0) {    
-      case TRANSID_CAN:      
+
+      switch (transId & 0xff0) {
+      case TRANSID_CAN:
         chan = transId & 0x00f;
         he   = cmd->mapChannelResp.heAddress;
         dev->channel2he[chan] = he;
@@ -1699,8 +1705,8 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
         DEBUGPRINT(4, (TXT("CMD_MAP_CHANNEL_RESP, dev->he2channel[he]: %d dev->channel2he[chan] %d\n"),
             dev->he2channel[he], dev->channel2he[chan]));
         break;
-		
-	    case TRANSID_SCRIPT: 
+
+	    case TRANSID_SCRIPT:
         script = transId & 0x00f;
         he     = cmd->mapChannelResp.heAddress;
         dev->script2he[script] = he;
@@ -1709,7 +1715,7 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
             dev->he2script[he], dev->script2he[script]));
         break;
 
-      case TRANSID_SYSDBG:   
+      case TRANSID_SYSDBG:
         if ((cmd->transId & 0x00f) == 0x01) {
           dev->sysdbg_he = cmd->mapChannelResp.heAddress;
         }
@@ -1796,12 +1802,12 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
         DEBUGPRINT(2, (TXT("[%s,%d] ERROR: chan(%d) >= nrChannels(%d)\n"), __FILE__, __LINE__, chan, vCard->nrChannels));
       }
       break;
-      
-      
+
+
     }
-	
+
 	  case CMD_PRINTF:   // may be followed by one or more corresponding TRP_DATA
-      printf_msg(vCard, cmd);  
+      printf_msg(vCard, cmd);
       break;
 
     case TRP_DATA:
@@ -1816,7 +1822,7 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
         trp_msg(vCard, cmd);
       }
       break;
-      
+
     case CMD_FATAL_ERROR:
       DEBUGPRINT(1, (TXT("Received CMD_FATAL_ERROR id:0x%x\n"), getSEQ(cmd)));
       fatal_msg(vCard, cmd);
@@ -1875,6 +1881,24 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
       }
       break;
 
+    case CMD_SCRIPT_ENVVAR_TRANSFER_BULK:
+    {
+      hcmdScriptEnvvarTransferBulk *data = &cmd->scriptEnvvarTransferBulk;
+
+      if ((vCard->retdataPtr) &&
+          (data->offset + data->length <= vCard->retdataSize))
+      {
+        memcpy(vCard->retdataPtr + data->offset,
+                data->bulkData,
+                data->length);
+      }
+
+      if (!data->bulkDone) {
+        return;
+      }
+      break;
+    }
+
     // these replys are not handled, the waking up is handled below.
     case CMD_GET_DRIVERMODE_RESP:
     case CMD_START_CHIP_RESP:
@@ -1907,7 +1931,7 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
     case CMD_TRANSPORT_RESP:
     case CMD_LISTEN_TO_HE_RESP:
     case CMD_SCRIPT_ENVVAR_CTRL_RESP:
-    case CMD_SCRIPT_ENVVAR_TRANSFER_BULK:
+
     case CMD_SCRIPT_ENVVAR_TRANSFER_CTRL_RESP:
       print_reply(cmd->cmdNo);
       break;
@@ -1937,6 +1961,7 @@ static void mhydra_handle_command (hydraHostCmd *cmd, VCanCardData *vCard)
     mwn = currNode->driver;
 
     if (mhydra_get_trans_id(cmd) == (currNode->transId & SEQ_MASK)) {
+
       if (currNode->cmdNr == cmd->cmdNo) {
         memcpy(currNode->replyPtr, cmd, mhydra_cmd_size(cmd));
         complete(&currNode->waitCompletion);
@@ -2367,7 +2392,7 @@ static int mhydra_map_channels (VCanCardData* vCard) {
 
   memset(dev->channel2he, ILLEGAL_HE, sizeof(dev->channel2he));
   memset(dev->he2channel, 0xff, sizeof(dev->he2channel));
-  
+
   memset(dev->script2he, ILLEGAL_HE, sizeof(dev->script2he));
   memset(dev->he2script, 0xff, sizeof(dev->he2script));
 
@@ -2392,8 +2417,8 @@ static int mhydra_map_channels (VCanCardData* vCard) {
                    reply.mapChannelResp.position,
                    reply.mapChannelResp.flags));
   }
-  
-  
+
+
   strcpy(cmd.mapChannelReq.name, "TSCRIPT");
   i = 0;
   for (i = 0; i < HYDRA_MAX_SCRIPTS; i++) {
@@ -2401,7 +2426,7 @@ static int mhydra_map_channels (VCanCardData* vCard) {
     cmd.mapChannelReq.channel = (unsigned char) i;
     transId = (TRANSID_SCRIPT | i);
     setSEQ(&cmd, transId);
-    
+
     r = mhydra_send_and_wait_reply(vCard, (hydraHostCmd *)&cmd, &reply,
                                    CMD_MAP_CHANNEL_RESP, getSEQ(&cmd), SKIP_ERROR_EVENT);
 
@@ -2414,7 +2439,7 @@ static int mhydra_map_channels (VCanCardData* vCard) {
     DEBUGPRINT(2, (TXT("1 Map he address 0x%02X position %d flags 0x%02X\n"),
                    reply.mapChannelResp.heAddress,
                    reply.mapChannelResp.position,
-                   reply.mapChannelResp.flags));                  
+                   reply.mapChannelResp.flags));
   }
 
 
@@ -2720,7 +2745,9 @@ static int mhydra_plugin (struct usb_interface *interface,
        (udev->descriptor.idProduct != USB_ATI_MEMO_PRO_2HS_V2_PRODUCT_ID) &&
        (udev->descriptor.idProduct != USB_HYBRID_PRO_CANLIN_PRODUCT_ID) &&
        (udev->descriptor.idProduct != USB_BLACKBIRD_PRO_HS_V2_PRODUCT_ID) &&
-       (udev->descriptor.idProduct != USB_MEMO_LIGHT_HS_V2_PRODUCT_ID)
+       (udev->descriptor.idProduct != USB_MEMO_LIGHT_HS_V2_PRODUCT_ID) &&
+       (udev->descriptor.idProduct != USB_U100_PRODUCT_ID) &&
+       (udev->descriptor.idProduct != USB_U100P_PRODUCT_ID)
       )
      )
   {
@@ -2792,6 +2819,14 @@ static int mhydra_plugin (struct usb_interface *interface,
     case USB_MEMO_LIGHT_HS_V2_PRODUCT_ID:
       DEBUGPRINT(2, (TXT("\nKVASER ")));
       DEBUGPRINT(2, (TXT("Kvaser Memorator Light HS v2 plugged in\n")));
+      break;
+    case USB_U100_PRODUCT_ID:
+      DEBUGPRINT(2, (TXT("\nKVASER ")));
+      DEBUGPRINT(2, (TXT("Kvaser U100 plugged in\n")));
+      break;
+    case USB_U100P_PRODUCT_ID:
+      DEBUGPRINT(2, (TXT("\nKVASER ")));
+      DEBUGPRINT(2, (TXT("Kvaser U100P plugged in\n")));
       break;
 
     default:
@@ -3075,12 +3110,6 @@ static int mhydra_start (VCanCardData *vCard)
     if (stat != VCAN_STAT_OK) {
       DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_HAS_IO_API\n")));
     }
-
-    //  KDI capability removed until further notice. see case fb#23327
-    //  stat = mhydra_capabilities (vCard, VCAN_CHANNEL_CAP_DIAGNOSTICS);
-    //  if (stat != VCAN_STAT_OK) {
-    //    DEBUGPRINT(2, (TXT("Failed reading capability: VCAN_CHANNEL_CAP_DIAGNOSTICS\n")));
-    //  }
   }
 
   set_capability_value (vCard,
@@ -3228,11 +3257,11 @@ static void mhydra_deallocate (VCanCardData *vCard)
                     dev->write_urb->transfer_dma);
 #endif
   usb_free_urb(dev->write_urb);
-  
+
   if (dev->dmBuffer != NULL) {
-    kfree(dev->dmBuffer);  
-    dev->dmBuffer = NULL;    
-  }    
+    kfree(dev->dmBuffer);
+    dev->dmBuffer = NULL;
+  }
 
   spin_lock(&driverData.canCardsLock);
 
@@ -3597,6 +3626,37 @@ static int mhydra_set_silent (VCanChanData *vChan, int silent)
 
   return ret;
 } // _set_silent
+
+
+//======================================================================
+//
+//  Get silent or normal mode
+//
+static int mhydra_get_silent (VCanChanData *vChan, int *silent)
+{
+  hydraHostCmd cmd, reply;
+  int ret;
+
+  VCanCardData    *vCard = vChan->vCard;
+  MhydraCardData *dev = vChan->vCard->hwCardData;
+
+  if (!vChan || !silent) return VCAN_STAT_BAD_PARAMETER;
+
+  memset(&cmd, 0, sizeof(cmd));
+  memset(&reply, 0, sizeof(reply));
+  cmd.cmdNo = CMD_GET_DRIVERMODE_REQ;
+  setDST(&cmd, dev->channel2he[vChan->channel]);
+  ret = mhydra_send_and_wait_reply(vCard, &cmd, &reply,
+                                 CMD_GET_DRIVERMODE_RESP,
+                                 0,
+                                 SKIP_ERROR_EVENT);
+
+  *silent  = reply.getDrivermodeResp.driverMode == DRIVERMODE_SILENT;
+
+  return ret;
+} // _get_silent
+
+
 
 //======================================================================
 //
@@ -5537,8 +5597,8 @@ static int mhydra_send_and_wait_reply_common (VCanCardData  *vCard,
   spin_lock_irqsave(&dev->replyWaitListLock, irqFlags);
   list_add(&waitNode->list, &dev->replyWaitList);
   spin_unlock_irqrestore(&dev->replyWaitListLock, irqFlags);
-  
-  
+
+
 
   ret = mhydra_queue_cmd(vCard, cmd, MHYDRA_Q_CMD_WAIT_TIME);
   if (ret != 0) {
@@ -5690,7 +5750,7 @@ static int mhydra_script_envvar_put (const VCanChanData *chd, KCAN_IOCTL_SCRIPT_
     remaining -= HYDRA_SCRIPT_ENVVAR_BULKSIZE;
     offset += cmd.scriptEnvvarTransferBulk.length;
 
-    r = mhydra_queue_cmd(chd->vCard, &cmd, 0);
+    r = mhydra_queue_cmd(chd->vCard, &cmd, 100);
 
     if (r != VCAN_STAT_OK) {
       return r;
@@ -5722,14 +5782,16 @@ static int mhydra_script_envvar_get  (const VCanChanData *chd, KCAN_IOCTL_SCRIPT
   // (and we get time out status set elsewhere) set returned user status ok.
   sc->envvar_status = SCRIPT_ENVVAR_RESP_OK;
 
+  chd->vCard->retdataPtr = sc->data;
+  chd->vCard->retdataSize = sc->dataLen;
+
   r = mhydra_send_and_wait_reply(chd->vCard, &cmd, &reply,
                                  CMD_SCRIPT_ENVVAR_TRANSFER_BULK,
                                  0,
                                  SKIP_ERROR_EVENT);
 
-  if (r == VCAN_STAT_OK) {
-    memcpy(&sc->data, reply.scriptEnvvarTransferBulk.bulkData, reply.scriptEnvvarTransferBulk.length);
-  }
+  chd->vCard->retdataPtr = NULL;
+  chd->vCard->retdataSize = 0;
 
   return r;
 }
