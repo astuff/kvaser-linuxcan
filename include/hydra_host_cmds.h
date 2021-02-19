@@ -1887,6 +1887,7 @@ typedef struct {
 #define IO_MODULE_TYPE_DIGITAL                    1
 #define IO_MODULE_TYPE_ANALOG                     2
 #define IO_MODULE_TYPE_RELAY                      3
+#define IO_MODULE_TYPE_INTERNAL                   4
 
 #define IO_EVENT_UNKNOWN                          0
 #define IO_EVENT_CONFIG_CHANGED                   2
@@ -2002,6 +2003,7 @@ typedef struct hydraHostCmd {
     hcmdChipStateEvent        chipStateEvent;
     hcmdSetDrivermodeReq      setDrivermodeReq;
     hcmdGetDrivermodeReq      getDrivermodeReq;
+    hcmdGetDrivermodeResp     getDrivermodeResp;
 
     hcmdResetChipReq          resetChipReq;
     hcmdResetCardReq          resetCardReq;

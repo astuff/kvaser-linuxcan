@@ -86,9 +86,7 @@
 
 /*****************************************************************************/
 #ifdef PCICAN_DEBUG
-static int debug_level = PCICAN_DEBUG;
-    MODULE_PARM_DESC(debug_level, "PCIcan debug level");
-    module_param(debug_level, int, 0644);
+    extern int debug_level;
 #   define DEBUGPRINT(n, args...) if (debug_level>=(n)) printk("<" #n ">" args)
 #else
 #   define DEBUGPRINT(n, args...) if ((n) == 1) printk("<" #n ">" args)

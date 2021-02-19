@@ -900,10 +900,11 @@ static void pciCanReceiveIsr (VCanCardData *vCard)
                                       VCAN_CHANNEL_CAP_RECEIVE_ERROR_FRAMES |
                                       VCAN_CHANNEL_CAP_TIMEBASE_ON_CARD     |
                                       VCAN_CHANNEL_CAP_BUSLOAD_CALCULATION  |
-                                      VCAN_CHANNEL_CAP_ERROR_COUNTERS       |
                                       VCAN_CHANNEL_CAP_EXTENDED_CAN         |
                                       VCAN_CHANNEL_CAP_TXREQUEST            |
-                                      VCAN_CHANNEL_CAP_TXACKNOWLEDGE,
+                                      VCAN_CHANNEL_CAP_TXACKNOWLEDGE        |
+                                      VCAN_CHANNEL_CAP_ERROR_COUNTERS       |
+                                      VCAN_CHANNEL_CAP_SILENTMODE,
                                       0xFFFFFFFF,
                                       0xFFFFFFFF,
                                       MAX_CARD_CHANNELS);

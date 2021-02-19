@@ -171,6 +171,7 @@ static int leaf_get_cust_channel_name(const VCanChanData * const vChan,
                                       unsigned int * const status);
 static int leaf_get_card_info_misc(const VCanChanData *chd, KCAN_IOCTL_MISC_INFO *cardInfoMisc);
 static int leaf_flash_leds(const VCanChanData *chd, int action, int timeout);
+static int leaf_get_silent(VCanChanData *vChan, int *silent);
 
 static VCanDriverData driverData;
 
@@ -209,6 +210,7 @@ static VCanHWInterface hwIf = {
   .getCustChannelName = leaf_get_cust_channel_name,
   .getCardInfoMisc    = leaf_get_card_info_misc,
   .flashLeds          = leaf_flash_leds,
+  .getOutputMode      = leaf_get_silent,
 };
 
 
@@ -2801,6 +2803,33 @@ static int leaf_set_silent (VCanChanData *vChan, int silent)
 
   return ret;
 } // _set_silent
+
+
+//======================================================================
+//
+//  Get silent or normal mode
+//
+static int leaf_get_silent(VCanChanData *vChan, int *silent)
+{
+  filoCmd cmd, reply;
+  int ret;
+
+  if (!vChan || !silent) return VCAN_STAT_BAD_PARAMETER;
+
+  memset(&cmd, 0, sizeof(cmd));
+  memset(&reply, 0, sizeof(reply));
+  cmd.getDrivermodeReq.cmdNo    = CMD_GET_DRIVERMODE_REQ;
+  cmd.getDrivermodeReq.cmdLen   = sizeof(cmdGetDrivermodeReq);
+  cmd.getDrivermodeReq.channel  = (unsigned char)vChan->channel;
+  ret = leaf_send_and_wait_reply(vChan->vCard, &cmd, &reply,
+                                 CMD_GET_DRIVERMODE_RESP,
+                                 0,
+                                 SKIP_ERROR_EVENT);
+
+  *silent  = reply.getDrivermodeResp.driverMode == DRIVERMODE_SILENT;
+
+  return ret;
+}
 
 
 //======================================================================

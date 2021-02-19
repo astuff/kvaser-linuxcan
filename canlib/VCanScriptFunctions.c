@@ -444,11 +444,11 @@ kvEnvHandle vCanScript_envvar_open(HandleData *hData,
   int free_entry = 0;
   int found = 0;
   envvar_payload ei;
-  
+
   hash = build_hash_from_name(envvarName);
 
   pthread_mutex_lock(&scriptEnvvarMutex);
-  
+
   // check if already open
   for (i = 0; i < MAX_ENVVAR; i++) {
     if (envvarTable[i].openCount == 0) {
@@ -506,7 +506,7 @@ kvEnvHandle vCanScript_envvar_open(HandleData *hData,
     memcpy(&my_arg.payload, (char *)&ei.envvar_info, sizeof(ei.envvar_info));
 
     ret = ioctl(hData->fd, KCAN_IOCTL_SCRIPT_ENVVAR_CONTROL, &my_arg);
-    
+
     if (ret != 0) {
       return errnoToCanStatus(errno);
     }
@@ -557,11 +557,11 @@ canStatus vCanScript_envvar_close(HandleData *hData, int envvarIdx)
       break;
     }
   }
-  
+
   if (j == MAX_ENVVAR_HND){
     stat = canERR_INVHANDLE;
   }
-  
+
   pthread_mutex_unlock(&scriptEnvvarMutex);
 
   return stat;
@@ -575,18 +575,14 @@ canStatus vCanScript_envvar_set_int(HandleData *hData, int envvarIdx, int val)
 {
   int                            ret;
   KCAN_IOCTL_SCRIPT_SET_ENVVAR_T my_arg;
-  
+
   VALIDATE_ENVVAR(envvarIdx);
-   
+
   my_arg.hash = envvarTable[envvarIdx].hash;
   memcpy(&my_arg.data, &val, sizeof(val));
   my_arg.dataLen = sizeof(val);
-  
+
   ret = ioctl(hData->fd, KCAN_IOCTL_SCRIPT_SET_ENVVAR, &my_arg);
-  
-  if (ret) {
-    return ret;
-  }
 
   return ret;
 }
@@ -599,7 +595,7 @@ canStatus vCanScript_envvar_get_int(HandleData *hData, int envvarIdx, int *val)
 {
   int                            ret;
   KCAN_IOCTL_SCRIPT_GET_ENVVAR_T my_arg;
-  
+
   VALIDATE_ENVVAR(envvarIdx);
 
   my_arg.hash    = envvarTable[envvarIdx].hash;
@@ -607,12 +603,12 @@ canStatus vCanScript_envvar_get_int(HandleData *hData, int envvarIdx, int *val)
   my_arg.offset  = 0;
 
   ret = ioctl(hData->fd, KCAN_IOCTL_SCRIPT_GET_ENVVAR, &my_arg);
-  
+
   if (ret) {
     return ret;
   }
-  
-  memcpy(val, &my_arg.data, sizeof(int));  
+
+  memcpy(val, &my_arg.data, sizeof(int));
   return ret;
 }
 
@@ -624,18 +620,14 @@ canStatus vCanScript_envvar_set_float(HandleData *hData, int envvarIdx, float va
 {
   int                            ret;
   KCAN_IOCTL_SCRIPT_SET_ENVVAR_T my_arg;
-  
+
   VALIDATE_ENVVAR(envvarIdx);
-   
+
   my_arg.hash = envvarTable[envvarIdx].hash;
   memcpy(&my_arg.data, &val, sizeof(val));
   my_arg.dataLen = sizeof(val);
-  
+
   ret = ioctl(hData->fd, KCAN_IOCTL_SCRIPT_SET_ENVVAR, &my_arg);
-  
-  if (ret) {
-    return ret;
-  }
 
   return ret;
 }
@@ -648,7 +640,7 @@ canStatus vCanScript_envvar_get_float(HandleData *hData, int envvarIdx, float *v
 {
   int                            ret;
   KCAN_IOCTL_SCRIPT_GET_ENVVAR_T my_arg;
-  
+
   VALIDATE_ENVVAR(envvarIdx);
 
   my_arg.hash    = envvarTable[envvarIdx].hash;
@@ -656,12 +648,12 @@ canStatus vCanScript_envvar_get_float(HandleData *hData, int envvarIdx, float *v
   my_arg.offset  = 0;
 
   ret = ioctl(hData->fd, KCAN_IOCTL_SCRIPT_GET_ENVVAR, &my_arg);
-  
+
   if (ret) {
     return ret;
   }
-  
-  memcpy(val, &my_arg.data, sizeof(float));  
+
+  memcpy(val, &my_arg.data, sizeof(float));
   return ret;
 }
 
@@ -669,33 +661,54 @@ canStatus vCanScript_envvar_get_float(HandleData *hData, int envvarIdx, float *v
 //======================================================================
 // vCanScript_envvar_set_data
 //======================================================================
-canStatus vCanScript_envvar_set_data(kvEnvHandle eHnd,
+canStatus vCanScript_envvar_set_data(HandleData *hData,
+                                     int envvarIdx,
                                      void *buf,
                                      int start_index,
                                      int data_len)
 {
-  (void) eHnd;
-  (void) buf;
+  int                            ret;
+  KCAN_IOCTL_SCRIPT_SET_ENVVAR_T my_arg;
   (void) start_index;
-  (void) data_len;
 
-  return canERR_NOT_IMPLEMENTED;
+  VALIDATE_ENVVAR(envvarIdx);
+
+  my_arg.hash = envvarTable[envvarIdx].hash;
+  memcpy(&my_arg.data, buf, data_len);
+  my_arg.dataLen = data_len;
+
+  ret = ioctl(hData->fd, KCAN_IOCTL_SCRIPT_SET_ENVVAR, &my_arg);
+
+  return ret;
 }
 
 //======================================================================
 // vCanScript_envvar_get_data
 //======================================================================
-canStatus vCanScript_envvar_get_data(kvEnvHandle eHnd,
+canStatus vCanScript_envvar_get_data(HandleData *hData,
+                                     int envvarIdx,
                                      void *buf,
                                      int start_index,
                                      int data_len)
 {
-  (void) eHnd;
-  (void) buf;
+  int                            ret;
+  KCAN_IOCTL_SCRIPT_GET_ENVVAR_T my_arg;
   (void) start_index;
-  (void) data_len;
 
-  return canERR_NOT_IMPLEMENTED;
+  VALIDATE_ENVVAR(envvarIdx);
+
+  my_arg.hash    = envvarTable[envvarIdx].hash;
+  my_arg.dataLen = data_len;
+  my_arg.offset  = 0;
+
+  ret = ioctl(hData->fd, KCAN_IOCTL_SCRIPT_GET_ENVVAR, &my_arg);
+
+  if (ret) {
+    return ret;
+  }
+
+  memcpy(buf, &my_arg.data, data_len);
+  return ret;
 }
 
 //======================================================================

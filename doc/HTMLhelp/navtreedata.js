@@ -1,23 +1,7 @@
 var NAVTREE =
 [
   [ "Welcome to Kvaser Linux Drivers and SDK!", "index.html", [
-    [ "Installation", "page_installing.html", [
-      [ "Installing on Windows", "page_installing.html#section_install_windows", [
-        [ "Installing the Driver", "page_installing.html#section_install_driver_windows", null ],
-        [ "Installing Additional Virtual Devices", "page_installing.html#section_install_virtual_device_windows", null ],
-        [ "Removing the driver", "page_installing.html#section_uninstall_driver_windows", null ],
-        [ "Installing Kvaser CANlib SDK", "page_installing.html#section_install_sdk_windows", null ],
-        [ "Removing Kvaser CANlib SDK", "page_installing.html#section_uninstall_sdk_windows", null ]
-      ] ],
-      [ "Installing on Linux", "page_installing.html#section_install_linux", [
-        [ "Installing the Driver", "page_installing.html#section_install_driver_linux", null ],
-        [ "Installing Virtual Devices", "page_installing.html#section_install_virtual_device_linux", null ],
-        [ "Removing the driver", "page_installing.html#section_uninstall_driver_linux", null ],
-        [ "Installing Kvaser CANlib SDK", "page_installing.html#section_install_sdk_linux", null ],
-        [ "Removing Kvaser CANlib SDK", "page_installing.html#section_uninstall_sdk_linux", null ]
-      ] ],
-      [ "Hardware Installation", "page_installing.html#section_install_hardware", null ]
-    ] ],
+    [ "Installation", "page_installing.html", "page_installing" ],
     [ "Tutorials", "page_tutorial.html", "page_tutorial" ],
     [ "CAN bus API (CANlib)", "page_canlib.html", "page_canlib" ],
     [ "LIN bus API (LINlib)", "page_linlib.html", [
@@ -66,13 +50,13 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"canlib_8h.html#ac16175a4cc065c0836fa51f72831f399",
-"group___c_a_n.html#ga7abcf8f512da6ab568850b9faa0bc28b",
-"group__kvadb__attributes.html#ga895fc58f6fa4ac946e4bb519a5348b59",
-"group__kvaxml__conversion.html#gae8de06f7538a65ccb07df301ea663c50",
-"group__lin__status__codes.html#gga7a5ecfd2846ddd76cd49fb4edec7fc14a575676385f024b8a895ab94babd7dab0",
-"kvlclib_8h.html#aa01f4e3796371f85e72e1dc374c0b084",
-"page_user_guide_device_and_channel.html#section_user_guide_cust_channel_name"
+"canlib_8h.html#ac12ca60f6d6e18d9bd29acc00c8ea2ff",
+"group___c_a_n.html#ga62c185329d6741c90102511e2f37983e",
+"group__kvadb__attributes.html#ga7578b036a1b304874e8d61eaea5252e3",
+"group__kvaxml__conversion.html#ga3e94f83e8f6bdd988f215dd7af7b1b64",
+"group__lin__status__codes.html#gga7a5ecfd2846ddd76cd49fb4edec7fc14a4410cb44bc89862bb4f8e2ec21b546cc",
+"kvlclib_8h.html#a8d93e7035a095d124299a2d71d2d2663",
+"page_user_guide_init.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

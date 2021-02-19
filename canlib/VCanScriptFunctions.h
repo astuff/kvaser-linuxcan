@@ -88,20 +88,22 @@ kvEnvHandle vCanScript_envvar_open(HandleData *hData,
                                    char* envvarName,
                                    int *envvarType,
                                    int *envvarSize);
-canStatus vCanScript_envvar_close(HandleData * hData, int envvarIdx); 
+canStatus vCanScript_envvar_close(HandleData * hData, int envvarIdx);
 canStatus vCanScript_envvar_set_int(HandleData * hData, int envvarIdx, int val);
 canStatus vCanScript_envvar_get_int(HandleData * hData, int envvarIdx, int *val);
-canStatus vCanScript_envvar_set_float(HandleData * hData, int envvarIdx, float val); 
+canStatus vCanScript_envvar_set_float(HandleData * hData, int envvarIdx, float val);
 canStatus vCanScript_envvar_get_float(HandleData * hData, int envvarIdx, float *val);
-canStatus vCanScript_envvar_set_data(kvEnvHandle eHnd, 
+canStatus vCanScript_envvar_set_data(HandleData * hData,
+                                     int envvarIdx,
                                      void *buf,
                                      int start_index,
                                      int data_len);
-canStatus vCanScript_envvar_get_data(kvEnvHandle eHnd,
+canStatus vCanScript_envvar_get_data(HandleData * hData,
+                                     int envvarIdx,
                                      void *buf,
                                      int start_index,
                                      int data_len);
-canStatus vCanScript_request_text(HandleData *hData, 
+canStatus vCanScript_request_text(HandleData *hData,
                                   unsigned int slot,
                                   unsigned int request);
                                   

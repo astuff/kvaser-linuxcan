@@ -7,7 +7,8 @@ var page_canlib =
     ] ],
     [ "Initialization", "page_user_guide_init.html", [
       [ "Library Initialization", "page_user_guide_init.html#section_user_guide_init_lib_init", null ],
-      [ "Library Deinitialization and Cleanup", "page_user_guide_init.html#section_user_guide_init_lib_deinit", null ]
+      [ "Library Deinitialization and Cleanup", "page_user_guide_init.html#section_user_guide_init_lib_deinit", null ],
+      [ "Manually Enumerating CAN channels", "page_user_guide_init.html#section_user_guide_enumerate_hw", null ]
     ] ],
     [ "Devices and Channels", "page_user_guide_device_and_channel.html", [
       [ "Identifying Devices and Channels", "page_user_guide_device_and_channel.html#section_user_guide_identifying_devices", null ],
@@ -92,12 +93,7 @@ var page_canlib =
         [ "Program to read User Data", "page_user_guide_userdata.html#section_example_c_read_customerdata", null ]
       ] ]
     ] ],
-    [ "Windows Advanced Topics", "page_user_guide_install.html", [
-      [ "Windows Installation troubleshooting", "page_user_guide_install.html#section_user_guide_build_installation_verification_3", null ],
-      [ "Running the installation in silent mode", "page_user_guide_install.html#section_user_guide_build_installation_advanced_2", null ],
-      [ "Custom Driver Install", "page_user_guide_install.html#section_user_guide_build_installation_custom", null ],
-      [ "Using Debug DLLs", "page_user_guide_install.html#section_user_guide_build_installation_debug", null ]
-    ] ],
+    [ "Windows Advanced Topics", "page_user_guide_install.html", null ],
     [ "Compiling and Compatibility", "page_user_guide_build.html", [
       [ "Compatibility", "page_user_guide_build.html#section_porting_code_older", null ],
       [ "Compiling and Linking Your Code", "page_user_guide_build.html#section_user_guide_build_compiling_linking", null ],

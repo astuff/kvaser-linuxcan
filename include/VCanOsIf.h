@@ -293,6 +293,9 @@ typedef struct VCanCardData
     uint32_t                timeHi;
     uint32_t                usPerTick;
 
+    void                    *retdataPtr;
+    int                      retdataSize;
+
     /* Ports and addresses */
     volatile unsigned int    cardPresent;
     VCanChanData           **chanData;
@@ -434,6 +437,7 @@ typedef struct VCanHWInterface {
     int (*script_envvar_control) (const VCanChanData *chd, KCAN_IOCTL_ENVVAR_GET_INFO_T *sc);
     int (*script_envvar_put)     (const VCanChanData *chd, KCAN_IOCTL_SCRIPT_SET_ENVVAR_T *sc);
     int (*script_envvar_get)     (const VCanChanData *chd, KCAN_IOCTL_SCRIPT_GET_ENVVAR_T *sc);
+    int (*getOutputMode)        (VCanChanData *chd, int *silent);
 } VCanHWInterface;
 
 #define SKIP_ERROR_EVENT 0

@@ -201,6 +201,8 @@ Functions</h2></td></tr>
 <p>If you want to remove a filter, call <a class="el" href="group___c_a_n.html#gaa4ffd2fad1932ad5763c2c923a1a12d8">canAccept()</a> with the mask set to 0.</p>
 <dl class="section note"><dt>Note</dt><dd>You can set the extended code and mask only on CAN boards that support extended identifiers.</dd>
 <dd>
+Acceptance filters for 11-bit and 29-bit (ext) are independent, meaning 11-bit filters will not affect 29-bit can frames and vice versa.</dd>
+<dd>
 Not all CAN boards support different masks for standard and extended CAN identifiers.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -213,7 +215,9 @@ Not all CAN boards support different masks for standard and extended CAN identif
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_filters">Acceptance Filters</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_filters">Acceptance Filters</a> </dd>
+<dd>
+<a class="el" href="group___c_a_n.html#gabe5023aa5de3115de946a6a10232fe84">canSetAcceptanceFilter()</a> </dd></dl>
 
 </div>
 </div>
@@ -706,7 +710,9 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_device_and_channel.html#section_user_guide_unique_device">Channel Information</a> </dd>
+<dd>
+<a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a> </dd></dl>
 
 </div>
 </div>
@@ -1433,8 +1439,8 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
     relevant" </li>
 <li>A relevant binary 1 in a code means "the corresponding bit in the
     identifier must be 1" </li>
-<li>A relevant binary 1 in a code means "the corresponding bit in the
-    identifier must be 1"</li>
+<li>A relevant binary 0 in a code means "the corresponding bit in the
+    identifier must be 0"</li>
 </ul>
 <p>In other words, the message is accepted if ((code XOR id) AND mask) == 0.</p>
 <p><em>extended</em> should be set to:</p>
@@ -1446,6 +1452,8 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
 <p>On some boards the acceptance filtering is done by the CAN hardware; on other boards (typically those with an embedded CPU,) the acceptance filtering is done by software. <a class="el" href="group___c_a_n.html#gabe5023aa5de3115de946a6a10232fe84">canSetAcceptanceFilter()</a> behaves in the same way for all boards, however.</p>
 <p><a class="el" href="group___c_a_n.html#gabe5023aa5de3115de946a6a10232fe84">canSetAcceptanceFilter()</a> and <a class="el" href="group___c_a_n.html#gaa4ffd2fad1932ad5763c2c923a1a12d8">canAccept()</a> both serve the same purpose but the former can set the code and mask in just one call.</p>
 <dl class="section note"><dt>Note</dt><dd>You can set the extended code and mask only on CAN boards that support extended identifiers.</dd>
+<dd>
+Acceptance filters for 11-bit and 29-bit (ext) are independent, meaning 11-bit filters will not affect 29-bit can frames and vice versa.</dd>
 <dd>
 Not all CAN boards support different masks for standard and extended CAN identifiers.</dd>
 <dd>
@@ -2075,7 +2083,7 @@ Not implemented in linux.</dd></dl>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.30) Tue Oct 8 2019</li>
+    <li class="footer"> (canlib 5.31) Mon Feb 24 2020</li>
   </ul>
 </div>
 </body>

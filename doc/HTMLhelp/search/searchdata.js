@@ -4,7 +4,7 @@ var indexSectionsWithContent =
   1: "cklt",
   2: "ceiklost",
   3: "ckl",
-  4: "bcdefilmnoprstvz",
+  4: "abcdefilmnoprstvz",
   5: "bcdhikltu",
   6: "ckl",
   7: "ckl",

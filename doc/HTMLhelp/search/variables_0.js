@@ -1,8 +1,11 @@
 var searchData=
 [
-  ['bitrate',['bitrate',['../struct_lin_message_info.html#ae1500e00270cc662f39a27c2f2d23962',1,'LinMessageInfo']]],
-  ['buserr',['busErr',['../structcan_notify_data.html#a0f3f821312e2c5e8b29394753ef40f94',1,'canNotifyData']]],
-  ['busload',['busLoad',['../structcan_bus_statistics__s.html#a10d3e5def5be80618a372a441eaadc2f',1,'canBusStatistics_s']]],
-  ['busstatus',['busStatus',['../structcan_notify_data.html#a43a5205812ec3002d08fca45821efc3f',1,'canNotifyData']]],
-  ['bytetime',['byteTime',['../struct_lin_message_info.html#a49b9c16add79f98b4f26894ae8f44356',1,'LinMessageInfo']]]
+  ['ai1',['AI1',['../structkv_io_module_analog.html#ad4ea693fe3b31c0d44fdc8d8edad2061',1,'kvIoModuleAnalog']]],
+  ['ai2',['AI2',['../structkv_io_module_analog.html#a09a8103e80a3ca67fe8076b14c02ea98',1,'kvIoModuleAnalog']]],
+  ['ai3',['AI3',['../structkv_io_module_analog.html#a5ee7aea94792b76835890e4537dd725d',1,'kvIoModuleAnalog']]],
+  ['ai4',['AI4',['../structkv_io_module_analog.html#a1fb7a7138a7a7715db157327905f716e',1,'kvIoModuleAnalog']]],
+  ['ao1',['AO1',['../structkv_io_module_analog.html#ac2f16b8dd9623f2e9318673706b96c20',1,'kvIoModuleAnalog']]],
+  ['ao2',['AO2',['../structkv_io_module_analog.html#a9e8939e576ba17b7d2157cb4e006080d',1,'kvIoModuleAnalog']]],
+  ['ao3',['AO3',['../structkv_io_module_analog.html#a5cb667a59dbff8de365b5d9f6a6cf4ec',1,'kvIoModuleAnalog']]],
+  ['ao4',['AO4',['../structkv_io_module_analog.html#a756091c81c808e2591d47c73a653b29e',1,'kvIoModuleAnalog']]]
 ];

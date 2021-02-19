@@ -1,11 +1,10 @@
 var searchData=
 [
-  ['tag',['tag',['../structcan_notify_data.html#a3fd9a258481b2a4c0610d35a95c516f6',1,'canNotifyData']]],
-  ['time',['time',['../structcan_notify_data.html#a43dc68c257e4ad93dcd26ccf96129b45',1,'canNotifyData']]],
-  ['timestamp',['timestamp',['../struct_lin_message_info.html#acba7776dcc1861edfe0e9c5736de4df8',1,'LinMessageInfo::timestamp()'],['../structkvm_log_msg_ex.html#aa1fa735b38f32cc201831ea72527ec37',1,'kvmLogMsgEx::timeStamp()'],['../structkvm_log_rtc_clock_ex.html#aa1fa735b38f32cc201831ea72527ec37',1,'kvmLogRtcClockEx::timeStamp()'],['../structkvm_log_trigger_ex.html#aa1fa735b38f32cc201831ea72527ec37',1,'kvmLogTriggerEx::timeStamp()']]],
-  ['trig',['trig',['../structkvm_log_event_ex.html#a5ba860ad33a6d0976c7f2e0a8ed80bba',1,'kvmLogEventEx']]],
-  ['trigmask',['trigMask',['../structkvm_log_trigger_ex.html#a876ab506b9075d4f42219bd68ddbe4f4',1,'kvmLogTriggerEx']]],
-  ['tx',['tx',['../structcan_notify_data.html#a3fdd15457d2e2319e68feeb505375fe5',1,'canNotifyData']]],
-  ['txerrorcounter',['txErrorCounter',['../structcan_notify_data.html#af474cc212c3fa114c32b574d8f9085e3',1,'canNotifyData']]],
-  ['type',['type',['../structkvm_log_trigger_ex.html#af5dcc482d7b811836ff61a4c408c3c78',1,'kvmLogTriggerEx::type()'],['../structkvm_log_event_ex.html#af356674bbaaf9bb782af79059eef1346',1,'kvmLogEventEx::type()'],['../structtag__token.html#ac765329451135abec74c45e1897abf26',1,'tag_token::type()']]]
+  ['serialnumber',['serialNumber',['../structkvm_log_version_ex.html#a1f36efa76fac084b62745c8e8ed0a751',1,'kvmLogVersionEx']]],
+  ['start_5fpos',['start_pos',['../structtag__token.html#a9715e2df77829e54cb078a298fd6c434',1,'tag_token']]],
+  ['status',['status',['../structcan_notify_data.html#a345c20017f48fbb3fb2b3adada292f29',1,'canNotifyData']]],
+  ['stddata',['stdData',['../structcan_bus_statistics__s.html#a45656d1d249afb1ef001b9d56337b26b',1,'canBusStatistics_s']]],
+  ['stdremote',['stdRemote',['../structcan_bus_statistics__s.html#adbc105164238a47be6d13a16cfdf07d8',1,'canBusStatistics_s']]],
+  ['synchbreaklength',['synchBreakLength',['../struct_lin_message_info.html#a137ad7080687a2011666ac9eafe0832f',1,'LinMessageInfo']]],
+  ['synchedgetime',['synchEdgeTime',['../struct_lin_message_info.html#a2eb7b88360a5994c5a4f49f02138c0f0',1,'LinMessageInfo']]]
 ];

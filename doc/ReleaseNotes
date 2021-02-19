@@ -62,7 +62,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.30  
+Release notes for linuxcan V5.31  
 ================================================================
 
 These release notes apply to both CANLIB SDK and the Linux drivers.
@@ -109,6 +109,8 @@ Linux device drivers for
   *  KVASER Hybrid 2xCAN/LIN (00965-3)
   *  KVASER Hybrid Pro 2xCAN/LIN (01042-0)
   *  KVASER Memorator Light HS v2 (01058-1)
+  *  KVASER U100 (01173-1)
+  *  KVASER U100P (01174-8)
 
 
   **    Recommended firmware > 3.0
@@ -162,6 +164,28 @@ Known problems
      (This is the same as under Windows.)
 
 
+New Features and Fixed Problems in V5.31   (24-FEB-2020)
+===========================================================================
+* Interchanged calls to canSetBusOutputControl() and canGetBusOutputControl()
+  using CANlib and t is now consistent.
+
+* Reverted a change regarding setting canDRIVER_NORMAL in v5.27 since this
+  globally affected all channels. Calls to canSetBusOutputControl() and
+  canGetBusOutputControl() is now persistent across all channels in the device
+  until power is cycled in latest generation of devices (kcany, kcanf,
+  kcanl). Older devices have not changed their behaviour.
+
+* SDK (canlib)
+  -Reading canCHANNELDATA_HW_STATUS will now return canERR_NOT_IMPLEMENTED
+   instead of canERR_PARAM.
+
+ -Capability SILENT_MODE is now reported for PCIcanx and PCIcanx II devices.
+
+* Added support for new device:
+  - KVASER U100 (01173-1)
+  - KVASER U100P (01174-8)
+
+
 New Features and Fixed Problems in V5.30   (08-OCT-2019)
 ===========================================================================
 * Minor changes.
@@ -172,11 +196,11 @@ New Features and Fixed Problems in V5.29   (13-SEP-2019)
 * SDK (canlib)
   - The message data buffer is untouched when reading a remote request frame
     as identified by the canMSG_RTR flag.
-  - canGetBusStatistics reports the same result if transmit acknowledge is 
+  - canGetBusStatistics reports the same result if transmit acknowledge is
     off (0) or on (1). Transmit acknowledge is set by ioctl canIOCTL_SET_TXACK.
   - Fixed a bug in kvFileCopyToDevice.
 
-  - Implemented the following tScript functions: 
+  - Implemented the following tScript functions:
     kvScriptStatus and kvScriptLoadFileOnDevice.
     kvScriptEnvvarOpen and kvScriptEnvvarClose.
     kvScriptEnvvarSetInt and kvScriptEnvvarGetInt.
@@ -206,7 +230,7 @@ New Features and Fixed Problems in V5.29   (13-SEP-2019)
     handling the situation where the number of events exceeds the size of an int.
 
 * Common
-  - fixed bug where a call to canIOCTL_TX_INTERVAL could cause a crash if 
+  - fixed bug where a call to canIOCTL_TX_INTERVAL could cause a crash if
     TX_INTERVAL is unsupported by the device.
   - BusStatistics increments between calls to canGetBusStatistics. Previously,
     it was cleared. The function now has the same behavior as in Windows.
@@ -265,7 +289,7 @@ New Features and Fixed Problems in V5.26   (26-NOV-2018)
   - Fixed a bug where kvaDbGetFlags() didn't return the KVADB_DATABASE_J1939-flag.
   - Added function kvaDbGetMsgByPGN().
   - Clarified null-terminated strings in documentation.
-  
+
 * SDK (linlib)
   - Clarified LIN diagnostic frames in documentation.
   - linWriteWakeup() parameter check updated.
@@ -277,7 +301,7 @@ New Features and Fixed Problems in V5.25   (16-SEP-2018)
 * Blacklisting SocketCAN kvaser_pciefd driver when installing pcican, pcican2
   and pciefd drivers.
 
-* The installation script will create any missing folders in 
+* The installation script will create any missing folders in
   /lib/modules/`uname -r`/kernel/drivers prior to installation.
 
 * Added compiled script file (.txe) information retrieval function
@@ -310,7 +334,7 @@ New Features and Fixed Problems in V5.24   (03-JUL-2018)
 ===========================================================================
 
 * SDK (canlib)
-  - Rolled back canOPEN_NO_INIT_ACCESS changes. 
+  - Rolled back canOPEN_NO_INIT_ACCESS changes.
 
 
 

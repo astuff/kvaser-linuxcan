@@ -202,12 +202,12 @@ typedef struct CANOps
   canStatus (*kvScriptSendEvent) (HandleData *, int, int, int, unsigned int);
   kvEnvHandle (*kvScriptEnvvarOpen) (HandleData *, char *, int *, int *);
   canStatus (*kvScriptEnvvarClose) (HandleData *, int);
-  canStatus (*kvScriptEnvvarSetInt) (HandleData *, int, int); 
+  canStatus (*kvScriptEnvvarSetInt) (HandleData *, int, int);
   canStatus (*kvScriptEnvvarGetInt) (HandleData *, int, int *);
   canStatus (*kvScriptEnvvarSetFloat) (HandleData *, int, float);
   canStatus (*kvScriptEnvvarGetFloat) (HandleData *, int, float *);
-  canStatus (*kvScriptEnvvarSetData) (kvEnvHandle, void *, int, int);
-  canStatus (*kvScriptEnvvarGetData) (kvEnvHandle, void *, int, int);
+  canStatus (*kvScriptEnvvarSetData) (HandleData *, int, void *, int, int);
+  canStatus (*kvScriptEnvvarGetData) (HandleData *, int, void *, int, int);
   canStatus (*kvScriptRequestText)  (HandleData *, unsigned int, unsigned int);
   canStatus (*kvScriptGetText)  (HandleData *, int *, unsigned long *, unsigned int *, char *, size_t);
 
