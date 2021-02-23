@@ -215,6 +215,41 @@ typedef struct {
   int  retval;
 }VCanSetBusOn;
 
+typedef struct {
+  unsigned int version;
+  unsigned int numerator;
+  unsigned int denominator;
+  unsigned int power_of_ten;
+  unsigned int accuracy_ppm;
+}VCanClockInfo;
+
+typedef struct {
+  unsigned int version;
+  unsigned int brp_size;
+  unsigned int seg1_size;
+  unsigned int seg2_size;
+  unsigned int sjw_size;
+}VCanBusParamLimits;
+
+typedef struct {
+  unsigned int tq;
+  unsigned int prop;
+  unsigned int phase1;
+  unsigned int phase2;
+  unsigned int sjw;
+  unsigned int prescaler;
+} VCanBusParamsApiTq;
+
+#define VCANSETBUSPARAMSTQ_NO_INIT_ACCESS -1
+#define VCANSETBUSPARAMSTQ_INVALID_HANDLE -2
+typedef struct {
+  VCanBusParamsApiTq  nominal;
+  VCanBusParamsApiTq  data;
+  unsigned int        data_valid;
+  int                 retval_from_device;
+  int                 retval_from_driver;
+} VCanBusParamsTq;
+
 // Other missing driver stuff
 //===========================================================================
 

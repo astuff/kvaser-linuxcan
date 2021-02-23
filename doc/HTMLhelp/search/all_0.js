@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['accuracy_5fppm',['accuracy_ppm',['../structkv_clock_info.html#a1ceb47504c247019604b4d4e05504a9e',1,'kvClockInfo']]],
   ['ai1',['AI1',['../structkv_io_module_analog.html#ad4ea693fe3b31c0d44fdc8d8edad2061',1,'kvIoModuleAnalog']]],
   ['ai2',['AI2',['../structkv_io_module_analog.html#a09a8103e80a3ca67fe8076b14c02ea98',1,'kvIoModuleAnalog']]],
   ['ai3',['AI3',['../structkv_io_module_analog.html#a5ee7aea94792b76835890e4537dd725d',1,'kvIoModuleAnalog']]],

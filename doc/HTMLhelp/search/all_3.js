@@ -1,6 +1,7 @@
 var searchData=
 [
   ['data',['data',['../structkvm_log_msg_ex.html#a62823cfc5356727ed036cea88e873777',1,'kvmLogMsgEx']]],
+  ['denominator',['denominator',['../structkv_clock_info.html#a6d7a01ea2b2b71b529a024b1a4617e3f',1,'kvClockInfo']]],
   ['deprecated_20list',['Deprecated List',['../deprecated.html',1,'']]],
   ['di',['DI',['../structkv_io_module_internal.html#a92162ee960f0e92fd68cca9838f05e3d',1,'kvIoModuleInternal']]],
   ['di1',['DI1',['../structkv_io_module_digital.html#ae673886a97b8bff94b37353d867360e2',1,'kvIoModuleDigital::DI1()'],['../structkv_io_module_relay.html#ae673886a97b8bff94b37353d867360e2',1,'kvIoModuleRelay::DI1()']]],

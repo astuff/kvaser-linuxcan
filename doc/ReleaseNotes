@@ -62,7 +62,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.33  
+Release notes for linuxcan V5.34  
 ================================================================
 
 These release notes apply to both CANLIB SDK and the Linux drivers.
@@ -164,6 +164,43 @@ Known problems
      hardware, the same is not true for auto tx. The latter is only
      available if there is firmware support in the device.
      (This is the same as under Windows.)
+
+
+New Features and Fixed Problems in V5.34   (09-SEP-2020)
+===========================================================================
+* Fixed false positive warning when building with Secure Boot disabled
+  (introduced in v5.27).
+
+* Updated linuxcan install procedure to record for which linux header version 
+  it was installed in order to be able to uninstall even after linux header
+  version upgrade.
+
+* Added option to uninstall all versions of linuxcan if it has been installed
+  several times for different linux header versions. This option is invoked 
+  through "sudo make purge".
+
+* SDK (canlib)
+  - New bus parameter API using time quanta, see e.g. canSetBusParamsTq().
+  - kvScriptEnvvarOpen()'s 'envvarName' parameter and kvScriptEnvvarSetData()'s
+    'buf' parameter have been changed to const.
+  - Added a filter on event canNOTIFY_STATUS. The event is now only generated
+    when status is changed.
+  - Source code are no longer installed together with the CANlib examples.
+
+* SDK (kvmlib)
+  - KME24 RTC events retrieved via kvmKmeReadEvent will no longer have
+    cached timeStamp values.
+
+* SDK (kvadblib)
+  - Added functions kvaDbGetMsgByPGNEx and kvaDbGetMsgByIdEx which differ
+    from their predecessors in that KVADB_MESSAGE_EXT is no longer set on
+    the id parameter. For kvaDbGetMsgByIdEx it is instead set on a flags
+    parameter.
+  - Fixed a bug on kvaDbGetMsgById which allowed ext messages to be found
+    when searching for std messages.
+  - kvaDbGetMsgByPGN was deprecated in favour of kvaDbGetMsgByPGNEx.
+  - kvaDbGetMsgByPGNEx (and kvaDbGetMsgByPGN) will not return the message
+    'VECTOR_INDEPENDENT_SIG_MSG'.
 
 
 New Features and Fixed Problems in V5.33   (27-MAY-2020)

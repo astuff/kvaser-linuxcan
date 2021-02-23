@@ -494,7 +494,8 @@ LinStatus LINLIBAPI linGetChannelData(int channel, int item, void *buffer, size_
  *
  * \note The handle shall be off-bus.
  *
- * \note Supported bit rates are 1000 - 20000 bits per second.
+ * \note Supported bit rates according to the LIN standard are 1000 - 20000
+ * bits per second. No check of the bps parameter is done inside LINlib.
  *
  * \param[in] h   A handle to an open LIN channel.
  * \param[in] bps Bit rate in bits per second.

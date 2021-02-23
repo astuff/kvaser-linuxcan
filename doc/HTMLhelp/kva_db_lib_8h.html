@@ -113,6 +113,12 @@ Macros</h2></td></tr>
 <tr class="memitem:a796f3e3f05590caf5c6e7988ee0cd11e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#a796f3e3f05590caf5c6e7988ee0cd11e">KVADB_MESSAGE_WAKEUP</a>&#160;&#160;&#160;0x00000002</td></tr>
 <tr class="memdesc:a796f3e3f05590caf5c6e7988ee0cd11e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message is a wakeup frame. This flag is currently not used.  <a href="#a796f3e3f05590caf5c6e7988ee0cd11e">More...</a><br /></td></tr>
 <tr class="separator:a796f3e3f05590caf5c6e7988ee0cd11e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">CANDBDatabaseFlags API Database Flags</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="KVADB_DATABASE_xxx"></a> The following value is used by <a class="el" href="group__kvadb__database.html#ga04b35b1f5416157cb633cf7c44df396e">kvaDbGetFlags()</a>. </p>
+</div></td></tr>
+<tr class="memitem:a9537a62c44999b70c79253ee1271e128"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#a9537a62c44999b70c79253ee1271e128">KVADB_DATABASE_J1939</a>&#160;&#160;&#160;0x0001</td></tr>
+<tr class="memdesc:a9537a62c44999b70c79253ee1271e128"><td class="mdescLeft">&#160;</td><td class="mdescRight">The database uses the J1939 protocol.  <a href="#a9537a62c44999b70c79253ee1271e128">More...</a><br /></td></tr>
+<tr class="separator:a9537a62c44999b70c79253ee1271e128"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Kvaser Database Multiplexer Mode values</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="KVADB_MUX_xxx"></a></p>
 </div></td></tr>
@@ -122,6 +128,31 @@ Macros</h2></td></tr>
 <tr class="memitem:a1d99a6637fef6f787f72765ba216b24d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#a1d99a6637fef6f787f72765ba216b24d">KVADB_MUX_INDEPENDENT</a>&#160;&#160;&#160;-1</td></tr>
 <tr class="memdesc:a1d99a6637fef6f787f72765ba216b24d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiplex mode value of an independent signal.  <a href="#a1d99a6637fef6f787f72765ba216b24d">More...</a><br /></td></tr>
 <tr class="separator:a1d99a6637fef6f787f72765ba216b24d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Kvaser Database Handle Types</div></td></tr>
+<tr class="memitem:a0ab6b252bb2dbf1312bd48208954e67b"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a></td></tr>
+<tr class="memdesc:a0ab6b252bb2dbf1312bd48208954e67b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Database handle.  <a href="#a0ab6b252bb2dbf1312bd48208954e67b">More...</a><br /></td></tr>
+<tr class="separator:a0ab6b252bb2dbf1312bd48208954e67b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a561c9270625ed9b7a4bc32edaab72227"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a></td></tr>
+<tr class="memdesc:a561c9270625ed9b7a4bc32edaab72227"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message handle.  <a href="#a561c9270625ed9b7a4bc32edaab72227">More...</a><br /></td></tr>
+<tr class="separator:a561c9270625ed9b7a4bc32edaab72227"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa41cb518eea5c637f18eda0affa4e011"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#aa41cb518eea5c637f18eda0affa4e011">KvaDbSignalHnd</a></td></tr>
+<tr class="memdesc:aa41cb518eea5c637f18eda0affa4e011"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal handle.  <a href="#aa41cb518eea5c637f18eda0affa4e011">More...</a><br /></td></tr>
+<tr class="separator:aa41cb518eea5c637f18eda0affa4e011"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb7f65c8a757705c653045957266beb4"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#adb7f65c8a757705c653045957266beb4">KvaDbNodeHnd</a></td></tr>
+<tr class="memdesc:adb7f65c8a757705c653045957266beb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Node handle.  <a href="#adb7f65c8a757705c653045957266beb4">More...</a><br /></td></tr>
+<tr class="separator:adb7f65c8a757705c653045957266beb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9cddd35b77cdc51def41e560f0d01a5e"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#a9cddd35b77cdc51def41e560f0d01a5e">KvaDbAttributeHnd</a></td></tr>
+<tr class="memdesc:a9cddd35b77cdc51def41e560f0d01a5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attribute handle.  <a href="#a9cddd35b77cdc51def41e560f0d01a5e">More...</a><br /></td></tr>
+<tr class="separator:a9cddd35b77cdc51def41e560f0d01a5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4be0bd27b01ad1ef6e1117369416e7d6"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#a4be0bd27b01ad1ef6e1117369416e7d6">KvaDbAttributeDefHnd</a></td></tr>
+<tr class="memdesc:a4be0bd27b01ad1ef6e1117369416e7d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attribute definition handle.  <a href="#a4be0bd27b01ad1ef6e1117369416e7d6">More...</a><br /></td></tr>
+<tr class="separator:a4be0bd27b01ad1ef6e1117369416e7d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf4013475de89eea3c708e933e552d14"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#aaf4013475de89eea3c708e933e552d14">KvaDbEnumValueHnd</a></td></tr>
+<tr class="memdesc:aaf4013475de89eea3c708e933e552d14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enumeration value handle.  <a href="#aaf4013475de89eea3c708e933e552d14">More...</a><br /></td></tr>
+<tr class="separator:aaf4013475de89eea3c708e933e552d14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -289,8 +320,12 @@ Functions</h2></td></tr>
 <tr class="separator:ga0146dd4ddf2c39bfdc3b93c29fe85b32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga732d691ed8ead650e4a49d18c8f7ffa2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#ga732d691ed8ead650e4a49d18c8f7ffa2">kvaDbGetMsgById</a> (<a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a> dh, unsigned int id, <a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *mh)</td></tr>
 <tr class="separator:ga732d691ed8ead650e4a49d18c8f7ffa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9698147c268d22991c3ff0f907dff02e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#ga9698147c268d22991c3ff0f907dff02e">kvaDbGetMsgByIdEx</a> (<a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a> dh, unsigned int id, unsigned int flags, <a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *mh)</td></tr>
+<tr class="separator:ga9698147c268d22991c3ff0f907dff02e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gab45031c6ed2eed71515f2badd586d4b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#gab45031c6ed2eed71515f2badd586d4b4">kvaDbGetMsgByPGN</a> (<a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a> dh, unsigned int id, <a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *mh)</td></tr>
 <tr class="separator:gab45031c6ed2eed71515f2badd586d4b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad582275cc3d35cf9d68e49bdb68b015c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#gad582275cc3d35cf9d68e49bdb68b015c">kvaDbGetMsgByPGNEx</a> (<a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a> dh, unsigned int id, <a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *mh)</td></tr>
+<tr class="separator:gad582275cc3d35cf9d68e49bdb68b015c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9685fdb33257ac28e4cd989cfe8ca154"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#ga9685fdb33257ac28e4cd989cfe8ca154">kvaDbGetMsgByName</a> (<a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a> dh, const char *msg_name, <a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *mh)</td></tr>
 <tr class="separator:ga9685fdb33257ac28e4cd989cfe8ca154"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga194badc7e10d889df38a0f4eb763b5e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#ga194badc7e10d889df38a0f4eb763b5e6">kvaDbGetMsgName</a> (<a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> mh, char *buf, size_t buflen)</td></tr>
@@ -551,35 +586,6 @@ Functions</h2></td></tr>
 <tr class="separator:gaf396a8ddcdb19ceca7be58376ae10cd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad5b5e16d7375d2a63c93b6b56aeae40a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#gad5b5e16d7375d2a63c93b6b56aeae40a">kvaDbBytesToMsgDlc</a> (<a class="el" href="kva_db_lib_8h.html#ad0362f767c822d2c461843ea80cb7694">KvaDbProtocolType</a> prot, unsigned int numBytes, unsigned int *dlc)</td></tr>
 <tr class="separator:gad5b5e16d7375d2a63c93b6b56aeae40a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
-CANDBDatabaseFlags API Database Flags</h2></td></tr>
-<tr><td class="ititle" colspan="2"><p><a class="anchor" id="amgrpbf8316a3465796ff8ecbcc19739e33df"></a><a class="anchor" id="KVADB_DATABASE_xxx"></a> The following value is used by <a class="el" href="group__kvadb__database.html#ga04b35b1f5416157cb633cf7c44df396e">kvaDbGetFlags()</a>. </p>
-</td></tr>
-<tr class="memitem:a9537a62c44999b70c79253ee1271e128"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#a9537a62c44999b70c79253ee1271e128">KVADB_DATABASE_J1939</a>&#160;&#160;&#160;0x0001</td></tr>
-<tr class="memdesc:a9537a62c44999b70c79253ee1271e128"><td class="mdescLeft">&#160;</td><td class="mdescRight">The database uses the J1939 protocol.  <a href="#a9537a62c44999b70c79253ee1271e128">More...</a><br /></td></tr>
-<tr class="separator:a9537a62c44999b70c79253ee1271e128"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ab6b252bb2dbf1312bd48208954e67b"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a></td></tr>
-<tr class="memdesc:a0ab6b252bb2dbf1312bd48208954e67b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Database handle.  <a href="#a0ab6b252bb2dbf1312bd48208954e67b">More...</a><br /></td></tr>
-<tr class="separator:a0ab6b252bb2dbf1312bd48208954e67b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a561c9270625ed9b7a4bc32edaab72227"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a></td></tr>
-<tr class="memdesc:a561c9270625ed9b7a4bc32edaab72227"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message handle.  <a href="#a561c9270625ed9b7a4bc32edaab72227">More...</a><br /></td></tr>
-<tr class="separator:a561c9270625ed9b7a4bc32edaab72227"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa41cb518eea5c637f18eda0affa4e011"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#aa41cb518eea5c637f18eda0affa4e011">KvaDbSignalHnd</a></td></tr>
-<tr class="memdesc:aa41cb518eea5c637f18eda0affa4e011"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal handle.  <a href="#aa41cb518eea5c637f18eda0affa4e011">More...</a><br /></td></tr>
-<tr class="separator:aa41cb518eea5c637f18eda0affa4e011"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb7f65c8a757705c653045957266beb4"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#adb7f65c8a757705c653045957266beb4">KvaDbNodeHnd</a></td></tr>
-<tr class="memdesc:adb7f65c8a757705c653045957266beb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Node handle.  <a href="#adb7f65c8a757705c653045957266beb4">More...</a><br /></td></tr>
-<tr class="separator:adb7f65c8a757705c653045957266beb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9cddd35b77cdc51def41e560f0d01a5e"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#a9cddd35b77cdc51def41e560f0d01a5e">KvaDbAttributeHnd</a></td></tr>
-<tr class="memdesc:a9cddd35b77cdc51def41e560f0d01a5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attribute handle.  <a href="#a9cddd35b77cdc51def41e560f0d01a5e">More...</a><br /></td></tr>
-<tr class="separator:a9cddd35b77cdc51def41e560f0d01a5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4be0bd27b01ad1ef6e1117369416e7d6"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#a4be0bd27b01ad1ef6e1117369416e7d6">KvaDbAttributeDefHnd</a></td></tr>
-<tr class="memdesc:a4be0bd27b01ad1ef6e1117369416e7d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attribute definition handle.  <a href="#a4be0bd27b01ad1ef6e1117369416e7d6">More...</a><br /></td></tr>
-<tr class="separator:a4be0bd27b01ad1ef6e1117369416e7d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf4013475de89eea3c708e933e552d14"><td class="memItemLeft" align="right" valign="top">typedef void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#aaf4013475de89eea3c708e933e552d14">KvaDbEnumValueHnd</a></td></tr>
-<tr class="memdesc:aaf4013475de89eea3c708e933e552d14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enumeration value handle.  <a href="#aaf4013475de89eea3c708e933e552d14">More...</a><br /></td></tr>
-<tr class="separator:aaf4013475de89eea3c708e933e552d14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Definitions for the Database API. </p>
@@ -1001,7 +1007,7 @@ CANDBDatabaseFlags API Database Flags</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="kva_db_lib_8h.html">kvaDbLib.h</a></li>
-    <li class="footer"> (canlib 5.33) Wed May 27 2020</li>
+    <li class="footer"> (canlib 5.34) Wed Sep 9 2020</li>
   </ul>
 </div>
 </body>

@@ -169,6 +169,12 @@ typedef struct CANOps
                             unsigned int *tseg2, unsigned int *sjw, unsigned int *noSamp,
                             long *freq_brs, unsigned int *tseg1_brs, unsigned int *tseg2_brs,
                             unsigned int *sjw_brs, unsigned int *syncmode);
+
+
+  canStatus (*setBusParamsTq)(HandleData *hData, const kvBusParamsTq *nominell, const kvBusParamsTq *data);
+  canStatus (*getBusParamsTq)(HandleData *hData, kvBusParamsTq *nominell, kvBusParamsTq *data);
+
+
   canStatus (*reqBusStats) (HandleData *hData);
   canStatus (*getBusStats) (HandleData *hData, canBusStatistics *stat);
   canStatus (*read)(HandleData *, long *, void *, unsigned int *,
@@ -200,13 +206,13 @@ typedef struct CANOps
   canStatus (*kvScriptLoadFileOnDevice) (HandleData *, int, char *);
   canStatus (*kvScriptUnload) (HandleData *, int);
   canStatus (*kvScriptSendEvent) (HandleData *, int, int, int, unsigned int);
-  kvEnvHandle (*kvScriptEnvvarOpen) (HandleData *, char *, int *, int *);
+  kvEnvHandle (*kvScriptEnvvarOpen) (HandleData *, const char *, int *, int *);
   canStatus (*kvScriptEnvvarClose) (HandleData *, int);
   canStatus (*kvScriptEnvvarSetInt) (HandleData *, int, int);
   canStatus (*kvScriptEnvvarGetInt) (HandleData *, int, int *);
   canStatus (*kvScriptEnvvarSetFloat) (HandleData *, int, float);
   canStatus (*kvScriptEnvvarGetFloat) (HandleData *, int, float *);
-  canStatus (*kvScriptEnvvarSetData) (HandleData *, int, void *, int, int);
+  canStatus (*kvScriptEnvvarSetData) (HandleData *, int, const void *, int, int);
   canStatus (*kvScriptEnvvarGetData) (HandleData *, int, void *, int, int);
   canStatus (*kvScriptRequestText)  (HandleData *, unsigned int, unsigned int);
   canStatus (*kvScriptGetText)  (HandleData *, int *, unsigned long *, unsigned int *, char *, size_t);

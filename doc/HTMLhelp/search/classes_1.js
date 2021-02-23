@@ -1,6 +1,9 @@
 var searchData=
 [
   ['kvadbprotocolproperties',['KvaDbProtocolProperties',['../struct_kva_db_protocol_properties.html',1,'']]],
+  ['kvbusparamlimits',['kvBusParamLimits',['../structkv_bus_param_limits.html',1,'']]],
+  ['kvbusparamstq',['kvBusParamsTq',['../structkv_bus_params_tq.html',1,'']]],
+  ['kvclockinfo',['kvClockInfo',['../structkv_clock_info.html',1,'']]],
   ['kviomoduleanalog',['kvIoModuleAnalog',['../structkv_io_module_analog.html',1,'']]],
   ['kviomoduledigital',['kvIoModuleDigital',['../structkv_io_module_digital.html',1,'']]],
   ['kviomoduleinternal',['kvIoModuleInternal',['../structkv_io_module_internal.html',1,'']]],

@@ -1,5 +1,6 @@
 var group___c_a_n =
 [
+    [ "bus_params_tq.h", "bus__params__tq_8h.html", null ],
     [ "canAccept", "group___c_a_n.html#gaa4ffd2fad1932ad5763c2c923a1a12d8", null ],
     [ "canBusOff", "group___c_a_n.html#gaf1786cfbfd542b18b9c599d278837bd9", null ],
     [ "canBusOn", "group___c_a_n.html#ga99c7c99cc71580f8099a1407f4f9ea1a", null ],
@@ -9,6 +10,8 @@ var group___c_a_n =
     [ "canGetBusOutputControl", "group___c_a_n.html#ga1683419d56af8afdbfc9184678c82fdd", null ],
     [ "canGetBusParams", "group___c_a_n.html#gaf2a734c0486030610389331685a3827a", null ],
     [ "canGetBusParamsFd", "group___c_a_n.html#gab620a5cd6249e2e53cf2a0099e7e8685", null ],
+    [ "canGetBusParamsFdTq", "group___c_a_n.html#ga2ca01a0c71b8c3b5204f07b051eb4758", null ],
+    [ "canGetBusParamsTq", "group___c_a_n.html#gae517a9c243c446e040f6f8898d09a677", null ],
     [ "canGetBusStatistics", "group___c_a_n.html#ga8d78ccbef4e6038ff63662f06b7cde65", null ],
     [ "canGetDriverMode", "group___c_a_n.html#gacbb6c333badfaa092e9b239ad99478c9", null ],
     [ "canGetHandleData", "group___c_a_n.html#ga909e5c14b09fe76bad280475138d503e", null ],
@@ -30,6 +33,8 @@ var group___c_a_n =
     [ "canSetBusParams", "group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301", null ],
     [ "canSetBusParamsC200", "group___c_a_n.html#gac34c1577cae55385250e7412513c8cbd", null ],
     [ "canSetBusParamsFd", "group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14", null ],
+    [ "canSetBusParamsFdTq", "group___c_a_n.html#ga4beeb28ede2e21a2988076e66f873723", null ],
+    [ "canSetBusParamsTq", "group___c_a_n.html#ga50f169c6f9dd6df93b17c322e8e4fd00", null ],
     [ "canSetDriverMode", "group___c_a_n.html#gae0bd6419b7a004c439dc582a53815c78", null ],
     [ "canSetNotify", "group___c_a_n.html#gaa5dd0f277c7059169055321fbda87486", null ],
     [ "canTranslateBaud", "group___c_a_n.html#gaf38b95fce4930347d9986887ec046e13", null ],

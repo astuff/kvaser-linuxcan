@@ -609,7 +609,7 @@ If the call fails, the return value is a negative integer indicating an error co
 <p>This function sets the bit rate for a master, or the initial bit rate for a slave.</p>
 <dl class="section note"><dt>Note</dt><dd>The handle shall be off-bus.</dd>
 <dd>
-Supported bit rates are 1000 - 20000 bits per second.</dd></dl>
+Supported bit rates according to the LIN standard are 1000 - 20000 bits per second. No check of the bps parameter is done inside LINlib.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>A handle to an open LIN channel. </td></tr>
@@ -956,7 +956,7 @@ Maximum value of interval is either 255 (0xFF) or 65535 (0xFFFF) depending on de
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.33) Wed May 27 2020</li>
+    <li class="footer"> (canlib 5.34) Wed Sep 9 2020</li>
   </ul>
 </div>
 </body>

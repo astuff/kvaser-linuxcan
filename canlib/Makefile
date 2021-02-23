@@ -95,6 +95,7 @@ SRCS += md5.c
 SRCS += txe.c
 SRCS += txe_fopen.c
 SRCS += dlc.c
+SRCS += tq_util.c
 
 OBJS := $(patsubst %.c, %.o, $(SRCS))
 OTHERDEPS := ../include/canlib.h
@@ -147,6 +148,7 @@ install:
 	/sbin/ldconfig
 	install -m 644 ../include/canlib.h /usr/include
 	install -m 644 ../include/canstat.h /usr/include
+	install -m 644 ../include/bus_params_tq.h /usr/include
 	install -m 644 ../include/obsolete.h /usr/include
 	mkdir -p /usr/doc/canlib
 	cp -r ../doc/HTMLhelp /usr/doc/canlib
@@ -155,7 +157,7 @@ uninstall:
 	$(MAKE) -C examples uninstall
 	rm -f /usr/lib/$(LIBNAME) /usr/lib/$(SONAME) /usr/lib/$(LIBRARY)
 	/sbin/ldconfig
-	rm -f /usr/include/canlib.h /usr/include/canstat.h /usr/include/obsolete.h
+	rm -f /usr/include/canlib.h /usr/include/canstat.h /usr/include/obsolete.h /usr/include/bus_params_tq.h
 	rm -rf /usr/doc/canlib
 
 clean:

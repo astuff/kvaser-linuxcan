@@ -100,10 +100,10 @@ all: sub
 
 install:
 	@echo --------------------------------------------------------------------
-	@echo "Installing examples into /usr/doc/canlib"
+	@echo "Installing examples into /usr/doc/canlib/examples"
 	@echo --------------------------------------------------------------------
-	mkdir -p /usr/doc/canlib
-	cp -r . /usr/doc/canlib/examples
+	mkdir -p /usr/doc/canlib/examples
+	cp $(OBJS) /usr/doc/canlib/examples/.
 
 uninstall:
 	rm -rf /usr/doc/canlib/examples

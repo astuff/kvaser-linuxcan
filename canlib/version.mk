@@ -1,4 +1,4 @@
 LIBNAME = libcanlib.so
 MAJOR = 1
-MINOR = 6
+MINOR = 7
 BUILD = 0

@@ -127,6 +127,9 @@ static uint32_t capabilities_table[][2] = {
   {VCAN_CHANNEL_CAP_DIAGNOSTICS,         canCHANNEL_CAP_DIAGNOSTICS}
 };
 
+static uint64_t capabilities_ex_table[][2] = {
+    {VCAN_CHANNEL_EX_CAP_HAS_BUSPARAMS_TQ,  canCHANNEL_CAP_EX_BUSPARAMS_TQ}
+};
 
 // If there are more handles than this, the rest will be
 // handled by a linked list.
@@ -144,6 +147,7 @@ static pthread_mutex_t handleMutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
 #endif
 
 static uint32_t get_capabilities (uint32_t cap);
+static uint64_t get_capabilities_ex (uint64_t cap_ex);
 static uint32_t convert_channel_info_flags (uint32_t vflags);
 
 #define ERROR_WHEN_NEQ 0
@@ -297,11 +301,12 @@ static canStatus kCanSetOpenMode (HandleData *hData)
   return canOK;
 }
 
-static void notify (HandleData *hData, VCAN_EVENT *msg, uint32_t *prev_busoff)
+static void notify (HandleData *hData, VCAN_EVENT *msg, uint32_t *prev_busoff, uint32_t *prev_bus_status)
 {
   canNotifyData *notifyData = &hData->notifyData;
   unsigned int   cb2_notify = 0;
   uint32_t       curr_busoff;
+  uint32_t       curr_bus_status;
 
   if (msg->tag == V_CHIP_STATE) {
     struct s_vcan_chip_state *chipState = &msg->tagData.chipState;
@@ -312,6 +317,8 @@ static void notify (HandleData *hData, VCAN_EVENT *msg, uint32_t *prev_busoff)
       curr_busoff = 0;
     }
 
+    curr_bus_status = (uint32_t)chipState->busStatus;
+
     if (hData->notifyFlags & canNOTIFY_BUSONOFF) {
       if (curr_busoff != *prev_busoff) {
         cb2_notify   |= canNOTIFY_BUSONOFF;
@@ -320,7 +327,10 @@ static void notify (HandleData *hData, VCAN_EVENT *msg, uint32_t *prev_busoff)
     }
 
     if (hData->notifyFlags & canNOTIFY_STATUS) {
-      cb2_notify |= canNOTIFY_STATUS;
+      if (curr_bus_status != *prev_bus_status) {
+        *prev_bus_status = curr_bus_status;
+        cb2_notify |= canNOTIFY_STATUS;
+      }
     }
 
     //just 1 event
@@ -381,6 +391,7 @@ static void *vCanNotifyThread (void *arg)
   VCAN_EVENT         msg;
   VCanRead           read;
   uint32_t           busoff;
+  uint32_t           bus_status;
 
   memset(&read, 0, sizeof(VCanRead));
 
@@ -401,6 +412,8 @@ static void *vCanNotifyThread (void *arg)
     } else {
       busoff = 0;
     }
+
+    bus_status = (uint32_t)chip_status.busStatus;
   }
   
   while (1) {
@@ -410,7 +423,7 @@ static void *vCanNotifyThread (void *arg)
     ret = ioctl(hData->notifyFd, VCAN_IOC_RECVMSG, &ioctl_read_arg);
 
     if (ret == 0) {
-      notify(hData, &msg, &busoff);
+      notify(hData, &msg, &busoff, &bus_status);
     } else {
       if (errno != EAGAIN) {
         pthread_exit(0); // When this thread is cancelled, ioctl will be interrupted by a signal.
@@ -714,6 +727,59 @@ static canStatus vCanSetBusParams (HandleData *hData,
   return canOK;
 }
 
+//======================================================================
+// vCanSetBusparamsTq
+//======================================================================
+static canStatus vCanSetBusParamsTq (HandleData          *hData,
+                                     const kvBusParamsTq *nominal,
+                                     const kvBusParamsTq *data)
+{
+  int             ret;
+  VCanBusParamsTq my_arg;
+
+  my_arg.nominal.tq        = (unsigned int)nominal->tq;
+  my_arg.nominal.prop      = (unsigned int)nominal->prop;
+  my_arg.nominal.phase1    = (unsigned int)nominal->phase1;
+  my_arg.nominal.phase2    = (unsigned int)nominal->phase2;
+  my_arg.nominal.sjw       = (unsigned int)nominal->sjw;
+  my_arg.nominal.prescaler = (unsigned int)nominal->prescaler;
+
+  if (data) {
+    my_arg.data.tq        = (unsigned int)data->tq;
+    my_arg.data.prop      = (unsigned int)data->prop;
+    my_arg.data.phase1    = (unsigned int)data->phase1;
+    my_arg.data.phase2    = (unsigned int)data->phase2;
+    my_arg.data.sjw       = (unsigned int)data->sjw;
+    my_arg.data.prescaler = (unsigned int)data->prescaler;
+    my_arg.data_valid     = 1;
+  } else {
+    my_arg.data_valid = 0;
+  }
+
+  ret = ioctl(hData->fd, VCAN_IOC_SET_BITRATE_TQ, &my_arg);
+
+  if (ret != 0) {
+    return errnoToCanStatus(errno);
+  }
+
+  if ((my_arg.retval_from_driver == VCANSETBUSPARAMSTQ_NO_INIT_ACCESS) && (hData->report_access_errors == 1)) {
+    return canERR_NO_ACCESS;
+  }
+  
+  if (my_arg.retval_from_driver == VCANSETBUSPARAMSTQ_INVALID_HANDLE) {
+    return canERR_INVHANDLE;
+  }
+  
+  if (my_arg.retval_from_device == 1) {
+    return canERR_PARAM;
+  }
+
+  if (my_arg.retval_from_device != 0) {
+    return canERR_HARDWARE;
+  } 
+
+  return canOK;
+}
 
 //======================================================================
 // vCanGetBusParams
@@ -753,6 +819,67 @@ static canStatus vCanGetBusParams(HandleData *hData,
   if (syncmode) *syncmode = 0;
 
   return canOK;
+}
+
+
+//======================================================================
+// vCanGetBusParams
+//======================================================================
+static canStatus vCanGetBusParamsTq(HandleData    *hData,
+                                    kvBusParamsTq *nominal,
+                                    kvBusParamsTq *data)
+
+{
+  int             ret;
+  VCanBusParamsTq my_arg;
+  
+  if (!nominal) {
+    return canERR_PARAM;
+  }
+
+  if (data) {
+    my_arg.data_valid = 1;
+  } else {
+    my_arg.data_valid = 0;
+  }
+
+  ret = ioctl(hData->fd, VCAN_IOC_GET_BITRATE_TQ, &my_arg);
+
+  if (ret != 0) {
+    return errnoToCanStatus(errno);
+  }
+
+  if (my_arg.retval_from_driver == VCANSETBUSPARAMSTQ_INVALID_HANDLE) {
+    return canERR_INVHANDLE;
+  }
+
+  if (my_arg.retval_from_device == 1) {
+    return canERR_PARAM;
+  }
+
+  if (my_arg.retval_from_device != 0) {
+    return canERR_HARDWARE;
+  }
+
+  nominal->tq        = (int)my_arg.nominal.tq;
+  nominal->prop      = (int)my_arg.nominal.prop;
+  nominal->phase1    = (int)my_arg.nominal.phase1;
+  nominal->phase2    = (int)my_arg.nominal.phase2;
+  nominal->sjw       = (int)my_arg.nominal.sjw;
+  nominal->prescaler = (int)my_arg.nominal.prescaler;
+
+  if (data) {
+    if (my_arg.data_valid) {
+      data->tq        = (int)my_arg.data.tq;
+      data->prop      = (int)my_arg.data.prop;
+      data->phase1    = (int)my_arg.data.phase1;
+      data->phase2    = (int)my_arg.data.phase2;
+      data->sjw       = (int)my_arg.data.sjw;
+      data->prescaler = (int)my_arg.data.prescaler;
+    }
+  }
+
+  return ret;
 }
 
 //======================================================================
@@ -1219,7 +1346,7 @@ static canStatus vCanScriptSendEvent(HandleData *hData,
 // vCanScriptEnvvarOpen
 //======================================================================
 static kvEnvHandle vCanScriptEnvvarOpen(HandleData *hData, 
-                                        char* envvarName,
+                                        const char* envvarName,
                                         int *envvarType,
                                         int *envvarSize) // returns scriptHandle
 {
@@ -1276,7 +1403,7 @@ static canStatus vCanScriptEnvvarGetFloat(HandleData *hData, int envvarIdx, floa
 //======================================================================
 static canStatus vCanScriptEnvvarSetData(HandleData *hData,
                                          int envvarIdx,
-                                         void *buf,
+                                         const void *buf,
                                          int start_index,
                                          int data_len)
 {
@@ -1727,6 +1854,37 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
   } else {
 
     switch (item) {
+      case canCHANNELDATA_BUS_PARAM_LIMITS:
+      {
+        VCanBusParamLimits my_arg;
+
+        if (ioctl(fd, VCAN_IOC_GET_BUS_PARAM_LIMITS, &my_arg) == 0) {
+          if (bufsize < sizeof(VCanBusParamLimits)) {
+            err = canERR_PARAM;
+            break;
+          }
+        }
+
+        *(VCanBusParamLimits*)buffer = my_arg;
+        break;
+      }
+
+      case canCHANNELDATA_CLOCK_INFO:
+      {
+        VCanClockInfo my_arg;
+
+
+        if (ioctl(fd, VCAN_IOC_GET_CLOCK_INFO, &my_arg) == 0) {
+          if (bufsize < sizeof(VCanClockInfo)) {
+            err = canERR_PARAM;
+            break;
+          }
+        }
+       
+        *(VCanClockInfo*)buffer = my_arg;
+        break;
+      }
+
     case canCHANNELDATA_CARD_NUMBER:
       if (bufsize < 4) {
         err = canERR_PARAM;
@@ -1800,6 +1958,19 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
       }
       if (ioctl(fd, VCAN_IOC_GET_CHAN_CAP_MASK, buffer) != -1) {
         *(uint32_t *)buffer = get_capabilities (*(uint32_t *)buffer);
+      }
+      break;
+
+    case canCHANNELDATA_CHANNEL_CAP_EX:
+      if (bufsize <16) {
+        err = canERR_PARAM;
+        break;
+      }
+      uint64_t tmp[2];
+      if (ioctl(fd, VCAN_IOC_GET_CHAN_CAP_EX, &tmp) != -1) {
+        uint64_t *p = (uint64_t *) buffer;
+        *p++ = get_capabilities_ex(tmp[0]);    // value
+        *p   = get_capabilities_ex(tmp[1]);    // mask
       }
       break;
 
@@ -2480,6 +2651,23 @@ static uint32_t get_capabilities (uint32_t cap) {
   return retval;
 }
 
+static uint64_t get_capabilities_ex (uint64_t cap_ex) {
+  uint32_t i;
+  uint64_t retval = 0;
+
+  for(i = 0;
+      i < sizeof(capabilities_ex_table) / sizeof(capabilities_ex_table[0]);
+      i++) {
+    if (cap_ex & capabilities_ex_table[i][0]) {
+      retval |= capabilities_ex_table[i][1];
+    }
+  }
+
+  return retval;
+}
+
+
+
 static int check_args (void*buf, uint32_t buf_len, uint32_t limit, uint32_t method)
 {
   if (!buf) {
@@ -2552,6 +2740,8 @@ CANOps vCanOps = {
   .busOff                   = vCanBusOff,
   .setBusParams             = vCanSetBusParams,
   .getBusParams             = vCanGetBusParams,
+  .setBusParamsTq           = vCanSetBusParamsTq,
+  .getBusParamsTq           = vCanGetBusParamsTq,
   .reqBusStats              = vCanReqBusStats,
   .getBusStats              = vCanGetBusStats,
   .read                = vCanRead,
