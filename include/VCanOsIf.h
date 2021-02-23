@@ -77,6 +77,7 @@
 #include <linux/types.h>
 #include <linux/tty.h>
 #include <linux/completion.h>
+#include <linux/time.h>
 
 #include "canIfData.h"
 #include "kcan_ioctl.h"
@@ -265,7 +266,11 @@ typedef struct VCanCardNumberData
 typedef struct VCanDriverData
 {
     int                       noOfDevices;
+#ifdef _LINUX_TIME64_H
+    struct timespec64         startTime;
+#else
     struct timeval            startTime;
+#endif
     char                      *deviceName;
     struct VCanHWInterface    *hwIf;
     struct VCanCardData       *canCards;
@@ -472,7 +477,11 @@ extern struct file_operations fops;
 
 
 /* Functions */
+#ifdef _LINUX_TIME64_H
+void            kv_do_gettimeofday (struct timespec64 *tv);
+#else
 void            kv_do_gettimeofday (struct timeval *tv);
+#endif
 int             vCanInitData(VCanCardData *chd);
 int             vCanTime(VCanCardData *vCard, uint64_t *time);
 int             vCanDispatchEvent(VCanChanData *chd, VCAN_EVENT *e);
@@ -484,7 +493,11 @@ int             vCanInit(VCanDriverData *, unsigned);
 void            vCanCleanup(VCanDriverData *);
 int             vCanGetCardInfo(VCanCardData *, VCAN_IOCTL_CARD_INFO *);
 int             vCanGetCardInfo2(VCanCardData *, KCAN_IOCTL_CARD_INFO_2 *);
+#ifdef _LINUX_TIME64_H
+struct timespec64 vCanCalc_dt(struct timespec64 *start); //returns now-start
+#else
 struct timeval  vCanCalc_dt(struct timeval *start); //returns now-start
+#endif
 void            vCanCardRemoved(VCanChanData *chd);
 int             vCanPopReceiveBuffer (VCanReceiveData *rcv);
 int             vCanPushReceiveBuffer (VCanReceiveData *rcv);

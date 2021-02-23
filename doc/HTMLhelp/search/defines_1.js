@@ -142,6 +142,7 @@ var searchData=
   ['canhwtype_5fpcicanx_5fii',['canHWTYPE_PCICANX_II',['../canlib_8h.html#a6ddcbbca55bfa784cad800eaeb4ae287',1,'canlib.h']]],
   ['canhwtype_5fpcie_5fv2',['canHWTYPE_PCIE_V2',['../canlib_8h.html#aa6b9a1812ed1b470705cb38cfd732699',1,'canlib.h']]],
   ['canhwtype_5fsimulated',['canHWTYPE_SIMULATED',['../canlib_8h.html#a95d07a58ea752b36e5224ec42258f36b',1,'canlib.h']]],
+  ['canhwtype_5fu100',['canHWTYPE_U100',['../canlib_8h.html#ab943def3563eb89a526ecd8f3b489768',1,'canlib.h']]],
   ['canhwtype_5fusbcan',['canHWTYPE_USBCAN',['../canlib_8h.html#a9260bb6dc758ba110edb786ffb96a645',1,'canlib.h']]],
   ['canhwtype_5fusbcan_5fii',['canHWTYPE_USBCAN_II',['../canlib_8h.html#a065da9e2a171575300b0994d4cef91b9',1,'canlib.h']]],
   ['canhwtype_5fusbcan_5fkline',['canHWTYPE_USBCAN_KLINE',['../canlib_8h.html#a944b12497ceefa82bd4de5b4198496f4',1,'canlib.h']]],

@@ -152,6 +152,10 @@ Installing using silent mode</h1>
 2	Installation aborted by script
 100	The virtual CAN driver, and/or the network enumerator driver, failed to start.
 	You should restart the computer and run the installation again.
+101	Error: the installation needs administrative rights.
+102	Error: the installation requires a later version of Windows.
+103	Files were locked during the installation. A computer restart is required to
+	complete the installation.
 </pre><dl class="section note"><dt>Note</dt><dd>You will still get popup messages <b>from Windows</b> when the drivers are installed. This is by design - newer versions of Windows warn the user that privileged code is about to be installed. To avoid this you can do either of:<br />
 <ul>
 <li>Install Kvaser's certificate in the machine's Trusted Publisher store.</li>
@@ -195,7 +199,7 @@ Using Debug DLLs</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="page_installing.html">Installation</a></li>
-    <li class="footer"> (canlib 5.31) Mon Feb 24 2020</li>
+    <li class="footer"> (canlib 5.33) Wed May 27 2020</li>
   </ul>
 </div>
 </body>

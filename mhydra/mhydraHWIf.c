@@ -376,6 +376,7 @@ static int mhydra_send_and_wait_reply_memo (VCanCardData  *vCard,
 #define USB_MEMO_LIGHT_HS_V2_PRODUCT_ID       272 // Kvaser Memorator Light HS v2 (01058-1)
 #define USB_U100_PRODUCT_ID                   273 // Kvaser U100 (01173-1)
 #define USB_U100P_PRODUCT_ID                  274 // Kvaser U100P (01174-8)
+#define USB_U100S_PRODUCT_ID                  275 // Kvaser U100P (01181-6)
 
 // Table of devices that work with this driver
 static struct usb_device_id mhydra_table [] = {
@@ -396,7 +397,7 @@ static struct usb_device_id mhydra_table [] = {
   { USB_DEVICE(KVASER_VENDOR_ID, USB_MEMO_LIGHT_HS_V2_PRODUCT_ID)},
   { USB_DEVICE(KVASER_VENDOR_ID, USB_U100_PRODUCT_ID)},
   { USB_DEVICE(KVASER_VENDOR_ID, USB_U100P_PRODUCT_ID)},
-
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_U100S_PRODUCT_ID)},
   { 0 }  // Terminating entry
 };
 
@@ -1089,6 +1090,7 @@ static void le_to_cpu (hydraHostCmd *cmd)
       DEBUGPRINT(4, (TXT("translate **** %d ****\n"), extCmd->cmdNoExt));
       break;
     }
+    break;
   }
 
   default:
@@ -2597,7 +2599,12 @@ int mhydra_queue_cmd (VCanCardData *vCard, hydraHostCmd *cmd, unsigned int timeo
   int queuePos;
   // Using an unrolled sleep
   wait_queue_entry_t wait;
+#ifdef _LINUX_TIME64_H
+  struct timespec64 t_start;
+#else
   struct timeval t_start;
+#endif
+
   unsigned int wait_ms = timeout_ms;
 
   kv_do_gettimeofday(&t_start);
@@ -2644,9 +2651,13 @@ int mhydra_queue_cmd (VCanCardData *vCard, hydraHostCmd *cmd, unsigned int timeo
         if (queuePos >= 0) {
           break;
         } else {//the queue is still full. try again if timeout hasn't elapsed
+#ifdef _LINUX_TIME64_H
+          struct timespec64 dt = vCanCalc_dt(&t_start);
+          unsigned long  dt_ms = (unsigned long)dt.tv_sec * 1000 +  ((unsigned long)dt.tv_nsec + 500000) / 1000000;
+#else
           struct timeval dt = vCanCalc_dt(&t_start);
           unsigned long  dt_ms = (unsigned long)dt.tv_sec * 1000 +  ((unsigned long)dt.tv_usec + 500) / 1000;
-
+#endif
           queue_release(&dev->txCmdQueue);
 
           if ((unsigned int)dt_ms >= timeout_ms) {
@@ -2747,7 +2758,8 @@ static int mhydra_plugin (struct usb_interface *interface,
        (udev->descriptor.idProduct != USB_BLACKBIRD_PRO_HS_V2_PRODUCT_ID) &&
        (udev->descriptor.idProduct != USB_MEMO_LIGHT_HS_V2_PRODUCT_ID) &&
        (udev->descriptor.idProduct != USB_U100_PRODUCT_ID) &&
-       (udev->descriptor.idProduct != USB_U100P_PRODUCT_ID)
+       (udev->descriptor.idProduct != USB_U100P_PRODUCT_ID) &&
+       (udev->descriptor.idProduct != USB_U100S_PRODUCT_ID)
       )
      )
   {
@@ -2828,6 +2840,10 @@ static int mhydra_plugin (struct usb_interface *interface,
       DEBUGPRINT(2, (TXT("\nKVASER ")));
       DEBUGPRINT(2, (TXT("Kvaser U100P plugged in\n")));
       break;
+    case USB_U100S_PRODUCT_ID:
+      DEBUGPRINT(2, (TXT("\nKVASER ")));
+      DEBUGPRINT(2, (TXT("Kvaser U100S plugged in\n")));
+      break;      
 
     default:
       DEBUGPRINT(2, (TXT("UNKNOWN product plugged in\n")));

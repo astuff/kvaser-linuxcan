@@ -148,9 +148,8 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <p>This function will re-enumerate all currently available CAN channels while not affecting already opened channel handles.</p>
-<dl class="section note"><dt>Note</dt><dd>When using this function, make sure your program does not keep any references to CANlib channel numbers since these numbers may change.</dd>
-<dd>
-Not implemented in linux.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>When using this function, make sure your program does not keep any references to CANlib channel numbers since these numbers may change.<br />
+ On Linux, no re-enumeration is needed since enumeration takes place when a device is plugged in or unplugged.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_init.html#section_user_guide_enumerate_hw">Manually Enumerating CAN channels</a> </dd></dl>
 
 </div>
@@ -211,7 +210,7 @@ Not implemented in linux.</dd></dl>
 <a class="el" href="group__can__general.html#ga65169ca633cd30aa92b8a80e28a5378b">canGetNumberOfChannels()</a> </dd>
 <dd>
 <a class="el" href="group___c_a_n.html#ga909e5c14b09fe76bad280475138d503e">canGetHandleData()</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2list_channels_8c-example.html#a3">how-to/c/listChannels.c</a>, and <a class="el" href="list_channels_8c-example.html#a7">listChannels.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2list_channels_8c-example.html#a3">how-to/c/listChannels.c</a>, and <a class="el" href="list_channels_8c-example.html#a6">listChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -291,7 +290,7 @@ Not implemented in linux.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_device_and_channel.html#section_user_guide_unique_device">Channel Information</a>, <a class="el" href="page_user_guide_device_and_channel.html#section_user_guide_virtual">Virtual Channels</a> </dd>
 <dd>
 <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2list_channels_8c-example.html#a0">how-to/c/listChannels.c</a>, and <a class="el" href="list_channels_8c-example.html#a6">listChannels.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2list_channels_8c-example.html#a0">how-to/c/listChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -453,7 +452,7 @@ Not implemented in linux.</dd></dl>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__can__general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1">canInitializeLibrary()</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a8">busparms.c</a>, <a class="el" href="cancount_8c-example.html#a18">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a18">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a19">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a28">canmonitor.c</a>, <a class="el" href="list_channels_8c-example.html#a16">listChannels.c</a>, <a class="el" href="read_timer_test_8c-example.html#a6">readTimerTest.c</a>, <a class="el" href="simplewrite_8c-example.html#a28">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a14">writeloop.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a8">busparms.c</a>, <a class="el" href="cancount_8c-example.html#a18">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a18">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a19">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a28">canmonitor.c</a>, <a class="el" href="list_channels_8c-example.html#a15">listChannels.c</a>, <a class="el" href="read_timer_test_8c-example.html#a6">readTimerTest.c</a>, <a class="el" href="simplewrite_8c-example.html#a28">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a14">writeloop.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -867,7 +866,7 @@ Not implemented in linux.</dd></dl>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.31) Mon Feb 24 2020</li>
+    <li class="footer"> (canlib 5.33) Wed May 27 2020</li>
   </ul>
 </div>
 </body>

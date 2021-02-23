@@ -69,7 +69,7 @@
 #include "canlib.h"
 #include <stdio.h>
 #include <string.h>
-
+#include "../canlib_channel_list.h"
 
 static void check(char* id, canStatus stat)
 {
@@ -83,7 +83,6 @@ static void check(char* id, canStatus stat)
 
 int main(int argc, char* argv[])
 {
-  int chanCount = 0;
   canStatus stat;
   int i;
   int beta;
@@ -94,6 +93,8 @@ int main(int argc, char* argv[])
   unsigned int ean[2], fw[2], serial[2];
   unsigned int canlibVersion;
   uint16_t fileVersion[4];
+
+  ccl_class channel_list;
 
   (void)argc; // Unused.
   (void)argv; // Unused.
@@ -118,14 +119,16 @@ int main(int argc, char* argv[])
   memset(fw, 0, sizeof(fw));
   memset(serial, 0, sizeof(serial));
 
-  stat = canGetNumberOfChannels(&chanCount);
+  stat = ccl_get_channel_list(&channel_list);
+
   if (stat != canOK) {
     check("canGetNumberOfChannels", stat);
     exit(1);
   }
-  printf("Found %d channel(s).\n", chanCount);
 
-  for (i = 0; i < chanCount; i++) {
+  printf("Found %u channel(s).\n", channel_list.n_channel);
+
+  for (i = 0; i < (int)channel_list.n_channel; i++) {
 
     stat = canGetChannelData(i, canCHANNELDATA_DRIVER_NAME,
                              &driverName, sizeof(driverName));
@@ -180,7 +183,7 @@ int main(int argc, char* argv[])
     (void) canGetChannelData(i, canCHANNELDATA_CUST_CHANNEL_NAME,
                              custChanName, sizeof(custChanName));
 
-    printf("ch %2.1d: %-22s\t%x-%05x-%05x-%x, s/n %u, v%u.%u.%u %s (%s v%d.%d.%d)\n",
+    printf("ch %2.1d: %-35s\t%x-%05x-%05x-%x, s/n %u, v%u.%u.%u %s (%s v%d.%d.%d)\n",
            i, name,
            (ean[1] >> 12), ((ean[1] & 0xfff) << 8) | ((ean[0] >> 24) & 0xff),
            (ean[0] >> 4) & 0xfffff, (ean[0] & 0x0f),

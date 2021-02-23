@@ -80,9 +80,9 @@ SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ENV{PRODUCT}=="bfd/1[0-3,6-9,a-d]/*"
 SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ENV{PRODUCT}=="bfd/2[0,2-4,6-7]/*",ACTION=="remove",RUN+="/usr/sbin/leaf.sh stop"
 SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ENV{PRODUCT}=="bfd/12[0-8]/*",ACTION=="remove",RUN+="/usr/sbin/leaf.sh stop"
 
-# Minihydra devices (id = 256, 258, 260-274)
+# Minihydra devices (id = 256, 258, 260-275)
 SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ENV{PRODUCT}=="bfd/10[0,2,4-9,a-f]/*",ACTION=="add",RUN+="/usr/sbin/mhydra.sh start"
 SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ENV{PRODUCT}=="bfd/10[0,2,4-9,a-f]/*",ACTION=="remove",RUN+="/usr/sbin/mhydra.sh stop"
-SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ENV{PRODUCT}=="bfd/11[0-2]/*",ACTION=="add",RUN+="/usr/sbin/mhydra.sh start"
-SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ENV{PRODUCT}=="bfd/11[0-2]/*",ACTION=="remove",RUN+="/usr/sbin/mhydra.sh stop"
+SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ENV{PRODUCT}=="bfd/11[0-3]/*",ACTION=="add",RUN+="/usr/sbin/mhydra.sh start"
+SUBSYSTEM=="usb",ENV{DEVTYPE}=="usb_device",ENV{PRODUCT}=="bfd/11[0-3]/*",ACTION=="remove",RUN+="/usr/sbin/mhydra.sh stop"
 
