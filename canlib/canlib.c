@@ -87,6 +87,8 @@
 #include <string.h>
 #include <sys/ioctl.h>
 
+#include "canlib_channel_list.h"
+
 #if DEBUG
 #   define DEBUGPRINT(args) printf args
 #else
@@ -201,15 +203,7 @@ static kvTimeDomainHead  timeDomains;
 
 static int Initialized = FALSE;
 
-// This has to be modified if we add/remove drivers.
-static const char *dev_name[] = {"lapcan", "pcican", "pcicanII",
-                                 "usbcanII", "leaf", "mhydra",
-                                 "pciefd",
-                                 "kvvirtualcan"}; // Virtual channels should always be last
-static const char *off_name[] = {"LAPcan", "PCIcan", "PCIcanII",
-                                 "USBcanII", "Leaf", "Minihydra",
-                                 "PCIe CAN",
-                                 "VIRTUALcan"}; // Virtual channels should always be last
+
 static struct dev_descr dev_descr_list[] = {
           {"Kvaser Unknown",                                    {0x00000000, 0x00000000}},
           {"Kvaser Virtual CAN",                                {0x00000000, 0x00000000}},
@@ -301,6 +295,7 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser Memorator Light HS",                         {0x30010581, 0x00073301}},
           {"Kvaser U100",                                       {0x30011731, 0x00073301}},
           {"Kvaser U100P",                                      {0x30011748, 0x00073301}},
+          {"Kvaser U100S",                                      {0x30011816, 0x00073301}},
 };
 
 static canStatus check_bitrate (const CanHandle hnd, unsigned int bitrate);
@@ -312,72 +307,32 @@ static
 canStatus getDevParams (int channel, char devName[], int *devChannel,
                         CANOps **canOps, char officialName[])
 {
-  // For now, we just count the number of /dev/%s%d files (see dev_name),
-  // where %d is numbers between 0 and 255.
-  // This is slow!
+  canStatus  stat;
+  ccl_class  channel_list;
 
-  int         chanCounter = 0;
-  int         devCounter  = 0;
-  struct stat stbuf;
-
-  unsigned n = 0;
-
-  int CardNo          = -1;
-  int ChannelNoOnCard = 0;
-  int ChannelsOnCard  = 0;
-  int err;
-  int fd;
-
-  for(n = 0; n < sizeof(dev_name) / sizeof(*dev_name); n++) {
-    CardNo = -1;
-    ChannelNoOnCard = 0;
-    ChannelsOnCard = 0;
-
-    // There are 256 minor inode numbers
-    for(devCounter = 0; devCounter <= 255; devCounter++) {
-      snprintf(devName, DEVICE_NAME_LEN, "/dev/%s%d", dev_name[n], devCounter);
-      if (stat(devName, &stbuf) != -1) {  // Check for existance
-
-        if (!ChannelsOnCard) {
-          err = 1;
-          fd = open(devName, O_RDONLY);
-          if (fd != -1) {
-            err = ioctl(fd, VCAN_IOC_GET_NRCHANNELS, &ChannelsOnCard);
-            close(fd);
-          }
-          if (err) {
-            ChannelsOnCard = 1;
-          } else {
-            ChannelNoOnCard = 0;
-            CardNo++;
-          }
-        } else {
-          ChannelNoOnCard++;
-        }
-        ChannelsOnCard--;
-
-        if (chanCounter++ == channel) {
-          *canOps = &vCanOps;
-          sprintf(officialName, "KVASER %s channel %d", off_name[n], devCounter);
-          *devChannel = ChannelNoOnCard;
-
-          errno = 0; // Calling stat() may set errno.
-          return canOK;
-        }
-      }
-      else {
-        // Handle gaps in device numbers
-        continue;
-      }
-    }
+  if (channel < 0) {
+    return canERR_NOTFOUND;
   }
 
-  DEBUGPRINT((TXT("return canERR_NOTFOUND\n")));
-  devName[0]  = 0;
-  *devChannel = -1;
-  *canOps     = NULL;
+  stat = ccl_get_channel_list(&channel_list);
 
-  return canERR_NOTFOUND;
+  if (stat != canOK) {
+    devName[0]  = 0;
+    *devChannel = -1;
+    *canOps     = NULL;
+    return stat;
+  }
+  
+  if ((uint32_t)(channel + 1) > channel_list.n_channel) {
+    return canERR_NOTFOUND;
+  }
+
+  *canOps = &vCanOps;
+  sprintf(officialName, "KVASER %s channel %d", channel_list.channel[channel].official_name, channel_list.channel[channel].number_on_driver);
+  *devChannel = channel_list.channel[channel].number_on_card;
+  sprintf(devName, "%s", channel_list.channel[channel].mknod_name);
+
+  return stat;
 }
 
 //
@@ -1384,38 +1339,23 @@ unsigned int CANLIBAPI canGetVersionEx(unsigned int itemCode)
 //******************************************************
 canStatus CANLIBAPI canGetNumberOfChannels (int *channelCount)
 {
-  // For now, we just count the number of /dev/%s%d files (see dev_name),
-  // where %d is numbers between 0 and 255.
-  // This is slow!
-
-  int tmpCount = 0;
-  int cardNr;
-  char filename[DEVICE_NAME_LEN];
-  unsigned n = 0;
+  canStatus stat;
+  ccl_class channel_list;
 
   if (channelCount == NULL) {
     return canERR_PARAM;
   }
 
-  for(n = 0; n < sizeof(dev_name) / sizeof(*dev_name); n++) {
-    // There are 256 minor inode numbers
-    for(cardNr = 0; cardNr <= 255; cardNr++) {
-      snprintf(filename,  DEVICE_NAME_LEN, "/dev/%s%d", dev_name[n], cardNr);
-      if (access(filename, F_OK) == 0) {  // Check for existance
-        tmpCount++;
-      }
-      else {
-        // Handle gaps in device numbers
-        continue;
-      }
-    }
+  stat = ccl_get_channel_list(&channel_list);
+
+  if (stat != canOK) {
+    return stat;
   }
 
-  *channelCount = tmpCount;
+  *channelCount = channel_list.n_channel;
 
-  return canOK;
+  return stat;
 }
-
 
 
 //******************************************************
@@ -2025,7 +1965,7 @@ kvStatus CANLIBAPI kvScriptSendEvent(const CanHandle hnd,
 
 // encode/decoce using ^
 
-#define HND_MASK 0x3141592658979323
+#define HND_MASK 0x3141592658979323LL
 
 
 static int64_t EncodeHandle(int64_t ev) {
@@ -2932,9 +2872,9 @@ void CANLIBAPI canInitializeLibrary (void)
 
 canStatus CANLIBAPI canEnumHardwareEx (int *channelCount)
 {
-  (void) channelCount;
-
-  return canERR_NOT_IMPLEMENTED;
+  canStatus stat;
+  stat = canGetNumberOfChannels(channelCount);
+  return stat;
 }
 
 

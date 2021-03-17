@@ -84,6 +84,7 @@
 #include <linux/ioport.h>
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
+
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0))
 #include <linux/sched/signal.h>
 #endif /* KERNEL_VERSION >= 4.11.0 */
@@ -126,7 +127,11 @@ MODULE_AUTHOR("KVASER");
 #define THIS_MODULE 0
 #endif
 
+# ifdef _LINUX_TIME64_H
+static long     calc_timeout        (struct timespec64 *start, unsigned long wanted_timeout);
+#else
 static long     calc_timeout        (struct timeval *start, unsigned long wanted_timeout);
+#endif
 static uint32_t read_specific       (VCanOpenFileNode *fileNodePtr, VCanRead *readOpt, VCAN_EVENT *msg);
 static int      wait_tx_queue_empty (VCanOpenFileNode *fileNodePtr, unsigned long timeout);
 
@@ -182,37 +187,61 @@ static void set_cardnumberdata(unsigned int index, VCanCardData *vCard)
 
 int vCanTime (VCanCardData *vCard, uint64_t *time)
 {
+# ifdef _LINUX_TIME64_H
+  struct timespec64 tv;
+#else
   struct timeval tv;
+#endif
 
   tv = vCanCalc_dt (&vCard->driverData->startTime);
-
-  *time = (uint64_t)((unsigned long)tv.tv_usec / (unsigned long)vCard->usPerTick +
+# ifdef _LINUX_TIME64_H
+  *time = (uint64_t)(((unsigned long)tv.tv_nsec /1000) / (unsigned long)vCard->usPerTick +
                      (1000000ul / (unsigned long)vCard->usPerTick) * (unsigned long)tv.tv_sec);
 
+  #else
+  *time = (uint64_t)((unsigned long)tv.tv_usec / (unsigned long)vCard->usPerTick +
+                     (1000000ul / (unsigned long)vCard->usPerTick) * (unsigned long)tv.tv_sec);
+#endif
   return VCAN_STAT_OK;
 }
 EXPORT_SYMBOL(vCanTime);
 
+# ifdef _LINUX_TIME64_H
+void kv_do_gettimeofday (struct timespec64 *tv)
+{
+  ktime_get_real_ts64(tv);
+}
+#else
 void kv_do_gettimeofday (struct timeval *tv)
 {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0))
-  struct timespec64 now;
-
-  ktime_get_real_ts64(&now);
-  tv->tv_sec = now.tv_sec;
-  tv->tv_usec = now.tv_nsec / 1000;
-#else
   do_gettimeofday(tv);
-#endif /* KERNEL_VERSION >= 5.0.0 */
 }
-EXPORT_SYMBOL(kv_do_gettimeofday);
+#endif /* _LINUX_TIME64_H */
 
+EXPORT_SYMBOL(kv_do_gettimeofday);
+#ifdef _LINUX_TIME64_H
+struct timespec64 vCanCalc_dt (struct timespec64 *start) {
+  struct timespec64 stop;
+
+  kv_do_gettimeofday (&stop);
+
+  if (stop.tv_nsec >= start->tv_nsec) {
+    stop.tv_nsec -= start->tv_nsec;
+    stop.tv_sec  -= start->tv_sec;
+  } else {
+    stop.tv_nsec = stop.tv_nsec + 1000000000 - start->tv_nsec;
+    stop.tv_sec  = stop.tv_sec - start->tv_sec - 1;
+  }
+
+  return stop;
+}
+#else
 struct timeval vCanCalc_dt (struct timeval *start) {
   struct timeval stop;
 
   kv_do_gettimeofday (&stop);
 
-  if (stop.tv_usec >= start->tv_usec) {
+ if (stop.tv_usec >= start->tv_usec) {
     stop.tv_usec -= start->tv_usec;
     stop.tv_sec  -= start->tv_sec;
   } else {
@@ -222,6 +251,7 @@ struct timeval vCanCalc_dt (struct timeval *start) {
 
   return stop;
 }
+#endif
 EXPORT_SYMBOL(vCanCalc_dt);
 
 //======================================================================
@@ -1015,7 +1045,11 @@ static int ioctl_non_blocking (VCanOpenFileNode *fileNodePtr,
     {
       long              timeout = 0;
       unsigned long     rcvLock_irqFlags;
+#ifdef _LINUX_TIME64_H
+      struct timespec64 start;
+#else
       struct timeval    start;
+#endif
       VCAN_IOCTL_READ_T ioctl_read;
       VCanRead          readOpt;
 
@@ -3166,12 +3200,21 @@ static int kvaser_proc_open(struct inode* inode, struct file* file)
 // Module init
 //======================================================================
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 6, 0)
 static const struct file_operations kvaser_proc_fops = {
     .open = kvaser_proc_open,
     .read = seq_read,
     .llseek = seq_lseek,
     .release = seq_release,
 };
+#else
+static const struct proc_ops kvaser_proc_fops = {
+    .proc_open = kvaser_proc_open,
+    .proc_read = seq_read,
+    .proc_lseek = seq_lseek,
+    .proc_release = seq_release,
+};
+#endif
 
 int vCanInit (VCanDriverData *driverData, unsigned max_channels)
 {
@@ -3277,19 +3320,29 @@ void cleanup_module (void)
   softSyncDeinitialize();
 }
 
+#ifdef _LINUX_TIME64_H
+static long calc_timeout (struct timespec64 *start, unsigned long wanted_timeout) {
+#else
 static long calc_timeout (struct timeval *start, unsigned long wanted_timeout) {
+#endif
   long retval;
 
   if ((long)wanted_timeout == -1) {//wait until match
     retval = -1;
   } else {
+#ifdef _LINUX_TIME64_H
+    struct timespec64 dt;
+#else
     struct timeval dt;
+#endif
     unsigned long  dt_ms;
 
     dt = vCanCalc_dt (start);
-
+#ifdef _LINUX_TIME64_H
+    dt_ms = (unsigned long)dt.tv_sec * 1000 +  ((unsigned long)dt.tv_nsec + 500000) / 1000000;
+#else
     dt_ms = (unsigned long)dt.tv_sec * 1000 +  ((unsigned long)dt.tv_usec + 500) / 1000;
-
+#endif
     if (dt_ms < wanted_timeout) {
       retval = wanted_timeout - dt_ms;
     } else {

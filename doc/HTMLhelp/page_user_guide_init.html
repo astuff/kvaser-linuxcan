@@ -100,7 +100,8 @@ Library Deinitialization and Cleanup</h1>
 <div class="fragment"><div class="line">stat = <a class="code" href="group__can__general.html#ga0d1c0e54ea20c3e3b328a32eb10c7b47">canUnloadLibrary</a>();</div><div class="line"> <span class="keywordflow">if</span> (stat &lt; 0) {</div><div class="line">     printf(<span class="stringliteral">&quot;Unload library failed.&quot;</span>);</div><div class="line"> }</div></div><!-- fragment --><h1><a class="anchor" id="section_user_guide_enumerate_hw"></a>
 Manually Enumerating CAN channels</h1>
 <p>The function <a class="el" href="group__can__general.html#ga2cf37192c855ce901fc0d69bfe72fbd5">canEnumHardwareEx()</a> scans all currently connected devices and creates a completely new set of CANlib channel numbers, while still keeping all currently opened channel handles valid and usable. This can be viewed upon as a replacement for calling the function <a class="el" href="group__can__general.html#ga0d1c0e54ea20c3e3b328a32eb10c7b47">canUnloadLibrary()</a> followed by <a class="el" href="group__can__general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1">canInitializeLibrary()</a> which do invalidate all open channel handles.</p>
-<p>One thing to keep in mind when using this functionality is to never track devices based on their CANlib channel number, since this number may change anytime <a class="el" href="group__can__general.html#ga2cf37192c855ce901fc0d69bfe72fbd5">canEnumHardwareEx()</a> is called. To retrieve information about a specific channel use <a class="el" href="group___c_a_n.html#ga909e5c14b09fe76bad280475138d503e">canGetHandleData</a>(hnd, ...), instead of <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(channel, ...). </p>
+<p>One thing to keep in mind when using this functionality is to never track devices based on their CANlib channel number, since this number may change anytime <a class="el" href="group__can__general.html#ga2cf37192c855ce901fc0d69bfe72fbd5">canEnumHardwareEx()</a> is called. To retrieve information about a specific channel use <a class="el" href="group___c_a_n.html#ga909e5c14b09fe76bad280475138d503e">canGetHandleData</a>(hnd, ...), instead of <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData</a>(channel, ...).</p>
+<dl class="section note"><dt>Note</dt><dd>On Linux, no re-enumeration is needed since enumeration takes place when a device is plugged in or unplugged. </dd></dl>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
@@ -108,7 +109,7 @@ Manually Enumerating CAN channels</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li>
-    <li class="footer"> (canlib 5.31) Mon Feb 24 2020</li>
+    <li class="footer"> (canlib 5.33) Wed May 27 2020</li>
   </ul>
 </div>
 </body>

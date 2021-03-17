@@ -343,7 +343,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get a handle to a message with a specific identifier.</p>
+<p>Get a handle to a message with a specific identifier. If the message is of extended CAN format, assumes the id contains the <a class="el" href="kva_db_lib_8h.html#acb793e70d95b7daf6045c6dd9cc8792d">KVADB_MESSAGE_EXT</a> flag. If nothing is found, adds the <a class="el" href="kva_db_lib_8h.html#acb793e70d95b7daf6045c6dd9cc8792d">KVADB_MESSAGE_EXT</a> flag to the id and tries again.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">dh</td><td>A database handle </td></tr>
@@ -439,7 +439,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get a handle to a message with a specific PGN-identifier. If the message is marked as J1939, check if the PGN-part is equal.</p>
+<p>Get a handle to a message with a specific PGN-identifier. If the message is marked as J1939, checks if the PGN-part is equal. The message identifier needs to contain the <a class="el" href="kva_db_lib_8h.html#acb793e70d95b7daf6045c6dd9cc8792d">KVADB_MESSAGE_EXT</a> flag.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">dh</td><td>A database handle </td></tr>
@@ -657,7 +657,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the message identifier.</p>
+<p>Get the message identifier. The message identifier will not contain any flags.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">mh</td><td>A message handle </td></tr>
@@ -1130,7 +1130,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Set the message identifier.</p>
+<p>Set the message identifier. The message identifier should not contain any flags.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">mh</td><td>A message handle </td></tr>
@@ -1234,7 +1234,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.31) Mon Feb 24 2020</li>
+    <li class="footer"> (canlib 5.33) Wed May 27 2020</li>
   </ul>
 </div>
 </body>

@@ -1,5 +1,5 @@
 /*
-**            Copyright 2017-2018 by Kvaser AB, Molndal, Sweden
+**            Copyright 2017-2020 by Kvaser AB, Molndal, Sweden
 **                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -62,7 +62,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.31  
+Release notes for linuxcan V5.33  
 ================================================================
 
 These release notes apply to both CANLIB SDK and the Linux drivers.
@@ -111,6 +111,7 @@ Linux device drivers for
   *  KVASER Memorator Light HS v2 (01058-1)
   *  KVASER U100 (01173-1)
   *  KVASER U100P (01174-8)
+  *  KVASER U100S (01181-6)
 
 
   **    Recommended firmware > 3.0
@@ -131,11 +132,12 @@ http://www.kvaser.com.
 Version info
 ================================================================
 
-   * Tested under x86_64 SMP Ubuntu 14.04 x32/x64 (3.13.0-32-generic/3.13.0-32-generic).
-   * Tested under x86_64 SMP Ubuntu 16.04 x32/x64 (4.4.0-generic/4.4.0-generic).
-   * Tested under x86_64 SMP Ubuntu 18.04 x64 (4.15.0-38-generic).
-   * Compiled with gcc version 4.6.3, 4.8.0, 5.4.0, 7.1.1, 7.2.0, 7.3.0 and 8.2.1.
-   * Used glibc version 2.15, 2.17, 2.19, 2.24, 2.26, 2.27 and 2.28.
+   * Tested under x86_64 SMP Ubuntu 16.04 x32/x64 (4.4.0-45-generic).
+   * Tested under x86_64 SMP Ubuntu 18.04 x64 (4.15.0-39-generic).
+   * Tested under x86_64 SMP Ubuntu 20.04 x64 (5.4.0-29-generic).
+   * Tested under x86_64 SMP Ubuntu 20.04 x64 (5.6.0-050600-generic).
+   * Compiled with gcc version 5.4.0, 7.3.0 and 9.3.0.
+   * Used glibc version 2.23, 2.27 and 2.31.
 
 
 ================================================================
@@ -162,6 +164,36 @@ Known problems
      hardware, the same is not true for auto tx. The latter is only
      available if there is firmware support in the device.
      (This is the same as under Windows.)
+
+
+New Features and Fixed Problems in V5.33   (27-MAY-2020)
+===========================================================================
+* Fixed build problems for kernel v5.6.0.
+
+* struct timeval has been replaced with struct timespec64 because
+  the timeval tv_sec member overflows in year 2038 on 32-bit architectures.
+  See https://www.kernel.org/doc/html/latest/core-api/timekeeping.html
+
+* Fixed build problem for GCC 4.4.
+
+* SDK (canlib)
+  - Function canEnumHardwareEx now implemented.
+  - Added prelimianry kvDiag API intended for use with Kvaser Signal Integrity.
+
+* SDK (kvadblib)
+  - Updated the documentation for functions that pass/get/set message id:s
+    to explicitly state whether the id should/will contain the extended id
+    flag KVADB_MESSAGE_EXT.
+
+* Added support for new device:
+  - KVASER U100S (01181-6)
+
+New Features and Fixed Problems in V5.32   (02-APR-2020)
+===========================================================================
+* SDK (kvlclib)
+  - Fixed writer for KVLC_FILE_FORMAT_MDF_4X_SIGNAL where multiplexed signals
+    where not getting populated with data, also fixed bug where signal headers
+    weren't written correctly for databases containing messages without signals.
 
 
 New Features and Fixed Problems in V5.31   (24-FEB-2020)
@@ -196,11 +228,11 @@ New Features and Fixed Problems in V5.29   (13-SEP-2019)
 * SDK (canlib)
   - The message data buffer is untouched when reading a remote request frame
     as identified by the canMSG_RTR flag.
-  - canGetBusStatistics reports the same result if transmit acknowledge is
+  - canGetBusStatistics reports the same result if transmit acknowledge is 
     off (0) or on (1). Transmit acknowledge is set by ioctl canIOCTL_SET_TXACK.
   - Fixed a bug in kvFileCopyToDevice.
 
-  - Implemented the following tScript functions:
+  - Implemented the following tScript functions: 
     kvScriptStatus and kvScriptLoadFileOnDevice.
     kvScriptEnvvarOpen and kvScriptEnvvarClose.
     kvScriptEnvvarSetInt and kvScriptEnvvarGetInt.
@@ -230,7 +262,7 @@ New Features and Fixed Problems in V5.29   (13-SEP-2019)
     handling the situation where the number of events exceeds the size of an int.
 
 * Common
-  - fixed bug where a call to canIOCTL_TX_INTERVAL could cause a crash if
+  - fixed bug where a call to canIOCTL_TX_INTERVAL could cause a crash if 
     TX_INTERVAL is unsupported by the device.
   - BusStatistics increments between calls to canGetBusStatistics. Previously,
     it was cleared. The function now has the same behavior as in Windows.
@@ -289,7 +321,7 @@ New Features and Fixed Problems in V5.26   (26-NOV-2018)
   - Fixed a bug where kvaDbGetFlags() didn't return the KVADB_DATABASE_J1939-flag.
   - Added function kvaDbGetMsgByPGN().
   - Clarified null-terminated strings in documentation.
-
+  
 * SDK (linlib)
   - Clarified LIN diagnostic frames in documentation.
   - linWriteWakeup() parameter check updated.
@@ -301,7 +333,7 @@ New Features and Fixed Problems in V5.25   (16-SEP-2018)
 * Blacklisting SocketCAN kvaser_pciefd driver when installing pcican, pcican2
   and pciefd drivers.
 
-* The installation script will create any missing folders in
+* The installation script will create any missing folders in 
   /lib/modules/`uname -r`/kernel/drivers prior to installation.
 
 * Added compiled script file (.txe) information retrieval function
@@ -334,7 +366,7 @@ New Features and Fixed Problems in V5.24   (03-JUL-2018)
 ===========================================================================
 
 * SDK (canlib)
-  - Rolled back canOPEN_NO_INIT_ACCESS changes.
+  - Rolled back canOPEN_NO_INIT_ACCESS changes. 
 
 
 

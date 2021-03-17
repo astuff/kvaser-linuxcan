@@ -504,9 +504,9 @@ void CANLIBAPI canInitializeLibrary (void);
  * not affecting already opened channel handles.
  *
  * \note When using this function, make sure your program does not keep any
- * references to CANlib channel numbers since these numbers may change.
- *
- * \note Not implemented in linux.
+ * references to CANlib channel numbers since these numbers may change.<br>
+ * On Linux, no re-enumeration is needed since enumeration takes place
+ * when a device is plugged in or unplugged.
  *
  * \sa \ref section_user_guide_enumerate_hw
  *
@@ -2247,6 +2247,7 @@ canStatus CANLIBAPI canGetChannelData (int channel,
 #define canHWTYPE_MEMORATOR_V2       82  ///< Kvaser Memorator (2nd generation)
 #define canHWTYPE_CANLINHYBRID       84  ///< Kvaser Hybrid CAN/LIN
 #define canHWTYPE_DINRAIL            86  ///< Kvaser DIN Rail SE400S and variants
+#define canHWTYPE_U100               88  ///< Kvaser U100 and variants
 
 
 /** @} */

@@ -85,6 +85,7 @@ LIBCFLAGS = $(CFLAGS) -D_REENTRANT -fPIC
 LDFLAGS = -lc -pthread
 
 SRCS := canlib.c
+SRCS += canlib_channel_list.c
 SRCS += linkedlist.c
 SRCS += VCanFunctions.c
 SRCS += VCanFuncUtil.c
