@@ -158,6 +158,9 @@ Compilation:
         edit files. This is taken care of the Makefile, in the root of the
         linuxcan directory.
 
+  Note: if there are multiple versions of linuxcan installed for different linux
+        headers, it is possible to remove them all by calling "sudo make purge".
+
 * To build just a single driver, go to the corresponding subdirectory:
 
     "make"

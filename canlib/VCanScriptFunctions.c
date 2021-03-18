@@ -434,7 +434,7 @@ void vCanScript_envvar_init(void)
 // vCanScript_envvar_open
 //======================================================================
 kvEnvHandle vCanScript_envvar_open(HandleData *hData,
-                                   char* envvarName,
+                                   const char* envvarName,
                                    int *envvarType,
                                    int *envvarSize) // returns scriptHandle)
 {
@@ -663,7 +663,7 @@ canStatus vCanScript_envvar_get_float(HandleData *hData, int envvarIdx, float *v
 //======================================================================
 canStatus vCanScript_envvar_set_data(HandleData *hData,
                                      int envvarIdx,
-                                     void *buf,
+                                     const void *buf,
                                      int start_index,
                                      int data_len)
 {

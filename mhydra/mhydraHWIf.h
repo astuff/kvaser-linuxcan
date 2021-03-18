@@ -319,6 +319,8 @@ typedef struct MhydraCardData {
   uint64_t  hires_timer_fq;
   uint64_t  time_offset_valid;
 
+  uint32_t can_base_clock_mhz;        // CAN transceiver base clock frequency in MHz
+
   uint32_t max_bitrate;
   uint8_t  rxCmdBuffer[sizeof(hydraHostCmdExt)];
   uint32_t rxCmdBufferLevel;

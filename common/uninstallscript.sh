@@ -65,6 +65,26 @@
 
 MODNAME=kvcommon
 DEPMOD=`which depmod`
+DIR="${0%/*}"
+DEVEL=
+PURGE=
+
+print_usage() {
+  echo "Usage: uninstallscript.sh [-p] [-d] [-h]"
+  echo
+  echo "  -p    Uninstall all versions of $MODNAME"
+  echo "  -d    Developer install, ignores $DEPMOD -a"
+  echo "  -h    Prints this usage message"
+}
+
+while getopts 'dph' flag ; do
+  case "${flag}" in
+    d) DEVEL=true ;;
+    p) PURGE=true ;;
+    h) print_usage
+       exit 0 ;;
+  esac
+done
 
 /sbin/rmmod $MODNAME 2>/dev/null
 rmmod $MODNAME 2>/dev/null
@@ -78,9 +98,21 @@ if [ $? -eq 0 ] ; then
   echo "*************************************************************************"
 fi
 
-rm -f /lib/modules/`uname -r`/kernel/drivers/usb/misc/$MODNAME.ko
+if [ "$PURGE" = true ] ; then
+    find /lib/modules/*/kernel/drivers/usb/misc/ -name $MODNAME.ko -exec rm -f {} +
 
-if [ "$#" -gt 0 ] && [ $1 = "develinstall" ] ; then
+# Need to loop in case installer was run several times on different kernel versions
+elif test -f "$DIR/kernel_ver"; then
+  while read line; do
+    rm -f /lib/modules/$line/kernel/drivers/usb/misc/$MODNAME.ko
+  done < "$DIR/kernel_ver"
+  rm -f "$DIR/kernel_ver"
+# If user for some reason deleted kernel_ver we try deleting in current kernel
+else
+  rm -f /lib/modules/`uname -r`/kernel/drivers/usb/misc/$MODNAME.ko
+fi
+
+if [ "$DEVEL" = true ] ; then
   echo "Ignoring $DEPMOD -a for now.."
 else
   $DEPMOD -a

@@ -234,6 +234,9 @@ typedef struct VCanChanData
     unsigned int            capabilities;
     unsigned int            capabilities_mask;
 
+    uint64_t                capabilities_ex;
+    uint64_t                capabilities_ex_mask;
+
     VCanBusStatistics       busStats;
 
     struct VCanCardData    *vCard;
@@ -376,6 +379,10 @@ typedef struct VCanHWInterface {
     int (*initAllDevices)       (void);
     int (*setBusParams)         (VCanChanData *chd, VCanBusParams *par);
     int (*getBusParams)         (VCanChanData *chd, VCanBusParams *par);
+
+    int (*setBusParamsTq)       (VCanChanData *chd, VCanBusParamsTq *par);
+    int (*getBusParamsTq)       (VCanChanData *chd, VCanBusParamsTq *par);
+
     int (*setOutputMode)        (VCanChanData *chd, int silent);
     int (*setTranceiverMode)    (VCanChanData *chd, int linemode, int resnet);
     int (*busOn)                (VCanChanData *chd);
@@ -423,6 +430,7 @@ typedef struct VCanHWInterface {
     int (*special_ioctl_handler) (VCanOpenFileNode *fileNodePtr, unsigned int ioctl_cmd, unsigned long arg);
     int (*memoConfigMode)       (const VCanChanData *chd, int interval);
     int (*kvDeviceGetMode)      (const VCanChanData *chd, int *mode);
+    int (*kvDeviceGetClockFreqMhz)      (const VCanChanData *chd, unsigned int *freq_mhz);
     int (*kvDeviceSetMode)      (const VCanChanData *chd, int mode);
     int (*kvFileGetCount)       (const VCanChanData *chd, int *count);
     int (*kvFileGetName)        (const VCanChanData *chd, int fileNo, char *name, int namelen);
@@ -502,4 +510,6 @@ void            vCanCardRemoved(VCanChanData *chd);
 int             vCanPopReceiveBuffer (VCanReceiveData *rcv);
 int             vCanPushReceiveBuffer (VCanReceiveData *rcv);
 
+//returns 1 if chd  supports busparams tq, otherwize 0
+int             vCanSupportsBusParamsTq(VCanChanData *chd);
 #endif /* _VCAN_OS_IF_H_ */

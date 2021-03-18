@@ -100,7 +100,8 @@ Compiling and Linking Your Code</h1>
 <h1><a class="anchor" id="section_user_guide_build_installation_deploy"></a>
 Deploying Your Application</h1>
 <p>As an application programmer, you may want to distribute canlib32.dll together with your application. If you choose to do so, you should place it in the application's directory. In this way you will not break any other applications on the computer.</p>
-<p>If you install canlib32.dll on the target system, and the rest of the device drivers are not installed, any call you make to canlib32.dll will return an error code. You should be prepared for this situation and handle the error code in a constructive way in your application.</p>
+<p>If you install canlib32.dll on the target system, and the rest of the device drivers are not installed, any call you make to canlib32.dll will return an error code. You should be prepared for this situation and handle the error code in a constructive way in your application. Another situation could be that the deployed application is using a new canlib32.dll function, as this also would require an update of the drivers it’s important to implement error handling in such a way that the application will inform the user to update their drivers.</p>
+<p>A version mismatch between canlib32.dll and drivers will return the error code: <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7aee571ea29d786d483d1d3ea9f70d6753">canERR_DYNALIB</a>, please see <a class="el" href="page_user_guide_intro.html#section_user_guide_canstatus">Error checking</a> for further reading about error handling.</p>
 <p>It is also possible to programmatically install the required device driver without user intervention.</p>
 <h1><a class="anchor" id="section_user_guide_intro_redistributable"></a>
 Redistributable Files in CANlib SDK</h1>
@@ -132,7 +133,7 @@ Redistributable Files in CANlib SDK</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li>
-    <li class="footer"> (canlib 5.33) Wed May 27 2020</li>
+    <li class="footer"> (canlib 5.34) Wed Sep 9 2020</li>
   </ul>
 </div>
 </body>

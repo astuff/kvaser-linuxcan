@@ -65,10 +65,44 @@
 
 MODNAME=kvvirtualcan
 DEPMOD=`which depmod`
+DIR="${0%/*}"
+DEVEL=
+PURGE=
+
+print_usage() {
+  echo "Usage: uninstallscript.sh [-p] [-d] [-h]"
+  echo
+  echo "  -p    Uninstall all versions of $MODNAME"
+  echo "  -d    Developer install, ignores $DEPMOD -a"
+  echo "  -h    Prints this usage message"
+}
+
+while getopts 'dph' flag ; do
+  case "${flag}" in
+    d) DEVEL=true ;;
+    p) PURGE=true ;;
+    h) print_usage
+       exit 0 ;;
+  esac
+done
 
 /usr/sbin/virtualcan.sh stop 2>/dev/null
-rm -f /lib/modules/`uname -r`/kernel/drivers/char/$MODNAME.ko \
-      /usr/sbin/virtualcan.sh
+
+if [ "$PURGE" = true ] ; then
+    find /lib/modules/*/kernel/drivers/char/ -name $MODNAME.ko -exec rm -f {} +
+
+# Need to loop in case installer was run several times on different kernel versions
+elif test -f "$DIR/kernel_ver"; then
+  while read line; do
+    rm -f /lib/modules/$line/kernel/drivers/char/$MODNAME.ko
+  done < "$DIR/kernel_ver"
+  rm -f "$DIR/kernel_ver"
+# If user for some reason deleted kernel_ver we try deleting in current kernel
+else
+  rm -f /lib/modules/`uname -r`/kernel/drivers/char/$MODNAME.ko
+fi
+
+rm -f /usr/sbin/virtualcan.sh
 
 if [ -f /etc/modprobe.conf ] ; then
   # CentOS/Redhat/RHEL/Fedora Linux...
@@ -86,7 +120,7 @@ grep -v virtualcan $CONF                                 > newconf
 cat newconf > $CONF
 rm newconf
 
-if [ "$#" -gt 0 ] && [ $1 = "develinstall" ] ; then
+if [ "$DEVEL" = true ] ; then
   echo "Ignoring $DEPMOD -a for now.."
 else
   $DEPMOD -a

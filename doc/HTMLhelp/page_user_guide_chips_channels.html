@@ -84,10 +84,14 @@ $(document).ready(function(){initNavTree('page_user_guide_chips_channels.html','
 <ul><li class="level1"><a href="#section_user_guide_init_sel_channel_can">Open as CAN</a></li>
 <li class="level1"><a href="#section_user_guide_init_sel_channel_canfd">Open as CAN FD</a></li>
 <li class="level1"><a href="#section_user_guide_init_sel_channel_close">Close Channel</a></li>
-<li class="level1"><a href="#section_user_guide_init_bit_rate_can">Set CAN Bitrate</a></li>
-<li class="level1"><a href="#section_user_guide_init_bit_rate_canfd">Set CAN FD Bitrate</a></li>
+<li class="level1"><a href="#section_user_guide_init_bit_rate_can_tq">Set CAN Bitrate</a></li>
+<li class="level1"><a href="#section_user_guide_init_bit_rate_canfd_tq">Set CAN FD Bitrate</a></li>
 <li class="level1"><a href="#section_user_guide_init_driver_modes">CAN Driver Modes</a></li>
 <li class="level1"><a href="#code_sample">Code Sample</a></li>
+<li class="level1"><a href="#section_user_guide_init_bit_rate_legacy">Legacy Functions</a><ul><li class="level2"><a href="#section_user_guide_init_bit_rate_can">Set CAN Bitrate</a></li>
+<li class="level2"><a href="#section_user_guide_init_bit_rate_canfd">Set CAN FD Bitrate</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="textblock"><p>Once we have called <a class="el" href="group__can__general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1">canInitializeLibrary()</a> to enumerate the connected Kvaser CAN devices, the next call is likely to be a call to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>, which returns a handle to a specific CAN circuit. This handle is then used to all subsequent calls to the library. The <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> function takes two arguments, the first of which is the number of the desired channel, the second argument is modifier flags <a class="el" href="canlib_8h.html#canOPEN_xxx">canOPEN_xxx</a>.</p>
@@ -96,32 +100,96 @@ $(document).ready(function(){initNavTree('page_user_guide_chips_channels.html','
 Open as CAN</h1>
 <p>No special <a class="el" href="canlib_8h.html#canOPEN_xxx">canOPEN_xxx</a> modifier flag is needed in the flags argument to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> when opening a channel in CAN mode.</p>
 <div class="fragment"><div class="line">hnd = <a class="code" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel</a>(channel_number, 0);</div></div><!-- fragment --><p><b>Example</b>. This example opens channel 0 for exclusive usage by this application.</p>
-<div class="fragment"><div class="line"><a class="code" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd;</div><div class="line">hnd = <a class="code" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel</a>(0, <a class="code" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a>);</div><div class="line"><span class="keywordflow">if</span> (hnd &lt; 0) {</div><div class="line">    printf(<span class="stringliteral">&quot;Open failed, stat=%d\n&quot;</span>, hnd);</div><div class="line">}</div></div><!-- fragment --><h1><a class="anchor" id="section_user_guide_init_sel_channel_canfd"></a>
+<div class="fragment"><div class="line"><a class="code" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd;</div><div class="line">hnd = <a class="code" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel</a>(0, <a class="code" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a>);</div><div class="line"><span class="keywordflow">if</span> (hnd &lt; 0) {</div><div class="line">    printf(<span class="stringliteral">&quot;Open failed, stat=%d\n&quot;</span>, hnd);</div><div class="line">}</div></div><!-- fragment --><p>When opening a channel as CAN, use <a class="el" href="group___c_a_n.html#ga50f169c6f9dd6df93b17c322e8e4fd00">canSetBusParamsTq()</a> to specify bus parameters. Instructions and examples are found below.</p>
+<h1><a class="anchor" id="section_user_guide_init_sel_channel_canfd"></a>
 Open as CAN FD</h1>
 <p>To open a channel in CAN FD mode, either <a class="el" href="canlib_8h.html#a10aad075bfb9891aa98cf3c131977dc3">canOPEN_CAN_FD</a> or <a class="el" href="canlib_8h.html#a692d91db67e06e0c11e9076141319e35">canOPEN_CAN_FD_NONISO</a> needs to be given in the flags argument to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>.</p>
 <div class="fragment"><div class="line">hnd = <a class="code" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel</a>(channel_number, <a class="code" href="canlib_8h.html#a10aad075bfb9891aa98cf3c131977dc3">canOPEN_CAN_FD</a>);</div></div><!-- fragment --><p><b>Example</b>. This example opens channel 0 in CAN FD mode for exclusive usage by this application.</p>
-<div class="fragment"><div class="line"><a class="code" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd;</div><div class="line">hnd = <a class="code" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel</a>(0, <a class="code" href="canlib_8h.html#a10aad075bfb9891aa98cf3c131977dc3">canOPEN_CAN_FD</a> | <a class="code" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a>);</div><div class="line"><span class="keywordflow">if</span> (hnd &lt; 0) {</div><div class="line">    printf(<span class="stringliteral">&quot;Open failed, stat=%d\n&quot;</span>, hnd);</div><div class="line">}</div></div><!-- fragment --><h1><a class="anchor" id="section_user_guide_init_sel_channel_close"></a>
+<div class="fragment"><div class="line"><a class="code" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd;</div><div class="line">hnd = <a class="code" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel</a>(0, <a class="code" href="canlib_8h.html#a10aad075bfb9891aa98cf3c131977dc3">canOPEN_CAN_FD</a> | <a class="code" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a>);</div><div class="line"><span class="keywordflow">if</span> (hnd &lt; 0) {</div><div class="line">    printf(<span class="stringliteral">&quot;Open failed, stat=%d\n&quot;</span>, hnd);</div><div class="line">}</div></div><!-- fragment --><p>When opening a channel as CAN FD, use <a class="el" href="group___c_a_n.html#ga4beeb28ede2e21a2988076e66f873723">canSetBusParamsFdTq()</a> to specify bus parameters. Instructions and examples are found below.</p>
+<h1><a class="anchor" id="section_user_guide_init_sel_channel_close"></a>
 Close Channel</h1>
 <p>Closing a channel is done using <a class="el" href="group___c_a_n.html#ga49525373a4d08d93c651ec10f79dd36b">canClose()</a>. If no other handles are referencing the same CANlib channel, the channel is taken off bus. The handle can not be used for further references to the channel, so any variable containing this handle should be set to <a class="el" href="canlib_8h.html#ad1f2b460c7780224a9dbc0f8f8a4918a">canINVALID_HANDLE</a>.</p>
-<div class="fragment"><div class="line"><a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> stat = <a class="code" href="group___c_a_n.html#ga49525373a4d08d93c651ec10f79dd36b">canClose</a>(hnd);</div><div class="line"><span class="keywordflow">if</span> (stat &lt; 0) {</div><div class="line">    printf(<span class="stringliteral">&quot;Close failed.&quot;</span>);</div><div class="line">}</div><div class="line">hnd = <a class="code" href="canlib_8h.html#ad1f2b460c7780224a9dbc0f8f8a4918a">canINVALID_HANDLE</a>;</div></div><!-- fragment --><h1><a class="anchor" id="section_user_guide_init_bit_rate_can"></a>
+<div class="fragment"><div class="line"><a class="code" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> stat = <a class="code" href="group___c_a_n.html#ga49525373a4d08d93c651ec10f79dd36b">canClose</a>(hnd);</div><div class="line"><span class="keywordflow">if</span> (stat &lt; 0) {</div><div class="line">    printf(<span class="stringliteral">&quot;Close failed.&quot;</span>);</div><div class="line">}</div><div class="line">hnd = <a class="code" href="canlib_8h.html#ad1f2b460c7780224a9dbc0f8f8a4918a">canINVALID_HANDLE</a>;</div></div><!-- fragment --><h1><a class="anchor" id="section_user_guide_init_bit_rate_can_tq"></a>
 Set CAN Bitrate</h1>
-<p>Use <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> to set the CAN bus parameters. The bus parameters include the bit rate, the position of the sampling point etc, they are also described in most CAN controller data sheets. CANlib provides a few default set of parameters for the most common bus speeds through the <a class="el" href="canlib_8h.html#canBITRATE_xxx">canBITRATE_xxx</a> constants. When using these constants in the call to <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a>, set the rest of the arguments to '0'.</p>
-<p><b>Example</b>. To set the bus speed to 500 kbit/s:</p>
-<div class="fragment"><div class="line">stat = <a class="code" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams</a>(hnd, <a class="code" href="canlib_8h.html#ae72ee3c12379c4817de3b53c7cc6d89c">canBITRATE_500K</a>, 0, 0, 0, 0, 0);</div><div class="line"><span class="keywordflow">if</span> (stat &lt; 0) {</div><div class="line">    printf(<span class="stringliteral">&quot;canBusParams failed, status=%d\n&quot;</span>, stat);</div><div class="line">    exit(1);</div><div class="line">}</div></div><!-- fragment --><p>To set a bit rate that is not predefined, you have to calculate the appropriate bus parameters yourself.</p>
-<p><b>Example</b>. Set the speed to 125 kbit/s, each bit comprising 8 (= 1 + 4 + 3) quanta, the sampling point occurs at 5/8 of a bit; SJW = 1; one sampling point.</p>
-<div class="fragment"><div class="line">stat = <a class="code" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams</a>(hnd, 125000, 4, 3, 1, 1, 0);</div></div><!-- fragment --><p><b>Example</b>. Set the speed to 111111 kbit/s, the sampling point to 75%, the SJW to 2 and the number of samples to 1:</p>
-<div class="fragment"><div class="line">stat = <a class="code" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams</a>(hnd, 111111, 5, 2, 2, 1, 0);</div></div><!-- fragment --><h1><a class="anchor" id="section_user_guide_init_bit_rate_canfd"></a>
+<p>After opening a channel as CAN, use <a class="el" href="group___c_a_n.html#ga50f169c6f9dd6df93b17c322e8e4fd00">canSetBusParamsTq()</a> to set CAN bus parameters. Bus parameters, including the total nominal bit time and individual phase segments in number of time quanta etc, must be packaged in a struct <a class="el" href="structkv_bus_params_tq.html">kvBusParamsTq</a>. The synchronization segment is excluded as it is always one time quantum. Appropriate parameters can be calculated using the <a href="https://www.kvaser.com/support/calculators/can-fd-bit-timing-calculator/" target="_blank">Bit Timing Calculator for CAN FD</a>. Note that for classic CAN, only the nominal bus parameters are of concern when using the Bus Bit Timing Calculator. Device clock frequency and additional information can be obtained by a call to <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>, with suitable arguments, e.g. <a class="el" href="canlib_8h.html#a40c7c5a86334adcc799cd78696deca2e">canCHANNELDATA_CLOCK_INFO</a>.</p>
+<p><b>Example</b>. To set the bus speed to 500 kbit/s on a CAN device with an 80 MHz oscillator:</p>
+<div class="fragment"><div class="line"><a class="code" href="structkv_bus_params_tq.html">kvBusParamsTq</a> params = { 8, 2, 2, 1, 3, 20 };</div><div class="line">stat = <a class="code" href="group___c_a_n.html#ga50f169c6f9dd6df93b17c322e8e4fd00">canSetBusParamsTq</a>(hnd, params);</div><div class="line"><span class="keywordflow">if</span> (stat &lt; 0) {</div><div class="line">  printf(<span class="stringliteral">&quot;canBusParams failed, status=%d\n&quot;</span>, stat);</div><div class="line">  exit(1);</div><div class="line">}</div></div><!-- fragment --><p>In the example a prescaler of 20 is used, resulting in each bit comprising of 160 time quanta (8 * 20). The nominal bus speed is given by 80*10^6/(20*8) = 500*10^3.</p>
+<p>Parameter settings for the most common bus speeds are listed in the below table.</p>
+<table class="doxtable">
+<tr>
+<td></td><th>tq</th><th>phase1</th><th>phase2</th><th>sjw</th><th>prop</th><th>prescaler</th><th>Sample point</th><th>Name of Constant </th></tr>
+<tr>
+<th>10 kbit/s</th><td>16</td><td>4</td><td>4</td><td>1</td><td>7</td><td>500</td><td>75%</td><td><a class="el" href="canlib_8h.html#aaf7d703ae2c044b44f170643d41a5a82">canBITRATE_10K</a> </td></tr>
+<tr>
+<th>50 kbit/s</th><td>16</td><td>4</td><td>4</td><td>1</td><td>7</td><td>100</td><td>75%</td><td><a class="el" href="canlib_8h.html#a9f0ad5c28bc92808241f2307c907cbbb">canBITRATE_50K</a> </td></tr>
+<tr>
+<th>62 kbit/s</th><td>16</td><td>4</td><td>4</td><td>1</td><td>7</td><td>80</td><td>75%</td><td><a class="el" href="canlib_8h.html#a2ccf65add975b82a4029367c7d07f137">canBITRATE_62K</a> </td></tr>
+<tr>
+<th>83 kbit/s</th><td>8</td><td>2</td><td>2</td><td>2</td><td>3</td><td>120</td><td>75%</td><td><a class="el" href="canlib_8h.html#a4f77f9a11ea758d99d4f0f76aab6e57e">canBITRATE_83K</a> </td></tr>
+<tr>
+<th>100 kbit/s</th><td>16</td><td>4</td><td>4</td><td>1</td><td>7</td><td>50</td><td>75%</td><td><a class="el" href="canlib_8h.html#afde822b542995b7fb45cfdd27ce29a10">canBITRATE_100K</a> </td></tr>
+<tr>
+<th>125 kbit/s</th><td>16</td><td>4</td><td>4</td><td>1</td><td>7</td><td>40</td><td>75%</td><td><a class="el" href="canlib_8h.html#a29a9aafde6e861b4fffb72ad124aeed1">canBITRATE_125K</a> </td></tr>
+<tr>
+<th>250 kbit/s</th><td>8</td><td>2</td><td>2</td><td>1</td><td>3</td><td>40</td><td>75%</td><td><a class="el" href="canlib_8h.html#a87f618db13ec4f48610def72cfb40969">canBITRATE_250K</a> </td></tr>
+<tr>
+<th>500 kbit/s</th><td>8</td><td>2</td><td>2</td><td>1</td><td>3</td><td>20</td><td>75%</td><td><a class="el" href="canlib_8h.html#ae72ee3c12379c4817de3b53c7cc6d89c">canBITRATE_500K</a> </td></tr>
+<tr>
+<th>1 Mbit/s</th><td>8</td><td>2</td><td>2</td><td>1</td><td>3</td><td>10</td><td>75%</td><td><a class="el" href="canlib_8h.html#ac823cae7d94763607a7ca40fcdb5196d">canBITRATE_1M</a>  </td></tr>
+</table>
+<p>Examples in the reference table are presented for a CAN device with an 80 MHz oscillator.</p>
+<h1><a class="anchor" id="section_user_guide_init_bit_rate_canfd_tq"></a>
 Set CAN FD Bitrate</h1>
-<p>In CAN FD we need to set both the arbitration/nominal bitrate, using <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a>, and the data phase bitrate, using <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a>. CANlib provides a few default set of parameters for the most common CAN FD bus speeds through the <a class="el" href="canlib_8h.html#canFD_BITRATE_xxx">canFD_BITRATE_xxx</a> constants. When using these constants in the call to <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a>, set the rest of the arguments to '0'.</p>
-<p><b>Example</b>. Set the nominal bitrate to 500 kbit/s, with sampling point at 80% and the data phase bitrate to 1000 kbit/s, with sampling point at 80%.</p>
-<div class="fragment"><div class="line">stat1 = <a class="code" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams</a>(hnd, <a class="code" href="canlib_8h.html#a71dec626b7de7ddd18daf93e535902f4">canFD_BITRATE_500K_80P</a>, 0, 0, 0, 0, 0);</div><div class="line">stat2 = <a class="code" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd</a>(hnd, <a class="code" href="canlib_8h.html#a3a93c64ba76ebe3c5e525d4dfa4ade8d">canFD_BITRATE_1M_80P</a>, 0, 0, 0);</div></div><!-- fragment --><p>For more copmplex settings of CAN FD bitrates, use the <a href="https://www.kvaser.com/support/calculators/can-fd-bit-timing-calculator/">Bit Timing Calculator for CAN FD</a> available on the Kvaser web site.</p>
+<p>After opening a channel in CAN FD mode (passing either canOPEN_CAN_FD or canOPEN_CAN_FD_NONISO to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>), parameters for both the arbitration and data phases need to be set, this is done by a call to <a class="el" href="group___c_a_n.html#ga4beeb28ede2e21a2988076e66f873723">canSetBusParamsFdTq()</a>. Parameter settings for the arbitration and data phases are passed as individual <a class="el" href="structkv_bus_params_tq.html">kvBusParamsTq</a>.</p>
+<p><b>Example</b>. Set the arbitration bitrate to 500 kbit/s and the data phase bitrate to 1000 kbit/s, with sampling point at 80% using an 80 MHz oscillator. Note that only prescaler values of 1 or 2 are valid as input for CAN FD. Also, identical prescaler values must be used for the arbitration and data bus parameter settings.</p>
+<div class="fragment"><div class="line"><a class="code" href="structkv_bus_params_tq.html">kvBusParamsTq</a> paramsArbitration = { 80, 16, 16, 16, 47, 2 };</div><div class="line"><a class="code" href="structkv_bus_params_tq.html">kvBusParamsTq</a> paramsData = { 40, 31, 8, 8, 0, 2 };</div><div class="line">stat = <a class="code" href="group___c_a_n.html#ga4beeb28ede2e21a2988076e66f873723">canSetBusParamsFdTq</a>(hnd, paramsArbitration, paramsData);</div><div class="line"><span class="keywordflow">if</span> (stat &lt; 0) {</div><div class="line">  printf(<span class="stringliteral">&quot;canBusParams failed, status=%d\n&quot;</span>, stat);</div><div class="line">  exit(1);</div><div class="line">}</div></div><!-- fragment --><p>Parameter settings for the most common CAN FD bus speeds are listed in the table below. For other desired CAN FD bitrates, the <a href="https://www.kvaser.com/support/calculators/can-fd-bit-timing-calculator/" target="_blank">Bit Timing Calculator for CAN FD</a> is available on the Kvaser web site.</p>
+<p><b>Data phase parameter settings for common bus speeds</b> </p><table class="doxtable">
+<tr>
+<td></td><th>tq</th><th>phase1</th><th>phase2</th><th>sjw</th><th>prop</th><th>prescaler</th><th>Sample point</th><th>Name of Constant </th></tr>
+<tr>
+<th>500 kbit/s</th><td>80</td><td>63</td><td>16</td><td>16</td><td>0</td><td>2</td><td>80%</td><td><a class="el" href="canlib_8h.html#a71dec626b7de7ddd18daf93e535902f4">canFD_BITRATE_500K_80P</a> </td></tr>
+<tr>
+<th>1 Mbit/s</th><td>40</td><td>31</td><td>8</td><td>8</td><td>0</td><td>2</td><td>80%</td><td><a class="el" href="canlib_8h.html#a3a93c64ba76ebe3c5e525d4dfa4ade8d">canFD_BITRATE_1M_80P</a> </td></tr>
+<tr>
+<th>2 Mbit/s</th><td>20</td><td>15</td><td>4</td><td>4</td><td>0</td><td>2</td><td>80%</td><td><a class="el" href="canlib_8h.html#a9f21214c84dbb6f5f37eb27520ecc162">canFD_BITRATE_2M_80P</a> </td></tr>
+<tr>
+<th>4 Mbit/s</th><td>10</td><td>7</td><td>2</td><td>2</td><td>0</td><td>2</td><td>80%</td><td><a class="el" href="canlib_8h.html#aa643e5939f0d4d5fff21747e55c76153">canFD_BITRATE_4M_80P</a> </td></tr>
+<tr>
+<th>8 Mbit/s</th><td>5</td><td>2</td><td>2</td><td>1</td><td>0</td><td>2</td><td>60%</td><td><a class="el" href="canlib_8h.html#ac1d8bd40554b1433f00e4f1bca3f7a8e">canFD_BITRATE_8M_60P</a>  </td></tr>
+</table>
+<p><b>Arbitration phase parameter settings for common bus speeds</b> </p><table class="doxtable">
+<tr>
+<td></td><th>tq</th><th>phase1</th><th>phase2</th><th>sjw</th><th>prop</th><th>prescaler</th><th>Sample point</th><th>Name of Constant </th></tr>
+<tr>
+<th>500 kbit/s</th><td>80</td><td>16</td><td>16</td><td>16</td><td>47</td><td>2</td><td>80%</td><td><a class="el" href="canlib_8h.html#a71dec626b7de7ddd18daf93e535902f4">canFD_BITRATE_500K_80P</a> </td></tr>
+<tr>
+<th>1 Mbit/s</th><td>40</td><td>8</td><td>8</td><td>8</td><td>23</td><td>2</td><td>80%</td><td><a class="el" href="canlib_8h.html#a3a93c64ba76ebe3c5e525d4dfa4ade8d">canFD_BITRATE_1M_80P</a>  </td></tr>
+</table>
+<p>Examples in the reference tables are presented for a CAN device with an 80 MHz oscillator.</p>
 <h1><a class="anchor" id="section_user_guide_init_driver_modes"></a>
 CAN Driver Modes</h1>
 <p>Use <a class="el" href="group___c_a_n.html#gafca31590718ac7101d065b0c18b2410e">canSetBusOutputControl()</a> to set the bus driver mode. This is usually set to <a class="el" href="canlib_8h.html#ae5d980394050f52fd4af8f8ca75a4bca">canDRIVER_NORMAL</a> to obtain the standard push-pull type of driver. Some controllers also support <a class="el" href="canlib_8h.html#ab82a818e60cddf4c65c54d42a474a023">canDRIVER_SILENT</a> which makes the controller receive only, not transmit anything, not even ACK bits. This might be handy for e.g. when listening to a CAN bus without interfering.</p>
 <div class="fragment"><div class="line">stat = <a class="code" href="group___c_a_n.html#gafca31590718ac7101d065b0c18b2410e">canSetBusOutputControl</a>(canDRIVER_SILENT);</div></div><!-- fragment --><p><a class="el" href="canlib_8h.html#ae5d980394050f52fd4af8f8ca75a4bca">canDRIVER_NORMAL</a> is set by default.</p>
 <h1><a class="anchor" id="code_sample"></a>
 Code Sample</h1>
-<p>See <a class="el" href="how-to_2c_2open_channels_8c-example.html">how-to/c/openChannels.c</a> for code sample. </p>
+<p>See <a class="el" href="how-to_2c_2open_channels_8c-example.html">how-to/c/openChannels.c</a> for code sample.</p>
+<h1><a class="anchor" id="section_user_guide_init_bit_rate_legacy"></a>
+Legacy Functions</h1>
+<p>The following functions are still supported by canlib. It is, however, recomended to use later implementations instead, see referenced functions in the individual paragraphs.</p>
+<h2><a class="anchor" id="section_user_guide_init_bit_rate_can"></a>
+Set CAN Bitrate</h2>
+<p>Use <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> to set the CAN bus parameters. The bus parameters include the bit rate, the position of the sampling point etc, they are also described in most CAN controller data sheets. CANlib provides a few default set of parameters for the most common bus speeds through the <a class="el" href="canlib_8h.html#canBITRATE_xxx">canBITRATE_xxx</a> constants. When using these constants in the call to <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a>, set the rest of the arguments to '0'.</p>
+<p><b>Example</b>. To set the bus speed to 500 kbit/s:</p>
+<div class="fragment"><div class="line">stat = <a class="code" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams</a>(hnd, <a class="code" href="canlib_8h.html#ae72ee3c12379c4817de3b53c7cc6d89c">canBITRATE_500K</a>, 0, 0, 0, 0, 0);</div><div class="line"><span class="keywordflow">if</span> (stat &lt; 0) {</div><div class="line">    printf(<span class="stringliteral">&quot;canBusParams failed, status=%d\n&quot;</span>, stat);</div><div class="line">    exit(1);</div><div class="line">}</div></div><!-- fragment --><p>To set a bit rate that is not predefined, you have to calculate the appropriate bus parameters yourself.</p>
+<p><b>Example</b>. Set the speed to 125 kbit/s, each bit comprising 8 (= 1 + 4 + 3) quanta, the sampling point occurs at 5/8 of a bit; SJW = 1; one sampling point.</p>
+<div class="fragment"><div class="line">stat = <a class="code" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams</a>(hnd, 125000, 4, 3, 1, 1, 0);</div></div><!-- fragment --><p><b>Example</b>. Set the speed to 111111 kbit/s, the sampling point to 75%, the SJW to 2 and the number of samples to 1:</p>
+<div class="fragment"><div class="line">stat = <a class="code" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams</a>(hnd, 111111, 5, 2, 2, 1, 0);</div></div><!-- fragment --><p>Prefarably use <a class="el" href="group___c_a_n.html#ga50f169c6f9dd6df93b17c322e8e4fd00">canSetBusParamsTq()</a> instead.</p>
+<h2><a class="anchor" id="section_user_guide_init_bit_rate_canfd"></a>
+Set CAN FD Bitrate</h2>
+<p>In CAN FD we need to set both the arbitration/nominal bitrate, using <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a>, and the data phase bitrate, using <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a>. CANlib provides a few default set of parameters for the most common CAN FD bus speeds through the <a class="el" href="canlib_8h.html#canFD_BITRATE_xxx">canFD_BITRATE_xxx</a> constants. When using these constants in the call to <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a>, set the rest of the arguments to '0'.</p>
+<p><b>Example</b>. Set the nominal bitrate to 500 kbit/s, with sampling point at 80% and the data phase bitrate to 1000 kbit/s, with sampling point at 80%.</p>
+<div class="fragment"><div class="line">stat1 = <a class="code" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams</a>(hnd, <a class="code" href="canlib_8h.html#a71dec626b7de7ddd18daf93e535902f4">canFD_BITRATE_500K_80P</a>, 0, 0, 0, 0, 0);</div><div class="line">stat2 = <a class="code" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd</a>(hnd, <a class="code" href="canlib_8h.html#a3a93c64ba76ebe3c5e525d4dfa4ade8d">canFD_BITRATE_1M_80P</a>, 0, 0, 0);</div></div><!-- fragment --><p>For more copmplex settings of CAN FD bitrates, use the <a href="https://www.kvaser.com/support/calculators/can-fd-bit-timing-calculator/">Bit Timing Calculator for CAN FD</a> available on the Kvaser web site.</p>
+<p>Prefarably use <a class="el" href="group___c_a_n.html#ga4beeb28ede2e21a2988076e66f873723">canSetBusParamsFdTq()</a> instead. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.13-->
@@ -129,7 +197,7 @@ Code Sample</h1>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="page_canlib.html">CAN bus API (CANlib)</a></li>
-    <li class="footer"> (canlib 5.33) Wed May 27 2020</li>
+    <li class="footer"> (canlib 5.34) Wed Sep 9 2020</li>
   </ul>
 </div>
 </body>

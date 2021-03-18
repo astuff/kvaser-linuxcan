@@ -114,7 +114,7 @@ Installing Virtual Devices</h2>
 <p>The driver named "virtualcan" controls the Virtual Devices. The number of channels each Virtual Device has, and the total number of Virtual Devices, is controlled by editing define statements in linuxcan\virtualcan\virtualcan.h.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define NR_CHANNELS          2</span></div><div class="line"></div><div class="line"><span class="preprocessor">#define NR_VIRTUAL_DEV       1</span></div></div><!-- fragment --><h2><a class="anchor" id="section_uninstall_driver_linux"></a>
 Removing the driver</h2>
-<p>To unload and uninstall all drivers: </p><div class="fragment"><div class="line">sudo make uninstall </div></div><!-- fragment --><h1><a class="anchor" id="section_install_sdk_linux"></a>
+<p>To unload and uninstall all drivers: </p><div class="fragment"><div class="line">sudo make uninstall </div></div><!-- fragment --><p>Alternatively, if there are multiple versions of the drivers installed, all of them can be removed using: </p><div class="fragment"><div class="line">sudo make purge </div></div><!-- fragment --><h1><a class="anchor" id="section_install_sdk_linux"></a>
 Installing Kvaser CANlib SDK</h1>
 <p>System requirements:</p><ul>
 <li>The package libxml2-dev is needed in order to build kvamemolibxml.</li>
@@ -133,7 +133,7 @@ Removing Kvaser CANlib SDK</h2>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="page_installing.html">Installation</a></li>
-    <li class="footer"> (canlib 5.33) Wed May 27 2020</li>
+    <li class="footer"> (canlib 5.34) Wed Sep 9 2020</li>
   </ul>
 </div>
 </body>

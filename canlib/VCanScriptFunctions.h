@@ -85,7 +85,7 @@ canStatus vCanScript_send_event(HandleData *hData,
                                 unsigned int data); 
 void vCanScript_envvar_init(void);
 kvEnvHandle vCanScript_envvar_open(HandleData *hData, 
-                                   char* envvarName,
+                                   const char* envvarName,
                                    int *envvarType,
                                    int *envvarSize);
 canStatus vCanScript_envvar_close(HandleData * hData, int envvarIdx);
@@ -95,7 +95,7 @@ canStatus vCanScript_envvar_set_float(HandleData * hData, int envvarIdx, float v
 canStatus vCanScript_envvar_get_float(HandleData * hData, int envvarIdx, float *val);
 canStatus vCanScript_envvar_set_data(HandleData * hData,
                                      int envvarIdx,
-                                     void *buf,
+                                     const void *buf,
                                      int start_index,
                                      int data_len);
 canStatus vCanScript_envvar_get_data(HandleData * hData,

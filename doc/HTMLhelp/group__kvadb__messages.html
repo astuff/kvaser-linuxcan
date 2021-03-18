@@ -94,8 +94,12 @@ Functions</h2></td></tr>
 <tr class="separator:ga0146dd4ddf2c39bfdc3b93c29fe85b32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga732d691ed8ead650e4a49d18c8f7ffa2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#ga732d691ed8ead650e4a49d18c8f7ffa2">kvaDbGetMsgById</a> (<a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a> dh, unsigned int id, <a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *mh)</td></tr>
 <tr class="separator:ga732d691ed8ead650e4a49d18c8f7ffa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9698147c268d22991c3ff0f907dff02e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#ga9698147c268d22991c3ff0f907dff02e">kvaDbGetMsgByIdEx</a> (<a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a> dh, unsigned int id, unsigned int flags, <a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *mh)</td></tr>
+<tr class="separator:ga9698147c268d22991c3ff0f907dff02e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gab45031c6ed2eed71515f2badd586d4b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#gab45031c6ed2eed71515f2badd586d4b4">kvaDbGetMsgByPGN</a> (<a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a> dh, unsigned int id, <a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *mh)</td></tr>
 <tr class="separator:gab45031c6ed2eed71515f2badd586d4b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad582275cc3d35cf9d68e49bdb68b015c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#gad582275cc3d35cf9d68e49bdb68b015c">kvaDbGetMsgByPGNEx</a> (<a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a> dh, unsigned int id, <a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *mh)</td></tr>
+<tr class="separator:gad582275cc3d35cf9d68e49bdb68b015c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9685fdb33257ac28e4cd989cfe8ca154"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#ga9685fdb33257ac28e4cd989cfe8ca154">kvaDbGetMsgByName</a> (<a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a> dh, const char *msg_name, <a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *mh)</td></tr>
 <tr class="separator:ga9685fdb33257ac28e4cd989cfe8ca154"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga194badc7e10d889df38a0f4eb763b5e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#ga194badc7e10d889df38a0f4eb763b5e6">kvaDbGetMsgName</a> (<a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> mh, char *buf, size_t buflen)</td></tr>
@@ -343,7 +347,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get a handle to a message with a specific identifier. If the message is of extended CAN format, assumes the id contains the <a class="el" href="kva_db_lib_8h.html#acb793e70d95b7daf6045c6dd9cc8792d">KVADB_MESSAGE_EXT</a> flag. If nothing is found, adds the <a class="el" href="kva_db_lib_8h.html#acb793e70d95b7daf6045c6dd9cc8792d">KVADB_MESSAGE_EXT</a> flag to the id and tries again.</p>
+<p>Get a handle to a message with a specific identifier. If the message requested has an extended id, the id should have the <a class="el" href="kva_db_lib_8h.html#acb793e70d95b7daf6045c6dd9cc8792d">KVADB_MESSAGE_EXT</a> flag set.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">dh</td><td>A database handle </td></tr>
@@ -355,9 +359,65 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57ad8a19899af8c1e42208a67afb572b2fc">kvaDbOK</a> (zero) if success </dd>
 <dd>
 <a class="el" href="kva_db_lib_8h.html#kvaDbErr_xxx">kvaDbErr_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvadb__messages.html#ga9685fdb33257ac28e4cd989cfe8ca154">kvaDbGetMsgByName()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvadb__messages.html#ga9685fdb33257ac28e4cd989cfe8ca154">kvaDbGetMsgByName()</a> </dd>
+<dd>
+<a class="el" href="group__kvadb__messages.html#ga9698147c268d22991c3ff0f907dff02e">kvaDbGetMsgByIdEx()</a> </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="example_2c_2candb_sample_8c-example.html#a50">example/c/candb_sample.c</a>.</dd>
 </dl>
+</div>
+</div>
+<a id="ga9698147c268d22991c3ff0f907dff02e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9698147c268d22991c3ff0f907dff02e">&#9670;&nbsp;</a></span>kvaDbGetMsgByIdEx()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a> kvaDbGetMsgByIdEx </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a>&#160;</td>
+          <td class="paramname"><em>dh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>flags</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *&#160;</td>
+          <td class="paramname"><em>mh</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get a handle to a message with a specific identifier. If the requested message has an extended id, <a class="el" href="kva_db_lib_8h.html#acb793e70d95b7daf6045c6dd9cc8792d">KVADB_MESSAGE_EXT</a> should be set on the flags parameter. Bits 31..29 of the id are ignored.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">dh</td><td>A database handle </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>The selected message identifier </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">flags</td><td>The flags, <a class="el" href="kva_db_lib_8h.html#KVADB_MESSAGE_xxx">KVADB_MESSAGE_xxx</a> </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">mh</td><td>A message handle</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57ad8a19899af8c1e42208a67afb572b2fc">kvaDbOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="kva_db_lib_8h.html#kvaDbErr_xxx">kvaDbErr_xxx</a> (negative) if failure</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvadb__messages.html#ga9685fdb33257ac28e4cd989cfe8ca154">kvaDbGetMsgByName()</a> </dd></dl>
+
 </div>
 </div>
 <a id="ga9685fdb33257ac28e4cd989cfe8ca154"></a>
@@ -440,6 +500,56 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Get a handle to a message with a specific PGN-identifier. If the message is marked as J1939, checks if the PGN-part is equal. The message identifier needs to contain the <a class="el" href="kva_db_lib_8h.html#acb793e70d95b7daf6045c6dd9cc8792d">KVADB_MESSAGE_EXT</a> flag.</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000004">Deprecated:</a></b></dt><dd>Use <a class="el" href="group__kvadb__messages.html#gad582275cc3d35cf9d68e49bdb68b015c">kvaDbGetMsgByPGNEx()</a> instead.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">dh</td><td>A database handle </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>The selected message identifier </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">mh</td><td>A message handle</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57ad8a19899af8c1e42208a67afb572b2fc">kvaDbOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="kva_db_lib_8h.html#kvaDbErr_xxx">kvaDbErr_xxx</a> (negative) if failure</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvadb__messages.html#ga9685fdb33257ac28e4cd989cfe8ca154">kvaDbGetMsgByName()</a> </dd>
+<dd>
+<a class="el" href="group__kvadb__messages.html#gad582275cc3d35cf9d68e49bdb68b015c">kvaDbGetMsgByPGNEx()</a> </dd></dl>
+
+</div>
+</div>
+<a id="gad582275cc3d35cf9d68e49bdb68b015c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad582275cc3d35cf9d68e49bdb68b015c">&#9670;&nbsp;</a></span>kvaDbGetMsgByPGNEx()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a> kvaDbGetMsgByPGNEx </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="kva_db_lib_8h.html#a0ab6b252bb2dbf1312bd48208954e67b">KvaDbHnd</a>&#160;</td>
+          <td class="paramname"><em>dh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> *&#160;</td>
+          <td class="paramname"><em>mh</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get a handle to a J1939 message using the PGN-identifier within the CAN id. All bits in the id that are not part of the PGN are ignored.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">dh</td><td>A database handle </td></tr>
@@ -1234,7 +1344,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.33) Wed May 27 2020</li>
+    <li class="footer"> (canlib 5.34) Wed Sep 9 2020</li>
   </ul>
 </div>
 </body>

@@ -75,6 +75,16 @@ static void set_capability (uint32_t *self, uint32_t cap, uint32_t to)
   }
 }
 
+static void set_capability_ex (uint64_t *self, uint64_t cap_ex, uint32_t to)
+{
+  if (to) {
+    *self |= cap_ex;
+  } else {
+    *self &= ~cap_ex;
+  }
+}
+
+
 void set_capability_value (VCanCardData *vCard, uint32_t cap, uint32_t to, uint32_t channel_mask, uint32_t n_channels_max)
 {
   uint32_t i;
@@ -128,3 +138,47 @@ int card_has_capability (VCanCardData *vCard, uint32_t cap, uint32_t n_channels_
   return 0;
 }
 EXPORT_SYMBOL(card_has_capability);
+
+
+int card_has_capability_ex (VCanCardData *vCard, uint64_t cap_ex, uint32_t n_channels_max)
+{
+  uint32_t i;
+  for (i = 0; i < n_channels_max; i++) {
+    VCanChanData *vChd = vCard->chanData[i];
+    if (vChd->capabilities_ex & cap_ex) return 1;
+  }
+  return 0;
+}
+EXPORT_SYMBOL(card_has_capability_ex);
+
+void set_capability_ex_value (VCanCardData *vCard, uint64_t cap_ex, uint32_t to, uint32_t channel_mask, uint32_t n_channels_max)
+{
+  uint32_t i;
+  for (i = 0; i < n_channels_max; i++) {
+    if ((1 << i) & channel_mask) {
+      VCanChanData *vChd = vCard->chanData[i];
+      set_capability_ex (&vChd->capabilities_ex, cap_ex, to);
+    }
+  }
+}
+EXPORT_SYMBOL(set_capability_ex_value);
+
+void set_capability_ex_mask (VCanCardData *vCard, uint64_t cap_ex, uint32_t to, uint32_t channel_mask, uint32_t n_channels_max)
+{
+  uint32_t i;
+  for (i = 0; i < n_channels_max; i++) {
+    if ((1 << i) & channel_mask) {
+      VCanChanData *vChd = vCard->chanData[i];
+      set_capability_ex (&vChd->capabilities_ex_mask, cap_ex, to);
+    }
+  }
+}
+EXPORT_SYMBOL(set_capability_ex_mask);
+
+uint8_t convert_vcan_ex_to_hydra_cmd(uint64_t vcan_ex_cmd) {
+  switch (vcan_ex_cmd) {
+    case VCAN_CHANNEL_EX_CAP_HAS_BUSPARAMS_TQ:   return CAP_SUB_CMD_HAS_BUSPARAMS_TQ; break;
+    default: return 0; break;
+  }
+}
+EXPORT_SYMBOL(convert_vcan_ex_to_hydra_cmd);

@@ -157,6 +157,15 @@
 #define VCAN_IOC_OPEN_INIT_ACCESS     _IO(VCAN_IOC_MAGIC,176)
 #define VCAN_IOC_GET_CHANNEL_INFO     _IO(VCAN_IOC_MAGIC,177)
 
+#define VCAN_IOC_GET_BUS_PARAM_LIMITS    _IO(VCAN_IOC_MAGIC,178)
+#define VCAN_IOC_GET_CLOCK_INFO          _IO(VCAN_IOC_MAGIC,179)
+
+#define VCAN_IOC_SET_BITRATE_TQ          _IO(VCAN_IOC_MAGIC,180)
+#define VCAN_IOC_GET_BITRATE_TQ          _IO(VCAN_IOC_MAGIC,181)
+
+#define VCAN_IOC_GET_CHAN_CAP_EX         _IO(VCAN_IOC_MAGIC,182)
+
+
 #define VCAN_CHANNEL_CAP_SEND_ERROR_FRAMES      0x00000001
 #define VCAN_CHANNEL_CAP_RECEIVE_ERROR_FRAMES   0x00000002
 #define VCAN_CHANNEL_CAP_TIMEBASE_ON_CARD       0x00000004
@@ -185,6 +194,10 @@
 #define VCAN_CHANNEL_CAP_HAS_SCRIPT             0x20000000  // Device has script capabilities
 #define VCAN_CHANNEL_CAP_LIN_HYBRID             0x40000000  // Device supports can/lin hybrid
 #define VCAN_CHANNEL_CAP_DIAGNOSTICS            0x80000000  // Device supports diagnostics
+
+/* Flags for Kvasers extended channel capabilities */
+#define VCAN_CHANNEL_EX_CAP_HAS_BUSPARAMS_TQ    0x0000000000000001  // Device supports busparams tq api
+
 
 #define VCAN_CHANNEL_STATUS_TIME_SYNC_ENABLED   0x00000001
 #define VCAN_CHANNEL_STATUS_TIME_SYNC_RUNNING   0x00000002

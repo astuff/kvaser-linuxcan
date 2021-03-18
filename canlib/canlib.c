@@ -74,6 +74,7 @@
 #include "VCanFunctions.h"
 #include "VCanScriptFunctions.h"
 #include "debug.h"
+#include "tq_util.h"
 
 
 #include <stdio.h>
@@ -602,10 +603,6 @@ canSetBusParamsFd (const CanHandle hnd, long freq_brs, unsigned int tseg1_brs,
     return canERR_INVHANDLE;
   }
 
-  if ((OPEN_AS_CANFD_ISO != hData->openMode) && (OPEN_AS_CANFD_NONISO != hData->openMode)) {
-    return canERR_INVHANDLE;
-  }
-
   ret = hData->canOps->getBusParams(hData, &freq, &tseg1, &tseg2, &sjw, &noSamp,
                                     NULL, NULL, NULL, NULL, &syncmode);
   if (ret != canOK) {
@@ -697,6 +694,106 @@ canGetBusParamsFd (const CanHandle hnd, long *freq, unsigned int *tseg1,
 
   return hData->canOps->getBusParams(hData, NULL, NULL, NULL, NULL, NULL,
                                      freq, tseg1, tseg2, sjw, NULL);
+}
+
+canStatus CANLIBAPI
+canSetBusParamsTq(const CanHandle     hnd,
+                  const kvBusParamsTq nominal)
+{
+  HandleData         *hData;
+  
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  if (tqu_check_nominal (nominal)) {
+    return canERR_PARAM;
+  }
+  
+  return hData->canOps->setBusParamsTq (hData, &nominal, NULL);
+}
+
+canStatus CANLIBAPI
+CANLIBAPI canGetBusParamsTq(const CanHandle      hnd,
+                                  kvBusParamsTq *nominal)
+{
+  HandleData *hData;
+  int         ret;
+  
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  if (nominal == NULL) {
+    return canERR_PARAM;
+  }
+  
+  ret = hData->canOps->getBusParamsTq (hData, nominal, NULL);
+
+  if (ret) {
+    return ret;
+  }
+
+  return canOK;
+}
+
+canStatus CANLIBAPI
+canSetBusParamsFdTq(const CanHandle     hnd,
+                    const kvBusParamsTq nominal,
+                    const kvBusParamsTq data)
+{
+  HandleData         *hData;
+  
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  if (tqu_check_nominal (nominal)) {
+    return canERR_PARAM;
+  }
+  
+  if (tqu_check_data (data)) {
+    return canERR_PARAM;
+  }
+  
+  if (nominal.prescaler != data.prescaler) {
+    return canERR_PARAM;
+  }
+
+  return hData->canOps->setBusParamsTq (hData, &nominal, &data);
+}
+
+canStatus CANLIBAPI
+canGetBusParamsFdTq(const CanHandle  hnd,
+                    kvBusParamsTq   *nominal,
+                    kvBusParamsTq   *data)
+{
+  HandleData *hData;
+  int         ret;
+  
+  hData = findHandle(hnd);
+  if (hData == NULL) {
+    return canERR_INVHANDLE;
+  }
+
+  if (nominal == NULL) {
+    return canERR_PARAM;
+  }
+
+  if (data == NULL) {
+    return canERR_PARAM;
+  }
+
+  ret = hData->canOps->getBusParamsTq (hData, nominal, data);
+
+  if (ret) {
+    return ret;
+  }
+
+  return canOK;
 }
 
 
@@ -1995,7 +2092,7 @@ static int GetENVVARHandle(int64_t ev) {
 
 /***************************************************************************/
 kvEnvHandle CANLIBAPI kvScriptEnvvarOpen(const CanHandle hnd,
-                                         char* envvarName,
+                                         const char* envvarName,
                                          int *envvarType,
                                          int *envvarSize)
 {
@@ -2085,7 +2182,7 @@ kvStatus CANLIBAPI kvScriptEnvvarGetFloat(const kvEnvHandle eHnd, float *val)
 
 /***************************************************************************/
 kvStatus CANLIBAPI kvScriptEnvvarSetData(const kvEnvHandle eHnd,
-                                         void *buf,
+                                         const void *buf,
                                          int start_index,
                                          int data_len)
 {

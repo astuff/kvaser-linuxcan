@@ -65,9 +65,14 @@
 
 MODNAME=kvpcican
 DEPMOD=`which depmod`
+DIR="${0%/*}"
+KERNEL_VER=`uname -r` # Kernel version at install time
 
-install -d -m 755 /lib/modules/`uname -r`/kernel/drivers/char/
-install -m 644 $MODNAME.ko /lib/modules/`uname -r`/kernel/drivers/char/
+# append to file in case installer is run several times on different kernels
+echo $KERNEL_VER >> $DIR/kernel_ver 
+
+install -d -m 755 /lib/modules/$KERNEL_VER/kernel/drivers/char/
+install -m 644 $MODNAME.ko /lib/modules/$KERNEL_VER/kernel/drivers/char/
 if [ "$?" -ne 0 ] ; then
   exit 1
 fi

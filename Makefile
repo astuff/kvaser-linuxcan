@@ -159,6 +159,13 @@ uninstall:
 	rm -f /etc/udev/rules.d/10-kvaser.rules
 	rm -f /etc/modules-load.d/kvaser.conf
 
+purge:
+	@for dir in $(call reverse,$(DRIVERS)) ; do cd $$dir; echo Uninstalling $$dir;./uninstallscript.sh -p || exit 1; cd ..; done
+	$(MAKE) -C canlib uninstall
+	$(MAKE) -C linlib uninstall
+	rm -f /etc/udev/rules.d/10-kvaser.rules
+	rm -f /etc/modules-load.d/kvaser.conf
+
 load:
 	@for dir in $(DRIVERS) ; do cd $$dir; echo Installing $$dir;./installscript.sh load || exit 1; cd ..; done
 	$(MAKE) -C canlib install
@@ -191,7 +198,7 @@ EFI_SECUREBOOT_PATH ?= $(EFI_SYS_PATH)/efivars/SecureBoot-8be4df61-93ca-11d2-aa0
 define check_for_secure_boot
 	if test -d $(EFI_SYS_PATH) ; then \
 		if which mokutil > /dev/null 2>&1 ; then \
-			if mokutil --sb-state | grep --silent -v 'SecureBoot disabled' ; then \
+			if mokutil --sb-state | grep --silent 'SecureBoot enabled' ; then \
 				echo '*****************************************************'; \
 				echo 'WARNING: Secure Boot is enabled on <$(HOSTNAME)>!'; \
 				echo '         When Secure Boot is enabled, driver modules'; \

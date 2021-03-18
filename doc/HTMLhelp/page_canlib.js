@@ -20,10 +20,14 @@ var page_canlib =
       [ "Open as CAN", "page_user_guide_chips_channels.html#section_user_guide_init_sel_channel_can", null ],
       [ "Open as CAN FD", "page_user_guide_chips_channels.html#section_user_guide_init_sel_channel_canfd", null ],
       [ "Close Channel", "page_user_guide_chips_channels.html#section_user_guide_init_sel_channel_close", null ],
-      [ "Set CAN Bitrate", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_can", null ],
-      [ "Set CAN FD Bitrate", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_canfd", null ],
+      [ "Set CAN Bitrate", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_can_tq", null ],
+      [ "Set CAN FD Bitrate", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_canfd_tq", null ],
       [ "CAN Driver Modes", "page_user_guide_chips_channels.html#section_user_guide_init_driver_modes", null ],
-      [ "Code Sample", "page_user_guide_chips_channels.html#code_sample", null ]
+      [ "Code Sample", "page_user_guide_chips_channels.html#code_sample", null ],
+      [ "Legacy Functions", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_legacy", [
+        [ "Set CAN Bitrate", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_can", null ],
+        [ "Set CAN FD Bitrate", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_canfd", null ]
+      ] ]
     ] ],
     [ "CAN Frame Types", "page_user_guide_can_frame_types_types.html", [
       [ "CAN Data Frames", "page_user_guide_can_frame_types_types.html#section_user_guide_can_frame_types_data_frames", null ],

@@ -254,6 +254,15 @@ struct timeval vCanCalc_dt (struct timeval *start) {
 #endif
 EXPORT_SYMBOL(vCanCalc_dt);
 
+int vCanSupportsBusParamsTq(VCanChanData *chd) {
+  if ((chd->capabilities_ex & chd->capabilities_ex_mask & VCAN_CHANNEL_EX_CAP_HAS_BUSPARAMS_TQ) == 0) {
+    return 0;
+  } else {
+    return 1;
+  }
+}
+EXPORT_SYMBOL(vCanSupportsBusParamsTq);
+
 //======================================================================
 //  Calculate queue length
 //======================================================================
@@ -1455,6 +1464,103 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
         }
       }
       break;
+
+
+    //------------------------------------------------------------------
+    case VCAN_IOC_SET_BITRATE_TQ:
+      {
+        VCanBusParamsTq my_arg;
+
+        if (vCanSupportsBusParamsTq (chd) == 0) {
+          return -ENOSYS;
+        }
+
+        if (copy_from_user(&my_arg, (VCanBusParamsTq *)arg, sizeof(VCanBusParamsTq))) {
+          DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_SET_BITRATE 1\n")));
+          return -EFAULT;
+        }
+
+        my_arg.retval_from_driver = 0;
+
+        if (fileNodePtr->init_access == 0) {
+          my_arg.retval_from_driver = VCANSETBUSPARAMSTQ_NO_INIT_ACCESS;
+        }
+
+        if (chd->vCard->card_flags & DEVHND_CARD_REFUSE_TO_USE_CAN) {
+          DEBUGPRINT(2, (TXT("ERROR: VCAN_IOC_SET_BITRATE Refuse to run. returning -EACCES\n")));
+          return -EACCES;
+        }
+
+        if (my_arg.retval_from_driver == 0) {
+          if (my_arg.data_valid == 0) {
+            if (chd->openMode != OPEN_AS_CAN) {
+              my_arg.retval_from_driver = VCANSETBUSPARAMSTQ_INVALID_HANDLE;
+            }
+          } else {
+            if ((chd->openMode != OPEN_AS_CANFD_ISO) && (chd->openMode != OPEN_AS_CANFD_NONISO)) {
+              my_arg.retval_from_driver = VCANSETBUSPARAMSTQ_INVALID_HANDLE;
+            }    
+          }
+
+          if (my_arg.retval_from_driver == 0) {
+            vStat = hwIf->setBusParamsTq(chd, &my_arg);
+          }
+        }
+        
+        if (vStat == VCAN_STAT_OK) { 
+          if (copy_to_user((VCanBusParamsTq *)arg, &my_arg, sizeof(VCanBusParamsTq))) {
+            DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_SET_BITRATE 3\n")));
+            return -EFAULT;
+          }
+        } else {
+          DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_SET_BITRATE 4. stat=%d\n"), vStat));
+        }
+      }
+      break;
+
+
+    //------------------------------------------------------------------
+    case VCAN_IOC_GET_BITRATE_TQ:
+      {
+        VCanBusParamsTq my_arg;
+
+        if (vCanSupportsBusParamsTq (chd) == 0) {
+          return -ENOSYS;
+        }
+
+        if (copy_from_user(&my_arg, (VCanBusParamsTq *)arg, sizeof(VCanBusParamsTq))) {
+          DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_GET_BITRATE 1\n")));
+          return -EFAULT;
+        }
+
+        my_arg.retval_from_driver = 0;
+
+        if (my_arg.data_valid == 0) {
+          if (chd->openMode != OPEN_AS_CAN) {
+            my_arg.retval_from_driver = VCANSETBUSPARAMSTQ_INVALID_HANDLE;
+          }
+        } else {
+          if ((chd->openMode != OPEN_AS_CANFD_ISO) && (chd->openMode != OPEN_AS_CANFD_NONISO)) {
+            my_arg.retval_from_driver = VCANSETBUSPARAMSTQ_INVALID_HANDLE;
+          }    
+        }
+
+        if (my_arg.retval_from_driver == 0) {
+          vStat = hwIf->getBusParamsTq(chd, &my_arg);
+        }
+
+        if (vStat == VCAN_STAT_OK) {
+          if (copy_to_user((VCanBusParamsTq *)arg, &my_arg, sizeof(VCanBusParamsTq))) {
+            DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_GET_BITRATE 2\n")));
+            return -EFAULT;
+          }
+        } else {
+          DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_GET_BITRATE 3. stat=%d\n"), vStat));
+        }
+      }
+      break;
+
+
     //------------------------------------------------------------------
     case VCAN_IOC_GET_BITRATE:
       {
@@ -1803,6 +1909,68 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
         put_user_ret(cardNumber, (uint32_t *)arg, -EFAULT);
       }
       break;
+
+
+   //------------------------------------------------------------------
+    case VCAN_IOC_GET_BUS_PARAM_LIMITS:
+      {
+        VCanBusParamLimits my_arg;
+
+        if (vCanSupportsBusParamsTq (chd) == 0) {
+          return -ENOSYS;
+        }
+        
+        if (copy_from_user(&my_arg, (VCanBusParamLimits *)arg, sizeof(VCanBusParamLimits))) {
+          DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_GET_BUS_PARAM_LIMITS 1\n")));
+          return -EFAULT;
+        }
+        
+        my_arg.version   = 1;
+        my_arg.brp_size  = 13;
+        my_arg.seg1_size = 9;
+        my_arg.seg2_size = 5;
+        my_arg.sjw_size  = 4;
+
+        if (copy_to_user((VCanBusParamLimits *)arg, &my_arg, sizeof(VCanBusParamLimits))) {
+          DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_GET_BUS_PARAM_LIMITS 2\n")));
+          return -EFAULT;
+        }
+      }
+      break;
+      
+
+   //------------------------------------------------------------------
+    case VCAN_IOC_GET_CLOCK_INFO:
+      {
+        uint32_t      freq_mhz;
+        VCanClockInfo my_arg;
+
+        if (vCanSupportsBusParamsTq (chd) == 0) {
+          return -ENOSYS;
+        }
+        
+        if (copy_from_user(&my_arg, (VCanClockInfo *)arg, sizeof(VCanClockInfo))) {
+          DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_GET_CLOCK_INFO 1\n")));
+          return -EFAULT;
+        }
+        
+        vStat = hwIf->kvDeviceGetClockFreqMhz (chd, &freq_mhz);
+        
+        if (vStat == VCAN_STAT_OK) {
+          my_arg.version      = 1;
+          my_arg.numerator    = freq_mhz;
+          my_arg.denominator  = 1;
+          my_arg.power_of_ten = 6;
+          my_arg.accuracy_ppm = 100;
+          
+          if (copy_to_user((VCanClockInfo *)arg, &my_arg, sizeof(VCanClockInfo))) {
+            DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_SET_BITRATE 2\n")));
+            return -EFAULT;
+          }
+        }
+      }
+      break;
+      
     //------------------------------------------------------------------
     case VCAN_IOC_GET_DRIVER_NAME:
       ArgPtrOut(MAX_IOCTL_DRIVER_NAME + 1);
@@ -1989,6 +2157,12 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
       put_user_ret(chd->capabilities_mask, (int *)arg, -EFAULT);
       break;
     //------------------------------------------------------------------
+    case VCAN_IOC_GET_CHAN_CAP_EX:
+      ArgPtrOut(sizeof(int));
+      put_user_ret(chd->capabilities_ex, (uint64_t *)arg, -EFAULT);
+      put_user_ret(chd->capabilities_ex_mask, ((uint64_t *)arg) +1, -EFAULT);
+      break;
+      //------------------------------------------------------------------
     case KCAN_IOCTL_LIN_MODE:
       ArgPtrIn(sizeof(int));
       {

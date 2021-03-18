@@ -71,4 +71,9 @@ void set_capability_mask  (VCanCardData *vCard, uint32_t cap, uint32_t to, uint3
 int card_has_capability (VCanCardData *vCard, uint32_t cap, uint32_t n_channels_max);
 uint8_t convert_vcan_to_hydra_cmd (uint32_t vcan_cmd);
 
+void set_capability_ex_value (VCanCardData *vCard, uint64_t cap_ex, uint32_t to, uint32_t channel_mask, uint32_t n_channels_max);
+void set_capability_ex_mask  (VCanCardData *vCard, uint64_t cap_ex, uint32_t to, uint32_t channel_mask, uint32_t n_channels_max);
+int card_has_capability_ex (VCanCardData *vCard, uint64_t cap_ex, uint32_t n_channels_max);
+uint8_t convert_vcan_ex_to_hydra_cmd (uint64_t vcan_cmd);
+
 #endif
