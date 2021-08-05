@@ -88,22 +88,24 @@ static void check(char* id, canStatus stat)
   }
 }
 
-static void sighand(int sig)
+static void sighand(int sig, siginfo_t *info, void *ucontext)
 {
   static unsigned int last;
+  (void) info;
+  (void) ucontext;
 
   switch (sig) {
-  case SIGINT:
-    willExit = 1;
-    break;
-  case SIGALRM:
-    if (msgCounter - last) {
-      printf("msg/s = %d, total=%u\n",
-             (msgCounter - last) / ALARM_INTERVAL_IN_S, msgCounter);
-    }
-    last = msgCounter;
-    alarm(ALARM_INTERVAL_IN_S);
-    break;
+    case SIGINT:
+      willExit = 1;
+      break;
+    case SIGALRM:
+      if (msgCounter - last) {
+        printf("msg/s = %d, total=%u\n",
+               (msgCounter - last) / ALARM_INTERVAL_IN_S, msgCounter);
+      }
+      last = msgCounter;
+      alarm(ALARM_INTERVAL_IN_S);
+      break;
   }
 }
 
@@ -119,6 +121,7 @@ int main(int argc, char *argv[])
   canStatus stat;
   char msg[8] = "Kvaser!";
   int channel;
+  struct sigaction sigact;
 
   if (argc != 2) {
     printUsageAndExit(argv[0]);
@@ -133,15 +136,22 @@ int main(int argc, char *argv[])
     }
   }
 
-  printf("Writing messages on channel %d\n", channel);
+  /* Use sighand as our signal handler for SIGALRM */
+  sigact.sa_flags = SA_SIGINFO | SA_RESTART;
+  sigemptyset(&sigact.sa_mask);
+  sigact.sa_sigaction = sighand;
+  if (sigaction(SIGALRM, &sigact, NULL) != 0) {
+    perror("sigaction SIGALRM failed");
+    return -1;
+  }
+  /* Use sighand and allow SIGINT to interrupt syscalls */
+  sigact.sa_flags = SA_SIGINFO;
+  if (sigaction(SIGINT, &sigact, NULL) != 0) {
+    perror("sigaction SIGINT failed");
+    return -1;
+  }
 
-  /* Use sighand as our signal handler */
-  signal(SIGALRM, sighand);
-  signal(SIGINT, sighand);
-  alarm(ALARM_INTERVAL_IN_S);
-
-  /* Allow signals to interrupt syscalls */
-  siginterrupt(SIGINT, 1);
+  printf("Writing CAN messages on channel %d\n", channel);
 
   canInitializeLibrary();
 
@@ -149,7 +159,7 @@ int main(int argc, char *argv[])
   hnd = canOpenChannel(channel, canOPEN_EXCLUSIVE | canOPEN_REQUIRE_EXTENDED | canOPEN_ACCEPT_VIRTUAL);
   if (hnd < 0) {
     printf("canOpenChannel %d", channel);
-    check("", hnd);
+    check("", (canStatus)hnd);
     return -1;
   }
   stat = canSetBusParams(hnd, canBITRATE_1M, 0, 0, 0, 0, 0);
@@ -162,6 +172,8 @@ int main(int argc, char *argv[])
   if (stat != canOK) {
     goto ErrorExit;
   }
+
+  alarm(ALARM_INTERVAL_IN_S);
 
   while ((stat == canOK) && !willExit) {
     long id = channel + 100;
@@ -178,7 +190,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  sighand(SIGALRM);
+  sighand(SIGALRM, NULL, NULL);
 
 ErrorExit:
 

@@ -100,6 +100,7 @@
 
 
 // Kvaser definitions
+#include "canlib_version.h"
 #include "helios_cmds.h"
 #include "VCanOsIf.h"
 #include "PciCan2HwIf.h"
@@ -112,6 +113,8 @@
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("KVASER");
 MODULE_DESCRIPTION("PCIcanII CAN module.");
+MODULE_VERSION(__stringify(CANLIB_MAJOR_VERSION) "."
+               __stringify(CANLIB_MINOR_VERSION));
 
 //
 // If you do not define PCICANII_DEBUG at all, all the debug code will be

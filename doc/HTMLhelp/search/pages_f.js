@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['welcome_20to_20kvaser_20linux_20drivers_20and_20sdk_21',['Welcome to Kvaser Linux Drivers and SDK!',['../index.html',1,'']]],
-  ['windows_20advanced_20topics',['Windows Advanced Topics',['../page_user_guide_install.html',1,'page_canlib']]]
+  ['using_20can_20databases',['Using CAN databases',['../page_example_c_candb.html',1,'page_user_guide_kvadblib_samples']]],
+  ['using_20threads',['Using Threads',['../page_user_guide_threads.html',1,'page_canlib']]],
+  ['user_20data_20in_20kvaser_20devices',['User Data in Kvaser Devices',['../page_user_guide_userdata.html',1,'page_canlib']]]
 ];

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['maxmessagedlc',['maxMessageDlc',['../struct_kva_db_protocol_properties.html#acea8c05d06bb3303dd71b41bec875533',1,'KvaDbProtocolProperties']]],
-  ['maxsignallength',['maxSignalLength',['../struct_kva_db_protocol_properties.html#a4f81fb4d85cd39f1658a64e087321245',1,'KvaDbProtocolProperties']]],
-  ['msg',['msg',['../structkvm_log_event_ex.html#ae3dbb7c786bd2bdd9d47bbaccbb17539',1,'kvmLogEventEx']]]
+  ['left',['left',['../structtag__token.html#a2607a6ff6144c871356b162cdff4a900',1,'tag_token']]],
+  ['liomajor',['lioMajor',['../structkvm_log_version_ex.html#a992fc1df4a262d763b04194a3df8293f',1,'kvmLogVersionEx']]],
+  ['liominor',['lioMinor',['../structkvm_log_version_ex.html#a4e19ea728f04ebb3b3d2966bf1b07280',1,'kvmLogVersionEx']]]
 ];

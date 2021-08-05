@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['data',['data',['../structkvm_log_msg_ex.html#a62823cfc5356727ed036cea88e873777',1,'kvmLogMsgEx']]],
+  ['data',['data',['../structkvm_log_msg_ex.html#a62823cfc5356727ed036cea88e873777',1,'kvmLogMsgEx::data()'],['../structkv_diag_sample.html#a511368d325b346716e874b6d878dad19',1,'kvDiagSample::data()']]],
+  ['data_5fmax',['data_max',['../structkv_bus_param_limits.html#ac989469cbc0ab9cae6da7801f11d4be0',1,'kvBusParamLimits']]],
+  ['data_5fmin',['data_min',['../structkv_bus_param_limits.html#aca75b9806920539ceea834b9ca411495',1,'kvBusParamLimits']]],
   ['denominator',['denominator',['../structkv_clock_info.html#a6d7a01ea2b2b71b529a024b1a4617e3f',1,'kvClockInfo']]],
   ['di',['DI',['../structkv_io_module_internal.html#a92162ee960f0e92fd68cca9838f05e3d',1,'kvIoModuleInternal']]],
   ['di1',['DI1',['../structkv_io_module_digital.html#ae673886a97b8bff94b37353d867360e2',1,'kvIoModuleDigital::DI1()'],['../structkv_io_module_relay.html#ae673886a97b8bff94b37353d867360e2',1,'kvIoModuleRelay::DI1()']]],
@@ -19,7 +21,7 @@ var searchData=
   ['di7',['DI7',['../structkv_io_module_digital.html#aa787bce223b5e1bd54385456816d6df9',1,'kvIoModuleDigital::DI7()'],['../structkv_io_module_relay.html#aa787bce223b5e1bd54385456816d6df9',1,'kvIoModuleRelay::DI7()']]],
   ['di8',['DI8',['../structkv_io_module_digital.html#a7e3ae6d77be430378addccb0436507af',1,'kvIoModuleDigital::DI8()'],['../structkv_io_module_relay.html#a7e3ae6d77be430378addccb0436507af',1,'kvIoModuleRelay::DI8()']]],
   ['di9',['DI9',['../structkv_io_module_digital.html#aa00448e75daec2a61b5f716030b24ad8',1,'kvIoModuleDigital']]],
-  ['dlc',['dlc',['../structkvm_log_msg_ex.html#a7d3cf80248d9011329b4b269f8b7d2c4',1,'kvmLogMsgEx']]],
+  ['dlc',['dlc',['../structkvm_log_msg_ex.html#a7d3cf80248d9011329b4b269f8b7d2c4',1,'kvmLogMsgEx::dlc()'],['../structkv_diag_sample.html#a6c4c124b5735c7cd34682cb45760c538',1,'kvDiagSample::dlc()']]],
   ['do',['DO',['../structkv_io_module_internal.html#ab0a26d3fc12f25e409e5676ac4ce2697',1,'kvIoModuleInternal']]],
   ['do1',['DO1',['../structkv_io_module_digital.html#ac86348f45d08aa92f5d16576372c1b69',1,'kvIoModuleDigital']]],
   ['do10',['DO10',['../structkv_io_module_digital.html#a4c0ceb5e06b9973630cf4d13ac8b6572',1,'kvIoModuleDigital']]],

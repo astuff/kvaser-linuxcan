@@ -68,7 +68,7 @@ CFLAGS = -Wall -Wextra -Werror -O2  -D_REENTRANT $(XTRA_CFLAGS) -I../../include
 LDFLAGS = -L..
 LDLIBS = -lcanlib -lpthread -lm
 OBJS =\
-	busparms\
+	busparams\
 	cancount\
 	canmonitor\
 	canfdmonitor\
@@ -81,7 +81,7 @@ OBJS =\
 	busstat\
 
 ifeq ($(KV_DEBUG_ON),1)
-  KV_XTRA_CFLAGS_DEBUG= -D_DEBUG=1 -DDEBUG=1
+  KV_XTRA_CFLAGS_DEBUG= -D_DEBUG=1 -DDEBUG=1 -O0 -g
   IS_DEBUG=Debug: $(KV_XTRA_CFLAGS_DEBUG)
   CFLAGS += $(KV_XTRA_CFLAGS_DEBUG)
 else
@@ -103,7 +103,7 @@ install:
 	@echo "Installing examples into /usr/doc/canlib/examples"
 	@echo --------------------------------------------------------------------
 	mkdir -p /usr/doc/canlib/examples
-	cp $(OBJS) /usr/doc/canlib/examples/.
+	cp -r . /usr/doc/canlib/examples
 
 uninstall:
 	rm -rf /usr/doc/canlib/examples

@@ -71,7 +71,7 @@ DIR="${0%/*}"
 KERNEL_VER=`uname -r` # Kernel version at install time
 
 # append to file in case installer is run several times on different kernels
-echo $KERNEL_VER >> $DIR/kernel_ver 
+echo $KERNEL_VER >> $DIR/kernel_ver
 
 # Check if module is loaded
 MODLOADED=$(lsmod | grep $MODNAME)

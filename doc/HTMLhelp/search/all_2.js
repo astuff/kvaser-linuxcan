@@ -164,6 +164,7 @@ var searchData=
   ['canfd_5fbitrate_5f4m_5f80p',['canFD_BITRATE_4M_80P',['../canlib_8h.html#aa643e5939f0d4d5fff21747e55c76153',1,'canlib.h']]],
   ['canfd_5fbitrate_5f500k_5f80p',['canFD_BITRATE_500K_80P',['../canlib_8h.html#a71dec626b7de7ddd18daf93e535902f4',1,'canlib.h']]],
   ['canfd_5fbitrate_5f8m_5f60p',['canFD_BITRATE_8M_60P',['../canlib_8h.html#ac1d8bd40554b1433f00e4f1bca3f7a8e',1,'canlib.h']]],
+  ['canfd_5fbitrate_5f8m_5f80p',['canFD_BITRATE_8M_80P',['../canlib_8h.html#a1692cfa2b92bf18a666aa040171f5a27',1,'canlib.h']]],
   ['canfdmsg_5fbrs',['canFDMSG_BRS',['../canstat_8h.html#a20c4f6ae319558189eb85d10036e9eea',1,'canstat.h']]],
   ['canfdmsg_5fedl',['canFDMSG_EDL',['../canstat_8h.html#a162be4f6b66c81fa09dc76c268475216',1,'canstat.h']]],
   ['canfdmsg_5fesi',['canFDMSG_ESI',['../canstat_8h.html#aa50c93236b2b28677bcae0f7c1ab3860',1,'canstat.h']]],
@@ -444,6 +445,8 @@ var searchData=
   ['canlib',['CANlib',['../group__grp__canlib.html',1,'']]],
   ['conversion',['Conversion',['../group__kvaxml__conversion.html',1,'']]],
   ['converter',['Converter',['../group__kvlc__converter.html',1,'']]],
+  ['converting',['Converting',['../kvlclib_converting.html',1,'page_kvlclib']]],
+  ['csv_20frame_20_28w_29',['CSV Frame (W)',['../kvlclib_format__f_o_r_m_a_t__c_s_v.html',1,'kvlclib_formats']]],
   ['configuration',['Configuration',['../group__kvm__configuration.html',1,'']]],
   ['can_20bus_20api_20_28canlib_29',['CAN bus API (CANlib)',['../page_canlib.html',1,'']]],
   ['canlib_20api_20calls_20grouped_20by_20function',['CANlib API Calls Grouped by Function',['../page_canlib_api_calls_grouped_by_function.html',1,'page_canlib']]],
@@ -453,6 +456,8 @@ var searchData=
   ['converter_20api_20_28kvlclib_29',['Converter API (kvlclib)',['../page_kvlclib.html',1,'']]],
   ['c_2b_2b_3a_20canlibtutorial_2c_20vs2017',['C++: CanlibTutorial, VS2017',['../page_tutorial_cpp_canlib_vs2017.html',1,'page_tutorial']]],
   ['c_23_20canlibtutorial_2c_20vs2017',['C# CanlibTutorial, VS2017',['../page_tutorial_csharp_canlib_vs2017.html',1,'page_tutorial']]],
-  ['compiling_20and_20compatibility',['Compiling and Compatibility',['../page_user_guide_build.html',1,'page_canlib']]],
+  ['compiling_20and_20compatibility',['Compiling and Compatibility',['../page_user_guide_build.html',1,'']]],
+  ['compiling_20and_20linking_20on_20linux',['Compiling and Linking on Linux',['../page_user_guide_build_compiling_linking_linux.html',1,'page_user_guide_build']]],
+  ['compiling_20and_20linking_20on_20windows',['Compiling and Linking on Windows',['../page_user_guide_build_compiling_linking_windows.html',1,'page_user_guide_build']]],
   ['can_20frame_20types',['CAN Frame Types',['../page_user_guide_can_frame_types_types.html',1,'page_canlib']]]
 ];

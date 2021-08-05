@@ -341,8 +341,8 @@ typedef struct
 /* File pointer specific data */
 typedef struct VCanOpenFileNode {
     struct completion        ioctl_completion;
-    VCanReceiveData          rcv;
-    VCanReceiveData          rcv_text;   // printf texts
+    VCanReceiveData          *rcv;
+    VCanReceiveData          *rcv_text;   // printf texts
     unsigned char            transId;
     struct file             *filp;
     struct VCanChanData     *chanData;

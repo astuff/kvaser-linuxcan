@@ -77,6 +77,7 @@
 #endif /* KERNEL_VERSION < 4.11.0 */
 
 // Non system headers
+#include "canlib_version.h"
 #include "VCanOsIf.h"
 #include "usbcanHWIf.h"
 #include "helios_cmds.h"
@@ -94,6 +95,8 @@
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("KVASER");
 MODULE_DESCRIPTION("USBcanII CAN module.");
+MODULE_VERSION(__stringify(CANLIB_MAJOR_VERSION) "."
+               __stringify(CANLIB_MINOR_VERSION));
 
 
 //----------------------------------------------------------------------------

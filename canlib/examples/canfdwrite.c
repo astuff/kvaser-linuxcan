@@ -89,11 +89,19 @@ static void printUsageAndExit(char *prgName)
   exit(1);
 }
 
+static void sighand(int sig, siginfo_t *info, void *ucontext)
+{
+  (void) sig;
+  (void) info;
+  (void) ucontext;
+}
+
 int main(int argc, char *argv[])
 {
   canHandle hnd;
   canStatus stat;
   int channel;
+  struct sigaction sigact;
 
   if (argc != 2) {
     printUsageAndExit(argv[0]);
@@ -110,8 +118,14 @@ int main(int argc, char *argv[])
 
   printf("Sending a CAN FD message on channel %d\n", channel);
 
-  /* Allow signals to interrupt syscalls */
-  siginterrupt(SIGINT, 1);
+  /* Use sighand and allow SIGINT to interrupt syscalls */
+  sigact.sa_flags = SA_SIGINFO;
+  sigemptyset(&sigact.sa_mask);
+  sigact.sa_sigaction = sighand;
+  if (sigaction(SIGINT, &sigact, NULL) != 0) {
+    perror("sigaction SIGINT failed");
+    return -1;
+  }
 
   canInitializeLibrary();
 
@@ -122,7 +136,6 @@ int main(int argc, char *argv[])
     check("", hnd);
     return -1;
   }
-
   stat = canSetBusParams(hnd, canFD_BITRATE_1M_80P, 0, 0, 0, 0, 0);
   check("canSetBusParams", stat);
   if (stat != canOK) {

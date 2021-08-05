@@ -75,7 +75,8 @@ CFLAGS  += $(ccflags-y)
 CFLAGS  += -I. -I../include
 
 # GCC 4.6 and below does not allow initializing of struct with '{ 0 }'
-GCC_VERSION_LTEQ_4_6 := $(shell expr `gcc -dumpversion | cut -f1-2 -d'.'` \<= 4.6)
+GCC_VERSION_LTEQ_4_6 := $(shell expr $$(gcc -dumpfullversion -dumpversion \
+                          | awk -F. '{print ($$2+100*$$1)}') \<= 406)
 ifeq ($(GCC_VERSION_LTEQ_4_6),1)
 CFLAGS += -Wno-missing-field-initializers
 endif
@@ -103,7 +104,7 @@ DEPS := $(patsubst %.c, %.d, $(SRCS))
 
 
 ifeq ($(KV_DEBUG_ON),1)
-  KV_XTRA_CFLAGS_DEBUG= -D_DEBUG=1 -DDEBUG=1
+  KV_XTRA_CFLAGS_DEBUG= -D_DEBUG=1 -DDEBUG=1 -O0 -g
   IS_DEBUG=Debug: $(KV_XTRA_CFLAGS_DEBUG)
   CFLAGS += $(KV_XTRA_CFLAGS_DEBUG)
 else

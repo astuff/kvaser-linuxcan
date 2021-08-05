@@ -79,9 +79,6 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 <div class="textblock">Here is a list of all functions, variables, defines, enums, and typedefs with links to the files they belong to:</div>
 
 <h3><a id="index_k"></a>- k -</h3><ul>
-<li>KDI_DEFAULT_MAX_SAMPLE_SIZE
-: <a class="el" href="kv_diag_8h.html#a37907e79fc7ecbe5e0e7481b9223c780">kvDiag.h</a>
-</li>
 <li>kmeFileHandle
 : <a class="el" href="kvmlib_8h.html#a89789a9cbf53304f9818835b36edc6f7">kvmlib.h</a>
 </li>
@@ -733,6 +730,9 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 <li>kvaFileToXml()
 : <a class="el" href="group__kvaxml__conversion.html#gae8de06f7538a65ccb07df301ea663c50">kvaMemoLibXML.h</a>
 </li>
+<li>kvAnnounceIdentityEx()
+: <a class="el" href="group__can__general.html#ga1c6db083e9def9c4d38b4a5226b5f77c">canlib.h</a>
+</li>
 <li>kvaToolsDumpExpr()
 : <a class="el" href="group__kvaxml__parsing.html#gaa87743f28c44fa757345f0024632a605">kvaMemoLibXML.h</a>
 </li>
@@ -904,6 +904,12 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 <li>KvaXmlValidationStatusWARN_NO_ACTIVE_LOG
 : <a class="el" href="kva_memo_lib_x_m_l_8h.html#a43075637b5455ecdf9412b4a1da4b6baa88e115525f0a8ef58509ee22a9b65646">kvaMemoLibXML.h</a>
 </li>
+<li>kvBitrateToBusParamsFdTq()
+: <a class="el" href="group___c_a_n.html#ga03be920624427856a9fde821ef3f9136">canlib.h</a>
+</li>
+<li>kvBitrateToBusParamsTq()
+: <a class="el" href="group___c_a_n.html#gaa666085d9544b2c8db002599595edc37">canlib.h</a>
+</li>
 <li>kvBusParamLimits
 : <a class="el" href="canlib_8h.html#af504af7b3820af8ec1ec997f3b0333d3">canlib.h</a>
 </li>
@@ -970,35 +976,44 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 <li>kvDeviceSetMode()
 : <a class="el" href="group__can__general.html#ga8ec3c64b63e50ff210294001bdbad7c3">canlib.h</a>
 </li>
-<li>kvDiagAlloc()
-: <a class="el" href="group__kvdiag__setup.html#ga28b98f7100fa0bb9cb23e5848c10940d">kvDiag.h</a>
+<li>kvDiagAttachAnalyzer()
+: <a class="el" href="group__kvdiag__diagnostics.html#ga76d09ccb89cf756d954144582f730330">kvDiag.h</a>
 </li>
-<li>kvDiagAttach()
-: <a class="el" href="group__kvdiag__setup.html#gabea2d51b6e961ba21e9c62ea24d6621f">kvDiag.h</a>
+<li>kvDiagCalculateBitrate()
+: <a class="el" href="group__kvdiag__diagnostics.html#gabc77cf695c7fb518263d32539a3aec9e">kvDiag.h</a>
 </li>
-<li>kvDiagConfigure()
-: <a class="el" href="group__kvdiag__diagnostics.html#gab4372ea63d7ccbd231f7aad43fa4ca41">kvDiag.h</a>
+<li>kvDiagCalculateClockOffset()
+: <a class="el" href="group__kvdiag__diagnostics.html#ga243548139dcbb64ff273648dd0c370dd">kvDiag.h</a>
 </li>
-<li>kvDiagDealloc()
-: <a class="el" href="group__kvdiag__setup.html#ga2a6950ff605deae5dfb7cba70e883e00">kvDiag.h</a>
-</li>
-<li>kvDiagDetach()
-: <a class="el" href="group__kvdiag__setup.html#ga8f1f2a2caca8b798987fa1f24147bccf">kvDiag.h</a>
+<li>kvDiagDetachAnalyzer()
+: <a class="el" href="group__kvdiag__diagnostics.html#ga61263295b3feaad95c257eef05a9579b">kvDiag.h</a>
 </li>
 <li>kvDiagGetAnalyzerInfo()
-: <a class="el" href="group__kvdiag__diagnostics.html#ga51f35afc5932e36d769c0bc6358a5d51">kvDiag.h</a>
+: <a class="el" href="group__kvdiag__diagnostics.html#ga348f389077d77b8fd4cf04ad53558aad">kvDiag.h</a>
 </li>
 <li>kvDiagGetNumberOfAnalyzers()
-: <a class="el" href="group__kvdiag__diagnostics.html#ga886b47550df183e143c3e97f4d4be0d4">kvDiag.h</a>
+: <a class="el" href="group__kvdiag__diagnostics.html#ga926f63f2ccb0b56ff4917151ab5e27fe">kvDiag.h</a>
 </li>
-<li>kvDiagReadSampleRaw()
-: <a class="el" href="group__kvdiag__diagnostics.html#gabee84d93ebb0e659c68e6a68eee354c3">kvDiag.h</a>
+<li>kvDiagReadSample()
+: <a class="el" href="group__kvdiag__diagnostics.html#ga43a268ee89c38c3ac496d20f35a48105">kvDiag.h</a>
+</li>
+<li>kvDiagReadSampleWait()
+: <a class="el" href="group__kvdiag__diagnostics.html#gaab9b2bc0856a7200d1f76533092eb023">kvDiag.h</a>
+</li>
+<li>kvDiagResetBitrateCalculation()
+: <a class="el" href="group__kvdiag__diagnostics.html#ga65bbdc1e8c8bf4affc8ba2041d72ff1a">kvDiag.h</a>
+</li>
+<li>kvDiagResetClockOffsetCalculation()
+: <a class="el" href="group__kvdiag__diagnostics.html#ga1708e589eb731c11c82a621b2a070d1d">kvDiag.h</a>
+</li>
+<li>kvDiagSetProgram()
+: <a class="el" href="group__kvdiag__diagnostics.html#gad615ea3768542e4d48f10d0dca4ef46d">kvDiag.h</a>
 </li>
 <li>kvDiagStart()
-: <a class="el" href="group__kvdiag__diagnostics.html#ga663a7dc925d0a4e49a9d85cbe59db917">kvDiag.h</a>
+: <a class="el" href="group__kvdiag__diagnostics.html#ga9cb62a80b9ffe4ea80b22acfb49bd3a4">kvDiag.h</a>
 </li>
 <li>kvDiagStop()
-: <a class="el" href="group__kvdiag__diagnostics.html#ga9cd97a8c629f875b97948f5e954274d9">kvDiag.h</a>
+: <a class="el" href="group__kvdiag__diagnostics.html#ga685c95a3e168601a28e680d9c820dd8a">kvDiag.h</a>
 </li>
 <li>kvEnvHandle
 : <a class="el" href="canlib_8h.html#ac12ca60f6d6e18d9bd29acc00c8ea2ff">canlib.h</a>
@@ -1016,25 +1031,25 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 : <a class="el" href="canlib_8h.html#a84d68bc3e337a19087053fb21e79d1f3">canlib.h</a>
 </li>
 <li>kvFileCopyFromDevice()
-: <a class="el" href="group__t_script.html#ga95f4a1383f8be77e74ff48d8be71aecf">canlib.h</a>
+: <a class="el" href="canlib_8h.html#a95f4a1383f8be77e74ff48d8be71aecf">canlib.h</a>
 </li>
 <li>kvFileCopyToDevice()
-: <a class="el" href="group__t_script.html#ga17b1093e1d294442635e5899120c548e">canlib.h</a>
+: <a class="el" href="canlib_8h.html#a17b1093e1d294442635e5899120c548e">canlib.h</a>
 </li>
 <li>kvFileDelete()
-: <a class="el" href="group__t_script.html#ga5430e6449f86509bb380672ee4183cc9">canlib.h</a>
+: <a class="el" href="canlib_8h.html#a5430e6449f86509bb380672ee4183cc9">canlib.h</a>
 </li>
 <li>kvFileDiskFormat()
-: <a class="el" href="group__t_script.html#ga40ce4dc39d01e0d33f4a1a8590e60a9d">canlib.h</a>
+: <a class="el" href="canlib_8h.html#a40ce4dc39d01e0d33f4a1a8590e60a9d">canlib.h</a>
 </li>
 <li>kvFileGetCount()
-: <a class="el" href="group__t_script.html#ga6f7e3b5d2faf2556a40ec7818cd74c47">canlib.h</a>
+: <a class="el" href="canlib_8h.html#a6f7e3b5d2faf2556a40ec7818cd74c47">canlib.h</a>
 </li>
 <li>kvFileGetName()
-: <a class="el" href="group__t_script.html#gad6ffe54a4c22dbdde855e5c8dd0634fa">canlib.h</a>
+: <a class="el" href="canlib_8h.html#ad6ffe54a4c22dbdde855e5c8dd0634fa">canlib.h</a>
 </li>
 <li>kvFileGetSystemData()
-: <a class="el" href="group__t_script.html#gaa5c82841a46a9ed78605120edb98cf23">canlib.h</a>
+: <a class="el" href="canlib_8h.html#aa5c82841a46a9ed78605120edb98cf23">canlib.h</a>
 </li>
 <li>kvFlashLeds()
 : <a class="el" href="group__can__general.html#gad3d0fc1bf752047f6e24020c478aeffd">canlib.h</a>
@@ -1222,6 +1237,9 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 <li>KVLC_FILE_FORMAT_VECTOR_BLF
 : <a class="el" href="kvlclib_8h.html#abec6abce4380094f497d652ed73851f0">kvlclib.h</a>
 </li>
+<li>KVLC_FILE_FORMAT_VECTOR_BLF_FD
+: <a class="el" href="kvlclib_8h.html#a7e92f1061c45f91146150f8364915438">kvlclib.h</a>
+</li>
 <li>KVLC_FILE_FORMAT_XCP
 : <a class="el" href="kvlclib_8h.html#a7492188e5f5888616dd42d7598cfaf40">kvlclib.h</a>
 </li>
@@ -1233,6 +1251,9 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 </li>
 <li>KVLC_PROPERTY_CHANNEL_MASK
 : <a class="el" href="kvlclib_8h.html#a7eebc5b67ba0db21c873eb4a846cbb64">kvlclib.h</a>
+</li>
+<li>KVLC_PROPERTY_COMPRESSION_LEVEL
+: <a class="el" href="kvlclib_8h.html#a1f5b66048477532c1fd41cd8389d5084">kvlclib.h</a>
 </li>
 <li>KVLC_PROPERTY_CREATION_DATE
 : <a class="el" href="kvlclib_8h.html#a36412a31040888bba5624cc65e7d6253">kvlclib.h</a>
@@ -1398,6 +1419,9 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 </li>
 <li>kvlcERR_TYPE_MISMATCH
 : <a class="el" href="kvlclib_8h.html#a95d58af3ce169304d3d3614ea5433e37">kvlclib.h</a>
+</li>
+<li>kvlcERR_UNSUPPORTED_VERSION
+: <a class="el" href="kvlclib_8h.html#af565cee958b67de272f959d553d64163">kvlclib.h</a>
 </li>
 <li>kvlcEventCount()
 : <a class="el" href="group__kvlc__converter.html#ga9dc12be7d0e933fb782bab86bca55666">kvlclib.h</a>
@@ -2033,7 +2057,7 @@ $(document).ready(function(){initNavTree('globals_k.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.34) Wed Sep 9 2020</li>
+    <li class="footer"> (canlib 5.35) Tue Feb 16 2021</li>
   </ul>
 </div>
 </body>

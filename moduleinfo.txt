@@ -1,43 +1,36 @@
 module=canlib
-version=5_34_317
-hgid=18b400337b9a tip
+version=5_35_477
+hgid=1483304b29f5
 
 LIBNAME = libcanlib.so
 MAJOR = 1
-MINOR = 7
+MINOR = 8
 BUILD = 0
-
 LIBNAME = libkvlclib.so
-MAJOR = 1
-MINOR = 4
-BUILD = 1
-
-LIBNAME = libkvadblib.so
 MAJOR = 1
 MINOR = 5
 BUILD = 0
-
+LIBNAME = libkvadblib.so
+MAJOR = 1
+MINOR = 6
+BUILD = 0
 LIBNAME = liblinlib.so
 MAJOR = 1
 MINOR = 5
-BUILD = 2
-
+BUILD = 3
 LIBNAME = libkvamemolibxml.so
 MAJOR = 1
 MINOR = 2
-BUILD = 3
-
+BUILD = 4
 LIBNAME = libkvmlib.so
 MAJOR = 1
 MINOR = 4
-BUILD = 0
-
+BUILD = 1
 LIBNAME = libkvamemolib.so
 MAJOR = 1
 MINOR = 4
-BUILD = 0
-
+BUILD = 1
 LIBNAME = libkvamemolib0700.so
 MAJOR = 1
 MINOR = 3
-BUILD = 0
+BUILD = 1

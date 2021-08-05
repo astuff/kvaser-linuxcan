@@ -69,7 +69,6 @@
 #include "canlib.h"
 #include <stdio.h>
 #include <string.h>
-#include "../canlib_channel_list.h"
 
 static void check(char* id, canStatus stat)
 {
@@ -83,6 +82,7 @@ static void check(char* id, canStatus stat)
 
 int main(int argc, char* argv[])
 {
+  int chanCount = 0;
   canStatus stat;
   int i;
   int beta;
@@ -94,8 +94,6 @@ int main(int argc, char* argv[])
   unsigned int canlibVersion;
   uint16_t fileVersion[4];
 
-  ccl_class channel_list;
-
   (void)argc; // Unused.
   (void)argv; // Unused.
 
@@ -104,7 +102,8 @@ int main(int argc, char* argv[])
   beta = canGetVersionEx(canVERSION_CANLIB32_BETA);
   if (beta) {
     sprintf(betaString, "BETA");
-  } else {
+  }
+  else {
     betaString[0] = '\0';
   }
   canlibVersion = canGetVersionEx(canVERSION_CANLIB32_PRODVER);
@@ -119,16 +118,14 @@ int main(int argc, char* argv[])
   memset(fw, 0, sizeof(fw));
   memset(serial, 0, sizeof(serial));
 
-  stat = ccl_get_channel_list(&channel_list);
-
+  stat = canGetNumberOfChannels(&chanCount);
   if (stat != canOK) {
     check("canGetNumberOfChannels", stat);
     exit(1);
   }
+  printf("Found %d channel(s).\n", chanCount);
 
-  printf("Found %u channel(s).\n", channel_list.n_channel);
-
-  for (i = 0; i < (int)channel_list.n_channel; i++) {
+  for (i = 0; i < chanCount; i++) {
 
     stat = canGetChannelData(i, canCHANNELDATA_DRIVER_NAME,
                              &driverName, sizeof(driverName));

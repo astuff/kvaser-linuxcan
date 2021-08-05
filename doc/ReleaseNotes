@@ -62,7 +62,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.34  
+Release notes for linuxcan V5.35  
 ================================================================
 
 These release notes apply to both CANLIB SDK and the Linux drivers.
@@ -112,6 +112,7 @@ Linux device drivers for
   *  KVASER U100 (01173-1)
   *  KVASER U100P (01174-8)
   *  KVASER U100S (01181-6)
+  *  KVASER USBcan Pro 4xHS (01261-5)
 
 
   **    Recommended firmware > 3.0
@@ -166,18 +167,86 @@ Known problems
      (This is the same as under Windows.)
 
 
+New Features and Fixed Problems in V5.35   (16-FEB-2021)
+===========================================================================
+* SDK (kvlclib)
+  - Added support for a newer version of the BLF format (4.9.4.0), which
+    contains CAN FD support. The new converter format
+    KVLC_FILE_FORMAT_VECTOR_BLF_FD has both read and write capabilities.
+  - Added property KVLC_PROPERTY_COMPRESSION_LEVEL to formats
+    KVLC_FILE_FORMAT_MDF_4X and KVLC_FILE_FORMAT_MDF_4X_SIGNAL. The
+    property represents zlib compression levels.
+  - A call to kvlcSetProperty() with a property that is not supported by
+    the converter now returns kvlcERR_NOT_IMPLEMENTED.
+  - Added check if any file named filename-partxx.xxx exists when
+    splitting files. If any such files exists in the output folder, no files
+    will be created, and kvlcERR_FILE_EXISTS is returned.
+  - When converting from MDF4 to another format, kvlclib now makes sure
+    the file originated from kvlclib. If it is from another tool,
+    kvlcERR_UNSUPPORTED_VERSION is returned.
+  - Enhanced support of TRDC, allowing data rate prescaler greater than 2.
+  - Fix build problems for GCC 9.3 and 10.2.
+
+* SDK (kvadblib)
+  - Corrected bug where functions to retrieve signal values
+    (kvaDbRetrieveSignalXxx) would not always retreive values even though the
+    signal was available in the provided data.
+  - Increased stability when using kvaDbGetNextMsg() and kvaDbGetNextNode().
+
+* SDK (canlib)
+  - Added functions kvBitrateToBusParamsTq() and kvBitrateToBusParamsFdTq(),
+    that translates bitrate constants to new bus parameters kvBusParamsTq.
+  - Fixed bug (intorduced in v5.33) causing errno to be set to ENOENT, after
+    call to canOpenChannel().
+  - canSetBusParamsTq and canSetBusParamsFdTq now return a canERR_NOT_SUPPORTED
+    (-19) instead of canERR_PARAM (-1) status code if the parameters are not
+    valid for the current device.
+  - Updated the documentation of the file handling API (kvFile).
+  - Source code for the CANlib examples for Linux is now installed.
+  - The info.bustatus.status field of the canNotifyData struct pointer returned
+    through a callback function was previously erroneously set to
+    canSTAT_BUS_OFF (2) when the state actually was "error passive" and
+    canSTAT_ERROR_PASSIVE (1) when the state actually was "bus off".
+  - Added bitrate constant canFD_BITRATE_8M_80P.
+  - Updated the kvDiag API and its documentation.
+  - Build with GDB debug information (-O0 -g) when KV_DEBUG_ON is set to 1.
+  - When canOPEN_NO_INIT_ACCESS is passed to canOpenChannel(), no additional
+    argument flags, canOPEN_xxx, are needed in order to get a valid handle.
+
+* Added MODULE_VERSION to each driver.
+
+* Fixed build problems for kernel v5.9.0.
+
+* Split some large memory allocations into smaller chunks, to reduce possible
+  memory fragmentation.
+
+* Fixed initial chipState in virtualcan driver.
+
+* PCIEcan
+  - Disable bus load packets when module is removed.
+  - Fixed bug where wrong customized channel name was returned, when more than
+    one PCIEcan card was connected.
+
+* Added support for new device:
+  Kvaser USBcan Pro 4xHS (01261-5)
+
+
 New Features and Fixed Problems in V5.34   (09-SEP-2020)
 ===========================================================================
 * Fixed false positive warning when building with Secure Boot disabled
   (introduced in v5.27).
 
-* Updated linuxcan install procedure to record for which linux header version 
+* Updated linuxcan install procedure to record for which linux header version
   it was installed in order to be able to uninstall even after linux header
   version upgrade.
 
 * Added option to uninstall all versions of linuxcan if it has been installed
-  several times for different linux header versions. This option is invoked 
+  several times for different linux header versions. This option is invoked
   through "sudo make purge".
+
+* Bus parameter checks in CANlib has been reduced in order to support more
+  hardware. CANlib will still issue a canERR_NOT_IMPLEMENTED (-32) status code
+  if the parameters are not valid for the current device.
 
 * SDK (canlib)
   - New bus parameter API using time quanta, see e.g. canSetBusParamsTq().
@@ -265,11 +334,11 @@ New Features and Fixed Problems in V5.29   (13-SEP-2019)
 * SDK (canlib)
   - The message data buffer is untouched when reading a remote request frame
     as identified by the canMSG_RTR flag.
-  - canGetBusStatistics reports the same result if transmit acknowledge is 
+  - canGetBusStatistics reports the same result if transmit acknowledge is
     off (0) or on (1). Transmit acknowledge is set by ioctl canIOCTL_SET_TXACK.
   - Fixed a bug in kvFileCopyToDevice.
 
-  - Implemented the following tScript functions: 
+  - Implemented the following tScript functions:
     kvScriptStatus and kvScriptLoadFileOnDevice.
     kvScriptEnvvarOpen and kvScriptEnvvarClose.
     kvScriptEnvvarSetInt and kvScriptEnvvarGetInt.
@@ -299,7 +368,7 @@ New Features and Fixed Problems in V5.29   (13-SEP-2019)
     handling the situation where the number of events exceeds the size of an int.
 
 * Common
-  - fixed bug where a call to canIOCTL_TX_INTERVAL could cause a crash if 
+  - fixed bug where a call to canIOCTL_TX_INTERVAL could cause a crash if
     TX_INTERVAL is unsupported by the device.
   - BusStatistics increments between calls to canGetBusStatistics. Previously,
     it was cleared. The function now has the same behavior as in Windows.
@@ -358,7 +427,7 @@ New Features and Fixed Problems in V5.26   (26-NOV-2018)
   - Fixed a bug where kvaDbGetFlags() didn't return the KVADB_DATABASE_J1939-flag.
   - Added function kvaDbGetMsgByPGN().
   - Clarified null-terminated strings in documentation.
-  
+
 * SDK (linlib)
   - Clarified LIN diagnostic frames in documentation.
   - linWriteWakeup() parameter check updated.
@@ -370,7 +439,7 @@ New Features and Fixed Problems in V5.25   (16-SEP-2018)
 * Blacklisting SocketCAN kvaser_pciefd driver when installing pcican, pcican2
   and pciefd drivers.
 
-* The installation script will create any missing folders in 
+* The installation script will create any missing folders in
   /lib/modules/`uname -r`/kernel/drivers prior to installation.
 
 * Added compiled script file (.txe) information retrieval function
@@ -403,7 +472,7 @@ New Features and Fixed Problems in V5.24   (03-JUL-2018)
 ===========================================================================
 
 * SDK (canlib)
-  - Rolled back canOPEN_NO_INIT_ACCESS changes. 
+  - Rolled back canOPEN_NO_INIT_ACCESS changes.
 
 
 

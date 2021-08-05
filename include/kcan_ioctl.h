@@ -66,6 +66,13 @@
 #ifndef _KCAN_IOCTL_H
 #define _KCAN_IOCTL_H
 
+#ifdef __KERNEL__
+#include <linux/types.h>
+#else
+#include <stdint.h>
+#endif /* __KERNEL__ */
+
+
 //#   include <linux/ioctl.h>
 #   include <asm/ioctl.h>
 #   include "compilerassert.h"

@@ -1,12 +1,5 @@
 var group__t_script =
 [
-    [ "kvFileCopyFromDevice", "group__t_script.html#ga95f4a1383f8be77e74ff48d8be71aecf", null ],
-    [ "kvFileCopyToDevice", "group__t_script.html#ga17b1093e1d294442635e5899120c548e", null ],
-    [ "kvFileDelete", "group__t_script.html#ga5430e6449f86509bb380672ee4183cc9", null ],
-    [ "kvFileDiskFormat", "group__t_script.html#ga40ce4dc39d01e0d33f4a1a8590e60a9d", null ],
-    [ "kvFileGetCount", "group__t_script.html#ga6f7e3b5d2faf2556a40ec7818cd74c47", null ],
-    [ "kvFileGetName", "group__t_script.html#gad6ffe54a4c22dbdde855e5c8dd0634fa", null ],
-    [ "kvFileGetSystemData", "group__t_script.html#gaa5c82841a46a9ed78605120edb98cf23", null ],
     [ "kvScriptEnvvarClose", "group__t_script.html#ga30f88cbfc588c801f8bf4c81c094875c", null ],
     [ "kvScriptEnvvarGetData", "group__t_script.html#ga5cbb37e43a2e24358c63295fedfe06a3", null ],
     [ "kvScriptEnvvarGetFloat", "group__t_script.html#gafee8ff7e33041bee5f523115aae7f59e", null ],

@@ -89,25 +89,25 @@ typedef LinkedList HandleList;
 struct CANops;
 
 
-typedef struct text_element_t { 
+typedef struct text_element_t {
   unsigned long  timeStamp;
   unsigned char  slot;          // valid if flags = DM_FLAG_PRINTF
-  unsigned short flags;         // DM_FLAG_PRINTF, DM_FLAG_DEBUG, DM_FLAG_ERROR 
+  unsigned short flags;         // DM_FLAG_PRINTF, DM_FLAG_DEBUG, DM_FLAG_ERROR
   unsigned short total_payload;
-  char           *payload;      
+  char           *payload;
   unsigned short index;
-  
+
   unsigned short state;
-  struct text_element_t *next;    
+  struct text_element_t *next;
 } text_element_t;
- 
+
 typedef struct {
   text_element_t  *text_receiving;  // used to collect the text from the driver (state = 0 or 1)
   text_element_t  *received_text_list;  // complete texts are moved from text_receiving to here (state = 2 or 3)
-  text_element_t  *last_received_text;  // point to the last received element in received_text_list; 
-  int             number_of_received_texts; // in received_text_list 
+  text_element_t  *last_received_text;  // point to the last received element in received_text_list;
+  int             number_of_received_texts; // in received_text_list
 } print_text_t;
-    
+
 
 // This struct is associated with each handle
 // returned by canOpenChannel
@@ -250,6 +250,7 @@ typedef struct CANOps
   canStatus (*setClockOffset)(HandleData *hData, HandleData *hFrom);
   canStatus (*getCardInfo)(HandleData *hData, VCAN_IOCTL_CARD_INFO *ci);
   canStatus (*getCardInfo2)(HandleData *hData, KCAN_IOCTL_CARD_INFO_2 *ci2);
+  canStatus (*getOpenMode)(HandleData *hData);
 } CANOps;
 
 #endif

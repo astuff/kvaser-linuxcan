@@ -138,6 +138,7 @@ canStatus ccl_get_channel_list (ccl_class *self)
           return canERR_NOTFOUND;
         }
         skip = 1;
+        errno = 0;
       } else {
         if (ioctl(fd, VCAN_IOC_GET_SERIAL, &self->channel[self->n_channel].snr)) {
           if (errno != ESHUTDOWN) {
@@ -145,6 +146,7 @@ canStatus ccl_get_channel_list (ccl_class *self)
             return canERR_NOTFOUND;
           }
           skip = 1;
+          errno = 0;
         }
 
         if (ioctl(fd, VCAN_IOC_GET_EAN, &self->channel[self->n_channel].ean)) {
@@ -153,6 +155,7 @@ canStatus ccl_get_channel_list (ccl_class *self)
             return canERR_NOTFOUND;
           }
           skip = 1;
+          errno = 0;
         }
 
         close(fd);
