@@ -1,12 +1,16 @@
 var searchData=
 [
-  ['tag',['tag',['../structcan_notify_data.html#a3fd9a258481b2a4c0610d35a95c516f6',1,'canNotifyData']]],
-  ['time',['time',['../structcan_notify_data.html#a43dc68c257e4ad93dcd26ccf96129b45',1,'canNotifyData']]],
-  ['timestamp',['timestamp',['../struct_lin_message_info.html#acba7776dcc1861edfe0e9c5736de4df8',1,'LinMessageInfo::timestamp()'],['../structkvm_log_msg_ex.html#aa1fa735b38f32cc201831ea72527ec37',1,'kvmLogMsgEx::timeStamp()'],['../structkvm_log_rtc_clock_ex.html#aa1fa735b38f32cc201831ea72527ec37',1,'kvmLogRtcClockEx::timeStamp()'],['../structkvm_log_trigger_ex.html#aa1fa735b38f32cc201831ea72527ec37',1,'kvmLogTriggerEx::timeStamp()']]],
-  ['tq',['tq',['../structkv_bus_params_tq.html#a4559f9255ccc9f785a33412fe5496d1a',1,'kvBusParamsTq']]],
-  ['trig',['trig',['../structkvm_log_event_ex.html#a5ba860ad33a6d0976c7f2e0a8ed80bba',1,'kvmLogEventEx']]],
-  ['trigmask',['trigMask',['../structkvm_log_trigger_ex.html#a876ab506b9075d4f42219bd68ddbe4f4',1,'kvmLogTriggerEx']]],
-  ['tx',['tx',['../structcan_notify_data.html#a3fdd15457d2e2319e68feeb505375fe5',1,'canNotifyData']]],
-  ['txerrorcounter',['txErrorCounter',['../structcan_notify_data.html#af474cc212c3fa114c32b574d8f9085e3',1,'canNotifyData']]],
-  ['type',['type',['../structkv_io_module_digital.html#ac765329451135abec74c45e1897abf26',1,'kvIoModuleDigital::type()'],['../structkv_io_module_internal.html#ac765329451135abec74c45e1897abf26',1,'kvIoModuleInternal::type()'],['../structkv_io_module_relay.html#ac765329451135abec74c45e1897abf26',1,'kvIoModuleRelay::type()'],['../structkv_io_module_analog.html#ac765329451135abec74c45e1897abf26',1,'kvIoModuleAnalog::type()'],['../structkvm_log_trigger_ex.html#af5dcc482d7b811836ff61a4c408c3c78',1,'kvmLogTriggerEx::type()'],['../structkvm_log_event_ex.html#af356674bbaaf9bb782af79059eef1346',1,'kvmLogEventEx::type()'],['../structtag__token.html#ac765329451135abec74c45e1897abf26',1,'tag_token::type()']]]
+  ['raw',['raw',['../structkvm_log_event_ex.html#a2d78703fd9a85a4cb3ead816db9038bc',1,'kvmLogEventEx']]],
+  ['right',['right',['../structtag__token.html#afa54f74105f850a372148e16dde90651',1,'tag_token']]],
+  ['ro1',['RO1',['../structkv_io_module_relay.html#a51f47034125d484b8a7d13e414f2854a',1,'kvIoModuleRelay']]],
+  ['ro2',['RO2',['../structkv_io_module_relay.html#a74ec56c96381bdbac5979ca55f1f6c81',1,'kvIoModuleRelay']]],
+  ['ro3',['RO3',['../structkv_io_module_relay.html#a5b25e1ffac3bdd23e1b7be606abfd437',1,'kvIoModuleRelay']]],
+  ['ro4',['RO4',['../structkv_io_module_relay.html#ab3f579cac16905edf55011dcc2e9090a',1,'kvIoModuleRelay']]],
+  ['ro5',['RO5',['../structkv_io_module_relay.html#a2a2866e10a2945ebd13e09bcbb57cd52',1,'kvIoModuleRelay']]],
+  ['ro6',['RO6',['../structkv_io_module_relay.html#ac8627cecb81615ec17028f05c2faf449',1,'kvIoModuleRelay']]],
+  ['ro7',['RO7',['../structkv_io_module_relay.html#a459a1901794b9ff25b154c25696a14c4',1,'kvIoModuleRelay']]],
+  ['ro8',['RO8',['../structkv_io_module_relay.html#a9fcce63e7449e5adb9ae98deaaf5efee',1,'kvIoModuleRelay']]],
+  ['rtc',['rtc',['../structkvm_log_event_ex.html#a1f9964cb31c1515adcee1dc69c01d41b',1,'kvmLogEventEx']]],
+  ['rx',['rx',['../structcan_notify_data.html#a08ba82dcb2d1828a60a16863d4266189',1,'canNotifyData']]],
+  ['rxerrorcounter',['rxErrorCounter',['../structcan_notify_data.html#a575e147dffea7d8a2fc90141079a4fe3',1,'canNotifyData']]]
 ];

@@ -108,6 +108,7 @@
 #include <asm/div64.h>
 
 // Kvaser definitions
+#include "canlib_version.h"
 #include "VCanOsIf.h"
 #include "pciefd_hwif.h"
 #include "queue.h"
@@ -160,6 +161,8 @@ module_param(debug_level, int, 0644);
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("KVASER");
 MODULE_DESCRIPTION("PCIe CAN module.");
+MODULE_VERSION(__stringify(CANLIB_MAJOR_VERSION) "."
+               __stringify(CANLIB_MINOR_VERSION));
 
 #define PCIEFD_VENDOR (0x1a07)
 #define PCIEFD_4HS_ID     (0x000d)
@@ -170,7 +173,6 @@ MODULE_DESCRIPTION("PCIe CAN module.");
 
 #define MAX_NB_PARAMETERS   256
 #define PARAM_MAGIC         0xCAFEF00D
-#define PARAMETER_MAX_SIZE  (24)
 
 #define PARAM_SYSTEM_VERSION 1
 
@@ -296,9 +298,6 @@ typedef struct {
   uint32_t crc;
   kcc_param_t param[MAX_NB_PARAMETERS];
 } kcc_param_image_t;
-
-typedef unsigned char cust_channel_name_t[PARAMETER_MAX_SIZE];
-static cust_channel_name_t cust_channel_name[MAX_CARD_CHANNELS];
 
 //======================================================================
 // DMA
@@ -1205,8 +1204,8 @@ static int getCardInfo(VCanCardData *vCard)
         }
 
         for (i = 0; i < MAX_CARD_CHANNELS; i++) {
-          readParameter(param_image, CHANNEL_NAME_PARAM_INDEX_FIRST + i, cust_channel_name[i], sizeof(cust_channel_name[i]));
-          INITPRINT("    * Cust channel name [%u]: %s\n", i, cust_channel_name[i]);
+          readParameter(param_image, CHANNEL_NAME_PARAM_INDEX_FIRST + i, hCard->cust_channel_name[i], sizeof(hCard->cust_channel_name[i]));
+          INITPRINT("    * Cust channel name [%u]: %s\n", i, hCard->cust_channel_name[i]);
         }
 
         kfree(param_image);
@@ -1419,7 +1418,7 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
   unsigned int    sjw;
   unsigned long   irqFlags;
   unsigned long   btrn, btrd=0;
-  uint32_t bus_load_prescaler;
+  uint32_t        bus_load_prescaler;
 
   freq  = par->freq;
   sjw   = par->sjw;
@@ -1448,6 +1447,14 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
 
   brp = hCard->frequency / (freq * quantaPerCycle);
 
+  if (brp   < 1 || brp   > 8192 || // 13-bits 1 + 0..8191
+      sjw   < 1 || sjw   >   16 || // 4-bits  1 + 0..15
+      tseg1 < 1 || tseg1 >  512 || // 9-bits  1 + 0..511
+      tseg2 < 1 || tseg2 >   32) { // 5-bits  1 + 0..31
+    DEBUGPRINT(1,"Error (pciefd): Other checks can or arbitration phase brp:%lu sjw:%u tseg1:%u tseg2:%u\n",brp,sjw,tseg1,tseg2);
+    return VCAN_STAT_BAD_PARAMETER;
+  }
+
   recalc_freq = hCard->frequency / (brp * quantaPerCycle);
   if (recalc_freq != freq) {
     DEBUGPRINT(1,"Error (pciefd): CAN prescaler residual. The parameters bitrate:%lu tseg1:%u tseg2:%u gives this bitrate:%lu\n",
@@ -1460,6 +1467,7 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
   bus_load_prescaler = calcBusloadPrescaler(quantaPerCycle, brp);
 
   if(hwSupportCanFD(hChd->canControllerBase)) {
+    unsigned int trdce_supported = 0;
     freq  = par->freq_brs;
     sjw   = par->sjw_brs;
     tseg1 = par->tseg1_brs;
@@ -1484,6 +1492,14 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
 
     brp = hCard->frequency / (freq * quantaPerCycle);
 
+    if (brp   < 1 || brp   > 8192 || // 13-bits 1 + 0..8191
+        sjw   < 1 || sjw   >   16 || // 4-bits  1 + 0..15
+        tseg1 < 1 || tseg1 >  512 || // 9-bits  1 + 0..511
+        tseg2 < 1 || tseg2 >   32) { // 5-bits  1 + 0..31
+      DEBUGPRINT(1,"Error (pciefd): Other checks can fd data phase brp:%lu sjw:%u tseg1:%u tseg2:%u\n",brp,sjw,tseg1,tseg2);
+      return VCAN_STAT_BAD_PARAMETER;
+    }
+
     recalc_freq = hCard->frequency / (brp * quantaPerCycle);
     if (recalc_freq != freq) {
       DEBUGPRINT(1,"Error (pciefd): CAN FD prescaler residual. The parameters bitrate:%lu tseg1:%u tseg2:%u give this bitrate:%lu\n",
@@ -1491,18 +1507,43 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
       return VCAN_STAT_BAD_PARAMETER;
     }
 
-    if (brp > CANFD_MAX_PRESCALER_VALUE) {
-      DEBUGPRINT(1,"[%s, %d] Error (pciefd): prescaler (%lu) out of limits (>%u)\n", __FILE__, __LINE__, brp,
-                 CANFD_MAX_PRESCALER_VALUE);
-      return VCAN_STAT_BAD_PARAMETER;
+    // Is TRDCE implemented in FPGA?
+    if (IORD_PCIEFD_STAT(hChd->canControllerBase) & PCIEFD_STAT_CAP_MSK) {
+      if (PCIEFD_HW_CAP_TRDCE_GET(IORD_PCIEFD_HW_CAP(hChd->canControllerBase))) {
+        trdce_supported = 1;
+      } else {
+        DEBUGPRINT(2,"[%s, %d] TRDCE not supported by HW. Can not change TRDCE setting\n", __FILE__, __LINE__);
+      }
+    } else {
+      DEBUGPRINT(2,"[%s, %d] FPGA_CAN_STAT_CAP unavailable. Can not change SSP settings\n", __FILE__, __LINE__);
     }
 
-    if (brp   < 1 || brp   > 8192 || // 13-bits 1 + 0..8191
-        sjw   < 1 || sjw   >   16 || // 4-bits  1 + 0..15
-        tseg1 < 1 || tseg1 >  512 || // 9-bits  1 + 0..511
-        tseg2 < 1 || tseg2 >   32) { // 5-bits  1 + 0..31
-      DEBUGPRINT(1,"Error (pciefd): Other checks can fd data phase brp:%lu sjw:%u tseg1:%u tseg2:%u\n",brp,sjw,tseg1,tseg2);
-      return VCAN_STAT_BAD_PARAMETER;
+    if (trdce_supported) {
+      uint32_t ssp_ctrl;
+
+      // TRDCE (transmitter delay compensation) shall be enabled if
+      // brp is 1 or 2, disabled otherwise.
+      // see the kcan specification for details.
+      ssp_ctrl = IORD_PCIEFD_SSP_CTRL(hChd->canControllerBase);
+      switch (brp) {
+        case 1:
+        case 2:
+          ssp_ctrl |= PCIEFD_SSP_TRDCE(1);
+          DEBUGPRINT(3,"[%s, %d] canfd brp is %lu, TRDCE = 1\n", __FILE__, __LINE__, brp);
+          break;
+
+        default:
+          ssp_ctrl &= ~PCIEFD_SSP_TRDCE_MSK;
+          DEBUGPRINT(3,"[%s, %d] canfd brp is %lu, TRDCE = 0\n", __FILE__, __LINE__, brp);
+          break;
+      }
+      IOWR_PCIEFD_SSP_CTRL(hChd->canControllerBase, ssp_ctrl);
+    } else {
+      if (brp > CANFD_MAX_PRESCALER_VALUE) {
+        DEBUGPRINT(1,"[%s, %d] Error (pciefd): prescaler (%lu) out of limits (>%u)\n", __FILE__, __LINE__, brp,
+                   CANFD_MAX_PRESCALER_VALUE);
+        return VCAN_STAT_BAD_PARAMETER;
+      }
     }
 
     btrd = PCIEFD_BTR_SEG2(tseg2-1) | PCIEFD_BTR_SEG1(tseg1-1) | PCIEFD_BTR_SJW(sjw-1) | PCIEFD_BTR_BRP(brp-1);
@@ -3855,6 +3896,8 @@ static void pciCanRemoveOne (struct pci_dev *dev)
       schedule_timeout(msecs_to_jiffies(10));
     }
 
+    // Disable bus load packets
+    IOWR_PCIEFD_BLP(hChd->canControllerBase, 0);
     // Stop pwm
     pwmSetDutyCycle(hChd->canControllerBase, 0);
   }
@@ -3943,6 +3986,7 @@ static int pciCanGetCustChannelName(const VCanChanData * const vChd,
                                     unsigned int * const status)
 {
   const unsigned int channel = vChd->channel;
+  PciCanCardData *hCard = vChd->vCard->hwCardData;
   unsigned int nbr_of_bytes_to_copy;
 
   DEBUGPRINT(2, "[%s,%d]\n", __FUNCTION__, __LINE__);
@@ -3952,8 +3996,9 @@ static int pciCanGetCustChannelName(const VCanChanData * const vChd,
     nbr_of_bytes_to_copy = data_size;
   }
 
-  if (cust_channel_name[channel][0] != 0) {
-    memcpy(data, cust_channel_name[channel], nbr_of_bytes_to_copy);
+
+  if (hCard->cust_channel_name[channel][0] != 0) {
+    memcpy(data, hCard->cust_channel_name[channel], nbr_of_bytes_to_copy);
     data[nbr_of_bytes_to_copy - 1] = 0;
     *status = VCAN_STAT_OK;
   }

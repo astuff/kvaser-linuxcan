@@ -98,6 +98,8 @@
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("KVASER");
 MODULE_DESCRIPTION("Leaf CAN module.");
+MODULE_VERSION(__stringify(CANLIB_MAJOR_VERSION) "."
+               __stringify(CANLIB_MINOR_VERSION));
 
 
 //----------------------------------------------------------------------------

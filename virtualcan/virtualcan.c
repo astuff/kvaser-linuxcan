@@ -93,6 +93,7 @@
 
 
 // Kvaser definitions
+#include "canlib_version.h"
 #include "VCanOsIf.h"
 #include "virtualcan.h"
 #include "queue.h"
@@ -103,6 +104,8 @@
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("KVASER");
 MODULE_DESCRIPTION("VirtualCAN CAN module.");
+MODULE_VERSION(__stringify(CANLIB_MAJOR_VERSION) "."
+               __stringify(CANLIB_MINOR_VERSION));
 
 //
 // If you do not define VIRTUAL_DEBUG at all, all the debug code will be
@@ -616,6 +619,7 @@ static int virtualInitData (VCanCardData *vCard)
         hChd->busparams.tseg1_brs = 63;
         hChd->busparams.tseg2_brs = 16;
         hChd->busparams.sjw_brs = 16;
+        vCard->chanData[chNr]->chipState.state = CHIPSTAT_BUSOFF;
     }
 
     return 0;

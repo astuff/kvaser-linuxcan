@@ -297,6 +297,7 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser U100",                                       {0x30011731, 0x00073301}},
           {"Kvaser U100P",                                      {0x30011748, 0x00073301}},
           {"Kvaser U100S",                                      {0x30011816, 0x00073301}},
+          {"Kvaser USBcan Pro 4xHS",                            {0x30012615, 0x00073301}},
 };
 
 static canStatus check_bitrate (const CanHandle hnd, unsigned int bitrate);
@@ -399,6 +400,13 @@ CanHandle CANLIBAPI canOpenChannel (int channel, int flags)
     DEBUGPRINT((TXT("getDevParams ret %d\n"), status));
     free(hData);
     return status;
+  }
+
+  if (flags & canOPEN_NO_INIT_ACCESS) {
+    status = hData->canOps->getOpenMode(hData);
+    if (status < 0) {
+      DEBUGPRINT((TXT("getOpenMode ret: %d\n"), status));
+    }
   }
 
   status = hData->canOps->openChannel(hData);
@@ -759,10 +767,6 @@ canSetBusParamsFdTq(const CanHandle     hnd,
     return canERR_PARAM;
   }
   
-  if (nominal.prescaler != data.prescaler) {
-    return canERR_PARAM;
-  }
-
   return hData->canOps->setBusParamsTq (hData, &nominal, &data);
 }
 
@@ -1255,6 +1259,13 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
 
   switch (*freq) {
 
+  case canFD_BITRATE_8M_80P:
+    *freq     = 8000000L;
+    *tseg1    = 7;
+    *tseg2    = 2;
+    *sjw      = 1;
+    break;
+
   case canFD_BITRATE_8M_60P:
     *freq     = 8000000L;
     *tseg1    = 2;
@@ -1360,6 +1371,54 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
   return canOK;
 }
 
+
+//******************************************************
+// Translate from baud macro to bus params tq.
+// freq must be one of type canBITRATE_xxx
+//******************************************************
+canStatus CANLIBAPI kvBitrateToBusParamsTq(const canHandle hnd, int freq, kvBusParamsTq *nominal)
+{
+  canStatus stat;
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) return canERR_INVHANDLE;
+  if ( nominal == NULL) return canERR_PARAM;
+
+  stat = tqu_translate_bitrate_constant(freq, nominal);
+  if (stat != canOK) return stat;
+
+  stat = tqu_validate_busparameters(hnd, nominal);
+  if (stat != canOK) return stat;
+
+  return canOK;
+}
+
+//******************************************************
+// Translate from baud macro to bus params tq.
+// freqA and freqD must be of type canFD_BITRATE_xxx
+//******************************************************
+canStatus CANLIBAPI kvBitrateToBusParamsFdTq(const canHandle hnd,
+                                             int freqA,
+                                             int freqD,
+                                             kvBusParamsTq *arbitration,
+                                             kvBusParamsTq *data)
+{
+  canStatus stat;
+  HandleData *hData;
+
+  hData = findHandle(hnd);
+  if (hData == NULL) return canERR_INVHANDLE;
+  if ( arbitration == NULL || data == NULL ) return canERR_PARAM;
+
+  stat = tqu_translate_bitrate_constant_fd(freqA, freqD, arbitration, data);
+  if (stat != canOK) return stat;
+
+  stat = tqu_validate_busparameters_fd(hnd);
+  if (stat != canOK) return stat;
+
+  return canOK;
+}
 
 //******************************************************
 // Get error text
@@ -1566,6 +1625,43 @@ getHandleData (HandleData *hData, int item, void *buffer, const size_t bufsize)
       return canOK;
     }
 
+  case canCHANNELDATA_BUS_PARAM_LIMITS:
+    DEBUGPRINT(("canCHANNELDATA_BUS_PARAM_LIMITS entry\n"));
+    if (bufsize < sizeof(kvBusParamLimits)) {
+      return canERR_PARAM;
+    }
+    kvBusParamLimits *bus_param_limits = (kvBusParamLimits*)buffer;
+    uint32_t cap;
+    uint64_t cap_ex[2];
+    unsigned int hw_type;
+    int has_FD;
+
+    status = hData->canOps->getChannelData(hData->deviceName,
+                                           canCHANNELDATA_CHANNEL_CAP_EX,
+                                           cap_ex,
+                                           sizeof(cap_ex));
+    if (status != canOK) return status;
+
+    if (cap_ex[0] & canCHANNEL_CAP_EX_BUSPARAMS_TQ) {
+      status = hData->canOps->getChannelData(hData->deviceName,
+                                           canCHANNELDATA_CHANNEL_CAP,
+                                           &cap,
+                                           sizeof(cap));
+      if (status != canOK) return status;
+      has_FD = (cap & canCHANNEL_CAP_CAN_FD);
+
+      status = hData->canOps->getChannelData(hData->deviceName,
+                                           canCHANNELDATA_CARD_TYPE,
+                                           &hw_type,
+                                           sizeof(hw_type));
+      if (status != canOK) return status;
+
+      status = get_tq_limits (hw_type, bus_param_limits, has_FD);
+    } else {
+        DEBUGPRINT(("canCHANNELDATA_BUS_PARAM_LIMITS not supported for device without tq API\n"));
+      return canERR_NOT_SUPPORTED;
+    }
+    return status;
 
   case canCHANNELDATA_TRANS_CAP:
   case canCHANNELDATA_TRANS_SERIAL_NO:
@@ -1875,6 +1971,16 @@ canStatus CANLIBAPI canGetBusStatistics (const CanHandle hnd,
   return hData->canOps->getBusStats(hData, stat);
 }
 
+
+/***************************************************************************/
+kvStatus CANLIBAPI kvAnnounceIdentityEx(const CanHandle hnd, int type, void *buf, size_t bufsiz)
+{
+  (void) hnd;
+  (void) type;
+  (void) buf;
+  (void) bufsiz;
+  return canERR_NOT_IMPLEMENTED;
+}
 
 /***************************************************************************/
 kvStatus CANLIBAPI kvFileCopyToDevice(const CanHandle hnd, char *hostFileName, char *deviceFileName)
@@ -3013,6 +3119,7 @@ static canStatus check_bitrate (const CanHandle hnd, unsigned int bitrate)
   }
   return canOK;
 }
+
 
 //******************************************************
 // IoAPI - not implemented in linux

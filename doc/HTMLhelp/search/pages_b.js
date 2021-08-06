@@ -1,10 +1,5 @@
 var searchData=
 [
-  ['send_20database_20signal',['Send database signal',['../page_example_c_gensig.html',1,'page_user_guide_kvadblib_samples']]],
-  ['sendmessage_2ec',['SendMessage.c',['../page_tutorial_c_sendmessage.html',1,'page_tutorial']]],
-  ['sendmessage_2ecs',['SendMessage.cs',['../page_tutorial_csharp_sendmessage.html',1,'page_tutorial']]],
-  ['sample_20programs_20_28canlib_29',['Sample Programs (CANlib)',['../page_user_guide_canlib_samples.html',1,'page_canlib']]],
-  ['sample_20programs_20_28kvadblib_29',['Sample Programs (kvaDBLib)',['../page_user_guide_kvadblib_samples.html',1,'page_kvadblib_user_guide_intro']]],
-  ['sample_20programs_20_28kvrlib_29',['Sample Programs (kvrlib)',['../page_user_guide_kvrlib_samples.html',1,'']]],
-  ['send_20and_20receive',['Send and Receive',['../page_user_guide_send_recv.html',1,'page_canlib']]]
+  ['plain_20text_20_28r_2fw_29',['Plain text (R/W)',['../kvlclib_format__p_l_a_i_n__a_s_c.html',1,'kvlclib_formats']]],
+  ['properties',['Properties',['../kvlclib_properties.html',1,'page_kvlclib']]]
 ];

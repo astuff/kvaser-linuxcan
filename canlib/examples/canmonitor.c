@@ -67,12 +67,12 @@
  */
 
 #include <canlib.h>
+#include <canstat.h>
 #include <stdio.h>
 #include <signal.h>
 #include <errno.h>
 #include <unistd.h>
 #include <time.h>
-#include "vcanevt.h"
 
 #define READ_WAIT_INFINITE    (unsigned long)(-1)
 
@@ -94,39 +94,51 @@ static void printUsageAndExit(char *prgName)
   exit(1);
 }
 
-static void sighand(int sig)
+static void sighand(int sig, siginfo_t *info, void *ucontext)
 {
-  (void)sig;
+  (void) sig;
+  (void) info;
+  (void) ucontext;
 }
 
-static char* busStatToStr(const unsigned long flag) {
-    char* tempStr = NULL;
-    #define MACRO2STR(x) case x: tempStr = #x; break
-    switch (flag) {
-        MACRO2STR( CHIPSTAT_BUSOFF        );
-        MACRO2STR( CHIPSTAT_ERROR_PASSIVE );
-        MACRO2STR( CHIPSTAT_ERROR_WARNING );
-        MACRO2STR( CHIPSTAT_ERROR_ACTIVE  );
-        default: tempStr = ""; break;
-    }
-    #undef MACRO2STR
-    return tempStr;
+static const char* busStatToStr(const unsigned long flag)
+{
+  switch (flag) {
+    case canSTAT_ERROR_PASSIVE:
+      return "canSTAT_ERROR_PASSIVE";
+
+    case canSTAT_BUS_OFF:
+      return "canSTAT_BUS_OFF";
+
+    case canSTAT_ERROR_WARNING:
+      return "canSTAT_ERROR_WARNING";
+
+    case canSTAT_ERROR_ACTIVE:
+      return "canSTAT_ERROR_ACTIVE";
+
+    default:
+      return "";
+  }
 }
 
-void notifyCallback(canNotifyData *data) {
+void notifyCallback(canNotifyData *data)
+{
   switch (data->eventType) {
-  case canEVENT_STATUS:
-    printf("CAN Status Event: %s\n", busStatToStr(data->info.status.busStatus));
-    break;
-  case canEVENT_ERROR:
-    printf("CAN Error Event\n");
-    break;
-  case canEVENT_TX:
-    printf("CAN Tx Event\n");
-    break;
-  case canEVENT_RX:
-    printf("CAN Rx Event\n");
-    break;
+    case canEVENT_STATUS:
+      printf("CAN Status Event: %s\n", busStatToStr(data->info.status.busStatus));
+      break;
+
+    case canEVENT_ERROR:
+      printf("CAN Error Event\n");
+      break;
+
+    case canEVENT_TX:
+      printf("CAN Tx Event\n");
+      break;
+
+    case canEVENT_RX:
+      printf("CAN Rx Event\n");
+      break;
   }
   return;
 }
@@ -136,6 +148,7 @@ int main(int argc, char *argv[])
   canHandle hnd;
   canStatus stat;
   int channel;
+  struct sigaction sigact;
 
   if (argc != 2) {
     printUsageAndExit(argv[0]);
@@ -150,11 +163,16 @@ int main(int argc, char *argv[])
     }
   }
 
-  printf("Reading messages on channel %d\n", channel);
+  /* Use sighand and allow SIGINT to interrupt syscalls */
+  sigact.sa_flags = SA_SIGINFO;
+  sigemptyset(&sigact.sa_mask);
+  sigact.sa_sigaction = sighand;
+  if (sigaction(SIGINT, &sigact, NULL) != 0) {
+    perror("sigaction SIGINT failed");
+    return -1;
+  }
 
-  /* Allow signals to interrupt syscalls */
-  signal(SIGINT, sighand);
-  siginterrupt(SIGINT, 1);
+  printf("Reading CAN messages on channel %d\n", channel);
 
   canInitializeLibrary();
 
@@ -174,6 +192,7 @@ int main(int argc, char *argv[])
   if (stat != canOK) {
     goto ErrorExit;
   }
+
   stat = canBusOn(hnd);
   check("canBusOn", stat);
   if (stat != canOK) {

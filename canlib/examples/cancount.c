@@ -88,21 +88,23 @@ static void check(char* id, canStatus stat)
   }
 }
 
-static void sighand(int sig)
+static void sighand(int sig, siginfo_t *info, void *ucontext)
 {
   static unsigned int last;
+  (void) info;
+  (void) ucontext;
 
   switch (sig) {
-  case SIGINT:
-    break;
-  case SIGALRM:
-    if (msgCounter - last) {
-      printf("msg/s = %d, total=%u, std=%u, ext=%u, err=%u, over=%u\n",
-             (msgCounter - last) / ALARM_INTERVAL_IN_S, msgCounter, std, ext, err, over);
-    }
-    last = msgCounter;
-    alarm(ALARM_INTERVAL_IN_S);
-    break;
+    case SIGINT:
+      break;
+    case SIGALRM:
+      if (msgCounter - last) {
+        printf("msg/s = %d, total=%u, std=%u, ext=%u, err=%u, over=%u\n",
+               (msgCounter - last) / ALARM_INTERVAL_IN_S, msgCounter, std, ext, err, over);
+      }
+      last = msgCounter;
+      alarm(ALARM_INTERVAL_IN_S);
+      break;
   }
 }
 
@@ -117,6 +119,7 @@ int main(int argc, char *argv[])
   canHandle hnd;
   canStatus stat;
   int channel;
+  struct sigaction sigact;
 
   if (argc != 2) {
     printUsageAndExit(argv[0]);
@@ -131,14 +134,22 @@ int main(int argc, char *argv[])
     }
   }
 
-  /* Use sighand as our signal handler */
-  signal(SIGALRM, sighand);
-  signal(SIGINT, sighand);
+  /* Use sighand as our signal handler for SIGALRM */
+  sigact.sa_flags = SA_SIGINFO | SA_RESTART;
+  sigemptyset(&sigact.sa_mask);
+  sigact.sa_sigaction = sighand;
+  if (sigaction(SIGALRM, &sigact, NULL) != 0) {
+    perror("sigaction SIGALRM failed");
+    return -1;
+  }
+  /* Use sighand and allow SIGINT to interrupt syscalls */
+  sigact.sa_flags = SA_SIGINFO;
+  if (sigaction(SIGINT, &sigact, NULL) != 0) {
+    perror("sigaction SIGINT failed");
+    return -1;
+  }
 
-  /* Allow signals to interrupt syscalls */
-  siginterrupt(SIGINT, 1);
-
-  printf("Counting messages on channel %d\n", channel);
+  printf("Counting CAN messages on channel %d\n", channel);
 
   canInitializeLibrary();
 
@@ -149,7 +160,6 @@ int main(int argc, char *argv[])
     check("", hnd);
     return -1;
   }
-
   stat = canSetBusParams(hnd, canBITRATE_1M, 0, 0, 0, 0, 0);
   check("canSetBusParams", stat);
   if (stat != canOK) {
@@ -175,7 +185,8 @@ int main(int argc, char *argv[])
     if (stat == canOK) {
       if (flag & canMSG_ERROR_FRAME) {
         err++;
-      } else {
+      }
+      else {
         if (flag & canMSG_STD)        std++;
         if (flag & canMSG_EXT)        ext++;
         if (flag & canMSG_RTR)        rtr++;
@@ -194,7 +205,7 @@ int main(int argc, char *argv[])
 
   } while (stat == canOK);
 
-  sighand(SIGALRM);
+  sighand(SIGALRM, NULL, NULL);
 
 ErrorExit:
 

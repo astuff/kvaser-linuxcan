@@ -106,6 +106,8 @@
 #define PCIEFD_BTRD_REG                   (PCIEFD_CONTROL_OFFSET + 10)
 #define PCIEFD_TX_RATE_LIMIT_REG          (PCIEFD_CONTROL_OFFSET + 11)
 #define PCIEFD_PWM_CTRL_REG               (PCIEFD_CONTROL_OFFSET + 12)
+#define PCIEFD_SSP_CTRL_REG               (PCIEFD_CONTROL_OFFSET + 13)
+#define PCIEFD_HW_CAP_REG                 (PCIEFD_CONTROL_OFFSET + 14)
 
 // Should read 0xdeadbeef if can controller is responding
 #define PCIEFD_UNDEF_REG                  (PCIEFD_PWM_CTRL_REG + 3)
@@ -391,6 +393,28 @@
 #define PCIEFD_PWM_CTRL_TOP(value)     field(PCIEFD_PWM_CTRL_TOP, value)
 
 // +----------------------------------------------------------------------------
+// | Secondary Sample Point Control (PCIEFD_SSP_CTRL)
+// | PCIEFD_SSP_CTRL_REG
+// +----------------------------------------------------------------------------
+
+#define PCIEFD_SSP_TRDCE_LSHIFT         16
+#define PCIEFD_SSP_TRDCE_NBITS          1
+#define PCIEFD_SSP_TRDCE_MSK            mask(PCIEFD_SSP_TRDCE)
+#define PCIEFD_SSP_TRDCE_GET(value)     get(PCIEFD_SSP_TRDCE, value)
+#define PCIEFD_SSP_TRDCE(value)         field(PCIEFD_SSP_TRDCE, value)
+
+// +----------------------------------------------------------------------------
+// | Hardware capability
+// | HW_CAP
+// +----------------------------------------------------------------------------
+
+#define PCIEFD_HW_CAP_TRDCE_LSHIFT      22
+#define PCIEFD_HW_CAP_TRDCE_NBITS       1
+#define PCIEFD_HW_CAP_TRDCE_MSK         mask(PCIEFD_HW_CAP_TRDCE)
+#define PCIEFD_HW_CAP_TRDCE_GET(value)  get(PCIEFD_HW_CAP_TRDCE, value)
+#define PCIEFD_HW_CAP_TRDCE(value)      field(PCIEFD_HW_CAP_TRDCE, value)
+
+// +----------------------------------------------------------------------------
 // | Register Access
 // |
 // +----------------------------------------------------------------------------
@@ -456,8 +480,16 @@
 #define IORD_PCIEFD_PWM_CTRL(base)        IORD(base, PCIEFD_PWM_CTRL_REG)
 #define IOWR_PCIEFD_PWM_CTRL(base, data)  IOWR(base, PCIEFD_PWM_CTRL_REG, data)
 
-#define IOADDR_PCIEFD_UNDEF(base)              __IO_CALC_ADDRESS_NATIVE(base, PCIEFD_UNDEF_REG)
-#define IORD_PCIEFD_UNDEF(base)                IORD(base, PCIEFD_UNDEF_REG)
+#define IOADDR_PCIEFD_UNDEF(base)         __IO_CALC_ADDRESS_NATIVE(base, PCIEFD_UNDEF_REG)
+#define IORD_PCIEFD_UNDEF(base)           IORD(base, PCIEFD_UNDEF_REG)
+
+#define IOADDR_PCIEFD_SSP_CTRL(base)      __IO_CALC_ADDRESS_NATIVE(base, PCIEFD_SSP_CTRL_REG)
+#define IORD_PCIEFD_SSP_CTRL(base)        IORD(base, PCIEFD_SSP_CTRL_REG)
+#define IOWR_PCIEFD_SSP_CTRL(base, data)  IOWR(base, PCIEFD_SSP_CTRL_REG, data)
+
+#define IOADDR_PCIEFD_HW_CAP(base)        __IO_CALC_ADDRESS_NATIVE(base, PCIEFD_HW_CAP_REG)
+#define IORD_PCIEFD_HW_CAP(base)          IORD(base, PCIEFD_HW_CAP_REG)
+#define IOWR_PCIEFD_HW_CAP(base, data)    IOWR(base, PCIEFD_HW_CAP_REG, data)
 
 #define IOADDR_FIFO_CONTROL(base)         __IO_CALC_ADDRESS_NATIVE(base, PCIEFD_FIFO_CONTROL_BASE)
 #define IORD_FIFO_CONTROL(base)           IORD(base, PCIEFD_FIFO_CONTROL_BASE)

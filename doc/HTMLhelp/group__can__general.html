@@ -108,6 +108,8 @@ Functions</h2></td></tr>
 <tr class="separator:ga0d1c0e54ea20c3e3b328a32eb10c7b47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad3d0fc1bf752047f6e24020c478aeffd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__general.html#gad3d0fc1bf752047f6e24020c478aeffd">kvFlashLeds</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, int action, int timeout)</td></tr>
 <tr class="separator:gad3d0fc1bf752047f6e24020c478aeffd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1c6db083e9def9c4d38b4a5226b5f77c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__general.html#ga1c6db083e9def9c4d38b4a5226b5f77c">kvAnnounceIdentityEx</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, int type, void *buf, size_t bufsiz)</td></tr>
+<tr class="separator:ga1c6db083e9def9c4d38b4a5226b5f77c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga99976c5b8e2c534b27bf9ec2e715d8d3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__general.html#ga99976c5b8e2c534b27bf9ec2e715d8d3">kvSetNotifyCallback</a> (const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a> hnd, <a class="el" href="canlib_8h.html#a7e926c0359a2caa6b9a663a333bab78d">kvCallback_t</a> callback, void *context, unsigned int notifyFlags)</td></tr>
 <tr class="separator:ga99976c5b8e2c534b27bf9ec2e715d8d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga76cb21c1b104f9b679caa3f4cda7424d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">kvStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__can__general.html#ga76cb21c1b104f9b679caa3f4cda7424d">kvGetSupportedInterfaceInfo</a> (int index, char *hwName, size_t nameLen, int *hwType, int *hwBusType)</td></tr>
@@ -210,7 +212,7 @@ Functions</h2></td></tr>
 <a class="el" href="group__can__general.html#ga65169ca633cd30aa92b8a80e28a5378b">canGetNumberOfChannels()</a> </dd>
 <dd>
 <a class="el" href="group___c_a_n.html#ga909e5c14b09fe76bad280475138d503e">canGetHandleData()</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2list_channels_8c-example.html#a3">how-to/c/listChannels.c</a>, and <a class="el" href="list_channels_8c-example.html#a6">listChannels.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2list_channels_8c-example.html#a3">how-to/c/listChannels.c</a>, and <a class="el" href="list_channels_8c-example.html#a7">listChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -258,7 +260,7 @@ Functions</h2></td></tr>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_intro.html#section_user_guide_canstatus">Error checking</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a1">busparms.c</a>, <a class="el" href="cancount_8c-example.html#a1">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a1">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a1">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a1">canmonitor.c</a>, <a class="el" href="how-to_2c_2list_channels_8c-example.html#a2">how-to/c/listChannels.c</a>, <a class="el" href="how-to_2c_2open_channels_8c-example.html#a1">how-to/c/openChannels.c</a>, <a class="el" href="list_channels_8c-example.html#a1">listChannels.c</a>, <a class="el" href="read_timer_test_8c-example.html#a1">readTimerTest.c</a>, <a class="el" href="simplewrite_8c-example.html#a1">simplewrite.c</a>, <a class="el" href="tutorial_2c_2_monitor_can_channel_8c-example.html#a1">tutorial/c/MonitorCanChannel.c</a>, <a class="el" href="tutorial_2c_2_send_message_8c-example.html#a1">tutorial/c/SendMessage.c</a>, and <a class="el" href="writeloop_8c-example.html#a1">writeloop.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparams_8c-example.html#a1">busparams.c</a>, <a class="el" href="cancount_8c-example.html#a1">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a1">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a1">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a1">canmonitor.c</a>, <a class="el" href="example_2c_2busparams_tq_8c-example.html#a1">example/c/busparams_tq.c</a>, <a class="el" href="how-to_2c_2list_channels_8c-example.html#a2">how-to/c/listChannels.c</a>, <a class="el" href="how-to_2c_2open_channels_8c-example.html#a1">how-to/c/openChannels.c</a>, <a class="el" href="list_channels_8c-example.html#a1">listChannels.c</a>, <a class="el" href="read_timer_test_8c-example.html#a1">readTimerTest.c</a>, <a class="el" href="simplewrite_8c-example.html#a1">simplewrite.c</a>, <a class="el" href="tutorial_2c_2_monitor_can_channel_8c-example.html#a1">tutorial/c/MonitorCanChannel.c</a>, <a class="el" href="tutorial_2c_2_send_message_8c-example.html#a1">tutorial/c/SendMessage.c</a>, and <a class="el" href="writeloop_8c-example.html#a1">writeloop.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -290,7 +292,7 @@ Functions</h2></td></tr>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_device_and_channel.html#section_user_guide_unique_device">Channel Information</a>, <a class="el" href="page_user_guide_device_and_channel.html#section_user_guide_virtual">Virtual Channels</a> </dd>
 <dd>
 <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2list_channels_8c-example.html#a0">how-to/c/listChannels.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="how-to_2c_2list_channels_8c-example.html#a0">how-to/c/listChannels.c</a>, and <a class="el" href="list_channels_8c-example.html#a6">listChannels.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -367,7 +369,7 @@ Functions</h2></td></tr>
 <p>You may call <a class="el" href="group__can__general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1">canInitializeLibrary()</a> more than once. The actual initialization will take place only once.</p>
 <p>Any errors encountered during library initialization will be "silent" and an appropriate <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> error code will be returned later on when <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> (or any other API call that requires initialization) is called.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_init.html">Initialization</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a2">busparms.c</a>, <a class="el" href="cancount_8c-example.html#a2">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a2">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a2">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a10">canmonitor.c</a>, <a class="el" href="list_channels_8c-example.html#a2">listChannels.c</a>, <a class="el" href="read_timer_test_8c-example.html#a2">readTimerTest.c</a>, <a class="el" href="simplewrite_8c-example.html#a10">simplewrite.c</a>, <a class="el" href="tutorial_2c_2_monitor_can_channel_8c-example.html#a5">tutorial/c/MonitorCanChannel.c</a>, <a class="el" href="tutorial_2c_2_send_message_8c-example.html#a2">tutorial/c/SendMessage.c</a>, and <a class="el" href="writeloop_8c-example.html#a2">writeloop.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparams_8c-example.html#a2">busparams.c</a>, <a class="el" href="cancount_8c-example.html#a2">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a2">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a2">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a14">canmonitor.c</a>, <a class="el" href="example_2c_2busparams_tq_8c-example.html#a3">example/c/busparams_tq.c</a>, <a class="el" href="list_channels_8c-example.html#a2">listChannels.c</a>, <a class="el" href="read_timer_test_8c-example.html#a2">readTimerTest.c</a>, <a class="el" href="simplewrite_8c-example.html#a14">simplewrite.c</a>, <a class="el" href="tutorial_2c_2_monitor_can_channel_8c-example.html#a5">tutorial/c/MonitorCanChannel.c</a>, <a class="el" href="tutorial_2c_2_send_message_8c-example.html#a2">tutorial/c/SendMessage.c</a>, and <a class="el" href="writeloop_8c-example.html#a2">writeloop.c</a>.</dd>
 </dl>
 </div>
 </div>
@@ -452,8 +454,62 @@ Functions</h2></td></tr>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__can__general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1">canInitializeLibrary()</a> </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparms_8c-example.html#a8">busparms.c</a>, <a class="el" href="cancount_8c-example.html#a18">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a18">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a19">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a28">canmonitor.c</a>, <a class="el" href="list_channels_8c-example.html#a15">listChannels.c</a>, <a class="el" href="read_timer_test_8c-example.html#a6">readTimerTest.c</a>, <a class="el" href="simplewrite_8c-example.html#a28">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a14">writeloop.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparams_8c-example.html#a8">busparams.c</a>, <a class="el" href="cancount_8c-example.html#a18">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a18">canfdmonitor.c</a>, <a class="el" href="canfdwrite_8c-example.html#a19">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a32">canmonitor.c</a>, <a class="el" href="example_2c_2busparams_tq_8c-example.html#a17">example/c/busparams_tq.c</a>, <a class="el" href="list_channels_8c-example.html#a16">listChannels.c</a>, <a class="el" href="read_timer_test_8c-example.html#a6">readTimerTest.c</a>, <a class="el" href="simplewrite_8c-example.html#a32">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a14">writeloop.c</a>.</dd>
 </dl>
+</div>
+</div>
+<a id="ga1c6db083e9def9c4d38b4a5226b5f77c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga1c6db083e9def9c4d38b4a5226b5f77c">&#9670;&nbsp;</a></span>kvAnnounceIdentityEx()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7">canStatus</a> kvAnnounceIdentityEx </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">CanHandle</a>&#160;</td>
+          <td class="paramname"><em>hnd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>buf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>bufsiz</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The <a class="el" href="group__can__general.html#ga1c6db083e9def9c4d38b4a5226b5f77c">kvAnnounceIdentityEx</a> function is used by certain OEM applications.</p>
+<dl class="section note"><dt>Note</dt><dd>Not implemented in linux.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">hnd</td><td>An open handle to a CAN channel. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>Type of announcement. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">buf</td><td>A pointer to the data to be sent to the driver. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">bufsiz</td><td>The size, in bytes, of the buffer that buf points to.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure </dd></dl>
+
 </div>
 </div>
 <a id="ga2f80c456dd1653ffe8a9062de3e1ad76"></a>
@@ -866,7 +922,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.34) Wed Sep 9 2020</li>
+    <li class="footer"> (canlib 5.35) Tue Feb 16 2021</li>
   </ul>
 </div>
 </body>

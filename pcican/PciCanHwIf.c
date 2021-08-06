@@ -99,6 +99,7 @@
 #include <asm/delay.h>
 
 // Kvaser definitions
+#include "canlib_version.h"
 #include "VCanOsIf.h"
 #include "dallas.h"
 #include "PciCanHwIf.h"
@@ -116,6 +117,8 @@
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("KVASER");
 MODULE_DESCRIPTION("PCIcan CAN module.");
+MODULE_VERSION(__stringify(CANLIB_MAJOR_VERSION) "."
+               __stringify(CANLIB_MINOR_VERSION));
 
 //
 // If you do not define PCICAN_DEBUG at all, all the debug code will be

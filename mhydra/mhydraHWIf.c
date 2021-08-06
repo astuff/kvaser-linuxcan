@@ -103,6 +103,8 @@
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("KVASER");
 MODULE_DESCRIPTION("Mhydra CAN module.");
+MODULE_VERSION(__stringify(CANLIB_MAJOR_VERSION) "."
+               __stringify(CANLIB_MINOR_VERSION));
 
 //----------------------------------------------------------------------------
 // If you do not define MHYDRA_DEBUG at all, all the debug code will be
@@ -388,6 +390,8 @@ static int mhydra_send_and_wait_reply_memo (VCanCardData  *vCard,
 #define USB_U100_PRODUCT_ID                   273 // Kvaser U100 (01173-1)
 #define USB_U100P_PRODUCT_ID                  274 // Kvaser U100P (01174-8)
 #define USB_U100S_PRODUCT_ID                  275 // Kvaser U100P (01181-6)
+#define USB_USBCAN_PRO_4HS_PRODUCT_ID         276 // Kvaser USBcan Pro 4xHS (01261-5)
+
 
 // Table of devices that work with this driver
 static struct usb_device_id mhydra_table [] = {
@@ -409,6 +413,7 @@ static struct usb_device_id mhydra_table [] = {
   { USB_DEVICE(KVASER_VENDOR_ID, USB_U100_PRODUCT_ID)},
   { USB_DEVICE(KVASER_VENDOR_ID, USB_U100P_PRODUCT_ID)},
   { USB_DEVICE(KVASER_VENDOR_ID, USB_U100S_PRODUCT_ID)},
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_USBCAN_PRO_4HS_PRODUCT_ID)},
   { 0 }  // Terminating entry
 };
 
@@ -1339,6 +1344,11 @@ static void mhydra_handle_cmd_rx_message_fd(hydraHostCmdExt *extCmd, VCanCardDat
       length                 = dlc_dlc_to_bytes_classic(dlc);
       vEvent.tagData.msg.dlc = (uint8_t)dlc;
     }
+  }
+
+  // Remote frames don't contain any data bytes
+  if (extCmd->rxCanMessageFd.flags & MSGFLAG_REMOTE_FRAME) {
+    length = 0;
   }
 
   DEBUGPRINT(4, (TXT("[%s,%d] id(%d) flags(0x%04X) dlc(%d)\n"), __FILE__, __LINE__, vEvent.tagData.msg.id, vEvent.tagData.msg.flags, vEvent.tagData.msg.dlc));
@@ -2781,7 +2791,8 @@ static int mhydra_plugin (struct usb_interface *interface,
        (udev->descriptor.idProduct != USB_MEMO_LIGHT_HS_V2_PRODUCT_ID) &&
        (udev->descriptor.idProduct != USB_U100_PRODUCT_ID) &&
        (udev->descriptor.idProduct != USB_U100P_PRODUCT_ID) &&
-       (udev->descriptor.idProduct != USB_U100S_PRODUCT_ID)
+       (udev->descriptor.idProduct != USB_U100S_PRODUCT_ID) &&
+       (udev->descriptor.idProduct != USB_USBCAN_PRO_4HS_PRODUCT_ID)
       )
      )
   {
@@ -2865,7 +2876,11 @@ static int mhydra_plugin (struct usb_interface *interface,
     case USB_U100S_PRODUCT_ID:
       DEBUGPRINT(2, (TXT("\nKVASER ")));
       DEBUGPRINT(2, (TXT("Kvaser U100S plugged in\n")));
-      break;      
+      break;   
+    case USB_USBCAN_PRO_4HS_PRODUCT_ID:
+      DEBUGPRINT(2, (TXT("\nKVASER ")));
+      DEBUGPRINT(2, (TXT("Kvaser USBcan Pro 4xHS plugged in\n")));
+      break;   
 
     default:
       DEBUGPRINT(2, (TXT("UNKNOWN product plugged in\n")));

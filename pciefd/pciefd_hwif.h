@@ -145,6 +145,8 @@
 // The actual max value supported by HW can be read using fifoPacketCountTxMax (altera/HAL/src/pciefd.c)
 #define MAX_OUTSTANDING_TX 17
 
+#define PARAMETER_MAX_SIZE  24
+
 #if USE_DMA
 
 #define DMA_BUFFER_SZ 4096
@@ -164,6 +166,7 @@ typedef struct {
 
 
 #endif
+typedef uint8_t cust_channel_name_t[PARAMETER_MAX_SIZE];
 
 // Avalon Address Translation Table Address Space Bit Encodings
 enum {
@@ -326,7 +329,7 @@ typedef struct PciCanCardData {
 
   atomic_t status_seq_no;
 
-
+  cust_channel_name_t cust_channel_name[MAX_CARD_CHANNELS];
 } PciCanCardData;
 
 

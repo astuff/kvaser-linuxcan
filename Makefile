@@ -97,7 +97,7 @@ define print_versions
 	echo '  User    : '$(USER)
 	echo '  System  : '`uname -a`
 	echo '  CC      : '$(CC)
-	echo '  CC ver. : '`$(CC) -dumpversion`
+	echo '  CC ver. : '`$(CC) -dumpfullversion -dumpversion`
 	echo '  KDIR    : '$(KDIR)
 	echo ''
 endef

@@ -63,7 +63,7 @@
 
 /*
  * Kvaser Linux Canlib
- * Set bus parameters and read them back
+ * Set bus parameters using setBusParams and read them back
  */
 
 #include <canlib.h>
@@ -82,36 +82,37 @@ static void check(char* id, canStatus stat)
 
 int main(int argc, char *argv[])
 {
-  long freq;
-  unsigned int tseg1, tseg2, sjw, noSamp, syncmode;
   canStatus stat = -1;
   int j;
   canHandle hnd[2];
+  long freq;
+  unsigned int tseg1, tseg2, sjw, noSamp, syncmode;
 
-  (void)argc; // Unused.
-  (void)argv; // Unused.
+  (void)argc;
+  (void)argv;
 
   canInitializeLibrary();
 
   for(j = 0 ; j < 2 ; j++) {
     hnd[j] = canOpenChannel(j, canOPEN_EXCLUSIVE | canOPEN_REQUIRE_EXTENDED);
-    if (hnd[j] < 0) {
+    if ((canStatus)hnd[j] < 0) {
       printf("canOpenChannel (%d) failed\n", j);
       return -1;
     }
-    stat = canSetBusParams(hnd[j], 500000, 4, 3, 1, 1, 0);
+    stat = canSetBusParams(hnd[j], 500000L, 5, 2, 1, 1, 0);
     check("canSetBusParams", stat);
   }
 
   printf("\n");
   for (j = 0; j < 2; j++) {
     stat = canGetBusParams(hnd[j], &freq, &tseg1, &tseg2, &sjw, &noSamp, &syncmode);
-    printf("hnd[%d]:freq %ld, tseg1 %u, tseg2 %u, sjw %u, noSamp %u, syncmode %u\n ",
+    printf("hnd[%d]:freq %ld, tseg1 %u, tseg2 %u, sjw %u, noSamp %u, syncmode %u\n",
            j, freq, tseg1, tseg2, sjw, noSamp, syncmode);
     check("canGetBusParams", stat);
   }
 
   stat = canUnloadLibrary();
+
   check("canUnloadLibrary", stat);
 
   return 0;

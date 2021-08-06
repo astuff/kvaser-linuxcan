@@ -68,6 +68,7 @@
   Interface   Product                  Driver Name
  -----------+------------------------+-------------
   USB         Leaf Light               leaf
+              Leaf Light v2
               Leaf SemiPro
               Leaf Professional
               Memorator Professional
@@ -91,7 +92,11 @@
               Memorator Pro 5xHS
               USBcan Light 4xHS
               USBcan Pro 2xHS v2
+              USBcan Pro 4xHS
               USBcan Pro 5xHS
+              U100
+              U100P
+              U100S
  -----------+------------------------+-------------
   USB         USBcanII                 usbcanII
               Memorator
@@ -179,7 +184,7 @@ Compilation:
 
   Note: See the note above, regarding the kvcommon driver.
 
-* To build with debug printouts:
+* To build with debug printouts, and include gdb debug information on generated binaries:
 
     "make KV_DEBUG_ON=1"
 

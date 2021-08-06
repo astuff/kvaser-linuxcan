@@ -159,6 +159,9 @@ Macros</h2></td></tr>
 <tr class="memitem:a5b963aa088e98a68d497ba57a285b3dd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a5b963aa088e98a68d497ba57a285b3dd">kvlcERR_RESULT_TOO_BIG</a>&#160;&#160;&#160;((<a class="el" href="kvlclib_8h.html#a0b9cf61f2cc7afc5765a9432153e6fa8">KvlcStatus</a>)-34)</td></tr>
 <tr class="memdesc:a5b963aa088e98a68d497ba57a285b3dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Result is too big for an out-parameter.  <a href="#a5b963aa088e98a68d497ba57a285b3dd">More...</a><br /></td></tr>
 <tr class="separator:a5b963aa088e98a68d497ba57a285b3dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af565cee958b67de272f959d553d64163"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#af565cee958b67de272f959d553d64163">kvlcERR_UNSUPPORTED_VERSION</a>&#160;&#160;&#160;((<a class="el" href="kvlclib_8h.html#a0b9cf61f2cc7afc5765a9432153e6fa8">KvlcStatus</a>)-35)</td></tr>
+<tr class="memdesc:af565cee958b67de272f959d553d64163"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsupported version of file format.  <a href="#af565cee958b67de272f959d553d64163">More...</a><br /></td></tr>
+<tr class="separator:af565cee958b67de272f959d553d64163"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">FILE_FORMAT_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="FILE_FORMAT_xxx"></a> Format used for input and output, used in <a class="el" href="group__kvlc__converter.html#ga35c9e5d685d55d17308e7755dd96c35c">kvlcSetInputFile()</a>, <a class="el" href="group__kvlc__memorator.html#ga607112a97a47dc861595b8928f08839f">kvlcFeedSelectFormat()</a>.</p>
 <dl class="section note"><dt>Note</dt><dd>Not all formats are valid as both output and input format. </dd></dl>
@@ -217,6 +220,9 @@ Macros</h2></td></tr>
 <tr class="memitem:a6b2ed45c5c5567a410ab7bd2a0f8cb8b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a6b2ed45c5c5567a410ab7bd2a0f8cb8b">KVLC_FILE_FORMAT_MDF_4X_SIGNAL</a>&#160;&#160;&#160;108</td></tr>
 <tr class="memdesc:a6b2ed45c5c5567a410ab7bd2a0f8cb8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output file format.  <a href="#a6b2ed45c5c5567a410ab7bd2a0f8cb8b">More...</a><br /></td></tr>
 <tr class="separator:a6b2ed45c5c5567a410ab7bd2a0f8cb8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e92f1061c45f91146150f8364915438"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a7e92f1061c45f91146150f8364915438">KVLC_FILE_FORMAT_VECTOR_BLF_FD</a>&#160;&#160;&#160;109</td></tr>
+<tr class="memdesc:a7e92f1061c45f91146150f8364915438"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input and output file format.  <a href="#a7e92f1061c45f91146150f8364915438">More...</a><br /></td></tr>
+<tr class="separator:a7e92f1061c45f91146150f8364915438"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7492188e5f5888616dd42d7598cfaf40"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a7492188e5f5888616dd42d7598cfaf40">KVLC_FILE_FORMAT_XCP</a>&#160;&#160;&#160;200</td></tr>
 <tr class="memdesc:a7492188e5f5888616dd42d7598cfaf40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not supported.  <a href="#a7492188e5f5888616dd42d7598cfaf40">More...</a><br /></td></tr>
 <tr class="separator:a7492188e5f5888616dd42d7598cfaf40"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -230,19 +236,14 @@ Macros</h2></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="PROPERTY_xxx"></a> Converter properties used in the output format. These are used in <a class="el" href="group__kvlc__converter.html#ga5c66494a5c025af27b0eace33e02dbf9">kvlcSetProperty()</a>, <a class="el" href="group__kvlc__converter.html#ga94e72f6db13869a2eff923540c2a2d4a">kvlcGetProperty()</a>, <a class="el" href="group__kvlc__converter.html#gaa674bba6c26b0146d416051b4d048d7c">kvlcGetWriterPropertyDefault()</a> and <a class="el" href="group__kvlc__output.html#ga2f671daa7746e63fb8697f914904f19e">kvlcIsPropertySupported()</a>. </p>
 </div></td></tr>
 <tr class="memitem:a6ea91cbff0e6455271dd12476af9a09e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a6ea91cbff0e6455271dd12476af9a09e">KVLC_PROPERTY_START_OF_MEASUREMENT</a>&#160;&#160;&#160;1</td></tr>
-<tr class="memdesc:a6ea91cbff0e6455271dd12476af9a09e"><td class="mdescLeft">&#160;</td><td class="mdescRight">(int) Use start of measurement as time reference.  <a href="#a6ea91cbff0e6455271dd12476af9a09e">More...</a><br /></td></tr>
 <tr class="separator:a6ea91cbff0e6455271dd12476af9a09e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c8cdb09ec62493c245ef429d121dc46"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a3c8cdb09ec62493c245ef429d121dc46">KVLC_PROPERTY_FIRST_TRIGGER</a>&#160;&#160;&#160;2</td></tr>
-<tr class="memdesc:a3c8cdb09ec62493c245ef429d121dc46"><td class="mdescLeft">&#160;</td><td class="mdescRight">(int) Use first trigger as time reference.  <a href="#a3c8cdb09ec62493c245ef429d121dc46">More...</a><br /></td></tr>
 <tr class="separator:a3c8cdb09ec62493c245ef429d121dc46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5975797ef48d757c9905c88f48f4668a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a5975797ef48d757c9905c88f48f4668a">KVLC_PROPERTY_USE_OFFSET</a>&#160;&#160;&#160;3</td></tr>
-<tr class="memdesc:a5975797ef48d757c9905c88f48f4668a"><td class="mdescLeft">&#160;</td><td class="mdescRight">(int) Use offset as time reference.  <a href="#a5975797ef48d757c9905c88f48f4668a">More...</a><br /></td></tr>
 <tr class="separator:a5975797ef48d757c9905c88f48f4668a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84e1c9268ef1ebe5fa7ada1632600b1e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a84e1c9268ef1ebe5fa7ada1632600b1e">KVLC_PROPERTY_OFFSET</a>&#160;&#160;&#160;4</td></tr>
-<tr class="memdesc:a84e1c9268ef1ebe5fa7ada1632600b1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">(time_int64) Time reference offset.  <a href="#a84e1c9268ef1ebe5fa7ada1632600b1e">More...</a><br /></td></tr>
 <tr class="separator:a84e1c9268ef1ebe5fa7ada1632600b1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7eebc5b67ba0db21c873eb4a846cbb64"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a7eebc5b67ba0db21c873eb4a846cbb64">KVLC_PROPERTY_CHANNEL_MASK</a>&#160;&#160;&#160;5</td></tr>
-<tr class="memdesc:a7eebc5b67ba0db21c873eb4a846cbb64"><td class="mdescLeft">&#160;</td><td class="mdescRight">(unsigned int) Bitmask of the channels that should be used during conversion.  <a href="#a7eebc5b67ba0db21c873eb4a846cbb64">More...</a><br /></td></tr>
 <tr class="separator:a7eebc5b67ba0db21c873eb4a846cbb64"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05730375f307129b4eccf720cb11c28e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a05730375f307129b4eccf720cb11c28e">KVLC_PROPERTY_HLP_J1939</a>&#160;&#160;&#160;6</td></tr>
 <tr class="memdesc:a05730375f307129b4eccf720cb11c28e"><td class="mdescLeft">&#160;</td><td class="mdescRight">(int) Interpret events as J1939.  <a href="#a05730375f307129b4eccf720cb11c28e">More...</a><br /></td></tr>
@@ -293,7 +294,6 @@ Macros</h2></td></tr>
 <tr class="memdesc:a1f91e7a1ca07dda8c579ad67a2316d90"><td class="mdescLeft">&#160;</td><td class="mdescRight">(int) Add a counter to the output.  <a href="#a1f91e7a1ca07dda8c579ad67a2316d90">More...</a><br /></td></tr>
 <tr class="separator:a1f91e7a1ca07dda8c579ad67a2316d90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed461e13f90e9925c7725509c4f3c9fb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#aed461e13f90e9925c7725509c4f3c9fb">KVLC_PROPERTY_CROP_PRETRIGGER</a>&#160;&#160;&#160;22</td></tr>
-<tr class="memdesc:aed461e13f90e9925c7725509c4f3c9fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">(int) Crop pre-triggers.  <a href="#aed461e13f90e9925c7725509c4f3c9fb">More...</a><br /></td></tr>
 <tr class="separator:aed461e13f90e9925c7725509c4f3c9fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad842dd09a9187a7a7f9b26a0f9e81f7e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#ad842dd09a9187a7a7f9b26a0f9e81f7e">KVLC_PROPERTY_ENUM_VALUES</a>&#160;&#160;&#160;23</td></tr>
 <tr class="memdesc:ad842dd09a9187a7a7f9b26a0f9e81f7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">(int) Replace integer values in signals with strings from database.  <a href="#ad842dd09a9187a7a7f9b26a0f9e81f7e">More...</a><br /></td></tr>
@@ -302,34 +302,29 @@ Macros</h2></td></tr>
 <tr class="memdesc:a1f6a704a961942ec86fd72e100736b7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">(unsigned int) Maximum file size in megabytes before starting a new output file.  <a href="#a1f6a704a961942ec86fd72e100736b7e">More...</a><br /></td></tr>
 <tr class="separator:a1f6a704a961942ec86fd72e100736b7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08cc1c9dc6eec80c874fe383d151ed39"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a08cc1c9dc6eec80c874fe383d151ed39">KVLC_PROPERTY_TIME_LIMIT</a>&#160;&#160;&#160;25</td></tr>
-<tr class="memdesc:a08cc1c9dc6eec80c874fe383d151ed39"><td class="mdescLeft">&#160;</td><td class="mdescRight">(unsigned int) Maximum delta time in seconds between first and last event before starting a new output file.  <a href="#a08cc1c9dc6eec80c874fe383d151ed39">More...</a><br /></td></tr>
 <tr class="separator:a08cc1c9dc6eec80c874fe383d151ed39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:addc4891b200159e18e35d8f2a611018e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#addc4891b200159e18e35d8f2a611018e">KVLC_PROPERTY_LIMIT_DATA_BYTES</a>&#160;&#160;&#160;26</td></tr>
-<tr class="memdesc:addc4891b200159e18e35d8f2a611018e"><td class="mdescLeft">&#160;</td><td class="mdescRight">(int) Number of data bytes that a converter will write.  <a href="#addc4891b200159e18e35d8f2a611018e">More...</a><br /></td></tr>
 <tr class="separator:addc4891b200159e18e35d8f2a611018e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a36412a31040888bba5624cc65e7d6253"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a36412a31040888bba5624cc65e7d6253">KVLC_PROPERTY_CREATION_DATE</a>&#160;&#160;&#160;27</td></tr>
 <tr class="memdesc:a36412a31040888bba5624cc65e7d6253"><td class="mdescLeft">&#160;</td><td class="mdescRight">(time_int64) File creation date/time as seconds in standard UNIX format. Used in file headers if not zero.  <a href="#a36412a31040888bba5624cc65e7d6253">More...</a><br /></td></tr>
 <tr class="separator:a36412a31040888bba5624cc65e7d6253"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a367688bca5aa3d831365e58de09ed47a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a367688bca5aa3d831365e58de09ed47a">KVLC_PROPERTY_OVERWRITE</a>&#160;&#160;&#160;28</td></tr>
-<tr class="memdesc:a367688bca5aa3d831365e58de09ed47a"><td class="mdescLeft">&#160;</td><td class="mdescRight">(int) Overwrite existing output files.  <a href="#a367688bca5aa3d831365e58de09ed47a">More...</a><br /></td></tr>
 <tr class="separator:a367688bca5aa3d831365e58de09ed47a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a4abe9a5ecc23802dadebf6a03f75d7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a5a4abe9a5ecc23802dadebf6a03f75d7">KVLC_PROPERTY_TIMEZONE</a>&#160;&#160;&#160;29</td></tr>
 <tr class="memdesc:a5a4abe9a5ecc23802dadebf6a03f75d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">(int) Timezone for absolute timestamps.  <a href="#a5a4abe9a5ecc23802dadebf6a03f75d7">More...</a><br /></td></tr>
 <tr class="separator:a5a4abe9a5ecc23802dadebf6a03f75d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f3247c188312b31149156aa6aa4fcf6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a6f3247c188312b31149156aa6aa4fcf6">KVLC_PROPERTY_FULLY_QUALIFIED_NAMES</a>&#160;&#160;&#160;30</td></tr>
-<tr class="memdesc:a6f3247c188312b31149156aa6aa4fcf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">(int) Write fully qualified names.  <a href="#a6f3247c188312b31149156aa6aa4fcf6">More...</a><br /></td></tr>
 <tr class="separator:a6f3247c188312b31149156aa6aa4fcf6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad022b4b7972e01ebe97063d4db8f7fa0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#ad022b4b7972e01ebe97063d4db8f7fa0">KVLC_PROPERTY_NUMBER_OF_DATA_DECIMALS</a>&#160;&#160;&#160;31</td></tr>
 <tr class="memdesc:ad022b4b7972e01ebe97063d4db8f7fa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">(int) Number of data decimals (0-9).  <a href="#ad022b4b7972e01ebe97063d4db8f7fa0">More...</a><br /></td></tr>
 <tr class="separator:ad022b4b7972e01ebe97063d4db8f7fa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f5b66048477532c1fd41cd8389d5084"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a1f5b66048477532c1fd41cd8389d5084">KVLC_PROPERTY_COMPRESSION_LEVEL</a>&#160;&#160;&#160;32</td></tr>
+<tr class="separator:a1f5b66048477532c1fd41cd8389d5084"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a672a70abb1c2b2fad14d4002cda6bf8a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a672a70abb1c2b2fad14d4002cda6bf8a">KVLC_PROPERTY_SIGNAL_BASED</a>&#160;&#160;&#160;1001</td></tr>
-<tr class="memdesc:a672a70abb1c2b2fad14d4002cda6bf8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes signals and not data frames. Used only with <a class="el" href="group__kvlc__output.html#ga2f671daa7746e63fb8697f914904f19e">kvlcIsPropertySupported()</a>.  <a href="#a672a70abb1c2b2fad14d4002cda6bf8a">More...</a><br /></td></tr>
 <tr class="separator:a672a70abb1c2b2fad14d4002cda6bf8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a788a2d01da9ea957347441fd1e020da0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a788a2d01da9ea957347441fd1e020da0">KVLC_PROPERTY_SHOW_SIGNAL_SELECT</a>&#160;&#160;&#160;1002</td></tr>
-<tr class="memdesc:a788a2d01da9ea957347441fd1e020da0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Requires a database. Used only with <a class="el" href="group__kvlc__output.html#ga2f671daa7746e63fb8697f914904f19e">kvlcIsPropertySupported()</a>.  <a href="#a788a2d01da9ea957347441fd1e020da0">More...</a><br /></td></tr>
 <tr class="separator:a788a2d01da9ea957347441fd1e020da0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59112cfd3687332a95e078db3024049a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kvlclib_8h.html#a59112cfd3687332a95e078db3024049a">KVLC_PROPERTY_ATTACHMENTS</a>&#160;&#160;&#160;1003</td></tr>
-<tr class="memdesc:a59112cfd3687332a95e078db3024049a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Can attach files to converted data. Use <a class="el" href="group__kvlc__converter.html#ga16f29807a405b832eb6250b104711c9e">kvlcAttachFile()</a> to add a file. Used only with <a class="el" href="group__kvlc__output.html#ga2f671daa7746e63fb8697f914904f19e">kvlcIsPropertySupported()</a>.  <a href="#a59112cfd3687332a95e078db3024049a">More...</a><br /></td></tr>
 <tr class="separator:a59112cfd3687332a95e078db3024049a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
@@ -752,6 +747,22 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a7e92f1061c45f91146150f8364915438"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e92f1061c45f91146150f8364915438">&#9670;&nbsp;</a></span>KVLC_FILE_FORMAT_VECTOR_BLF_FD</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define KVLC_FILE_FORMAT_VECTOR_BLF_FD&#160;&#160;&#160;109</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Input and output file format. </p>
+
+</div>
+</div>
 <a id="a7492188e5f5888616dd42d7598cfaf40"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7492188e5f5888616dd42d7598cfaf40">&#9670;&nbsp;</a></span>KVLC_FILE_FORMAT_XCP</h2>
 
@@ -779,7 +790,6 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
 <p>Can attach files to converted data. Use <a class="el" href="group__kvlc__converter.html#ga16f29807a405b832eb6250b104711c9e">kvlcAttachFile()</a> to add a file. Used only with <a class="el" href="group__kvlc__output.html#ga2f671daa7746e63fb8697f914904f19e">kvlcIsPropertySupported()</a>. </p>
 
 </div>
@@ -811,8 +821,24 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Bitmask of the channels that should be used during conversion.</p>
+<p>Type: <code>unsigned</code> int </p>
 
-<p>(unsigned int) Bitmask of the channels that should be used during conversion. </p>
+</div>
+</div>
+<a id="a1f5b66048477532c1fd41cd8389d5084"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f5b66048477532c1fd41cd8389d5084">&#9670;&nbsp;</a></span>KVLC_PROPERTY_COMPRESSION_LEVEL</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define KVLC_PROPERTY_COMPRESSION_LEVEL&#160;&#160;&#160;32</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>ZLIB compression level for writers that use ZLIB for compression. [-1, 9].</p>
+<div class="fragment"><div class="line">NO_COMPRESSION         0</div><div class="line">BEST_SPEED             1</div><div class="line">BEST_COMPRESSION       9</div><div class="line">DEFAULT_COMPRESSION  (-1)</div></div><!-- fragment --><p>Type: <code>int</code> </p>
 
 </div>
 </div>
@@ -843,8 +869,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>(int) Crop pre-triggers. </p>
+<p>Crop pre-triggers.</p>
+<p>Type: <code>int</code> </p>
 
 </div>
 </div>
@@ -923,8 +949,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>(int) Use first trigger as time reference. </p>
+<p>Use first trigger as time reference.</p>
+<p>Type: <code>int</code> </p>
 
 </div>
 </div>
@@ -939,8 +965,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>(int) Write fully qualified names. </p>
+<p>Write fully qualified names.</p>
+<p>Type: <code>int</code> </p>
 
 </div>
 </div>
@@ -1003,8 +1029,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>(int) Number of data bytes that a converter will write. </p>
+<p>Number of data bytes that a converter will write.</p>
+<p>Type: <code>int</code> </p>
 
 </div>
 </div>
@@ -1083,8 +1109,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>(time_int64) Time reference offset. </p>
+<p>Time reference offset.</p>
+<p>Type: <a class="el" href="kvlclib_8h.html#a2ac7d78d16323e3284c868eebad5816a">time_int64</a> </p>
 
 </div>
 </div>
@@ -1099,8 +1125,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>(int) Overwrite existing output files. </p>
+<p>Overwrite existing output files.</p>
+<p>Type: <code>int</code> </p>
 
 </div>
 </div>
@@ -1163,7 +1189,6 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
 <p>Requires a database. Used only with <a class="el" href="group__kvlc__output.html#ga2f671daa7746e63fb8697f914904f19e">kvlcIsPropertySupported()</a>. </p>
 
 </div>
@@ -1195,7 +1220,6 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
 <p>Writes signals and not data frames. Used only with <a class="el" href="group__kvlc__output.html#ga2f671daa7746e63fb8697f914904f19e">kvlcIsPropertySupported()</a>. </p>
 
 </div>
@@ -1227,8 +1251,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>(int) Use start of measurement as time reference. </p>
+<p>Use start of measurement as time reference.</p>
+<p>Type: <code>int</code> </p>
 
 </div>
 </div>
@@ -1243,8 +1267,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>(unsigned int) Maximum delta time in seconds between first and last event before starting a new output file. </p>
+<p>Maximum delta time in seconds between first and last event before starting a new output file.</p>
+<p>Type: <code>unsigned</code> int </p>
 
 </div>
 </div>
@@ -1275,8 +1299,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>(int) Use offset as time reference. </p>
+<p>Use offset as time reference.</p>
+<p>Type: <code>int</code> </p>
 
 </div>
 </div>
@@ -1600,6 +1624,22 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="af565cee958b67de272f959d553d64163"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af565cee958b67de272f959d553d64163">&#9670;&nbsp;</a></span>kvlcERR_UNSUPPORTED_VERSION</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define kvlcERR_UNSUPPORTED_VERSION&#160;&#160;&#160;((<a class="el" href="kvlclib_8h.html#a0b9cf61f2cc7afc5765a9432153e6fa8">KvlcStatus</a>)-35)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Unsupported version of file format. </p>
+
+</div>
+</div>
 <a id="ad1253023c2b7732257d81940e0049a90"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad1253023c2b7732257d81940e0049a90">&#9670;&nbsp;</a></span>kvlcFail</h2>
 
@@ -1744,7 +1784,7 @@ Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="kvlclib_8h.html">kvlclib.h</a></li>
-    <li class="footer"> (canlib 5.34) Wed Sep 9 2020</li>
+    <li class="footer"> (canlib 5.35) Tue Feb 16 2021</li>
   </ul>
 </div>
 </body>

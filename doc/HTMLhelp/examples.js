@@ -1,10 +1,11 @@
 var examples =
 [
-    [ "busparms.c", "busparms_8c-example.html", null ],
+    [ "busparams.c", "busparams_8c-example.html", null ],
     [ "cancount.c", "cancount_8c-example.html", null ],
     [ "canfdmonitor.c", "canfdmonitor_8c-example.html", null ],
     [ "canfdwrite.c", "canfdwrite_8c-example.html", null ],
     [ "canmonitor.c", "canmonitor_8c-example.html", null ],
+    [ "example/c/busparams_tq.c", "example_2c_2busparams_tq_8c-example.html", null ],
     [ "example/c/candb_sample.c", "example_2c_2candb_sample_8c-example.html", null ],
     [ "how-to/c/listChannels.c", "how-to_2c_2list_channels_8c-example.html", null ],
     [ "how-to/c/openChannels.c", "how-to_2c_2open_channels_8c-example.html", null ],

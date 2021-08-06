@@ -93,20 +93,22 @@ static void printUsageAndExit(char *prgName)
   exit(1);
 }
 
-static void sighand(int sig)
+static void sighand(int sig, siginfo_t *info, void *ucontext)
 {
   static unsigned int last;
+  (void) info;
+  (void) ucontext;
 
   switch (sig) {
-  case SIGINT:
-    break;
-  case SIGALRM:
-    if (msgCounter != last) {
-      printf("rx : %u total: %u\n", msgCounter - last, msgCounter);
-    }
-    last = msgCounter;
-    alarm(ALARM_INTERVAL_IN_S);
-    break;
+    case SIGINT:
+      break;
+    case SIGALRM:
+      if (msgCounter != last) {
+        printf("rx : %u total: %u\n", msgCounter - last, msgCounter);
+      }
+      last = msgCounter;
+      alarm(ALARM_INTERVAL_IN_S);
+      break;
   }
 }
 
@@ -115,6 +117,7 @@ int main(int argc, char *argv[])
   canHandle hnd;
   canStatus stat;
   int channel;
+  struct sigaction sigact;
 
   if (argc != 2) {
     printUsageAndExit(argv[0]);
@@ -129,14 +132,22 @@ int main(int argc, char *argv[])
     }
   }
 
-  printf("Reading messages on channel %d\n", channel);
+  /* Use sighand as our signal handler for SIGALRM */
+  sigact.sa_flags = SA_SIGINFO | SA_RESTART;
+  sigemptyset(&sigact.sa_mask);
+  sigact.sa_sigaction = sighand;
+  if (sigaction(SIGALRM, &sigact, NULL) != 0) {
+    perror("sigaction SIGALRM failed");
+    return -1;
+  }
+  /* Use sighand and allow SIGINT to interrupt syscalls */
+  sigact.sa_flags = SA_SIGINFO;
+  if (sigaction(SIGINT, &sigact, NULL) != 0) {
+    perror("sigaction SIGINT failed");
+    return -1;
+  }
 
-  /* Use sighand as our signal handler */
-  signal(SIGALRM, sighand);
-  signal(SIGINT, sighand);
-
-  /* Allow signals to interrupt syscalls */
-  siginterrupt(SIGINT, 1);
+  printf("Reading CAN FD messages on channel %d\n", channel);
 
   canInitializeLibrary();
 
@@ -147,7 +158,6 @@ int main(int argc, char *argv[])
     check("", hnd);
     return -1;
   }
-
   stat = canSetBusParams(hnd, canFD_BITRATE_1M_80P, 0, 0, 0, 0, 0);
   check("canSetBusParams", stat);
   if (stat != canOK) {
@@ -188,7 +198,7 @@ int main(int argc, char *argv[])
       if (flag & canFDMSG_FDF) {
         if (flag & canFDMSG_BRS) {
           can_std = "FD+";
-          }
+        }
         else {
           can_std = "FD ";
         }
@@ -229,7 +239,7 @@ int main(int argc, char *argv[])
 
   } while (stat == canOK);
 
-  sighand(SIGALRM);
+  sighand(SIGALRM, NULL, NULL);
 
 ErrorExit:
 

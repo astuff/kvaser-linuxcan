@@ -6,6 +6,5 @@ var modules =
     [ "kvlclib", "group__grp__kvlc.html", "group__grp__kvlc" ],
     [ "kvmlib", "group__grp__kvm.html", "group__grp__kvm" ],
     [ "kvaMemoLibXML", "group__grp__kvaxml.html", "group__grp__kvaxml" ],
-    [ "kvrlib", "group__grp__kvrlib.html", null ],
-    [ "kvdiag", "group__grp__kvdiag.html", "group__grp__kvdiag" ]
+    [ "kvrlib", "group__grp__kvrlib.html", null ]
 ];

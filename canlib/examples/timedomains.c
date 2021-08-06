@@ -103,8 +103,8 @@ int main (int argc, char *argv[])
 
   if (n > NUMBER_OF_CHANNELS) {
     printf("Error: Too many channels. Got %d, expected no more than %d. "
-        "Increase NUMBER_OF_CHANNELS and rebuild this example.\n",
-        n, NUMBER_OF_CHANNELS);
+           "Increase NUMBER_OF_CHANNELS and rebuild this example.\n",
+           n, NUMBER_OF_CHANNELS);
     printUsageAndExit(argv[0]);
   }
 

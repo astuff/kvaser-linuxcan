@@ -9,6 +9,7 @@ var group__can__general =
     [ "canInitializeLibrary", "group__can__general.html#gaff1ec1d3416d3bdd56336a7b9ac008b1", null ],
     [ "canIoCtl", "group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12", null ],
     [ "canUnloadLibrary", "group__can__general.html#ga0d1c0e54ea20c3e3b328a32eb10c7b47", null ],
+    [ "kvAnnounceIdentityEx", "group__can__general.html#ga1c6db083e9def9c4d38b4a5226b5f77c", null ],
     [ "kvDeviceGetMode", "group__can__general.html#ga2f80c456dd1653ffe8a9062de3e1ad76", null ],
     [ "kvDeviceSetMode", "group__can__general.html#ga8ec3c64b63e50ff210294001bdbad7c3", null ],
     [ "kvFlashLeds", "group__can__general.html#gad3d0fc1bf752047f6e24020c478aeffd", null ],

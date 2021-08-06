@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['kdi_5fdefault_5fmax_5fsample_5fsize',['KDI_DEFAULT_MAX_SAMPLE_SIZE',['../kv_diag_8h.html#a37907e79fc7ecbe5e0e7481b9223c780',1,'kvDiag.h']]],
   ['kvadb_5fdatabase_5fj1939',['KVADB_DATABASE_J1939',['../kva_db_lib_8h.html#a9537a62c44999b70c79253ee1271e128',1,'kvaDbLib.h']]],
   ['kvadb_5fmessage_5fext',['KVADB_MESSAGE_EXT',['../kva_db_lib_8h.html#acb793e70d95b7daf6045c6dd9cc8792d',1,'kvaDbLib.h']]],
   ['kvadb_5fmessage_5fj1939',['KVADB_MESSAGE_J1939',['../kva_db_lib_8h.html#a0cb969b5cbf74422ee7064b6b8a355f7',1,'kvaDbLib.h']]],
@@ -73,10 +72,12 @@ var searchData=
   ['kvlc_5ffile_5fformat_5fplain_5fasc',['KVLC_FILE_FORMAT_PLAIN_ASC',['../kvlclib_8h.html#a9715f06464339ebfff01706842ddf80f',1,'kvlclib.h']]],
   ['kvlc_5ffile_5fformat_5fvector_5fasc',['KVLC_FILE_FORMAT_VECTOR_ASC',['../kvlclib_8h.html#a252c09811841325130b340b063fe7929',1,'kvlclib.h']]],
   ['kvlc_5ffile_5fformat_5fvector_5fblf',['KVLC_FILE_FORMAT_VECTOR_BLF',['../kvlclib_8h.html#abec6abce4380094f497d652ed73851f0',1,'kvlclib.h']]],
+  ['kvlc_5ffile_5fformat_5fvector_5fblf_5ffd',['KVLC_FILE_FORMAT_VECTOR_BLF_FD',['../kvlclib_8h.html#a7e92f1061c45f91146150f8364915438',1,'kvlclib.h']]],
   ['kvlc_5ffile_5fformat_5fxcp',['KVLC_FILE_FORMAT_XCP',['../kvlclib_8h.html#a7492188e5f5888616dd42d7598cfaf40',1,'kvlclib.h']]],
   ['kvlc_5fproperty_5fattachments',['KVLC_PROPERTY_ATTACHMENTS',['../kvlclib_8h.html#a59112cfd3687332a95e078db3024049a',1,'kvlclib.h']]],
   ['kvlc_5fproperty_5fcalendar_5ftime_5fstamps',['KVLC_PROPERTY_CALENDAR_TIME_STAMPS',['../kvlclib_8h.html#aae5ccde884e49f6bcf3bb3f3621c17f4',1,'kvlclib.h']]],
   ['kvlc_5fproperty_5fchannel_5fmask',['KVLC_PROPERTY_CHANNEL_MASK',['../kvlclib_8h.html#a7eebc5b67ba0db21c873eb4a846cbb64',1,'kvlclib.h']]],
+  ['kvlc_5fproperty_5fcompression_5flevel',['KVLC_PROPERTY_COMPRESSION_LEVEL',['../kvlclib_8h.html#a1f5b66048477532c1fd41cd8389d5084',1,'kvlclib.h']]],
   ['kvlc_5fproperty_5fcreation_5fdate',['KVLC_PROPERTY_CREATION_DATE',['../kvlclib_8h.html#a36412a31040888bba5624cc65e7d6253',1,'kvlclib.h']]],
   ['kvlc_5fproperty_5fcrop_5fpretrigger',['KVLC_PROPERTY_CROP_PRETRIGGER',['../kvlclib_8h.html#aed461e13f90e9925c7725509c4f3c9fb',1,'kvlclib.h']]],
   ['kvlc_5fproperty_5fdata_5fin_5fhex',['KVLC_PROPERTY_DATA_IN_HEX',['../kvlclib_8h.html#ad473863808da64541dc6fe988f4ac39a',1,'kvlclib.h']]],
@@ -126,6 +127,7 @@ var searchData=
   ['kvlcerr_5fresult_5ftoo_5fbig',['kvlcERR_RESULT_TOO_BIG',['../kvlclib_8h.html#a5b963aa088e98a68d497ba57a285b3dd',1,'kvlclib.h']]],
   ['kvlcerr_5ftime_5fdecreasing',['kvlcERR_TIME_DECREASING',['../kvlclib_8h.html#aa648da61033bb162c5a977eff01d21f6',1,'kvlclib.h']]],
   ['kvlcerr_5ftype_5fmismatch',['kvlcERR_TYPE_MISMATCH',['../kvlclib_8h.html#a95d58af3ce169304d3d3614ea5433e37',1,'kvlclib.h']]],
+  ['kvlcerr_5funsupported_5fversion',['kvlcERR_UNSUPPORTED_VERSION',['../kvlclib_8h.html#af565cee958b67de272f959d553d64163',1,'kvlclib.h']]],
   ['kvlcfail',['kvlcFail',['../kvlclib_8h.html#ad1253023c2b7732257d81940e0049a90',1,'kvlclib.h']]],
   ['kvlcok',['kvlcOK',['../kvlclib_8h.html#a1d75a67f7d616e0bc534ef1d8c321cf8',1,'kvlclib.h']]],
   ['kvled_5faction_5fall_5fleds_5foff',['kvLED_ACTION_ALL_LEDS_OFF',['../canlib_8h.html#a904471b2f2e1417f37415a0caec61914',1,'canlib.h']]],

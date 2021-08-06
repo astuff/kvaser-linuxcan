@@ -106,6 +106,7 @@ var searchData=
   ['canfd_5fbitrate_5f4m_5f80p',['canFD_BITRATE_4M_80P',['../canlib_8h.html#aa643e5939f0d4d5fff21747e55c76153',1,'canlib.h']]],
   ['canfd_5fbitrate_5f500k_5f80p',['canFD_BITRATE_500K_80P',['../canlib_8h.html#a71dec626b7de7ddd18daf93e535902f4',1,'canlib.h']]],
   ['canfd_5fbitrate_5f8m_5f60p',['canFD_BITRATE_8M_60P',['../canlib_8h.html#ac1d8bd40554b1433f00e4f1bca3f7a8e',1,'canlib.h']]],
+  ['canfd_5fbitrate_5f8m_5f80p',['canFD_BITRATE_8M_80P',['../canlib_8h.html#a1692cfa2b92bf18a666aa040171f5a27',1,'canlib.h']]],
   ['canfdmsg_5fbrs',['canFDMSG_BRS',['../canstat_8h.html#a20c4f6ae319558189eb85d10036e9eea',1,'canstat.h']]],
   ['canfdmsg_5fedl',['canFDMSG_EDL',['../canstat_8h.html#a162be4f6b66c81fa09dc76c268475216',1,'canstat.h']]],
   ['canfdmsg_5fesi',['canFDMSG_ESI',['../canstat_8h.html#aa50c93236b2b28677bcae0f7c1ab3860',1,'canstat.h']]],

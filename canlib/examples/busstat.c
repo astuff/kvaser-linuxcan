@@ -67,9 +67,9 @@
  */
 
 #include <canlib.h>
+#include <canstat.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <vcanevt.h>
 #include <errno.h>
 
 static const long bitrate = canBITRATE_1M;
@@ -84,39 +84,48 @@ static void check(char* id, canStatus stat)
   }
 }
 
-static char* busStatToStr(const unsigned long flag) {
-    char* tempStr = NULL;
-    #define MACRO2STR(x) case x: tempStr = #x; break
-    switch (flag) {
-        MACRO2STR( CHIPSTAT_BUSOFF        );
-        MACRO2STR( CHIPSTAT_ERROR_PASSIVE );
-        MACRO2STR( CHIPSTAT_ERROR_WARNING );
-        MACRO2STR( CHIPSTAT_ERROR_ACTIVE  );
-        default: tempStr = ""; break;
-    }
-    #undef MACRO2STR
-    return tempStr;
+static const char* busStatToStr(const unsigned long flag)
+{
+  switch (flag) {
+    case canSTAT_ERROR_PASSIVE:
+      return "canSTAT_ERROR_PASSIVE";
+
+    case canSTAT_BUS_OFF:
+      return "canSTAT_BUS_OFF";
+
+    case canSTAT_ERROR_WARNING:
+      return "canSTAT_ERROR_WARNING";
+
+    case canSTAT_ERROR_ACTIVE:
+      return "canSTAT_ERROR_ACTIVE";
+
+    default:
+      return "";
+  }
 }
 
 void callback (canNotifyData *nd)
 {
   switch (nd -> eventType) {
-  case canEVENT_STATUS:
-    printf("canEVENT_STATUS\n");
-    printf("busStatus: %s\n", busStatToStr(nd -> info.status.busStatus));
-    printf("TXerror  : %d\n", nd -> info.status.txErrorCounter);
-    printf("RXerror  : %d\n", nd -> info.status.txErrorCounter);
-    printf("Time     : %ld\n", nd -> info.status.time);
-    break;
-  case canEVENT_ERROR:
-    printf("canEVENT_ERROR\n");
-    break;
-  case canEVENT_TX:
-    printf("canEVENT_TX\n");
-    break;
-  case canEVENT_RX:
-    printf("canEVENT_RX\n");
-    break;
+    case canEVENT_STATUS:
+      printf("canEVENT_STATUS\n");
+      printf("busStatus: %s\n", busStatToStr(nd->info.status.busStatus));
+      printf("TXerror  : %u\n", nd->info.status.txErrorCounter);
+      printf("RXerror  : %u\n", nd->info.status.rxErrorCounter);
+      printf("Time     : %lu\n", nd->info.status.time);
+      break;
+
+    case canEVENT_ERROR:
+      printf("canEVENT_ERROR\n");
+      break;
+
+    case canEVENT_TX:
+      printf("canEVENT_TX\n");
+      break;
+
+    case canEVENT_RX:
+      printf("canEVENT_RX\n");
+      break;
   }
   return;
 }

@@ -20,8 +20,15 @@ var page_canlib =
       [ "Open as CAN", "page_user_guide_chips_channels.html#section_user_guide_init_sel_channel_can", null ],
       [ "Open as CAN FD", "page_user_guide_chips_channels.html#section_user_guide_init_sel_channel_canfd", null ],
       [ "Close Channel", "page_user_guide_chips_channels.html#section_user_guide_init_sel_channel_close", null ],
-      [ "Set CAN Bitrate", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_can_tq", null ],
-      [ "Set CAN FD Bitrate", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_canfd_tq", null ],
+      [ "Check Channel Capabilities", "page_user_guide_chips_channels.html#section_user_guide_check_channel_capabilities", null ],
+      [ "Set CAN Bitrate", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_can_tq", [
+        [ "Specifying Bit Timing Parameters", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_can_specify_tq", null ],
+        [ "Using Predefined Bitrate Constants", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_can_predefined", null ]
+      ] ],
+      [ "Set CAN FD Bitrate", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_canfd_tq", [
+        [ "Specifying Bit Timing Parameters", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_canfd_specify_tq", null ],
+        [ "Using Predefined Bitrate Constants", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_canfd_predefined", null ]
+      ] ],
       [ "CAN Driver Modes", "page_user_guide_chips_channels.html#section_user_guide_init_driver_modes", null ],
       [ "Code Sample", "page_user_guide_chips_channels.html#code_sample", null ],
       [ "Legacy Functions", "page_user_guide_chips_channels.html#section_user_guide_init_bit_rate_legacy", [
@@ -77,6 +84,13 @@ var page_canlib =
       [ "Environment Variable", "page_user_guide_kvscript.html#section_user_guide_kvscript_envvar", null ],
       [ "Send Event", "page_user_guide_kvscript.html#section_user_guide_kvscript_send_event", null ]
     ] ],
+    [ "File handling", "page_user_guide_kvfile.html", [
+      [ "Overview", "page_user_guide_kvfile.html#section_user_guide_kvfile_overview", null ],
+      [ "Enumerate files", "page_user_guide_kvfile.html#section_user_guide_kvfile_enumerate_files", null ],
+      [ "Copying files from / to device", "page_user_guide_kvfile.html#section_user_guide_kvfile_copying_files_to_device", null ],
+      [ "Deleting files", "page_user_guide_kvfile.html#section_user_guide_kvfile_deleting_files", null ],
+      [ "Disk formatting", "page_user_guide_kvfile.html#section_user_guide_kvfile_disk_formatting", null ]
+    ] ],
     [ "I/O Pin Handling", "page_user_guide_kviopin.html", [
       [ "Initialize", "page_user_guide_kviopin.html#section_user_guide_kviopin_init", null ],
       [ "Pin information", "page_user_guide_kviopin.html#section_user_guide_kviopin_info", null ],
@@ -85,6 +99,10 @@ var page_canlib =
         [ "Digital Pins", "page_user_guide_kviopin.html#section_user_guide_kviopin_type_digital", null ],
         [ "Relay Pins", "page_user_guide_kviopin.html#section_user_guide_kviopin_type_relay", null ]
       ] ]
+    ] ],
+    [ "Diagnostics API (kvDiag)", "page_user_guide_kvdiag.html", [
+      [ "Setting up an analyzer", "page_user_guide_kvdiag.html#section_uset_guide_kvdiag_setup", null ],
+      [ "Samples", "page_user_guide_kvdiag.html#section_user_guide_kvdiag_samples", null ]
     ] ],
     [ "Message Mailboxes", "page_user_guide_send_recv_mailboxes.html", [
       [ "Message Queue and Buffer Sizes", "page_user_guide_send_recv_mailboxes.html#section_user_guide_send_recv_queue_and_buf_sizes", null ]
@@ -98,12 +116,6 @@ var page_canlib =
       ] ]
     ] ],
     [ "Windows Advanced Topics", "page_user_guide_install.html", null ],
-    [ "Compiling and Compatibility", "page_user_guide_build.html", [
-      [ "Compatibility", "page_user_guide_build.html#section_porting_code_older", null ],
-      [ "Compiling and Linking Your Code", "page_user_guide_build.html#section_user_guide_build_compiling_linking", null ],
-      [ "Deploying Your Application", "page_user_guide_build.html#section_user_guide_build_installation_deploy", null ],
-      [ "Redistributable Files in CANlib SDK", "page_user_guide_build.html#section_user_guide_intro_redistributable", null ]
-    ] ],
     [ "CANlib API Calls Grouped by Function", "page_canlib_api_calls_grouped_by_function.html", [
       [ "Information Services", "page_canlib_api_calls_grouped_by_function.html#section_information", null ],
       [ "Channel Open and Close", "page_canlib_api_calls_grouped_by_function.html#section_open", null ],

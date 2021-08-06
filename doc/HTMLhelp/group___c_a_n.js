@@ -40,5 +40,7 @@ var group___c_a_n =
     [ "canTranslateBaud", "group___c_a_n.html#gaf38b95fce4930347d9986887ec046e13", null ],
     [ "canWrite", "group___c_a_n.html#ga62c185329d6741c90102511e2f37983e", null ],
     [ "canWriteSync", "group___c_a_n.html#ga304cb3a7bc2874c1f8ad361a911bcd5f", null ],
-    [ "canWriteWait", "group___c_a_n.html#ga47d03bfcc31e290284e65211b61f15f3", null ]
+    [ "canWriteWait", "group___c_a_n.html#ga47d03bfcc31e290284e65211b61f15f3", null ],
+    [ "kvBitrateToBusParamsFdTq", "group___c_a_n.html#ga03be920624427856a9fde821ef3f9136", null ],
+    [ "kvBitrateToBusParamsTq", "group___c_a_n.html#gaa666085d9544b2c8db002599595edc37", null ]
 ];

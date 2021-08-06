@@ -65,6 +65,7 @@
 #define _GNU_SOURCE // This is required for recursive mutex support in pthread
 
 #include <stdint.h>
+#include <assert.h>
 #include "vcan_ioctl.h"
 #include "kcan_ioctl.h"
 #include "canIfData.h"
@@ -301,6 +302,58 @@ static canStatus kCanSetOpenMode (HandleData *hData)
   return canOK;
 }
 
+static canStatus kCanReadOpenMode (HandleData *hData)
+{
+  int ret;
+  KCAN_IOCTL_OPEN_MODE_T open_data;
+
+  hData->fd = open(hData->deviceName, O_RDONLY);
+  if (hData->fd == canINVALID_HANDLE) {
+    return canERR_NOTFOUND;
+  }
+
+  memset(&open_data, 0, sizeof(KCAN_IOCTL_OPEN_MODE_T));
+  open_data.action = CAN_MODE_READ;
+  ret = ioctl(hData->fd, KCAN_IOCTL_OPEN_MODE, &open_data);
+  if (ret != 0) {
+    DEBUGPRINT((TXT("kCanReadOpenMode failed!\n")));
+    return errnoToCanStatus(errno);
+  }
+
+  if (open_data.status != CAN_OPEN_MODE_SUCCESS) {
+    DEBUGPRINT((TXT("Error while reading open mode, status %d\n"), open_data.status));
+    return canERR_NOTFOUND;
+  }
+
+  hData->openMode = open_data.mode;
+  close(hData->fd);
+
+  return canOK;
+}
+
+static uint8_t chipBusStatusToCanlibBusStatus(uint8_t chipStatus)
+{
+  switch (chipStatus) {
+    case CHIPSTAT_BUSOFF:
+      return canSTAT_BUS_OFF;
+
+    case CHIPSTAT_ERROR_PASSIVE:
+      return canSTAT_ERROR_PASSIVE;
+
+    case CHIPSTAT_ERROR_WARNING:
+      return canSTAT_ERROR_WARNING;
+
+    case CHIPSTAT_ERROR_ACTIVE:
+      return canSTAT_ERROR_ACTIVE;
+
+    default:
+#if DEBUG
+      assert(0);    // invalid argument value
+#endif /* DEBUG */
+      return 0xFF;  // make error visible
+  }
+}
+
 static void notify (HandleData *hData, VCAN_EVENT *msg, uint32_t *prev_busoff, uint32_t *prev_bus_status)
 {
   canNotifyData *notifyData = &hData->notifyData;
@@ -340,7 +393,7 @@ static void notify (HandleData *hData, VCAN_EVENT *msg, uint32_t *prev_busoff, u
       notifyData->eventType = canEVENT_STATUS;
     }
 
-    notifyData->info.status.busStatus      = chipState->busStatus;
+    notifyData->info.status.busStatus      = chipBusStatusToCanlibBusStatus(chipState->busStatus);
     notifyData->info.status.txErrorCounter = chipState->txErrorCounter;
     notifyData->info.status.rxErrorCounter = chipState->rxErrorCounter;
     notifyData->info.status.time           = (msg->timeStamp * 10UL) / (hData->timerResolution);
@@ -372,7 +425,7 @@ static void notify (HandleData *hData, VCAN_EVENT *msg, uint32_t *prev_busoff, u
   if (!cb2_notify) {
     return;
   }
-  
+
   if (hData->callback) {
     hData->callback(notifyData);
   } else if (hData->callback2) {
@@ -402,11 +455,11 @@ static void *vCanNotifyThread (void *arg)
   //are we buson or busoff?
   {
     VCanRequestChipStatus  chip_status;
-    
+
     if (ioctl(hData->notifyFd, VCAN_IOC_GET_CHIP_STATE, &chip_status)) {
       pthread_exit(0); // When this thread is cancelled, ioctl will be interrupted by a signal.
     }
-    
+
     if (chip_status.busStatus & CHIPSTAT_BUSOFF) {
       busoff = 1;
     } else {
@@ -415,7 +468,7 @@ static void *vCanNotifyThread (void *arg)
 
     bus_status = (uint32_t)chip_status.busStatus;
   }
-  
+
   while (1) {
     pthread_testcancel();
 
@@ -661,7 +714,7 @@ static canStatus vCanBusOn (HandleData *hData)
   if (my_arg.retval == VCANSETBUSON_FAIL) {
     return canERR_INTERNAL;
   }
-  
+
   return canOK;
 }
 
@@ -762,21 +815,21 @@ static canStatus vCanSetBusParamsTq (HandleData          *hData,
     return errnoToCanStatus(errno);
   }
 
-  if ((my_arg.retval_from_driver == VCANSETBUSPARAMSTQ_NO_INIT_ACCESS) && (hData->report_access_errors == 1)) {
+  if (my_arg.retval_from_driver == VCANSETBUSPARAMSTQ_NO_INIT_ACCESS) {
     return canERR_NO_ACCESS;
   }
-  
+
   if (my_arg.retval_from_driver == VCANSETBUSPARAMSTQ_INVALID_HANDLE) {
     return canERR_INVHANDLE;
   }
-  
+
   if (my_arg.retval_from_device == 1) {
-    return canERR_PARAM;
+    return canERR_NOT_SUPPORTED;
   }
 
   if (my_arg.retval_from_device != 0) {
     return canERR_HARDWARE;
-  } 
+  }
 
   return canOK;
 }
@@ -832,7 +885,7 @@ static canStatus vCanGetBusParamsTq(HandleData    *hData,
 {
   int             ret;
   VCanBusParamsTq my_arg;
-  
+
   if (!nominal) {
     return canERR_PARAM;
   }
@@ -1339,27 +1392,27 @@ static canStatus vCanScriptSendEvent(HandleData *hData,
                                      unsigned int data)
 {
   return vCanScript_send_event(hData, slotNo, eventType, eventNo, data);
-} 
+}
 
 
 //======================================================================
 // vCanScriptEnvvarOpen
 //======================================================================
-static kvEnvHandle vCanScriptEnvvarOpen(HandleData *hData, 
+static kvEnvHandle vCanScriptEnvvarOpen(HandleData *hData,
                                         const char* envvarName,
                                         int *envvarType,
                                         int *envvarSize) // returns scriptHandle
 {
-  return vCanScript_envvar_open(hData, envvarName, envvarType, envvarSize); 
+  return vCanScript_envvar_open(hData, envvarName, envvarType, envvarSize);
 }
 
 
 //======================================================================
 // vCanScriptEnvvarClose
 //======================================================================
-static canStatus vCanScriptEnvvarClose(HandleData *hData, int envvarIdx)  
+static canStatus vCanScriptEnvvarClose(HandleData *hData, int envvarIdx)
 {
-  return vCanScript_envvar_close(hData, envvarIdx); 
+  return vCanScript_envvar_close(hData, envvarIdx);
 }
 
 
@@ -1377,7 +1430,7 @@ static canStatus vCanScriptEnvvarSetInt(HandleData *hData, int envvarIdx, int va
 //======================================================================
 static canStatus vCanScriptEnvvarGetInt(HandleData *hData, int envvarIdx, int *val)
 {
-  return vCanScript_envvar_get_int(hData, envvarIdx, val); 
+  return vCanScript_envvar_get_int(hData, envvarIdx, val);
 }
 
 
@@ -1436,7 +1489,7 @@ static canStatus vCanScriptRequestText(HandleData *hData,
 
 //======================================================================
 // vCanScriptGetText
-//======================================================================  
+//======================================================================
 static canStatus vCanScriptGetText(HandleData *hData,
                                    int  *slot,
                                    unsigned long *time,
@@ -1446,7 +1499,7 @@ static canStatus vCanScriptGetText(HandleData *hData,
 {
   return vCanScript_get_text(hData, slot, time, flags, buf, bufsize);
 }
-  
+
 //======================================================================
 // vCanAccept
 //======================================================================
@@ -1641,7 +1694,7 @@ static canStatus vCanWriteWait (HandleData *hData, long id, void *msgPtr,
 //======================================================================
 static canStatus vKvReadTimer64 (HandleData *hData, uint64_t *time)
 {
-  uint64_t tmpTime;
+  uint64_t tmpTime = 0;
 
   if (!time) {
     return canERR_PARAM;
@@ -1660,7 +1713,7 @@ static canStatus vKvReadTimer64 (HandleData *hData, uint64_t *time)
 //======================================================================
 static canStatus vKvReadTimer (HandleData *hData, unsigned int *time)
 {
-  uint64_t tmpTime;
+  uint64_t tmpTime = 0;
   canStatus stat;
 
   if (!time) {
@@ -1681,7 +1734,7 @@ static canStatus vKvReadTimer (HandleData *hData, unsigned int *time)
 static canStatus vCanReadTimer (HandleData *hData, unsigned long *time)
 {
 
-  uint64_t tmpTime;
+  uint64_t tmpTime = 0;
   canStatus stat;
 
   if (!time) {
@@ -1856,17 +1909,10 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
     switch (item) {
       case canCHANNELDATA_BUS_PARAM_LIMITS:
       {
-        VCanBusParamLimits my_arg;
-
-        if (ioctl(fd, VCAN_IOC_GET_BUS_PARAM_LIMITS, &my_arg) == 0) {
-          if (bufsize < sizeof(VCanBusParamLimits)) {
-            err = canERR_PARAM;
-            break;
-          }
-        }
-
-        *(VCanBusParamLimits*)buffer = my_arg;
-        break;
+        // A call to ioctl with flag VCAN_IOC_GET_BUS_PARAM_LIMITS is currently
+        // not implemented for the new tq API. May be subject to change in the
+        // future. As of now, this code snippet should not be reached.
+        return canERR_NOT_IMPLEMENTED;
       }
 
       case canCHANNELDATA_CLOCK_INFO:
@@ -1880,7 +1926,7 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
             break;
           }
         }
-       
+
         *(VCanClockInfo*)buffer = my_arg;
         break;
       }
@@ -2137,7 +2183,7 @@ static canStatus vCanGetChannelData (char *deviceName, int item,
             }
           }
           else {
-	    err = canERR_NOT_IMPLEMENTED;
+            err = canERR_NOT_IMPLEMENTED;
           }
         }
       }
@@ -2771,10 +2817,10 @@ CANOps vCanOps = {
   .kvScriptEnvvarGetInt = vCanScriptEnvvarGetInt,
   .kvScriptEnvvarSetFloat = vCanScriptEnvvarSetFloat,
   .kvScriptEnvvarGetFloat = vCanScriptEnvvarGetFloat,
-  .kvScriptEnvvarSetData  = vCanScriptEnvvarSetData,  
-  .kvScriptEnvvarGetData  = vCanScriptEnvvarGetData,  
-  .kvScriptRequestText = vCanScriptRequestText,  
-  .kvScriptGetText     = vCanScriptGetText,  
+  .kvScriptEnvvarSetData  = vCanScriptEnvvarSetData,
+  .kvScriptEnvvarGetData  = vCanScriptEnvvarGetData,
+  .kvScriptRequestText = vCanScriptRequestText,
+  .kvScriptGetText     = vCanScriptGetText,
   .kvScriptStatus      = vCanScriptStatus,
   .accept              = vCanAccept,
   .write               = vCanWrite,
@@ -2804,4 +2850,5 @@ CANOps vCanOps = {
   .setClockOffset           = vCanSetClockOffset,
   .getCardInfo              = vCanGetCardInfo,
   .getCardInfo2             = vCanGetCardInfo2,
+  .getOpenMode              = kCanReadOpenMode,
 };

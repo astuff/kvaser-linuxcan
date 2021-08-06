@@ -11,25 +11,21 @@ var NAVTREE =
       [ "Where to go from here", "page_linlib.html#section_user_guide_lin_where_to_go_from_here", null ]
     ] ],
     [ "Database API (kvaDbLib)", "page_kvadblib.html", "page_kvadblib" ],
-    [ "Converter API (kvlclib)", "page_kvlclib.html", [
-      [ "Description", "page_kvlclib.html#section_user_guide_kvlclib_1", null ],
-      [ "Naming convention", "page_kvlclib.html#section_user_guide_kvlclib_2", null ],
-      [ "Build an application", "page_kvlclib.html#section_user_guide_kvlclib_3", null ]
-    ] ],
+    [ "Converter API (kvlclib)", "page_kvlclib.html", "page_kvlclib" ],
     [ "Memorator API (kvmlib)", "page_kvmlib.html", [
       [ "Description", "page_kvmlib.html#section_user_guide_kvmlib_1", null ],
       [ "Naming convention", "page_kvmlib.html#section_user_guide_kvmlib_2", null ],
-      [ "Build an application", "page_kvmlib.html#section_user_guide_kvmlib_3", null ]
+      [ "Build an application", "page_kvmlib.html#section_user_guide_kvmlib_3", null ],
+      [ "Where to go from here", "page_kvmlib.html#section_user_guide_kvmlib_where_to_go_from_here", null ]
     ] ],
     [ "Memorator XML API (kvaMemoLibXML)", "page_kvamemolibxml.html", [
       [ "Description", "page_kvamemolibxml.html#section_user_guide_kvamemolibxml_1", null ],
-      [ "Build an application", "page_kvamemolibxml.html#section_user_guide_kvamemolibxml_2", null ]
+      [ "Build an application", "page_kvamemolibxml.html#section_user_guide_kvamemolibxml_2", null ],
+      [ "Where to go from here", "page_kvamemolibxml.html#section_user_guide_kvamemolibxml_where_to_go_from_here", null ]
     ] ],
-    [ "Remote Device API (kvrlib)", "page_kvrlib.html", [
-      [ "Description", "page_kvrlib.html#section_user_guide_kvrlib_1", null ]
-    ] ],
+    [ "Remote Device API (kvrlib)", "page_kvrlib.html", "page_kvrlib" ],
     [ "License and Copyright", "page_license_and_copyright.html", null ],
-    [ "Sample Programs (kvrlib)", "page_user_guide_kvrlib_samples.html", "page_user_guide_kvrlib_samples" ],
+    [ "Compiling and Compatibility", "page_user_guide_build.html", "page_user_guide_build" ],
     [ "Kvaser Support", "page_support.html", null ],
     [ "Deprecated List", "deprecated.html", null ],
     [ "Modules", "modules.html", "modules" ],
@@ -50,14 +46,14 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"canlib_8h.html#abc63331b227da4573dff86d7b119969c",
-"group___c_a_n.html#ga2ca01a0c71b8c3b5204f07b051eb4758",
-"group__kvadb__attributes.html#ga40223b0e02ed37ce5a858a99d41e28b6",
-"group__kvadb__signals.html#gac094c8af277fc9d21315bb190d7ae3fd",
-"group__kvm__rtc.html#ga0545d8d9c2782728d263ed67cbc0efac",
-"kva_memo_lib_x_m_l_8h.html#af101e30719b94a31bfca04d5089dfc0d",
-"page_linlib.html#section_user_guide_lin_lib_1",
-"structkv_time_domain_data__s.html#a9cc0826be3a3477969cc862737e0f334"
+"canlib_8h.html#ab7c70409147e76675e586a7d201f8ae4",
+"group___c_a_n.html#ga03be920624427856a9fde821ef3f9136",
+"group__kvadb__attributes.html#ga25ce4037a1db7a26e3a1f83da0040e76",
+"group__kvadb__signals.html#gaa55f93eb1866e1786e66be587abf1b6f",
+"group__kvm__files.html#ga26c980e4cdd291958cc540b55d1bf481",
+"kva_memo_lib_x_m_l_8h.html#a668c1e6df525480097a3b0af4a516194a9e4594dee0aeee4648f78055bb9211ca",
+"page_canlib_api_calls_grouped_by_function.html#section_time",
+"structkv_clock_info.html#afda10a8365f279d4d95a406787507bde"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
