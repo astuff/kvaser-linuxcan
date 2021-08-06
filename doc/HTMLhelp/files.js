@@ -1,6 +1,5 @@
 var files =
 [
-    [ "bus_params_tq.h", "bus__params__tq_8h.html", "bus__params__tq_8h" ],
     [ "canlib.h", "canlib_8h.html", "canlib_8h" ],
     [ "canstat.h", "canstat_8h.html", "canstat_8h" ],
     [ "kvaDbLib.h", "kva_db_lib_8h.html", "kva_db_lib_8h" ],

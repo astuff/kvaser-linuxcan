@@ -1,0 +1,196 @@
+README for Kvaser standalone firmware upgrade utility
+With this tool it is currently possible to upgrade the firmware of Kvaser PCIe
+devices.
+
+There are two different variants of the Kvaser firmware upgrade utility:
+  * kv_flash_prog, which relies on Kvaser linuxcan drivers and CANlib
+  * kv_flash_prog_mmap, is a standalone tool which does not require
+    any vendor specific driver
+
+The standard variant, kv_flash_prog, is preferred for anyone using Kvaser
+CANlib. The standalone variant, kv_flash_prog_mmap, is preferred when you do
+not want to build and install Kvaser linuxcan drivers nor CANlib. Typically when
+you use SocketCAN.
+This README will only cover the kv_flash_prog_mmap variant.
+See linuxcan/kvflash/README for more details about kv_flash_prog.
+
+With this tool it is possible to upgrade the firmware of Kvaser PCIe devices,
+without any vendor specific driver. Unlike the standard kv_flash_prog variant,
+kv_flash_prog_mmap requires root permissions. And it is not possible to upgrade
+devices that are in use by a driver. If a driver is in use, kv_flash_prog_mmap
+will print an error containing the name of the driver and exit.
+
+Requirements:
+The libpci (libpci-dev) library.
+
+
+By default kv_flash_prog_mmap will execute in interactive mode, where available and
+supported Kvaser devices are listed, the user needs to select one of the listed
+devices. Before the firmware upgrade is started the user need to confirm.
+
+When the --list option is used, it will return a list all compatible devices
+with list index and exit. It is not possible to use any of the other options
+together with --list.
+
+When the --dryrun option is used, the device firmware is compared with the image
+provided by the user, and the firmware is not upgraded.
+
+kv_flash_prog_mmap will exit with a status of zero if firmware upgrade was
+successful. Status zero is also returned when a dry run is successfully executed,
+regardless of whether the image matched or not.
+A status of one will be returned if kv_flash_prog_mmap encountered any errors before
+the image was flashed (e.g file does not exists, permission denied, invalid
+device selection).
+A status of two will be returned if any fatal error occurred during firmware
+upgrade.
+
+
+
+To build kv_flash_prog_mmap
+$ cd linuxcan/kvflash/mmap
+$ make
+$ ./kv_flash_prog_mmap --help
+or
+$ cd linuxcan/kvflash
+$ KV_FLASH_VARIANTS=kv_flash_prog_mmap make
+$ ./mmap/kv_flash_prog_mmap --help
+
+Download the "Kvaser Firmware Update Tool" from the downloads section at
+https://www.kvaser.com. It contains the different firmware image files (*.img).
+unzip the downloaded FwUpdateTool_xx_yy.zip
+The images are sorted after platform. Locate the image matching your device
+(for instance for Kvaser PCIEcan 4xHS use pcie/pciecan_00683_fpgasys.img).
+
+
+
+Interactive usage example
+$ sudo ./kv_flash_prog_mmap FwUpdateTool_4_24/pcie/pciecan_00683_fpgasys.img
+Found 4 supported device(s):
+	Kvaser PCIEcan 4xHS
+	Index   0
+	EAN     73-30130-00683-6
+	SN      11056
+	FW      v2.2.20
+	Driver  kvpciefd_mmap
+	sysfs   /sys/bus/pci/devices/0000:05:00.0
+	Addr    0xf7800000
+
+	Kvaser PCIEcan 4xHS
+	Index   1
+	EAN     73-30130-00683-6
+	SN      10230
+	FW      v2.3.24
+	Driver  kvpciefd_mmap
+	sysfs   /sys/bus/pci/devices/0000:01:00.0
+	Addr    0xf7c00000
+
+	Kvaser PCIEcan 4xHS
+	Index   2
+	EAN     73-30130-00683-6
+	SN      11055
+	FW      v2.2.20
+	Driver  kvpciefd_mmap
+	sysfs   /sys/bus/pci/devices/0000:02:00.0
+	Addr    0xf7b00000
+
+	Kvaser PCIEcan 4xHS
+	Index   3
+	EAN     73-30130-00683-6
+	SN      11027
+	FW      v2.4.25
+	Driver  kvpciefd_mmap
+	sysfs   /sys/bus/pci/devices/0000:03:00.0
+	Addr   0xf7a00000
+
+Select device index [0 - 3]: 1
+About to flash FwUpdateTool_4_24/pcie/pciecan_00683_fpgasys.img
+	Kvaser PCIEcan 4xHS
+	Index   1
+	EAN     73-30130-00683-6
+	SN      10230
+	FW      v2.3.24
+	Driver  kvpciefd_mmap
+	sysfs   /sys/bus/pci/devices/0000:01:00.0
+	Addr    0xf7c00000
+
+Successfully loaded hydra image
+	FwUpdateTool_4_24/pcie/pciecan_00683_fpgasys.img
+	EAN 73-30130-00683-6
+	    v2.4.25
+
+Do you want to continue? [y/N] y
+Firmware upgrade started. Do not interrupt or power down.
+Downloading image...
+
+Download complete (423200000 bytes/s, total 423200 bytes)
+Committing...
+Flash completed, status 0
+The firmware was updated successfully, please power cycle the device
+Note: When updating PCIEcan, a complete shutdown of the computer is required in order to power cycle the device
+
+Finishing...
+
+
+
+It is also possible to execute kv_flash_prog in unattended mode, where no user
+input is required. To specify which device to upgrade either use the
+--device=<EAN:s/n> option, or --device-index=<index>.
+
+Unattended usage example, upgrading device with EAN 73-30130-00683-6 and serial
+number 11055
+$ sudo ./kv_flash_prog_mmap --yes --device=73-30130-00683-6:11055 FwUpdateTool_4_24/pcie/pciecan_00683_fpgasys.img
+About to flash FwUpdateTool_4_24/pcie/pciecan_00683_fpgasys.img onto device with index 2
+	Kvaser PCIEcan 4xHS
+	Index   2
+	EAN     73-30130-00683-6
+	SN      11055
+	FW      v2.2.20
+	Driver  kvpciefd_mmap
+	sysfs   /sys/bus/pci/devices/0000:02:00.0
+	Addr    0xf7b00000
+
+Successfully loaded hydra image
+	FwUpdateTool_4_24/pcie/pciecan_00683_fpgasys.img
+	EAN 73-30130-00683-6
+	    v2.4.25
+
+Firmware upgrade started. Do not interrupt or power down.
+Downloading image...
+
+Download complete (423200000 bytes/s, total 423200 bytes)
+Committing...
+Flash completed, status 0
+The firmware was updated successfully, please power cycle the device
+Note: When updating PCIEcan, a complete shutdown of the computer is required in order to power cycle the device
+
+Finishing...
+
+
+
+Unattended usage example, upgrading device with list index 2
+$ sudo ./kv_flash_prog_mmap --yes --device-index=2 FwUpdateTool_4_24/pcie/pciecan_00683_fpgasys.img
+About to flash FwUpdateTool_4_24/pcie/pciecan_00683_fpgasys.img onto device with index 2
+	Kvaser PCIEcan 4xHS
+	Index   2
+	EAN     73-30130-00683-6
+	SN      11055
+	FW      v2.2.20
+	Driver  kvpciefd_mmap
+	sysfs   /sys/bus/pci/devices/0000:02:00.0
+	Addr    0xf7b00000
+
+Successfully loaded hydra image
+	FwUpdateTool_4_24/pcie/pciecan_00683_fpgasys.img
+	EAN 73-30130-00683-6
+	    v2.4.25
+
+Firmware upgrade started. Do not interrupt or power down.
+Downloading image...
+
+Download complete (423200000 bytes/s, total 423200 bytes)
+Committing...
+Flash completed, status 0
+The firmware was updated successfully, please power cycle the device
+Note: When updating PCIEcan, a complete shutdown of the computer is required in order to power cycle the device
+
+Finishing...

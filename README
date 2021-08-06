@@ -84,7 +84,9 @@
               BlackBird v2
               BlackBird Pro HS v2
               Hybrid 2xCAN/LIN
+              Hybrid CAN/LIN
               Hybrid Pro 2xCAN/LIN
+              Hybrid Pro CAN/LIN
               Leaf Pro HS v2
               Memorator 2xHS v2
               Memorator Light HS v2
@@ -133,6 +135,11 @@ System requirements:
   NOTE! Having versions of the linux headers installed other than that of
         the currently running kernel may cause conflicts and faulty drivers.
 
+* DKMS if you want to the drivers to be built whenever the kernel is upgraded.
+  To install dkms on Ubuntu:
+
+    "sudo apt-get install dkms"
+
 
 Compilation:
 
@@ -165,6 +172,21 @@ Compilation:
 
   Note: if there are multiple versions of linuxcan installed for different linux
         headers, it is possible to remove them all by calling "sudo make purge".
+
+  Another way to install CANlib is by using DKMS which automatically recompiles
+  and reinstalls the CANlib drivers after a kernel upgrade.
+
+  To build and install CANlib and all drivers using DKMS:
+
+    "make dkms"
+
+    "sudo make dkms_install"
+
+  Note: this requires you to have dkms installed.
+
+  To uninstall CANlib and to unload and uninstall all linuxcan DKMS modules:
+
+    "sudo make dkms_uninstall"
 
 * To build just a single driver, go to the corresponding subdirectory:
 

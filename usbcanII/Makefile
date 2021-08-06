@@ -74,7 +74,7 @@ INCLUDES := $(src)/../include/
 # source files
 SRCS := usbcanHWIf.c
 
-ifneq ($(KERNELRELEASE),)
+ifneq ($(src),)
 	RUNDIR := $(src)
 else
 	RUNDIR := $(PWD)

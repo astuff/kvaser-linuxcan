@@ -149,7 +149,6 @@ install:
 	/sbin/ldconfig
 	install -m 644 ../include/canlib.h /usr/include
 	install -m 644 ../include/canstat.h /usr/include
-	install -m 644 ../include/bus_params_tq.h /usr/include
 	install -m 644 ../include/obsolete.h /usr/include
 	mkdir -p /usr/doc/canlib
 	cp -r ../doc/HTMLhelp /usr/doc/canlib

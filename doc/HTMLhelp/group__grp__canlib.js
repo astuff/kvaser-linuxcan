@@ -9,5 +9,5 @@ var group__grp__canlib =
     [ "t-script", "group__t_script.html", "group__t_script" ],
     [ "File Handling", "group__grp__kvfile.html", null ],
     [ "I/O Pin Handling", "group__kv__io.html", "group__kv__io" ],
-    [ "Diagnostics", "group__kvdiag__diagnostics.html", "group__kvdiag__diagnostics" ]
+    [ "CANtegrity API", "group__kvdiag__diagnostics.html", "group__kvdiag__diagnostics" ]
 ];

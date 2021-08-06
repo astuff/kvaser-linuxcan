@@ -6,6 +6,6 @@ var page_user_guide_canlib_samples =
     [ "Multi threading in CANlib", "page_example_c_threads.html", null ],
     [ "Echo server", "page_example_c_canecho.html", null ],
     [ "Send database signal", "page_example_c_gensig.html", null ],
-    [ "Diagnostics with DIAG_PROGRAM_TYPE_NORMAL", "page_example_c_kvdiag_normal.html", null ],
-    [ "Diagnostics with DIAG_PROGRAM_TYPE_AUTOBAUD", "page_example_c_kvdiag_autobaud.html", null ]
+    [ "High frequency sampling with CANtegrity", "page_example_c_kvdiag_normal.html", null ],
+    [ "Bitrate calculation with CANtegrity", "page_example_c_kvdiag_autobaud.html", null ]
 ];

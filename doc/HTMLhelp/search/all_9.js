@@ -288,7 +288,7 @@ var searchData=
   ['kvbitratetobusparamsfdtq',['kvBitrateToBusParamsFdTq',['../group___c_a_n.html#ga03be920624427856a9fde821ef3f9136',1,'canlib.h']]],
   ['kvbitratetobusparamstq',['kvBitrateToBusParamsTq',['../group___c_a_n.html#gaa666085d9544b2c8db002599595edc37',1,'canlib.h']]],
   ['kvbusparamlimits',['kvBusParamLimits',['../structkv_bus_param_limits.html',1,'kvBusParamLimits'],['../canlib_8h.html#af504af7b3820af8ec1ec997f3b0333d3',1,'kvBusParamLimits():&#160;canlib.h']]],
-  ['kvbusparamstq',['kvBusParamsTq',['../structkv_bus_params_tq.html',1,'kvBusParamsTq'],['../bus__params__tq_8h.html#a55095b4ff633151ac4ccf06b1f3df1da',1,'kvBusParamsTq():&#160;bus_params_tq.h']]],
+  ['kvbusparamstq',['kvBusParamsTq',['../structkv_bus_params_tq.html',1,'kvBusParamsTq'],['../group___c_a_n.html#ga55095b4ff633151ac4ccf06b1f3df1da',1,'kvBusParamsTq():&#160;canlib.h']]],
   ['kvbustype_5fgroup_5finternal',['kvBUSTYPE_GROUP_INTERNAL',['../canlib_8h.html#a4d6dedfc7f9a78c23743b59392b824a0',1,'canlib.h']]],
   ['kvbustype_5fgroup_5flocal',['kvBUSTYPE_GROUP_LOCAL',['../canlib_8h.html#aafac1a920ba6f66e52f79f369b1c6035',1,'canlib.h']]],
   ['kvbustype_5fgroup_5fremote',['kvBUSTYPE_GROUP_REMOTE',['../canlib_8h.html#a24f25c256084632b6dadc3352bc3acec',1,'canlib.h']]],

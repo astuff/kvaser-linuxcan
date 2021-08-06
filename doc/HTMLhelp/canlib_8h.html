@@ -91,7 +91,6 @@ $(document).ready(function(){initNavTree('canlib_8h.html','');});
 <div class="textblock"><code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &lt;stdint.h&gt;</code><br />
 <code>#include &quot;<a class="el" href="canstat_8h_source.html">canstat.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="bus__params__tq_8h_source.html">bus_params_tq.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="obsolete_8h_source.html">obsolete.h</a>&quot;</code><br />
 </div>
 <p><a href="canlib_8h_source.html">Go to the source code of this file.</a></p>
@@ -99,6 +98,8 @@ $(document).ready(function(){initNavTree('canlib_8h.html','');});
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcan_notify_data.html">canNotifyData</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkv_bus_params_tq.html">kvBusParamsTq</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkv_clock_info.html">kvClockInfo</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -217,6 +218,8 @@ Macros</h2></td></tr>
 <tr class="separator:ac1d8bd40554b1433f00e4f1bca3f7a8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1692cfa2b92bf18a666aa040171f5a27"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a1692cfa2b92bf18a666aa040171f5a27">canFD_BITRATE_8M_80P</a>&#160;&#160;&#160;(-1005)</td></tr>
 <tr class="separator:a1692cfa2b92bf18a666aa040171f5a27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e16a689103d649b9566bfe2546944ad"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a6e16a689103d649b9566bfe2546944ad">canFD_BITRATE_8M_70P</a>&#160;&#160;&#160;(-1006)</td></tr>
+<tr class="separator:a6e16a689103d649b9566bfe2546944ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0a3340ea8fe8c3be9881bf03bddc23e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#af0a3340ea8fe8c3be9881bf03bddc23e">BAUD_1M</a>&#160;&#160;&#160;(-1)</td></tr>
 <tr class="separator:af0a3340ea8fe8c3be9881bf03bddc23e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9067c488b198464dc4e635eec21bf6c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ac9067c488b198464dc4e635eec21bf6c">BAUD_500K</a>&#160;&#160;&#160;(-2)</td></tr>
@@ -539,9 +542,9 @@ Macros</h2></td></tr>
 <tr class="memitem:a116f1a9d0623257d2b1865669054d0b7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a116f1a9d0623257d2b1865669054d0b7">canCHANNEL_CAP_IO_API</a>&#160;&#160;&#160;0x08000000L</td></tr>
 <tr class="memdesc:a116f1a9d0623257d2b1865669054d0b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used in <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>. Channel has IO API capabilities.  <a href="#a116f1a9d0623257d2b1865669054d0b7">More...</a><br /></td></tr>
 <tr class="separator:a116f1a9d0623257d2b1865669054d0b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0651695dbca39a7c1ed81c96079551ad"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a0651695dbca39a7c1ed81c96079551ad">canCHANNEL_CAP_DIAGNOSTICS</a>&#160;&#160;&#160;0x10000000L</td></tr>
-<tr class="memdesc:a0651695dbca39a7c1ed81c96079551ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used in <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>. Channel has diagnostic capabilities.  <a href="#a0651695dbca39a7c1ed81c96079551ad">More...</a><br /></td></tr>
-<tr class="separator:a0651695dbca39a7c1ed81c96079551ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8cc8a1a1960813e55b753943274d1006"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a8cc8a1a1960813e55b753943274d1006">canCHANNEL_CAP_CANTEGRITY</a>&#160;&#160;&#160;0x10000000L</td></tr>
+<tr class="memdesc:a8cc8a1a1960813e55b753943274d1006"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used in <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>. Channel has CANtegrity capabilities.  <a href="#a8cc8a1a1960813e55b753943274d1006">More...</a><br /></td></tr>
+<tr class="separator:a8cc8a1a1960813e55b753943274d1006"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canCHANNEL_CAP_EX_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canCHANNEL_CAP_EX_xxx"></a> Channel extended capabilities. </p>
 </div></td></tr>
@@ -941,6 +944,8 @@ Typedefs</h2></td></tr>
 <tr class="separator:a75f2e3a4c7b1e47c8c6b25b76975b510"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58db5be8859c14cd8a0c0f6963c64f26"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structcan_notify_data.html">canNotifyData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a58db5be8859c14cd8a0c0f6963c64f26">canNotifyData</a></td></tr>
 <tr class="separator:a58db5be8859c14cd8a0c0f6963c64f26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga55095b4ff633151ac4ccf06b1f3df1da"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structkv_bus_params_tq.html">kvBusParamsTq</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga55095b4ff633151ac4ccf06b1f3df1da">kvBusParamsTq</a></td></tr>
+<tr class="separator:ga55095b4ff633151ac4ccf06b1f3df1da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acfa6eceefcd36704a04b99b8af669528"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structkv_clock_info.html">kvClockInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#acfa6eceefcd36704a04b99b8af669528">kvClockInfo</a></td></tr>
 <tr class="separator:acfa6eceefcd36704a04b99b8af669528"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af504af7b3820af8ec1ec997f3b0333d3"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structkv_bus_param_limits.html">kvBusParamLimits</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#af504af7b3820af8ec1ec997f3b0333d3">kvBusParamLimits</a></td></tr>
@@ -1506,19 +1511,19 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a0651695dbca39a7c1ed81c96079551ad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0651695dbca39a7c1ed81c96079551ad">&#9670;&nbsp;</a></span>canCHANNEL_CAP_DIAGNOSTICS</h2>
+<a id="a8cc8a1a1960813e55b753943274d1006"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8cc8a1a1960813e55b753943274d1006">&#9670;&nbsp;</a></span>canCHANNEL_CAP_CANTEGRITY</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define canCHANNEL_CAP_DIAGNOSTICS&#160;&#160;&#160;0x10000000L</td>
+          <td class="memname">#define canCHANNEL_CAP_CANTEGRITY&#160;&#160;&#160;0x10000000L</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Used in <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>. Channel has diagnostic capabilities. </p>
+<p>Used in <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a>. Channel has CANtegrity capabilities. </p>
 
 </div>
 </div>
@@ -2944,6 +2949,21 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>Used in <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a> when using the CAN FD protocol. Indicates a bitrate of 8.0 Mbit/s and sampling point at 60%. </p>
+
+</div>
+</div>
+<a id="a6e16a689103d649b9566bfe2546944ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e16a689103d649b9566bfe2546944ad">&#9670;&nbsp;</a></span>canFD_BITRATE_8M_70P</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canFD_BITRATE_8M_70P&#160;&#160;&#160;(-1006)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Used in <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a> when using the CAN FD protocol. Indicates a bitrate of 8.0 Mbit/s and sampling point at 70%. </p>
 
 </div>
 </div>
@@ -6742,7 +6762,7 @@ On Linux, the default calling convention is used.</dd></dl>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="canlib_8h.html">canlib.h</a></li>
-    <li class="footer"> (canlib 5.35) Tue Feb 16 2021</li>
+    <li class="footer"> (canlib 5.36) Tue May 25 2021</li>
   </ul>
 </div>
 </body>

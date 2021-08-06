@@ -111,8 +111,10 @@
  *
  * \ingroup grp_canlib
  *
- * \defgroup kvdiag_diagnostics    Diagnostics
- * \brief Diagnostics API Library.
+ * \defgroup kvdiag_diagnostics    CANtegrity API
+ * \brief CANtegrity API
+ * \details The kvDiagXxx functions specify the CANtegrity API, which is based on high frequency sampling of the CAN bus.
+ * To check if a device has CANtegrity support, use \ref canGetChannelData() with the item \ref canCHANNELDATA_CHANNEL_CAP and the flag \ref canCHANNEL_CAP_CANTEGRITY.
  * \ingroup grp_canlib
  *
  */
@@ -159,7 +161,6 @@
 #include <stdint.h>
 
 #include "canstat.h"
-#include "bus_params_tq.h"
 
 /** Handle to an opened circuit, created with \ref canOpenChannel(). */
 typedef int canHandle;
@@ -452,6 +453,10 @@ typedef struct canNotifyData {
     CAN FD protocol. Indicates a bitrate of 8.0 Mbit/s and sampling point at
     80%. */
 #define canFD_BITRATE_8M_80P       (-1005)
+/** Used in \ref canSetBusParams() and \ref canSetBusParamsFd() when using the
+    CAN FD protocol. Indicates a bitrate of 8.0 Mbit/s and sampling point at
+    70%. */
+#define canFD_BITRATE_8M_70P       (-1006)
 
 /** The \ref BAUD_xxx names are deprecated, use \ref canBITRATE_1M instead. */
 #define BAUD_1M              (-1)
@@ -662,6 +667,44 @@ canStatus CANLIBAPI canSetBusParams (const CanHandle hnd,
                                      unsigned int sjw,
                                      unsigned int noSamp,
                                      unsigned int syncmode);
+
+/**
+ * \ingroup CAN
+ *\b Constraints
+ \verbatim
+ Constraints that must be fulfilled when opening channel in classic CAN Mode:
+
+   tq         = 1 + prop + phase1 + phase2
+   tq        >= 3
+   sjw       <= min(phase1, phase2)
+   prescaler >= 1
+ \endverbatim
+*
+ \verbatim
+   Constraints that must be fulfilled when opening channel in CAN FD Mode:
+
+   arbitration.tq         = 1 + arbitration.prop + arbitration.phase1 + arbitration.phase2
+   arbitration.tq        >= 3
+   arbitration.sjw       <= min(arbitration.phase1, arbitration.phase2)
+   arbitration.prescaler >= 1  (<=2 will enable Transmitter Delay Compensation Mechanism)
+
+   data.tq         = 1 + data.phase1 + data.phase2
+   data.tq        >= 3
+   data.sjw       <= min(data.phase1, data.phase2)
+   data.prop       = 0
+   data.prescaler  = arbitration.prescaler
+ \endverbatim
+*
+* Used in \ref canSetBusParamsTq, \ref canSetBusParamsFdTq, \ref canGetBusParamsTq and \ref canGetBusParamsTq
+*/
+typedef struct kvBusParamsTq {
+  int tq;                /**< Total bit time, in number of time quanta. */
+  int phase1;            /**< Phase segment 1, in number of time quanta */
+  int phase2;            /**< Phase segment 2, in number of time quanta */
+  int sjw;               /**< Sync jump width, in number of time quanta */
+  int prop;              /**< Propagation segment, in number of time quanta */
+  int prescaler;         /**< Prescaler */
+} kvBusParamsTq;
 
 /**
  * \ingroup CAN
@@ -2538,7 +2581,7 @@ typedef struct kvBusParamLimits {
 #define canCHANNEL_CAP_SCRIPT            0x02000000L ///< Used in \ref canGetChannelData(). Channel has script capabilities.
 #define canCHANNEL_CAP_LIN_HYBRID        0x04000000L ///< Used in \ref canGetChannelData(). Channel has LIN capabilities.
 #define canCHANNEL_CAP_IO_API            0x08000000L ///< Used in \ref canGetChannelData(). Channel has IO API capabilities.
-#define canCHANNEL_CAP_DIAGNOSTICS       0x10000000L ///< Used in \ref canGetChannelData(). Channel has diagnostic capabilities.
+#define canCHANNEL_CAP_CANTEGRITY        0x10000000L ///< Used in \ref canGetChannelData(). Channel has CANtegrity capabilities.
 
 /**
  * \name canCHANNEL_CAP_EX_xxx
@@ -6159,8 +6202,5 @@ canStatus CANLIBAPI kvIoSetModulePins (const CanHandle hnd, unsigned int module,
 #endif /* __cplusplus */
 
 #include "obsolete.h"
-
-
-
 
 #endif /*  _CANLIB_H_ */

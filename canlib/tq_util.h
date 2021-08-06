@@ -68,7 +68,6 @@
 #ifndef _TQ_UTIL_H
 #define _TQ_UTIL_H
 
-#include "bus_params_tq.h"
 #include "canlib.h"
 
 /*returns -1 if bad arb-parameters, otherwize 0*/

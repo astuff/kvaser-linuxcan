@@ -69,9 +69,17 @@ UDEVCTRL=`which udevcontrol`
 UDEVADM=`which udevadm`
 UDEVD=`which udevd`
 
-install -D -m 644 $MODNAME.ko /lib/modules/`uname -r`/kernel/drivers/usb/misc/$MODNAME.ko
-if [ "$?" -ne 0 ] ; then
-  exit 1
+# Determine wether or not this is called by DKMS
+DKMS_HOOK=0
+if [ "$1" = "dkms-install" -o "$1" = "dkms-load" ]; then
+  DKMS_HOOK=1
+fi
+
+if [ $DKMS_HOOK -eq 0 ]; then
+  install -D -m 644 $MODNAME.ko /lib/modules/`uname -r`/kernel/drivers/usb/misc/$MODNAME.ko
+  if [ "$?" -ne 0 ] ; then
+    exit 1
+  fi
 fi
 install -m 755 $MODNAME.sh /usr/sbin/
 if [ "$?" -ne 0 ] ; then

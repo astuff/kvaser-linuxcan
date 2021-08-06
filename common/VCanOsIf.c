@@ -1560,7 +1560,7 @@ static inline int vcan_ioctl_set_bitrate_tq(VCanChanData *chd,
   }
 
   if (copy_from_user(&my_arg, arg, sizeof(VCanBusParamsTq))) {
-    DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_SET_BITRATE 1\n")));
+    DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_SET_BITRATE_TQ 1\n")));
     return -EFAULT;
   }
 
@@ -1571,7 +1571,7 @@ static inline int vcan_ioctl_set_bitrate_tq(VCanChanData *chd,
   }
 
   if (chd->vCard->card_flags & DEVHND_CARD_REFUSE_TO_USE_CAN) {
-    DEBUGPRINT(2, (TXT("ERROR: VCAN_IOC_SET_BITRATE Refuse to run. returning -EACCES\n")));
+    DEBUGPRINT(2, (TXT("ERROR: VCAN_IOC_SET_BITRATE_TQ Refuse to run. returning -EACCES\n")));
     return -EACCES;
   }
 
@@ -1594,11 +1594,11 @@ static inline int vcan_ioctl_set_bitrate_tq(VCanChanData *chd,
 
   if (*vStat == VCAN_STAT_OK) {
     if (copy_to_user(arg, &my_arg, sizeof(VCanBusParamsTq))) {
-      DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_SET_BITRATE 3\n")));
+      DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_SET_BITRATE_TQ 3\n")));
       return -EFAULT;
     }
   } else {
-    DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_SET_BITRATE 4. stat=%d\n"), *vStat));
+    DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_SET_BITRATE_TQ 4. stat=%d\n"), *vStat));
   }
 
   return 0;
@@ -2089,7 +2089,7 @@ static inline int vcan_ioctl_get_clock_info(VCanChanData *chd,
     my_arg.accuracy_ppm = 100;
 
     if (copy_to_user(arg, &my_arg, sizeof(VCanClockInfo))) {
-      DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_SET_BITRATE 2\n")));
+      DEBUGPRINT(1, (TXT("ERROR: VCAN_IOC_GET_CLOCK_INFO 2\n")));
       return -EFAULT;
     }
   }
@@ -3642,6 +3642,22 @@ static int ioctl_blocking (VCanOpenFileNode *fileNodePtr,
   case KCAN_IOCTL_GET_CARD_INFO_MISC:
     ret = kcan_ioctl_get_card_info_misc(chd, hwIf, &vStat,
                                         (KCAN_IOCTL_MISC_INFO *)arg);
+    break;
+  //------------------------------------------------------------------
+  case KCAN_IOCTL_FLASH_PROG:
+    {
+      KCAN_FLASH_PROG flashProg;
+
+      if (hwIf->deviceFlashProg == NULL) {
+        return -ENOSYS;
+      }
+      copy_from_user_ret(&flashProg, (KCAN_FLASH_PROG *)arg,
+                       sizeof(KCAN_FLASH_PROG), -EFAULT);
+
+      vStat = hwIf->deviceFlashProg(chd, &flashProg);
+
+      copy_to_user_ret((void *)arg, &flashProg, sizeof(flashProg), -EFAULT);
+    }
     break;
   //------------------------------------------------------------------
   default:

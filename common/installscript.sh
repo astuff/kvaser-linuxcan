@@ -73,20 +73,28 @@ KERNEL_VER=`uname -r` # Kernel version at install time
 # append to file in case installer is run several times on different kernels
 echo $KERNEL_VER >> $DIR/kernel_ver
 
-# Check if module is loaded
-MODLOADED=$(lsmod | grep $MODNAME)
-if [ $? -eq 0 ] ; then
-  echo "***********************************************************************"
-  echo "WARNING: $MODNAME is already loaded! It is advised to unplug Kvaser USB"
-  echo "         devices and call 'sudo make uninstall' before doing a new"
-  echo "         installation. Or do a reboot after installation."
-  echo "***********************************************************************"
+# Determine wether or not this is called by DKMS
+DKMS_HOOK=0
+if [ "$1" = "dkms-install" -o "$1" = "dkms-load" ]; then
+  DKMS_HOOK=1
 fi
 
-install -d -m 755 /lib/modules/$KERNEL_VER/kernel/drivers/usb/misc
-install -D -m 644 $MODNAME.ko /lib/modules/$KERNEL_VER/kernel/drivers/usb/misc
-if [ "$?" -ne 0 ] ; then
-  exit 1
+if [ $DKMS_HOOK -eq 0 ]; then
+  # Check if module is loaded
+  MODLOADED=$(lsmod | grep $MODNAME)
+  if [ $? -eq 0 ] ; then
+    echo "***********************************************************************"
+    echo "WARNING: $MODNAME is already loaded! It is advised to unplug Kvaser USB"
+    echo "         devices and call 'sudo make uninstall' before doing a new"
+    echo "         installation. Or do a reboot after installation."
+    echo "***********************************************************************"
+  fi
+
+  install -d -m 755 /lib/modules/$KERNEL_VER/kernel/drivers/usb/misc
+  install -D -m 644 $MODNAME.ko /lib/modules/$KERNEL_VER/kernel/drivers/usb/misc
+  if [ "$?" -ne 0 ] ; then
+    exit 1
+  fi
 fi
 
 if [ "$#" -gt 0 ] && [ $1 = "develinstall" ] ; then
