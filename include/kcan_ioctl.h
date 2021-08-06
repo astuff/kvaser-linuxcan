@@ -144,6 +144,8 @@
 #define KCAN_IOCTL_SCRIPT_SET_ENVVAR            CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 92, METHOD_BUFFERED, FILE_ANY_ACCESS)
 #define KCAN_IOCTL_SCRIPT_GET_ENVVAR            CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 93, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
+#define KCAN_IOCTL_FLASH_PROG                   CTL_CODE (VCAN_DEVICE, KCAN_IOCTL_START + 94, METHOD_BUFFERED, FILE_ANY_ACCESS)
+
 #define KCAN_CARDFLAG_FIRMWARE_BETA       0x01  // Firmware is beta
 #define KCAN_CARDFLAG_FIRMWARE_RC         0x02  // Firmware is release candidate
 #define KCAN_CARDFLAG_AUTO_RESP_OBJBUFS   0x04  // Firmware supports auto-response object buffers
@@ -469,5 +471,5 @@ typedef struct s_kcan_ioctl_card_info_2 {
 } KCAN_IOCTL_CARD_INFO_2;
 
 
+#include "kcan_ioctl_flash.h"
 #endif /* KCANIO_H */
-

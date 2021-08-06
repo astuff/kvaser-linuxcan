@@ -1,5 +1,6 @@
 var NAVTREEINDEX8 =
 {
+"structkv_clock_info.html#aad880fc4455c253781e8968f2239d56f":[14,0,9,4],
 "structkv_clock_info.html#afda10a8365f279d4d95a406787507bde":[14,0,9,2],
 "structkv_diag_sample.html":[14,0,10],
 "structkv_diag_sample.html#a028e7a23cc3979d738320763b3e1a9d5":[14,0,10,8],

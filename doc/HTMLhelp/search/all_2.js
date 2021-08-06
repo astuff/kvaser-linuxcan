@@ -20,7 +20,8 @@ var searchData=
   ['canchannel_5fcap_5fcan_5fdiagnostics',['canCHANNEL_CAP_CAN_DIAGNOSTICS',['../obsolete_8h.html#a4867d2b7df8711010dd7f9441cbafa88',1,'obsolete.h']]],
   ['canchannel_5fcap_5fcan_5ffd',['canCHANNEL_CAP_CAN_FD',['../canlib_8h.html#af46aa24f177eabf4355d89a00fc0ffe4',1,'canlib.h']]],
   ['canchannel_5fcap_5fcan_5ffd_5fnoniso',['canCHANNEL_CAP_CAN_FD_NONISO',['../canlib_8h.html#a45e356713bd5b6f87d15966045a19f1c',1,'canlib.h']]],
-  ['canchannel_5fcap_5fdiagnostics',['canCHANNEL_CAP_DIAGNOSTICS',['../canlib_8h.html#a0651695dbca39a7c1ed81c96079551ad',1,'canlib.h']]],
+  ['canchannel_5fcap_5fcantegrity',['canCHANNEL_CAP_CANTEGRITY',['../canlib_8h.html#a8cc8a1a1960813e55b753943274d1006',1,'canlib.h']]],
+  ['canchannel_5fcap_5fdiagnostics',['canCHANNEL_CAP_DIAGNOSTICS',['../obsolete_8h.html#a0651695dbca39a7c1ed81c96079551ad',1,'obsolete.h']]],
   ['canchannel_5fcap_5ferror_5fcounters',['canCHANNEL_CAP_ERROR_COUNTERS',['../canlib_8h.html#a759fbc45e4c750b1753b1426526ebd4f',1,'canlib.h']]],
   ['canchannel_5fcap_5fex_5fbusparams_5ftq',['canCHANNEL_CAP_EX_BUSPARAMS_TQ',['../canlib_8h.html#aeaa66fdba7afa78344fdebce758fd198',1,'canlib.h']]],
   ['canchannel_5fcap_5fextended_5fcan',['canCHANNEL_CAP_EXTENDED_CAN',['../canlib_8h.html#aea4674f9e6857f681e911f638fd0c00e',1,'canlib.h']]],
@@ -164,6 +165,7 @@ var searchData=
   ['canfd_5fbitrate_5f4m_5f80p',['canFD_BITRATE_4M_80P',['../canlib_8h.html#aa643e5939f0d4d5fff21747e55c76153',1,'canlib.h']]],
   ['canfd_5fbitrate_5f500k_5f80p',['canFD_BITRATE_500K_80P',['../canlib_8h.html#a71dec626b7de7ddd18daf93e535902f4',1,'canlib.h']]],
   ['canfd_5fbitrate_5f8m_5f60p',['canFD_BITRATE_8M_60P',['../canlib_8h.html#ac1d8bd40554b1433f00e4f1bca3f7a8e',1,'canlib.h']]],
+  ['canfd_5fbitrate_5f8m_5f70p',['canFD_BITRATE_8M_70P',['../canlib_8h.html#a6e16a689103d649b9566bfe2546944ad',1,'canlib.h']]],
   ['canfd_5fbitrate_5f8m_5f80p',['canFD_BITRATE_8M_80P',['../canlib_8h.html#a1692cfa2b92bf18a666aa040171f5a27',1,'canlib.h']]],
   ['canfdmsg_5fbrs',['canFDMSG_BRS',['../canstat_8h.html#a20c4f6ae319558189eb85d10036e9eea',1,'canstat.h']]],
   ['canfdmsg_5fedl',['canFDMSG_EDL',['../canstat_8h.html#a162be4f6b66c81fa09dc76c268475216',1,'canstat.h']]],
@@ -444,6 +446,7 @@ var searchData=
   ['checksum',['checkSum',['../struct_lin_message_info.html#a0890e48334b4123d76276b8341d3d82c',1,'LinMessageInfo']]],
   ['canlib',['CANlib',['../group__grp__canlib.html',1,'']]],
   ['conversion',['Conversion',['../group__kvaxml__conversion.html',1,'']]],
+  ['cantegrity_20api',['CANtegrity API',['../group__kvdiag__diagnostics.html',1,'']]],
   ['converter',['Converter',['../group__kvlc__converter.html',1,'']]],
   ['converting',['Converting',['../kvlclib_converting.html',1,'page_kvlclib']]],
   ['csv_20frame_20_28w_29',['CSV Frame (W)',['../kvlclib_format__f_o_r_m_a_t__c_s_v.html',1,'kvlclib_formats']]],
@@ -459,5 +462,6 @@ var searchData=
   ['compiling_20and_20compatibility',['Compiling and Compatibility',['../page_user_guide_build.html',1,'']]],
   ['compiling_20and_20linking_20on_20linux',['Compiling and Linking on Linux',['../page_user_guide_build_compiling_linking_linux.html',1,'page_user_guide_build']]],
   ['compiling_20and_20linking_20on_20windows',['Compiling and Linking on Windows',['../page_user_guide_build_compiling_linking_windows.html',1,'page_user_guide_build']]],
-  ['can_20frame_20types',['CAN Frame Types',['../page_user_guide_can_frame_types_types.html',1,'page_canlib']]]
+  ['can_20frame_20types',['CAN Frame Types',['../page_user_guide_can_frame_types_types.html',1,'page_canlib']]],
+  ['cantegrity_20api_20_28kvdiag_29',['CANtegrity API (kvDiag)',['../page_user_guide_kvdiag.html',1,'page_canlib']]]
 ];

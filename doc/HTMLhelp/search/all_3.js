@@ -45,14 +45,10 @@ var searchData=
   ['do9',['DO9',['../structkv_io_module_digital.html#ad3f65a1871a74e5e051f38886d3d38fc',1,'kvIoModuleDigital']]],
   ['dword',['DWORD',['../linlib_8h.html#a798af1e30bc65f319c1a246cecf59e39',1,'linlib.h']]],
   ['databases',['Databases',['../group__kvadb__database.html',1,'']]],
-  ['diagnostics',['Diagnostics',['../group__kvdiag__diagnostics.html',1,'']]],
   ['database',['Database',['../group__kvlc__database.html',1,'']]],
   ['device_20connection',['Device Connection',['../group__kvm__connection.html',1,'']]],
   ['databases',['Databases',['../group__kvm__database.html',1,'']]],
   ['disk_20operations',['Disk Operations',['../group__kvm__disk__operations.html',1,'']]],
-  ['diagnostics_20with_20diag_5fprogram_5ftype_5fautobaud',['Diagnostics with DIAG_PROGRAM_TYPE_AUTOBAUD',['../page_example_c_kvdiag_autobaud.html',1,'page_user_guide_canlib_samples']]],
-  ['diagnostics_20with_20diag_5fprogram_5ftype_5fnormal',['Diagnostics with DIAG_PROGRAM_TYPE_NORMAL',['../page_example_c_kvdiag_normal.html',1,'page_user_guide_canlib_samples']]],
   ['database_20api_20_28kvadblib_29',['Database API (kvaDbLib)',['../page_kvadblib.html',1,'']]],
-  ['devices_20and_20channels',['Devices and Channels',['../page_user_guide_device_and_channel.html',1,'page_canlib']]],
-  ['diagnostics_20api_20_28kvdiag_29',['Diagnostics API (kvDiag)',['../page_user_guide_kvdiag.html',1,'page_canlib']]]
+  ['devices_20and_20channels',['Devices and Channels',['../page_user_guide_device_and_channel.html',1,'page_canlib']]]
 ];

@@ -76,7 +76,7 @@ SRCS := mhydraHWIf.c
 SRCS += mhydraHWIf_TRP.c
 SRCS += ioctl_handler.c
 
-ifneq ($(KERNELRELEASE),)
+ifneq ($(src),)
 	RUNDIR := $(src)
 else
 	RUNDIR := $(PWD)

@@ -298,6 +298,8 @@ static struct dev_descr dev_descr_list[] = {
           {"Kvaser U100P",                                      {0x30011748, 0x00073301}},
           {"Kvaser U100S",                                      {0x30011816, 0x00073301}},
           {"Kvaser USBcan Pro 4xHS",                            {0x30012615, 0x00073301}},
+          {"Kvaser Hybrid CAN/LIN",                             {0x30012844, 0x00073301}},
+          {"Kvaser Hybrid Pro CAN/LIN",                         {0x30012882, 0x00073301}},
 };
 
 static canStatus check_bitrate (const CanHandle hnd, unsigned int bitrate);
@@ -1263,6 +1265,13 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
     *freq     = 8000000L;
     *tseg1    = 7;
     *tseg2    = 2;
+    *sjw      = 1;
+    break;
+
+  case canFD_BITRATE_8M_70P:
+    *freq     = 8000000L;
+    *tseg1    = 6;
+    *tseg2    = 3;
     *sjw      = 1;
     break;
 

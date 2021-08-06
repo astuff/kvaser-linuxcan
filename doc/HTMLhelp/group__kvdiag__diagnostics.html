@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Diagnostics</title>
+<title>CANtegrity API</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -79,11 +79,11 @@ $(document).ready(function(){initNavTree('group__kvdiag__diagnostics.html','');}
   <div class="summary">
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Diagnostics<div class="ingroups"><a class="el" href="group__grp__canlib.html">CANlib</a></div></div>  </div>
+<div class="title">CANtegrity API<div class="ingroups"><a class="el" href="group__grp__canlib.html">CANlib</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Diagnostics API Library.  
+<p>CANtegrity API.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -116,7 +116,8 @@ Functions</h2></td></tr>
 <tr class="separator:ga1708e589eb731c11c82a621b2a070d1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>Diagnostics API Library. </p>
+<p>CANtegrity API. </p>
+<p>The kvDiagXxx functions specify the CANtegrity API, which is based on high frequency sampling of the CAN bus. To check if a device has CANtegrity support, use <a class="el" href="group__can__general.html#gab9552d1a588b0dbc144b097acba017b2">canGetChannelData()</a> with the item <a class="el" href="canlib_8h.html#a7eeb70e7c666f629ca3762f4692469ae">canCHANNELDATA_CHANNEL_CAP</a> and the flag <a class="el" href="canlib_8h.html#a8cc8a1a1960813e55b753943274d1006">canCHANNEL_CAP_CANTEGRITY</a>. </p>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="ga76d09ccb89cf756d954144582f730330"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga76d09ccb89cf756d954144582f730330">&#9670;&nbsp;</a></span>kvDiagAttachAnalyzer()</h2>
@@ -143,7 +144,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Attach an analyzer to the a CAN channel handle. The device needs to have the diagnostics capability. See <a class="el" href="page_user_guide_kvdiag.html">Diagnostics API (kvDiag)</a> for how to check this.</p>
+<p>Attach an analyzer to the a CAN channel handle. The device needs to have the CANtegrity capability. See <a class="el" href="page_user_guide_kvdiag.html">CANtegrity API (kvDiag)</a> for how to check this.</p>
 <dl class="section note"><dt>Note</dt><dd>A CAN channel can currently only have one attached Analyzer.</dd>
 <dd>
 The kvDiag API is preliminary and will change!</dd></dl>
@@ -186,7 +187,7 @@ The kvDiag API is preliminary and will change!</dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Run with <a class="el" href="kv_diag_8h.html#a64bb36d4e56a896eb2af5dc09cce1542">DIAG_PROGRAM_TYPE_AUTOBAUD</a>, see <a class="el" href="page_user_guide_kvdiag.html">Diagnostics API (kvDiag)</a>.</p>
+<p>Run with <a class="el" href="kv_diag_8h.html#a64bb36d4e56a896eb2af5dc09cce1542">DIAG_PROGRAM_TYPE_AUTOBAUD</a>, see <a class="el" href="page_user_guide_kvdiag.html">CANtegrity API (kvDiag)</a>.</p>
 <p>Calculate the bitrate on the CAN bus by sampling a series of CAN frames. Uses all the sampled frames in the device buffer on each call. Stores information between calls. May require several calls until the quality value is sufficiently high.</p>
 <dl class="section note"><dt>Note</dt><dd>The Analyzer program <a class="el" href="kv_diag_8h.html#a64bb36d4e56a896eb2af5dc09cce1542">DIAG_PROGRAM_TYPE_AUTOBAUD</a> will stop processing after 100 frames have been received. To restart processing, call <a class="el" href="group__kvdiag__diagnostics.html#ga65bbdc1e8c8bf4affc8ba2041d72ff1a">kvDiagResetBitrateCalculation()</a>.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>For classic CAN <em>btr.bitrate</em> contains the calculated bitrate and quality. Currently, FD is not supported so <em>btr.bitrate_brs</em> can be disregarded.</dd></dl>
@@ -266,7 +267,7 @@ The kvDiag API is preliminary and will change!</dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Run with <a class="el" href="kv_diag_8h.html#ad24c2e14068b790b7b105c6423e42400">DIAG_PROGRAM_TYPE_NORMAL</a>, see <a class="el" href="page_user_guide_kvdiag.html">Diagnostics API (kvDiag)</a>.</p>
+<p>Run with <a class="el" href="kv_diag_8h.html#ad24c2e14068b790b7b105c6423e42400">DIAG_PROGRAM_TYPE_NORMAL</a>, see <a class="el" href="page_user_guide_kvdiag.html">CANtegrity API (kvDiag)</a>.</p>
 <p>Get the clock offset of a device relative to the clock of the measuring device. This roughly equates to the relative difference of the two frequencies.</p>
 <div class="fragment"><div class="line">clockoffset = (T_id - T_diag) / T_diag = (f_diag - f_id) / f_id</div></div><!-- fragment --><p>where </p><div class="fragment"><div class="line">T_diag     Time elapsed on the measuring device.</div><div class="line"></div><div class="line">T_id       Time elapsed on the target device.</div><div class="line"></div><div class="line">f_diag     Frequency of the measuring device.</div><div class="line"></div><div class="line">f_id       Frequency of the target device.</div></div><!-- fragment --><p>The result is expressed as a normal distribution over the sampled frames used. The unit of measurement is ppt (parts per trillion, 1e-12).</p>
 <p>The function stores information between calls. Call until sufficient precision is reached. Each call will consume one sampled frame from the device buffer.</p>
@@ -435,7 +436,7 @@ The kvDiag API is preliminary and will change!</dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Run with <a class="el" href="kv_diag_8h.html#ad24c2e14068b790b7b105c6423e42400">DIAG_PROGRAM_TYPE_NORMAL</a>, see <a class="el" href="page_user_guide_kvdiag.html">Diagnostics API (kvDiag)</a>.</p>
+<p>Run with <a class="el" href="kv_diag_8h.html#ad24c2e14068b790b7b105c6423e42400">DIAG_PROGRAM_TYPE_NORMAL</a>, see <a class="el" href="page_user_guide_kvdiag.html">CANtegrity API (kvDiag)</a>.</p>
 <p>Read (and consume) one full sample from an analyzer.</p>
 <dl class="section note"><dt>Note</dt><dd>The kvDiag API is preliminary and will change!</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -491,7 +492,7 @@ The kvDiag API is preliminary and will change!</dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Run with <a class="el" href="kv_diag_8h.html#ad24c2e14068b790b7b105c6423e42400">DIAG_PROGRAM_TYPE_NORMAL</a>, see <a class="el" href="page_user_guide_kvdiag.html">Diagnostics API (kvDiag)</a>.</p>
+<p>Run with <a class="el" href="kv_diag_8h.html#ad24c2e14068b790b7b105c6423e42400">DIAG_PROGRAM_TYPE_NORMAL</a>, see <a class="el" href="page_user_guide_kvdiag.html">CANtegrity API (kvDiag)</a>.</p>
 <p>Read (and consume) one full sample from an analyzer. Will wait until a message arrives or a timeout occurs.It can take up to 100 ms for this function to return after a new sample is available.</p>
 <dl class="section note"><dt>Note</dt><dd>The kvDiag API is preliminary and will change!</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -693,7 +694,7 @@ The kvDiag API is preliminary and will change!</dd></dl>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.35) Tue Feb 16 2021</li>
+    <li class="footer"> (canlib 5.36) Tue May 25 2021</li>
   </ul>
 </div>
 </body>

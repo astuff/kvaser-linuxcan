@@ -75,7 +75,7 @@ INCLUDES := $(src)/../include/
 SRCS := PciCan2HwIf.c
 SRCS += memQ.c
 
-ifneq ($(KERNELRELEASE),)
+ifneq ($(src),)
 	RUNDIR := $(src)
 else
 	RUNDIR := $(PWD)

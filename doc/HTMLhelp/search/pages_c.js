@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['receive_20and_20reply_20to_20can_20message',['Receive and reply to CAN message',['../page_example_c_echo.html',1,'page_user_guide_canlib_samples']]],
-  ['remote_20device_20api_20_28kvrlib_29',['Remote Device API (kvrlib)',['../page_kvrlib.html',1,'']]]
+  ['plain_20text_20_28r_2fw_29',['Plain text (R/W)',['../kvlclib_format__p_l_a_i_n__a_s_c.html',1,'kvlclib_formats']]],
+  ['properties',['Properties',['../kvlclib_properties.html',1,'page_kvlclib']]]
 ];

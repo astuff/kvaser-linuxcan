@@ -451,6 +451,7 @@ typedef struct VCanHWInterface {
     int (*script_envvar_put)     (const VCanChanData *chd, KCAN_IOCTL_SCRIPT_SET_ENVVAR_T *sc);
     int (*script_envvar_get)     (const VCanChanData *chd, KCAN_IOCTL_SCRIPT_GET_ENVVAR_T *sc);
     int (*getOutputMode)        (VCanChanData *chd, int *silent);
+    int (*deviceFlashProg)      (const VCanChanData *vChan, KCAN_FLASH_PROG *fp);
 } VCanHWInterface;
 
 #define SKIP_ERROR_EVENT 0

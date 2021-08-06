@@ -75,7 +75,7 @@ INCLUDES := $(src)/../include/
 SRCS := PciCanHwIf.c
 SRCS += dallas.c
 
-ifneq ($(KERNELRELEASE),)
+ifneq ($(src),)
 	RUNDIR := $(src)
 else
 	RUNDIR := $(PWD)

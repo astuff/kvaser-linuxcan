@@ -74,7 +74,7 @@ INCLUDES := $(src)/../include/
 # source files
 SRCS := leafHWIf.c
 
-ifneq ($(KERNELRELEASE),)
+ifneq ($(src),)
 	RUNDIR := $(src)
 else
 	RUNDIR := $(PWD)

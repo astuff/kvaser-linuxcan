@@ -79,11 +79,11 @@ $(document).ready(function(){initNavTree('structkv_bus_params_tq.html','');});
   <div class="summary">
 <a href="#pub-attribs">Data Fields</a>  </div>
   <div class="headertitle">
-<div class="title">kvBusParamsTq Struct Reference</div>  </div>
+<div class="title">kvBusParamsTq Struct Reference<div class="ingroups"><a class="el" href="group__grp__canlib.html">CANlib</a> &raquo; <a class="el" href="group___c_a_n.html">CAN</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="bus__params__tq_8h_source.html">bus_params_tq.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="canlib_8h_source.html">canlib.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
@@ -112,8 +112,7 @@ Data Fields</h2></td></tr>
   arbitration.tq         = 1 + arbitration.prop + arbitration.phase1 + arbitration.phase2
   arbitration.tq        &gt;= 3
   arbitration.sjw       &lt;= min(arbitration.phase1, arbitration.phase2)
-  arbitration.prescaler &gt;= 1
-  arbitration.prescaler &lt;= 2
+  arbitration.prescaler &gt;= 1  (&lt;=2 will enable Transmitter Delay Compensation Mechanism)
 
   data.tq         = 1 + data.phase1 + data.phase2
   data.tq        &gt;= 3
@@ -220,7 +219,7 @@ Data Fields</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li><a class="el" href="bus__params__tq_8h_source.html">bus_params_tq.h</a></li>
+<li><a class="el" href="canlib_8h_source.html">canlib.h</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
@@ -229,7 +228,7 @@ Data Fields</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="structkv_bus_params_tq.html">kvBusParamsTq</a></li>
-    <li class="footer"> (canlib 5.35) Tue Feb 16 2021</li>
+    <li class="footer"> (canlib 5.36) Tue May 25 2021</li>
   </ul>
 </div>
 </body>

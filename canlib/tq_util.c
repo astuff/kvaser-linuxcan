@@ -62,35 +62,41 @@
 */
 
 #include "tq_util.h"
+#include "kvdebug.h"
 #include "stdio.h"
 
 /*returns -1 if bad parameters, otherwize 0*/
 int tqu_check_nominal (const kvBusParamsTq self)
 {
   if ((self.tq < 0) || (self.prop < 0) || (self.phase1 < 0) || (self.phase2 < 0) || (self.sjw < 0) || (self.prescaler < 0)) {
+    DEBUGPRINTF(("canERR_PARAM (nom): All arguments must be positive: tq=%d, prop=%d,"
+                 " phase1=%d, phase2=%d, sjw=%d, prescaler=%d\n", self.tq, self.prop,
+                 self.phase1, self.phase2, self.sjw, self.prescaler));
     return -1;
   }
 
   if (self.tq != (1 + self.prop + self.phase1 + self.phase2)) {
+    DEBUGPRINTF(("canERR_PARAM (nom): Mismatch in sum: 1 (sync) + %d (prop) +"
+                 " %d (phase1) + %d (phase2) != %d (tq)", self.prop, self.phase1,
+                 self.phase2, self.tq));
     return -1;
   }
 
   if (self.tq <= 2) {
+    DEBUGPRINTF(("canERR_PARAM (nom): tq is too small, %d (tq) >= 3", self.tq));
     return -1;
   }
 
-  {
-    int tmp;
+  if (self.sjw > self.phase1) {
+    DEBUGPRINTF(("canERR_PARAM (nom): sjw is too big, %d (sjw) <= %d (phase1)",
+                 self.sjw, self.phase1));
+    return -1;
+  }
 
-    if (self.phase1 > self.phase2) {
-      tmp = self.phase2;
-    } else {
-      tmp = self.phase1;
-    }
-
-    if (self.sjw > tmp) {
-      return -1;
-    }
+  if (self.sjw > self.phase2) {
+    DEBUGPRINTF(("canERR_PARAM (nom): sjw is too big, %d (sjw) <= %d (phase2)",
+                 self.sjw, self.phase2));
+    return -1;
   }
 
   return 0;
@@ -100,29 +106,29 @@ int tqu_check_nominal (const kvBusParamsTq self)
 int tqu_check_data (const kvBusParamsTq self)
 {
   if ((self.tq < 0) || (self.prop < 0) || (self.phase1 < 0) || (self.phase2 < 0) || (self.sjw < 0) || (self.prescaler < 0)) {
+    DEBUGPRINTF(("canERR_PARAM (data): All arguments must be positive: tq=%d, prop=%d,"
+                 " phase1=%d, phase2=%d, sjw=%d, prescaler=%d\n", self.tq, self.prop,
+                 self.phase1, self.phase2, self.sjw, self.prescaler));
     return -1;
   }
-
   if (self.tq != (1 + self.prop + self.phase1 + self.phase2)) {
     return -1;
   }
 
   if (self.tq <= 2) {
+    DEBUGPRINTF(("canERR_PARAM (data): tq is too small, %d (tq) >= 3", self.tq));
     return -1;
   }
 
-  {
-    int tmp;
-
-    if (self.phase1 > self.phase2) {
-      tmp = self.phase2;
-    } else {
-      tmp = self.phase1;
-    }
-
-    if (self.sjw > tmp) {
-      return -1;
-    }
+  if (self.sjw > self.phase1) {
+    DEBUGPRINTF(("canERR_PARAM (data): sjw is too big, %d (sjw) <= %d (phase1)",
+                 self.sjw, self.phase1));
+    return -1;
+  }
+  if (self.sjw > self.phase2) {
+    DEBUGPRINTF(("canERR_PARAM (data): sjw is too big, %d (sjw) <= %d (phase2)",
+                 self.sjw, self.phase2));
+    return -1;
   }
 
   return 0;
@@ -169,10 +175,10 @@ canStatus tqu_translate_bitrate_constant_fd (int freqA, int freqD, kvBusParamsTq
 {
   switch (freqA) {
     case canFD_BITRATE_1M_80P:
-      tqu_set_busparam_values(arbitration, 40, 8, 8, 8, 23, 2);
+      tqu_set_busparam_values(arbitration, 80, 16, 16, 16, 47, 1);
       break;
     case canFD_BITRATE_500K_80P:
-      tqu_set_busparam_values(arbitration, 40, 8, 8, 8, 23, 4);
+      tqu_set_busparam_values(arbitration, 80, 16, 16, 16, 47, 2);
       break;
     default:
       return canERR_PARAM;
@@ -180,6 +186,9 @@ canStatus tqu_translate_bitrate_constant_fd (int freqA, int freqD, kvBusParamsTq
   switch (freqD) {
     case canFD_BITRATE_8M_80P:
       tqu_set_busparam_values(data, 10, 7, 2, 1, 0, 1);
+      break;
+    case canFD_BITRATE_8M_70P:
+      tqu_set_busparam_values(data, 10, 6, 3, 1, 0, 1);
       break;
     case canFD_BITRATE_8M_60P:
       tqu_set_busparam_values(data, 5, 2, 2, 1, 0, 2);
@@ -259,6 +268,7 @@ canStatus tqu_validate_busparameters_fd (const CanHandle hnd)
 
 canStatus get_tq_limits (int hw_type, kvBusParamLimits *bus_param_limits, int has_FD)
 {
+  bus_param_limits->version = 2;
   switch(hw_type) {
     case canHWTYPE_U100:
       bus_param_limits->arbitration_min.tq = 0;
@@ -304,7 +314,6 @@ canStatus get_tq_limits (int hw_type, kvBusParamLimits *bus_param_limits, int ha
     case canHWTYPE_BLACKBIRD_V2:
     case canHWTYPE_EAGLE:
     case canHWTYPE_ETHERCAN:
-    case canHWTYPE_DINRAIL:
       bus_param_limits->arbitration_min.tq = 0;
       bus_param_limits->arbitration_min.phase1 = 1;
       bus_param_limits->arbitration_min.phase2 = 1;
@@ -340,6 +349,8 @@ canStatus get_tq_limits (int hw_type, kvBusParamLimits *bus_param_limits, int ha
     case canHWTYPE_USBCAN_LIGHT:
     case canHWTYPE_LEAF2:
     case canHWTYPE_CANLINHYBRID:
+    case canHWTYPE_PCIE_V2:
+    case canHWTYPE_DINRAIL:
       bus_param_limits->arbitration_min.tq = 0;
       bus_param_limits->arbitration_min.phase1 = 1;
       bus_param_limits->arbitration_min.phase2 = 1;

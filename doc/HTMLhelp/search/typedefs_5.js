@@ -9,7 +9,7 @@ var searchData=
   ['kvadbnodehnd',['KvaDbNodeHnd',['../kva_db_lib_8h.html#adb7f65c8a757705c653045957266beb4',1,'kvaDbLib.h']]],
   ['kvadbsignalhnd',['KvaDbSignalHnd',['../kva_db_lib_8h.html#aa41cb518eea5c637f18eda0affa4e011',1,'kvaDbLib.h']]],
   ['kvbusparamlimits',['kvBusParamLimits',['../canlib_8h.html#af504af7b3820af8ec1ec997f3b0333d3',1,'canlib.h']]],
-  ['kvbusparamstq',['kvBusParamsTq',['../bus__params__tq_8h.html#a55095b4ff633151ac4ccf06b1f3df1da',1,'bus_params_tq.h']]],
+  ['kvbusparamstq',['kvBusParamsTq',['../group___c_a_n.html#ga55095b4ff633151ac4ccf06b1f3df1da',1,'canlib.h']]],
   ['kvcallback_5ft',['kvCallback_t',['../canlib_8h.html#a7e926c0359a2caa6b9a663a333bab78d',1,'canlib.h']]],
   ['kvclockinfo',['kvClockInfo',['../canlib_8h.html#acfa6eceefcd36704a04b99b8af669528',1,'canlib.h']]],
   ['kvenvhandle',['kvEnvHandle',['../canlib_8h.html#ac12ca60f6d6e18d9bd29acc00c8ea2ff',1,'canlib.h']]],

@@ -83,7 +83,7 @@ SRCS += altera/HAL/src/altera_avalon_spi.c
 SRCS += altera/HAL/src/epcs_commands.c
 SRCS += altera/HAL/src/pwm_util.c
 
-ifneq ($(KERNELRELEASE),)
+ifneq ($(src),)
 	RUNDIR := $(src)
 else
 	RUNDIR := $(PWD)

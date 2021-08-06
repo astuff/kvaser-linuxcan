@@ -119,6 +119,9 @@
 
 #include "hwnames.h"
 
+#include <linux/crc32.h>
+#include "hydra_host_private_cmds.h"
+#include "hydra_imgheader.h"
 
 // Force 32-bit DMA addresses
 #ifdef KV_PCIEFD_DMA_32BIT
@@ -182,6 +185,17 @@ MODULE_VERSION(__stringify(CANLIB_MAJOR_VERSION) "."
 
 #define CANFD_MAX_PRESCALER_VALUE   2U
 
+#define PCIEFD_MAX_FLASH_IMAGE_SIZE  1024*1024
+
+typedef struct busParams {
+  uint32_t brp;
+  uint32_t tseg1;
+  uint32_t tseg2;
+  uint32_t sjw;
+  uint32_t tq;
+  uint32_t freq;
+} busParams_t;
+
 //======================================================================
 // HW function pointers
 //======================================================================
@@ -189,6 +203,9 @@ MODULE_VERSION(__stringify(CANLIB_MAJOR_VERSION) "."
 static int pciCanInitAllDevices(void);
 static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par);
 static int pciCanGetBusParams (VCanChanData *vChd, VCanBusParams *par);
+static int pciCanSetBusParamsTq (VCanChanData *vChd, VCanBusParamsTq *par);
+static int pciCanGetBusParamsTq (VCanChanData *vChd, VCanBusParamsTq *par);
+static int pciCanGetClockFreqMhz (const VCanChanData *chd, uint32_t *freq_mhz);
 static int pciCanSetOutputMode (VCanChanData *vChd, int silent);
 static int pciCanGetOutputMode (VCanChanData *vChd, int *silent);
 static int pciCanSetTranceiverMode (VCanChanData *vChd, int linemode, int resnet);
@@ -207,6 +224,8 @@ static int pciCanProcRead (struct seq_file* m, void* v);
 static int pciCanRequestChipState (VCanChanData *vChd);
 static unsigned long pciCanTxQLen(VCanChanData *vChd);
 static void pciCanRequestSend (VCanCardData *vCard, VCanChanData *vChd);
+static int pciDeviceFlashProg (const VCanChanData *vChan,
+                               KCAN_FLASH_PROG *io);
 static int pciCanGetCustChannelName(const VCanChanData * const vChd,
                                     unsigned char * const data,
                                     const unsigned int data_size,
@@ -215,28 +234,32 @@ static int pciCanGetCustChannelName(const VCanChanData * const vChd,
 static VCanDriverData driverData;
 
 static VCanHWInterface hwIf = {
-  .initAllDevices     = pciCanInitAllDevices,
-  .setBusParams       = pciCanSetBusParams,
-  .getBusParams       = pciCanGetBusParams,
-  .setOutputMode      = pciCanSetOutputMode,
-  .getOutputMode      = pciCanGetOutputMode,
-  .setTranceiverMode  = pciCanSetTranceiverMode,
-  .busOn              = pciCanBusOn,
-  .busOff             = pciCanBusOff,
-  .txAvailable        = pciCanInSync,
-  .procRead           = pciCanProcRead,
-  .closeAllDevices    = pciCanCloseAllDevices,
-  .getTime            = pciCanTime,
-  .flushSendBuffer    = pciCanFlushSendBuffer,
-  .getTxErr           = pciCanGetTxErr,
-  .getRxErr           = pciCanGetRxErr,
-  .txQLen             = pciCanTxQLen,
-  .requestChipState   = pciCanRequestChipState,
-  .requestSend        = pciCanRequestSend,
-  .getCustChannelName = pciCanGetCustChannelName,
-  .getCardInfo        = vCanGetCardInfo,
-  .getCardInfo2       = vCanGetCardInfo2,
-  .reqBusStats        = pciCanReqBusStats,
+  .initAllDevices           = pciCanInitAllDevices,
+  .setBusParams             = pciCanSetBusParams,
+  .getBusParams             = pciCanGetBusParams,
+  .setBusParamsTq           = pciCanSetBusParamsTq,
+  .getBusParamsTq           = pciCanGetBusParamsTq,
+  .kvDeviceGetClockFreqMhz  = pciCanGetClockFreqMhz,
+  .setOutputMode            = pciCanSetOutputMode,
+  .getOutputMode            = pciCanGetOutputMode,
+  .setTranceiverMode        = pciCanSetTranceiverMode,
+  .busOn                    = pciCanBusOn,
+  .busOff                   = pciCanBusOff,
+  .txAvailable              = pciCanInSync,
+  .procRead                 = pciCanProcRead,
+  .closeAllDevices          = pciCanCloseAllDevices,
+  .getTime                  = pciCanTime,
+  .flushSendBuffer          = pciCanFlushSendBuffer,
+  .getTxErr                 = pciCanGetTxErr,
+  .getRxErr                 = pciCanGetRxErr,
+  .txQLen                   = pciCanTxQLen,
+  .requestChipState         = pciCanRequestChipState,
+  .requestSend              = pciCanRequestSend,
+  .getCustChannelName       = pciCanGetCustChannelName,
+  .getCardInfo              = vCanGetCardInfo,
+  .getCardInfo2             = vCanGetCardInfo2,
+  .reqBusStats              = pciCanReqBusStats,
+  .deviceFlashProg          = pciDeviceFlashProg,
 };
 
 
@@ -1268,6 +1291,18 @@ static int pciCanProbe (VCanCardData *vCard)
                         0xFFFFFFFF,
                         MAX_CARD_CHANNELS);
 
+  set_capability_ex_value (vCard,
+                           VCAN_CHANNEL_EX_CAP_HAS_BUSPARAMS_TQ,
+                           0xFFFFFFFF,
+                           0xFFFFFFFF,
+                           MAX_CARD_CHANNELS);
+
+  set_capability_ex_mask (vCard,
+                          VCAN_CHANNEL_EX_CAP_HAS_BUSPARAMS_TQ,
+                          0xFFFFFFFF,
+                          0xFFFFFFFF,
+                          MAX_CARD_CHANNELS);
+
   vCard->nrChannels = KCAN_SYSID_NUM_CHAN_GET(IORD_SYSID_VERSION(hCard->sysidBase));
   if(vCard->nrChannels > MAX_CARD_CHANNELS) {
     vCard->nrChannels = MAX_CARD_CHANNELS;
@@ -1399,111 +1434,73 @@ static void pciCanResetErrorCounter (VCanChanData *vChd)
   vChd->errorCount = 0;
 } // pciCanResetErrorCounter
 
+static inline int checkBusParams(const PciCanCardData *hCard,
+                                 const busParams_t *busParams,
+                                 const char *typeStr)
+{
+  int res = 0;
+  // Detect overflow
+  if (busParams->tq < busParams->tseg1) {
+    DEBUGPRINT(1,"Error (pciefd): Bad parameter CAN %s (tseg1)\n", typeStr);
+    res = 1;
+  } else if (busParams->tq < busParams->tseg2) {
+    DEBUGPRINT(1,"Error (pciefd): Bad parameter CAN %s (tseg2)\n", typeStr);
+    res = 2;
+  } else if (busParams->tq == 0) {
+    DEBUGPRINT(1,"Error (pciefd): Bad parameter CAN %s (tq)\n", typeStr);
+    res = 3;
+  } else if (busParams->brp   < 1 || busParams->brp   > 8192 || // 13-bits 1 + 0..8191
+      busParams->sjw   < 1 || busParams->sjw   >   16 || // 4-bits  1 + 0..15
+      busParams->tseg1 < 1 || busParams->tseg1 >  512 || // 9-bits  1 + 0..511
+      busParams->tseg2 < 1 || busParams->tseg2 >   32) { // 5-bits  1 + 0..31
+      DEBUGPRINT(1, "Error (pciefd): Other checks CAN %s phase brp:%u sjw:%u tseg1:%u tseg2:%u\n",
+                 typeStr, busParams->brp, busParams->sjw, busParams->tseg1,
+                 busParams->tseg2);
 
-//======================================================================
-//  Set bit timing
-//======================================================================
-static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
+    res = 4;
+  }
+
+  if (res == 0 && busParams->freq) {
+    uint32_t recalc_freq;
+
+    recalc_freq = hCard->frequency / (busParams->brp * busParams->tq);
+    if (recalc_freq != busParams->freq) {
+      DEBUGPRINT(1,"Error (pciefd): CAN %s phase prescaler residual. The parameters bitrate:%u tseg1:%u tseg2:%u give this bitrate:%u\n",
+                 typeStr, busParams->freq, busParams->tseg1, busParams->tseg2,
+                 recalc_freq);
+      res = 5;
+    }
+  }
+
+  return res;
+}
+
+static int pciCanSetBusParamsInner(VCanChanData *vChd, busParams_t * arb,
+                                   busParams_t * brs, unsigned int useBrs)
 {
   PciCanChanData *hChd  = vChd->hwChanData;
-  VCanCardData   *vCard = vChd->vCard;
-  PciCanCardData *hCard = vCard->hwCardData;
-  unsigned int    quantaPerCycle;
-  unsigned long   brp;
-  unsigned long   mode;
-  unsigned long   freq;
-  unsigned long   recalc_freq;
-  unsigned int    tseg1;
-  unsigned int    tseg2;
-  unsigned int    sjw;
-  unsigned long   irqFlags;
-  unsigned long   btrn, btrd=0;
-  uint32_t        bus_load_prescaler;
+  PciCanCardData *hCard = vChd->vCard->hwCardData;
+  uint32_t btrn;
+  uint32_t btrd = 0;
+  uint32_t bus_load_prescaler;
+  uint32_t mode;
+  unsigned long irqFlags;
 
-  freq  = par->freq;
-  sjw   = par->sjw;
-  tseg1 = par->tseg1;
-  tseg2 = par->tseg2;
-
-  quantaPerCycle = tseg1 + tseg2 + 1;
-  // Detect overflow.
-  if (quantaPerCycle < tseg1) {
-    DEBUGPRINT(1,"Error (pciefd): Bad parameter (tseg1)\n");
+  if (checkBusParams(hCard, arb, "arbitration")) {
     return VCAN_STAT_BAD_PARAMETER;
   }
 
-  if (quantaPerCycle < tseg2) {
-    DEBUGPRINT(1,"Error (pciefd): Bad parameter (tseg2)\n");
-    return VCAN_STAT_BAD_PARAMETER;
-  }
+  btrn = PCIEFD_BTR_SEG2(arb->tseg2 - 1) |
+         PCIEFD_BTR_SEG1(arb->tseg1 - 1) |
+         PCIEFD_BTR_SJW(arb->sjw - 1) |
+         PCIEFD_BTR_BRP(arb->brp - 1);
 
-  DEBUGPRINT(2, "Set CAN/Arbitration params: bitrate:%lu, tseg1:%u, tseg2:%u, sjw:%u\n",
-             freq, tseg1, tseg2, sjw);
+  bus_load_prescaler = calcBusloadPrescaler(arb->tq, arb->brp);
 
-  if (quantaPerCycle == 0 || freq == 0) {
-    DEBUGPRINT(1,"Error (pciefd): Bad parameter (freq)\n");
-    return VCAN_STAT_BAD_PARAMETER;
-  }
-
-  brp = hCard->frequency / (freq * quantaPerCycle);
-
-  if (brp   < 1 || brp   > 8192 || // 13-bits 1 + 0..8191
-      sjw   < 1 || sjw   >   16 || // 4-bits  1 + 0..15
-      tseg1 < 1 || tseg1 >  512 || // 9-bits  1 + 0..511
-      tseg2 < 1 || tseg2 >   32) { // 5-bits  1 + 0..31
-    DEBUGPRINT(1,"Error (pciefd): Other checks can or arbitration phase brp:%lu sjw:%u tseg1:%u tseg2:%u\n",brp,sjw,tseg1,tseg2);
-    return VCAN_STAT_BAD_PARAMETER;
-  }
-
-  recalc_freq = hCard->frequency / (brp * quantaPerCycle);
-  if (recalc_freq != freq) {
-    DEBUGPRINT(1,"Error (pciefd): CAN prescaler residual. The parameters bitrate:%lu tseg1:%u tseg2:%u gives this bitrate:%lu\n",
-               freq,tseg1,tseg2, recalc_freq);
-    return VCAN_STAT_BAD_PARAMETER;
-  }
-
-  btrn = PCIEFD_BTR_SEG2(tseg2-1) | PCIEFD_BTR_SEG1(tseg1-1) | PCIEFD_BTR_SJW(sjw-1) | PCIEFD_BTR_BRP(brp-1);
-
-  bus_load_prescaler = calcBusloadPrescaler(quantaPerCycle, brp);
-
-  if(hwSupportCanFD(hChd->canControllerBase)) {
+  if (useBrs && hwSupportCanFD(hChd->canControllerBase)) {
     unsigned int trdce_supported = 0;
-    freq  = par->freq_brs;
-    sjw   = par->sjw_brs;
-    tseg1 = par->tseg1_brs;
-    tseg2 = par->tseg2_brs;
 
-    quantaPerCycle = tseg1 + tseg2 + 1;
-    // Detect overflow.
-    if (quantaPerCycle < tseg1) {
-      DEBUGPRINT(1,"Error (pciefd): Bad parameter fd (tseg1)\n");
-      return VCAN_STAT_BAD_PARAMETER;
-    }
-
-    if (quantaPerCycle < tseg2) {
-      DEBUGPRINT(1,"Error (pciefd): Bad parameter fd (tseg2)\n");
-      return VCAN_STAT_BAD_PARAMETER;
-    }
-
-    if (quantaPerCycle == 0 || freq == 0) {
-      DEBUGPRINT(1,"Error (pciefd): Bad parameter fd (freq)\n");
-      return VCAN_STAT_BAD_PARAMETER;
-    }
-
-    brp = hCard->frequency / (freq * quantaPerCycle);
-
-    if (brp   < 1 || brp   > 8192 || // 13-bits 1 + 0..8191
-        sjw   < 1 || sjw   >   16 || // 4-bits  1 + 0..15
-        tseg1 < 1 || tseg1 >  512 || // 9-bits  1 + 0..511
-        tseg2 < 1 || tseg2 >   32) { // 5-bits  1 + 0..31
-      DEBUGPRINT(1,"Error (pciefd): Other checks can fd data phase brp:%lu sjw:%u tseg1:%u tseg2:%u\n",brp,sjw,tseg1,tseg2);
-      return VCAN_STAT_BAD_PARAMETER;
-    }
-
-    recalc_freq = hCard->frequency / (brp * quantaPerCycle);
-    if (recalc_freq != freq) {
-      DEBUGPRINT(1,"Error (pciefd): CAN FD prescaler residual. The parameters bitrate:%lu tseg1:%u tseg2:%u give this bitrate:%lu\n",
-                 freq,tseg1,tseg2, recalc_freq);
+    if (checkBusParams(hCard, brs, "FD data")) {
       return VCAN_STAT_BAD_PARAMETER;
     }
 
@@ -1512,10 +1509,12 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
       if (PCIEFD_HW_CAP_TRDCE_GET(IORD_PCIEFD_HW_CAP(hChd->canControllerBase))) {
         trdce_supported = 1;
       } else {
-        DEBUGPRINT(2,"[%s, %d] TRDCE not supported by HW. Can not change TRDCE setting\n", __FILE__, __LINE__);
+        DEBUGPRINT(2, "[%s, %d] TRDCE not supported by HW. Can not change TRDCE setting\n",
+                   __FILE__, __LINE__);
       }
     } else {
-      DEBUGPRINT(2,"[%s, %d] FPGA_CAN_STAT_CAP unavailable. Can not change SSP settings\n", __FILE__, __LINE__);
+      DEBUGPRINT(2, "[%s, %d] FPGA_CAN_STAT_CAP unavailable. Can not change SSP settings\n",
+                 __FILE__, __LINE__);
     }
 
     if (trdce_supported) {
@@ -1525,31 +1524,36 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
       // brp is 1 or 2, disabled otherwise.
       // see the kcan specification for details.
       ssp_ctrl = IORD_PCIEFD_SSP_CTRL(hChd->canControllerBase);
-      switch (brp) {
+      switch (brs->brp) {
         case 1:
         case 2:
           ssp_ctrl |= PCIEFD_SSP_TRDCE(1);
-          DEBUGPRINT(3,"[%s, %d] canfd brp is %lu, TRDCE = 1\n", __FILE__, __LINE__, brp);
+          DEBUGPRINT(3, "[%s, %d] canfd brp is %u, TRDCE = 1\n", __FILE__, __LINE__,
+                     brs->brp);
           break;
 
         default:
           ssp_ctrl &= ~PCIEFD_SSP_TRDCE_MSK;
-          DEBUGPRINT(3,"[%s, %d] canfd brp is %lu, TRDCE = 0\n", __FILE__, __LINE__, brp);
+          DEBUGPRINT(3, "[%s, %d] canfd brp is %u, TRDCE = 0\n", __FILE__, __LINE__,
+                     brs->brp);
           break;
       }
       IOWR_PCIEFD_SSP_CTRL(hChd->canControllerBase, ssp_ctrl);
     } else {
-      if (brp > CANFD_MAX_PRESCALER_VALUE) {
-        DEBUGPRINT(1,"[%s, %d] Error (pciefd): prescaler (%lu) out of limits (>%u)\n", __FILE__, __LINE__, brp,
-                   CANFD_MAX_PRESCALER_VALUE);
+      if (brs->brp > CANFD_MAX_PRESCALER_VALUE) {
+        DEBUGPRINT(1, "[%s, %d] Error (pciefd): prescaler (%u) out of limits (>%u)\n", __FILE__, __LINE__,
+                   brs->brp, CANFD_MAX_PRESCALER_VALUE);
         return VCAN_STAT_BAD_PARAMETER;
       }
     }
 
-    btrd = PCIEFD_BTR_SEG2(tseg2-1) | PCIEFD_BTR_SEG1(tseg1-1) | PCIEFD_BTR_SJW(sjw-1) | PCIEFD_BTR_BRP(brp-1);
+    btrd = PCIEFD_BTR_SEG2(brs->tseg2 - 1) |
+           PCIEFD_BTR_SEG1(brs->tseg1 - 1) |
+           PCIEFD_BTR_SJW(brs->sjw - 1) |
+           PCIEFD_BTR_BRP(brs->brp - 1);
 
     if (OPEN_AS_CAN != vChd->openMode) {
-      bus_load_prescaler = calcBusloadPrescaler(quantaPerCycle, brp);
+      bus_load_prescaler = calcBusloadPrescaler(brs->tq, brs->brp);
     }
   }
 
@@ -1578,8 +1582,9 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
 
   IOWR_PCIEFD_BTRN(hChd->canControllerBase, btrn);
 
-  if(hwSupportCanFD(hChd->canControllerBase))
+  if(useBrs && hwSupportCanFD(hChd->canControllerBase)) {
     IOWR_PCIEFD_BTRD(hChd->canControllerBase, btrd);
+  }
 
   mode &= ~PCIEFD_MOD_SSO_MSK;
   mode |= PCIEFD_MOD_SSO(hChd->sso);
@@ -1591,8 +1596,104 @@ static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
   complete(&hChd->busOnCompletion);
 
   return VCAN_STAT_OK;
+}
+
+//======================================================================
+//  Set bit timing
+//======================================================================
+static int pciCanSetBusParams (VCanChanData *vChd, VCanBusParams *par)
+{
+  PciCanChanData *hChd  = vChd->hwChanData;
+  PciCanCardData *hCard = vChd->vCard->hwCardData;
+  busParams_t arb;
+  busParams_t brs = {0};
+  unsigned int useBrs = 0;
+
+  arb.freq  = par->freq;
+  arb.sjw   = par->sjw;
+  arb.tseg1 = par->tseg1;
+  arb.tseg2 = par->tseg2;
+
+  arb.tq = arb.tseg1 + arb.tseg2 + 1;
+  DEBUGPRINT(2, "Set CAN arbitration params: bitrate:%u, tseg1:%u, tseg2:%u, sjw:%u, tq:%u\n",
+             arb.freq, arb.tseg1, arb.tseg2, arb.sjw, arb.tq);
+  if (arb.freq == 0) {
+    DEBUGPRINT(1,"Error (pciefd): Bad parameter CAN arbitration (freq)\n");
+    return VCAN_STAT_BAD_PARAMETER;
+  }
+  if (arb.tq == 0) {
+    DEBUGPRINT(1,"Error (pciefd): Bad parameter CAN arbitration (tq)\n");
+    return VCAN_STAT_BAD_PARAMETER;
+  }
+  arb.brp = hCard->frequency / (arb.freq * arb.tq);
+
+  if (hwSupportCanFD(hChd->canControllerBase)) {
+    brs.freq  = par->freq_brs;
+    brs.sjw   = par->sjw_brs;
+    brs.tseg1 = par->tseg1_brs;
+    brs.tseg2 = par->tseg2_brs;
+
+    brs.tq = brs.tseg1 + brs.tseg2 + 1;
+    DEBUGPRINT(2, "Set CAN FD data params: bitrate:%u, tseg1:%u, tseg2:%u, sjw:%u, tq:%u\n",
+               brs.freq, brs.tseg1, brs.tseg2, brs.sjw, brs.tq);
+    if (brs.freq == 0) {
+      DEBUGPRINT(1, "Error (pciefd): Bad paramter CAN FD data (freq)\n");
+      return VCAN_STAT_BAD_PARAMETER;
+    }
+    if (brs.tq == 0) {
+      DEBUGPRINT(1,"Error (pciefd): Bad parameter CAN FD data (tq)\n");
+      return VCAN_STAT_BAD_PARAMETER;
+    }
+    brs.brp = hCard->frequency / (brs.freq * brs.tq);
+    useBrs = 1;
+  }
+
+  return pciCanSetBusParamsInner(vChd, &arb, &brs, useBrs);
 } // pciCanSetBusParams
 
+static int pciCanSetBusParamsTq (VCanChanData *vChd, VCanBusParamsTq *par)
+{
+  PciCanChanData *hChd  = vChd->hwChanData;
+  busParams_t arb;
+  busParams_t brs = {0};
+  int stat;
+  int ret;
+  unsigned int useBrs = par->data_valid;
+
+  arb.brp   = par->nominal.prescaler;
+  arb.sjw   = par->nominal.sjw;
+  arb.tseg1 = par->nominal.phase1 + par->nominal.prop;
+  arb.tseg2 = par->nominal.phase2;
+  arb.tq    = par->nominal.tq;
+  arb.freq  = 0;
+
+  DEBUGPRINT(1, "Set CAN arbitration params: prescaler:%u, tseg1:%u, tseg2:%u, sjw:%u, tq:%u\n",
+             arb.brp, arb.tseg1, arb.tseg2, arb.sjw, arb.tq);
+
+  if (useBrs && hwSupportCanFD(hChd->canControllerBase)) {
+    brs.brp   = par->data.prescaler;
+    brs.sjw   = par->data.sjw;
+    brs.tseg1 = par->data.phase1 + par->data.prop;
+    brs.tseg2 = par->data.phase2;
+    brs.tq    = par->data.tq;
+    brs.freq  = 0;
+
+    DEBUGPRINT(1, "Set CAN FD data params: prescaler:%u, tseg1:%u, tseg2:%u, sjw:%u, tq:%u\n",
+               brs.brp, brs.tseg1, brs.tseg2, brs.sjw, brs.tq);
+  }
+  stat = pciCanSetBusParamsInner(vChd, &arb, &brs, useBrs);
+  if (stat == VCAN_STAT_BAD_PARAMETER) {
+    par->retval_from_driver = 0;
+    par->retval_from_device = 1;
+    ret = 0;
+  } else {
+    par->retval_from_driver = stat;
+    par->retval_from_device = stat;
+    ret = stat;
+  }
+
+  return ret;
+} // pciCanSetBusParamsTq
 
 //======================================================================
 //  Get bit timing
@@ -1643,6 +1744,56 @@ static int pciCanGetBusParams (VCanChanData *vChd, VCanBusParams *par)
 
   return VCAN_STAT_OK;
 } // pciCanGetBusParams
+
+static int pciCanGetBusParamsTq (VCanChanData *vChd, VCanBusParamsTq *par)
+{
+  PciCanChanData *hChd  = vChd->hwChanData;
+  uint32_t btr;
+
+  btr = IORD_PCIEFD_BTRN (hChd->canControllerBase);
+  par->nominal.phase1    = PCIEFD_BTR_SEG1_GET(btr) + 1;
+  par->nominal.phase2    = PCIEFD_BTR_SEG2_GET(btr) + 1;
+  par->nominal.sjw       = PCIEFD_BTR_SJW_GET(btr) + 1;
+  par->nominal.prescaler = PCIEFD_BTR_BRP_GET(btr) + 1;
+  par->nominal.tq        = 1 + par->nominal.phase1 + par->nominal.phase2;
+  par->nominal.prop      =  0;
+
+  if (hwSupportCanFD(hChd->canControllerBase)) {
+    btr = IORD_PCIEFD_BTRD (hChd->canControllerBase);
+    par->data.phase1    = PCIEFD_BTR_SEG1_GET(btr) + 1;
+    par->data.phase2    = PCIEFD_BTR_SEG2_GET(btr) + 1;
+    par->data.sjw       = PCIEFD_BTR_SJW_GET(btr) + 1;
+    par->data.prescaler = PCIEFD_BTR_BRP_GET(btr) + 1;
+    par->data.tq        = 1 + par->data.phase1 + par->data.phase2;
+    par->data.prop      = 0;
+    par->data_valid     = 1;
+  } else {
+    par->data.phase1    = 0;
+    par->data.phase2    = 0;
+    par->data.sjw       = 0;
+    par->data.prescaler = 0;
+    par->data.tq        = 0;
+    par->data.prop      = 0;
+    par->data_valid     = 0;
+  }
+  par->retval_from_driver = 0;
+  par->retval_from_device = 0;
+
+  return VCAN_STAT_OK;
+} // pciCanGetBusParamsTq
+
+static int pciCanGetClockFreqMhz (const VCanChanData *chd, uint32_t *freq_mhz)
+{
+  VCanCardData *vCard = chd->vCard;
+  PciCanCardData *hCard = vCard->hwCardData;
+
+  if (hCard) {
+    *freq_mhz = hCard->frequency / 1000000;
+    return 0;
+  } else {
+    return -1;
+  }
+}
 
 
 
@@ -2002,6 +2153,200 @@ static int pciCanReqBusStats (VCanChanData *vChan)
 
         return VCAN_STAT_OK;
 }
+
+//======================================================================
+//  Flash API
+//======================================================================
+static uint32_t calcImageCrc (uint8_t *buffer, uint32_t size)
+{
+   return crc32(0xffffffff, buffer, size) ^ 0xffffffff;
+}
+
+static int checkImageEAN (const VCanCardData *vCard, HydraImgHeader *sysHeader)
+{
+   uint32_t ean_hi = *(uint32_t*)&(vCard->ean[4]);
+   uint32_t ean_lo = *(uint32_t*)&(vCard->ean[0]);
+
+   if (ean_hi != sysHeader->eanHi)
+      return -1;
+   if (ean_lo != sysHeader->eanLo)
+      return -1;
+   return 0;
+}
+
+static int pciefd_flash_prog (const PciCanCardData *hCard, uint32_t addr,
+                              uint8_t *image, uint32_t len )
+{
+  alt_flash_epcs_dev epcsFlashDev;
+  int stat;
+
+  stat = alt_epcs_flash_init(&epcsFlashDev, hCard->serialFlashBase);
+  if (stat != 0) {
+    DEBUGPRINT(0, "Error: pciefd_flash_prog init failed: %d\n", stat);
+    return FIRMWARE_ERROR_FLASH_FAILED;
+  }
+
+  stat = alt_epcs_flash_write(&epcsFlashDev.dev, addr, image, len);
+  if (stat != 0) {
+    DEBUGPRINT(0,"Error: pciefd_flash_prog write failed: %d\n", stat);
+    return FIRMWARE_ERROR_FLASH_FAILED;
+  }
+
+  if (alt_epcs_flash_memcmp( &epcsFlashDev.dev, image, addr, len)) {
+    DEBUGPRINT(0,"Error: pciefd_flash_prog compare failed\n");
+    return FIRMWARE_ERROR_FLASH_FAILED;
+  }
+
+  return 0;
+}
+
+static int pciefd_flash_compare_image (const PciCanCardData *hCard,
+                                       uint32_t addr, uint8_t *image,
+                                       uint32_t len )
+{
+  alt_flash_epcs_dev epcsFlashDev;
+
+  alt_epcs_flash_init(&epcsFlashDev, hCard->serialFlashBase);
+
+  if (alt_epcs_flash_memcmp( &epcsFlashDev.dev, image, addr, len))
+  {
+    DEBUGPRINT(1, "Warning: Image does NOT match current.\n");
+    return -1;
+  }
+  DEBUGPRINT(2, "Image matches current.\n");
+
+  return 0;
+}
+
+/***************************************************************************/
+
+static int pciDeviceFlashProg (const VCanChanData *vChan,
+                               KCAN_FLASH_PROG *fp)
+{
+  VCanCardData *vCard = vChan->vCard;
+  PciCanCardData *hCard = vCard->hwCardData;
+  static int dryrun = 0;
+
+  switch (fp->tag) {
+  case FIRMWARE_DOWNLOAD_STARTUP:
+    if (hCard->flashImage == NULL) {
+      hCard->flashImage = kmalloc(PCIEFD_MAX_FLASH_IMAGE_SIZE, GFP_KERNEL);
+      if (hCard->flashImage == NULL) {
+        DEBUGPRINT(0, "Error: kmalloc (PCIEFD_MAX_FLASH_IMAGE_SIZE)\n");
+        return VCAN_STAT_NO_MEMORY;
+      }
+    }
+    memset(hCard->flashImage, 0xff, PCIEFD_MAX_FLASH_IMAGE_SIZE);
+
+    dryrun = fp->x.setup.dryrun;
+
+    fp->x.setup.flash_procedure_version = 0;
+    fp->x.setup.buffer_size             = KCAN_FLASH_DOWNLOAD_CHUNK;
+    break;
+
+  case FIRMWARE_DOWNLOAD_WRITE:
+    if (hCard->flashImage &&
+        ((fp->x.data.address + fp->x.data.len) < PCIEFD_MAX_FLASH_IMAGE_SIZE)) {
+      memcpy(hCard->flashImage + fp->x.data.address, fp->x.data.data,
+             fp->x.data.len);
+    } else {
+      fp->status = FIRMWARE_ERROR_ADDR;
+      return VCAN_STAT_FAIL;
+    }
+    break;
+  case FIRMWARE_DOWNLOAD_COMMIT: {
+      HydraImgHeader *sysHeader;
+      int numberOfImages;
+      int i;
+
+      if (hCard->flashImage == NULL) {
+        fp->status = FIRMWARE_ERROR_ADDR;
+        return VCAN_STAT_FAIL;
+      }
+
+      sysHeader = (HydraImgHeader*) hCard->flashImage;
+      /* validate image header */
+      if (sysHeader->hdCrc !=
+          calcImageCrc(hCard->flashImage, sizeof(HydraImgHeader) - 4)) {
+        fp->status = FIRMWARE_ERROR_BAD_CRC;
+        return VCAN_STAT_FAIL;
+      }
+
+      /* validate image type */
+      if ((sysHeader->imgType != IMG_TYPE_SYSTEM_CONTAINER)) {
+        DEBUGPRINT(0, "Error: image type %d invalid\n", sysHeader->imgType);
+        fp->status = FIRMWARE_ERROR_ADDR;
+        return VCAN_STAT_FAIL;
+      }
+
+      /* ensure image matches current hardware */
+      if (checkImageEAN(vCard, sysHeader) != 0) {
+        DEBUGPRINT(0, "Error: image EAN does not match device\n");
+        fp->status = FIRMWARE_ERROR_FLASH_FAILED;
+        return VCAN_STAT_FAIL;
+      }
+
+      numberOfImages = *(hCard->flashImage + sizeof(HydraImgHeader));
+      DEBUGPRINT(3, "Nbr images %d\n", numberOfImages);
+
+      for (i = 0; i<numberOfImages; i++) {
+
+
+         /* validate full hydra image */
+        if (sysHeader->imgCrc ==
+            calcImageCrc(hCard->flashImage + sizeof(HydraImgHeader),
+                         sysHeader->imgLength)) {
+          ImageContainerInfo *imgInfo;
+          HydraImgHeader *imgHeader;
+          uint8_t *startAddr;
+
+          imgInfo = (ImageContainerInfo*)(hCard->flashImage +
+                                          sizeof(HydraImgHeader) + 4);
+          imgHeader = (HydraImgHeader*)(hCard->flashImage +
+                                        imgInfo[i].imgStartAddr);
+          startAddr = hCard->flashImage + imgInfo[i].imgStartAddr +
+                      sizeof(HydraImgHeader);
+
+          DEBUGPRINT(3, "Sys image validated. (V.%08x)\n", sysHeader->version);
+          if (!dryrun) {
+            fp->status = pciefd_flash_prog(hCard, imgHeader->prgAddr, startAddr,
+                                           imgHeader->imgLength);
+            DEBUGPRINT(3, "Flash completed, status %d\n", fp->status);
+          } else {
+            pciefd_flash_compare_image(hCard, imgHeader->prgAddr, startAddr,
+                                       imgHeader->imgLength);
+            DEBUGPRINT(3, "Dry-run\n");
+          }
+        } else {
+          DEBUGPRINT(1, "Error: Image crc check failed. (V.%08x)\n",
+                        sysHeader->version);
+        }
+      }
+      break;
+    }
+  case FIRMWARE_DOWNLOAD_FINISH:
+    if (hCard->flashImage) {
+      DEBUGPRINT(3, "freeing image buffer\n");
+      kfree(hCard->flashImage);
+      hCard->flashImage = NULL;
+    } else {
+      fp->status = FIRMWARE_ERROR_ADDR;
+      return VCAN_STAT_FAIL;
+    }
+    break;
+
+  case FIRMWARE_DOWNLOAD_ERASE:
+    /* not supported */
+    break;
+
+  default:
+    DEBUGPRINT(0, "Error: device_flash_prog() Unknown tag %d\n", fp->tag);
+    return VCAN_STAT_FAIL;
+  }
+
+  return VCAN_STAT_OK;
+}
+
 
 //======================================================================
 //  Go bus on

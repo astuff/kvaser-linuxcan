@@ -81,7 +81,7 @@ SRCS += capabilities.c
 SRCS += dlc.c
 SRCS += ticks.c
 
-ifneq ($(KERNELRELEASE),)
+ifneq ($(src),)
 	RUNDIR := $(src)
 else
 	RUNDIR := $(PWD)

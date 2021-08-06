@@ -1,5 +1,5 @@
 /*
-**            Copyright 2017-2020 by Kvaser AB, Molndal, Sweden
+**            Copyright 2017-2021 by Kvaser AB, Molndal, Sweden
 **                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -62,7 +62,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.35  
+Release notes for linuxcan V5.36  
 ================================================================
 
 These release notes apply to both CANLIB SDK and the Linux drivers.
@@ -113,7 +113,8 @@ Linux device drivers for
   *  KVASER U100P (01174-8)
   *  KVASER U100S (01181-6)
   *  KVASER USBcan Pro 4xHS (01261-5)
-
+  *  KVASER Hybrid CAN/LIN (01284-4)
+  *  KVASER Hybrid Pro CAN/LIN (01288-2)
 
   **    Recommended firmware > 3.0
   ***   Only with USBcan II functionality.
@@ -165,6 +166,37 @@ Known problems
      hardware, the same is not true for auto tx. The latter is only
      available if there is firmware support in the device.
      (This is the same as under Windows.)
+
+
+New Features and Fixed Problems in V5.36   (25-MAY-2021)
+===========================================================================
+* SDK (kvadblib)
+  - Reverted the deprecation status of kvaDbGetMsgByPGN
+  - Updated kvaDbGetMsgByPGN/kvaDbGetMsgByPGNEx to account for data page (dp), /
+    extended data page (edp) and to work with old j1939 databases.
+
+* SDK (kvlclib)
+  - Improved filtering of j1939 PGN when using KVLC_FILE_FORMAT_CSV_SIGNAL,
+    KVLC_FILE_FORMAT_MDF_SIGNAL and KVLC_FILE_FORMAT_MDF_4X_SIGNAL.
+
+* SDK (kvaMemoLibXML)
+  - Fixed a bug where j1939 triggers failed to trigger.
+
+* SDK  (canlib)
+  - Fixed a bug where CanGetBusParamsTq() failed after call to busOn().
+  - Modified canFD_BITRATE_xxx constant for improved stability.
+  - Added bitrate constant canFD_BITRATE_8M_70P.
+
+* Added support for new devices:
+  - Kvaser Hybrid CAN/LIN (01284-4)
+  - Kvaser Hybrid Pro CAN/LIN (01288-2)
+
+* Added firmware upgrade utility, kv_flash_prog and kv_flash_prog_mmap.
+  This utility is currently only supported for devices using the pciefd driver.
+
+* Drivers
+  - Kernel modules can now be installed using DKMS, which automatically builds
+    and reinstalls the drivers after a kernel update.
 
 
 New Features and Fixed Problems in V5.35   (16-FEB-2021)

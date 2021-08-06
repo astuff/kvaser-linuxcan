@@ -100,7 +100,7 @@ var page_canlib =
         [ "Relay Pins", "page_user_guide_kviopin.html#section_user_guide_kviopin_type_relay", null ]
       ] ]
     ] ],
-    [ "Diagnostics API (kvDiag)", "page_user_guide_kvdiag.html", [
+    [ "CANtegrity API (kvDiag)", "page_user_guide_kvdiag.html", [
       [ "Setting up an analyzer", "page_user_guide_kvdiag.html#section_uset_guide_kvdiag_setup", null ],
       [ "Samples", "page_user_guide_kvdiag.html#section_user_guide_kvdiag_samples", null ]
     ] ],

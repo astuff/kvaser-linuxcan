@@ -330,6 +330,7 @@ typedef struct PciCanCardData {
   atomic_t status_seq_no;
 
   cust_channel_name_t cust_channel_name[MAX_CARD_CHANNELS];
+  uint8_t            *flashImage;
 } PciCanCardData;
 
 

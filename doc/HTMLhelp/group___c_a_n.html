@@ -77,7 +77,8 @@ $(document).ready(function(){initNavTree('group___c_a_n.html','');});
 
 <div class="header">
   <div class="summary">
-<a href="#files">Files</a> &#124;
+<a href="#nested-classes">Data Structures</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">CAN<div class="ingroups"><a class="el" href="group__grp__canlib.html">CANlib</a></div></div>  </div>
@@ -87,11 +88,15 @@ $(document).ready(function(){initNavTree('group___c_a_n.html','');});
 <p>CAN related functions.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="files"></a>
-Files</h2></td></tr>
-<tr class="memitem:bus__params__tq_8h"><td class="memItemLeft" align="right" valign="top">file &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bus__params__tq_8h.html">bus_params_tq.h</a></td></tr>
-<tr class="memdesc:bus__params__tq_8h"><td class="mdescLeft">&#160;</td><td class="mdescRight">Definitions for the CANLIB API. <br /></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structkv_bus_params_tq.html">kvBusParamsTq</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:ga55095b4ff633151ac4ccf06b1f3df1da"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structkv_bus_params_tq.html">kvBusParamsTq</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___c_a_n.html#ga55095b4ff633151ac4ccf06b1f3df1da">kvBusParamsTq</a></td></tr>
+<tr class="separator:ga55095b4ff633151ac4ccf06b1f3df1da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -182,6 +187,40 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>CAN related functions. </p>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="ga55095b4ff633151ac4ccf06b1f3df1da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga55095b4ff633151ac4ccf06b1f3df1da">&#9670;&nbsp;</a></span>kvBusParamsTq</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structkv_bus_params_tq.html">kvBusParamsTq</a>  <a class="el" href="structkv_bus_params_tq.html">kvBusParamsTq</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p><b>Constraints</b> </p><pre class="fragment">Constraints that must be fulfilled when opening channel in classic CAN Mode:
+
+  tq         = 1 + prop + phase1 + phase2
+  tq        &gt;= 3
+  sjw       &lt;= min(phase1, phase2)
+  prescaler &gt;= 1
+</pre><pre class="fragment">  Constraints that must be fulfilled when opening channel in CAN FD Mode:
+
+  arbitration.tq         = 1 + arbitration.prop + arbitration.phase1 + arbitration.phase2
+  arbitration.tq        &gt;= 3
+  arbitration.sjw       &lt;= min(arbitration.phase1, arbitration.phase2)
+  arbitration.prescaler &gt;= 1  (&lt;=2 will enable Transmitter Delay Compensation Mechanism)
+
+  data.tq         = 1 + data.phase1 + data.phase2
+  data.tq        &gt;= 3
+  data.sjw       &lt;= min(data.phase1, data.phase2)
+  data.prop       = 0
+  data.prescaler  = arbitration.prescaler
+</pre><p>Used in <a class="el" href="group___c_a_n.html#ga50f169c6f9dd6df93b17c322e8e4fd00">canSetBusParamsTq</a>, <a class="el" href="group___c_a_n.html#ga4beeb28ede2e21a2988076e66f873723">canSetBusParamsFdTq</a>, <a class="el" href="group___c_a_n.html#gae517a9c243c446e040f6f8898d09a677">canGetBusParamsTq</a> and <a class="el" href="group___c_a_n.html#gae517a9c243c446e040f6f8898d09a677">canGetBusParamsTq</a> </p>
+
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="gaa4ffd2fad1932ad5763c2c923a1a12d8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#gaa4ffd2fad1932ad5763c2c923a1a12d8">&#9670;&nbsp;</a></span>canAccept()</h2>
@@ -2374,7 +2413,7 @@ Not implemented in linux.</dd></dl>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.35) Tue Feb 16 2021</li>
+    <li class="footer"> (canlib 5.36) Tue May 25 2021</li>
   </ul>
 </div>
 </body>

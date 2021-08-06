@@ -296,3 +296,64 @@ A16
     We try to determine if you are using EFI and if secure boot is enabled.
     See A12 in this FAQ for more details.
 
+--------------------------------------------------------------------------------
+Q17
+    How do I update the firmware on my device?
+
+A17
+    It is possible to update the firmware of a device using kv_flash_prog,
+    located in linuxcan/kvflash/canlib. Basic usage is covered bellow. For more
+    details see linuxcan/kvflash/README.
+
+    Build kv_flash_prog:
+    $ cd linuxcan
+    $ make kvflash
+
+    Download the "Kvaser Firmware Update Tool" from the downloads section at
+    https://www.kvaser.com. It contains the different firmware image
+    files (*.img).
+    unzip the downloaded FwUpdateTool_xx_yy.zip
+    The images are sorted after platform. Locate the image matching your device
+    (for instance for Kvaser PCIEcan 4xHS use pcie/pciecan_00683_fpgasys.img).
+    kv_flash_prog expects the path to the firmware image. If no other option is
+    passed, kv_flash_prog is started in interactive mode. It is possible to
+    specify a device with the option --device-index=<index>. Or if you know the
+    EAN and serial number of the device, you can use the option
+    --device=<EAN>:<S/N>.
+
+    Return an indexed list with supported and available Kvaser devices found on
+    the PC:
+    $ cd linuxcan/kvflash/canlib
+    $ ./kv_flash_prog --list
+
+    Interactive usage:
+    $ cd linuxcan/kvflash/canlib
+    $ ./kv_flash_prog FwUpdateTool_4_23/pcie/pciecan_00683_fpgasys.img
+
+    Flash device with index 4:
+    $ cd linuxcan/kvflash/canlib
+    $ ./kv_flash_prog --device-index=4 FirmwareUpdateTool/4_23/pcie/pciecan_00683_fpgasys.img
+
+    Flash device with EAN 73-30130-00683-6 an serial number 11055:
+    $ cd linuxcan/kvflash/canlib
+    $ ./kv_flash_prog --device=73-30130-00683-6:11055 FirmwareUpdateTool/4_23/pcie/pciecan_00683_fpgasys.img
+
+
+    It is also possible to do a "dry run", where the image is only verified and
+    not actually flashed:
+    $ cd linuxcan/kvflash/canlib
+    $ ./kv_flash_prog --dryrun --device-index=4 FwUpdateTool_4_23/pcie/pciecan_00683_fpgasys.img
+
+    Note: Currently firmware upgrade is only supported in Linux for devices
+          using the pciefd driver (see list in README). If you need to upgrade
+          firmware of a different device, please use the
+          "Kvaser Firmware Update Tool" in Windows.
+
+--------------------------------------------------------------------------------
+Q18
+    Why can't CANlib find any devices after a system upgrade?
+
+A18
+    If the Linux kernel was upgraded, it is required to rebuild and reinstall
+    the CANlib drivers. If the CANlib drivers are installed using DKMS, this is
+    done automatically and won't be a problem.

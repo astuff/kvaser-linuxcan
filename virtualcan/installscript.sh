@@ -71,10 +71,18 @@ KERNEL_VER=`uname -r` # Kernel version at install time
 # append to file in case installer is run several times on different kernels
 echo $KERNEL_VER >> $DIR/kernel_ver 
 
-install -d -m 755 /lib/modules/$KERNEL_VER/kernel/drivers/char/
-install -m 644 $MODNAME.ko /lib/modules/$KERNEL_VER/kernel/drivers/char/
-if [ "$?" -ne 0 ] ; then
-  exit 1
+# Determine wether or not this is called by DKMS
+DKMS_HOOK=0
+if [ "$1" = "dkms-install" -o "$1" = "dkms-load" ]; then
+  DKMS_HOOK=1
+fi
+
+if [ $DKMS_HOOK -eq 0 ]; then
+  install -d -m 755 /lib/modules/$KERNEL_VER/kernel/drivers/char/
+  install -m 644 $MODNAME.ko /lib/modules/$KERNEL_VER/kernel/drivers/char/
+  if [ "$?" -ne 0 ] ; then
+    exit 1
+  fi
 fi
 install -m 755 virtualcan.sh /usr/sbin/
 if [ "$?" -ne 0 ] ; then
@@ -112,7 +120,7 @@ fi
 
 MODCONF=/etc/modules-load.d/kvaser.conf
 
-if [ "$#" -gt 0 ] && [ $1 = "load" ] ; then
+if [ "$#" -gt 0 ] && [ $1 = "load" -o "$1" = "dkms-load" ] ; then
   /usr/sbin/virtualcan.sh start
   touch $MODCONF
   if [ -f $MODCONF ] ; then

@@ -125,7 +125,7 @@ static uint32_t capabilities_table[][2] = {
   {VCAN_CHANNEL_CAP_HAS_SCRIPT,          canCHANNEL_CAP_SCRIPT},
   {VCAN_CHANNEL_CAP_LIN_HYBRID,          canCHANNEL_CAP_LIN_HYBRID},
   {VCAN_CHANNEL_CAP_HAS_IO_API,          canCHANNEL_CAP_IO_API},
-  {VCAN_CHANNEL_CAP_DIAGNOSTICS,         canCHANNEL_CAP_DIAGNOSTICS}
+  {VCAN_CHANNEL_CAP_DIAGNOSTICS,         canCHANNEL_CAP_CANTEGRITY}
 };
 
 static uint64_t capabilities_ex_table[][2] = {
