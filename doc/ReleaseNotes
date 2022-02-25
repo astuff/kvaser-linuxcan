@@ -1,5 +1,5 @@
 /*
-**            Copyright 2017-2021 by Kvaser AB, Molndal, Sweden
+**            Copyright 2017-2022 by Kvaser AB, Molndal, Sweden
 **                         http://www.kvaser.com
 **
 ** This software is dual licensed under the following two licenses:
@@ -62,7 +62,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.37  
+Release notes for linuxcan V5.38  
 ================================================================
 
 These release notes apply to both CANLIB SDK and the Linux drivers.
@@ -168,6 +168,33 @@ Known problems
      (This is the same as under Windows.)
 
 
+New Features and Fixed Problems in V5.38   (15-FEB-2022)
+===========================================================================
+* Drivers
+  - Fixed build problems for Ubuntu 21.10.
+  - Fixed build problems for kernel v5.13.0, v5.16.0 and v5.17.0.
+  - Fixed DKMS install problem when previous install attempt failed.
+  - Improved dkms target in Makefile.
+
+* SDK (canlib)
+  - Clarified in doc that the representation of 'time' in canRead() and
+    canReadWait() can be set by canIOCTL_SET_TIMER_SCALE.
+  - Added missing devices for canCHANNELDATA_MFGNAME_ASCII.
+
+* SDK (kvadblib)
+  - Fixed bug where motorola CAN FD signals were handled incorrectly.
+  - Error handling added for invalid bound format on int signals in dbc files.
+
+* SDK (kvlclib)
+  - Fixed bug where using multiple databases with Matlab output format
+    generated illegal variable names.
+  - Bugfix in vector ASCII input format.
+  - Updated experimental KME 6.0 format handler.
+
+* SDK (kvmlib)
+  - Updated experimental KME 6.0 format handler.
+
+
 New Features and Fixed Problems in V5.37   (13-SEP-2021)
 ===========================================================================
 * SDK (kvlclib)
@@ -190,7 +217,7 @@ New Features and Fixed Problems in V5.37   (13-SEP-2021)
   - Added experimental KME 6.0 format to kvmKme API
 
 * Drivers
-  - Fixed a bug where kernel modules could not be installed using DKMS on 
+  - Fixed a bug where kernel modules could not be installed using DKMS on
     systems without PCI interfaces.
 
 New Features and Fixed Problems in V5.36   (25-MAY-2021)

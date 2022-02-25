@@ -64,10 +64,10 @@
 #ifndef _MODULE_VERSIONING_H_
 #define _MODULE_VERSIONING_H_
 
-
-// Module versioning
-#define EXPORT_SYMTAB
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wtype-limits"
+#include <linux/bitops.h>
+#pragma GCC diagnostic pop
 #include <linux/version.h>
 
 // Check that CONFIG_* macros are included
@@ -80,15 +80,6 @@
 #endif
 #endif
 
-#if defined(CONFIG_MODVERSIONS) && !defined(MODVERSIONS)
-#   define MODVERSIONS
-#endif
-
-#ifdef MODVERSIONS
-#include <config/modversions.h>
-#endif
 #include <linux/module.h>
 
-
 #endif //_MODULE_VERSIONING_H_
-

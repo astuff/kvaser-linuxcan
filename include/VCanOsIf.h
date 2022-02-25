@@ -72,6 +72,10 @@
 #define _VCAN_OS_IF_H_
 
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wtype-limits"
+#include <linux/bitops.h>
+#pragma GCC diagnostic pop
 #include <linux/poll.h>
 #include <asm/atomic.h>
 #include <linux/types.h>

@@ -1012,7 +1012,7 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
     <tr><td class="paramdir">[out]</td><td class="paramname">msg</td><td>Pointer to the buffer which receives the message data. This buffer must be large enough (i.e. 8 bytes for classic CAN and up to 64 bytes for CAN FD). </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">dlc</td><td>Pointer to a buffer which receives the message length. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">flag</td><td>Pointer to a buffer which receives the message flags, which is a combination of the <a class="el" href="canstat_8h.html#canMSG_xxx">canMSG_xxx</a> (including <a class="el" href="canstat_8h.html#canFDMSG_xxx">canFDMSG_xxx</a> if the CAN FD protocol is enabled) and <a class="el" href="canstat_8h.html#canMSGERR_xxx">canMSGERR_xxx</a> values. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">time</td><td>Pointer to a buffer which receives the message time stamp.</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">time</td><td>Pointer to a buffer which receives the message time stamp. The unit of the time stamp is configurable using <a class="el" href="canlib_8h.html#a5b5d43fc8968aa77e48ef8c8d3036c36">canIOCTL_SET_TIMER_SCALE</a>, default is 1 ms.</td></tr>
   </table>
   </dd>
 </dl>
@@ -1023,7 +1023,7 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_reading">Reading Messages</a>, <a class="el" href="page_user_guide_send_recv_mailboxes.html">Message Mailboxes</a>, <a class="el" href="page_user_guide_send_recv.html#section_user_guide_send_recv_reading">Reading Messages</a> page_user_guide_time Time Measurement</dd>
 <dd>
-<a class="el" href="group___c_a_n.html#gafb5e475233ef14ccf9084f610caba560">canReadSpecific()</a>, <a class="el" href="group___c_a_n.html#ga0eecb6695653d4dc6a4c0bb884a1b261">canReadSpecificSkip()</a>, <a class="el" href="group___c_a_n.html#ga16356f4d646240ff2e640773d21f4d76">canReadSync()</a>, <a class="el" href="group___c_a_n.html#ga4b21a0e2547c1435c378d13e6803acef">canReadSyncSpecific()</a>, <a class="el" href="group___c_a_n.html#gac01f98e282609b5f6aaf2b1eabfb83ec">canReadWait()</a> </dd></dl>
+<a class="el" href="group___c_a_n.html#gafb5e475233ef14ccf9084f610caba560">canReadSpecific()</a>, <a class="el" href="group___c_a_n.html#ga0eecb6695653d4dc6a4c0bb884a1b261">canReadSpecificSkip()</a>, <a class="el" href="group___c_a_n.html#ga16356f4d646240ff2e640773d21f4d76">canReadSync()</a>, <a class="el" href="group___c_a_n.html#ga4b21a0e2547c1435c378d13e6803acef">canReadSyncSpecific()</a>, <a class="el" href="group___c_a_n.html#gac01f98e282609b5f6aaf2b1eabfb83ec">canReadWait()</a>, <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a> </dd></dl>
 
 </div>
 </div>
@@ -1432,7 +1432,7 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
     <tr><td class="paramdir">[out]</td><td class="paramname">msg</td><td>Pointer to the buffer which receives the message data. This buffer must be large enough (i.e. 8 bytes for classic CAN and up to 64 bytes for CAN FD). </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">dlc</td><td>Pointer to a buffer which receives the message length. </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">flag</td><td>Pointer to a buffer which receives the message flags, which is a combination of the <a class="el" href="canstat_8h.html#canMSG_xxx">canMSG_xxx</a> (including <a class="el" href="canstat_8h.html#canFDMSG_xxx">canFDMSG_xxx</a> if the CAN FD protocol is enabled) and <a class="el" href="canstat_8h.html#canMSGERR_xxx">canMSGERR_xxx</a> values. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">time</td><td>Pointer to a buffer which receives the message time stamp. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">time</td><td>Pointer to a buffer which receives the message time stamp. The unit of the time stamp is configurable using <a class="el" href="canlib_8h.html#a5b5d43fc8968aa77e48ef8c8d3036c36">canIOCTL_SET_TIMER_SCALE</a>, default is 1 ms. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">timeout</td><td>If no message is immediately available, this parameter gives the number of milliseconds to wait for a message before returning. 0xFFFFFFFF gives an infinite timeout.</td></tr>
   </table>
   </dd>
@@ -1442,7 +1442,7 @@ Silent Mode is not supported by all CAN controllers.</dd></dl>
 <a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a734089f351bc421c230bf8b6cd9b1e8e">canERR_NOMSG</a> (negative) if there was no message available. </dd>
 <dd>
 <a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a>, <a class="el" href="group___c_a_n.html#gafb5e475233ef14ccf9084f610caba560">canReadSpecific()</a>, <a class="el" href="group___c_a_n.html#ga0eecb6695653d4dc6a4c0bb884a1b261">canReadSpecificSkip()</a>, <a class="el" href="group___c_a_n.html#ga4b21a0e2547c1435c378d13e6803acef">canReadSyncSpecific()</a>, <a class="el" href="group___c_a_n.html#ga16356f4d646240ff2e640773d21f4d76">canReadSync()</a></dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a>, <a class="el" href="group___c_a_n.html#gafb5e475233ef14ccf9084f610caba560">canReadSpecific()</a>, <a class="el" href="group___c_a_n.html#ga0eecb6695653d4dc6a4c0bb884a1b261">canReadSpecificSkip()</a>, <a class="el" href="group___c_a_n.html#ga4b21a0e2547c1435c378d13e6803acef">canReadSyncSpecific()</a>, <a class="el" href="group___c_a_n.html#ga16356f4d646240ff2e640773d21f4d76">canReadSync()</a>, <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a></dd>
 <dd>
 <a class="el" href="page_user_guide_time.html">Time Measurement</a> Time Measurement </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a10">cancount.c</a>, <a class="el" href="canfdmonitor_8c-example.html#a10">canfdmonitor.c</a>, <a class="el" href="canmonitor_8c-example.html#a28">canmonitor.c</a>, and <a class="el" href="tutorial_2c_2_monitor_can_channel_8c-example.html#a2">tutorial/c/MonitorCanChannel.c</a>.</dd>
@@ -2172,7 +2172,7 @@ Not implemented in linux.</dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>This function sends a CAN message. The call returns immediately after queuing the message to the driver.</p>
+<p>This function sends a CAN message. The call returns immediately after queuing the message to the driver so the message has not necessarily been transmitted.</p>
 <p>If you are using the same channel via multiple handles, note that the default behaviour is that the different handles will "hear" each other just as if each handle referred to a channel of its own. If you open, say, channel 0 from thread A and thread B and then send a message from thread A, it will be "received" by thread B. This behaviour can be changed using <a class="el" href="canlib_8h.html#a86f7ce6c809f30983b69ead49d793689">canIOCTL_SET_LOCAL_TXECHO</a>.</p>
 <dl class="section note"><dt>Note</dt><dd>The message has been queued for transmission when this calls return. It has not necessarily been sent.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -2291,7 +2291,7 @@ Not implemented in linux.</dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>This function sends a CAN message. It returns when the message is sent, or the timeout expires.</p>
+<p>This function sends a CAN message and returns when the message has been successfully transmitted, or the timeout expires.</p>
 <p>This is a convenience function that combines <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a> and <a class="el" href="group___c_a_n.html#ga304cb3a7bc2874c1f8ad361a911bcd5f">canWriteSync()</a>.</p>
 <p>If you are using the same channel via multiple handles, note that the default behaviour is that the different handles will "hear" each other just as if each handle referred to a channel of its own. If you open, say, channel 0 from thread A and thread B and then send a message from thread A, it will be "received" by thread B. This behaviour can be changed using <a class="el" href="canlib_8h.html#a86f7ce6c809f30983b69ead49d793689">canIOCTL_SET_LOCAL_TXECHO</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -2309,7 +2309,8 @@ Not implemented in linux.</dd></dl>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="canstat_8h.html#a52b5e5c71832b0bd3c6a5b1fd48583e7a49743d0d438957118b9c6af2e831b209">canOK</a> (zero) if success </dd>
 <dd>
-<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure </dd></dl>
+<a class="el" href="canstat_8h.html#canERR_xxx">canERR_xxx</a> (negative) if failure</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="canlib_8h.html#af74b97adce24c13d8ecc3388aee6e891">canIOCTL_SET_TXACK</a> </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="writeloop_8c-example.html#a10">writeloop.c</a>.</dd>
 </dl>
 </div>
@@ -2413,7 +2414,7 @@ Not implemented in linux.</dd></dl>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.37) Mon Sep 13 2021</li>
+    <li class="footer"> (canlib 5.38) Tue Feb 15 2022</li>
   </ul>
 </div>
 </body>

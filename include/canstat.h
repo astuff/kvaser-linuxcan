@@ -337,7 +337,13 @@ typedef enum {
 #define canEVENT_TX             32001       ///< when a CAN message has been transmitted
 #define canEVENT_ERROR          32002       ///< when a CAN bus error is reported by the CAN controller
 #define canEVENT_STATUS         32003       ///< when the CAN controller changes state
-#define canEVENT_ENVVAR         32004       ///< An envvar changed
+/**
+ * An envvar in a t script changed.
+ * \note Ignored by channels that does not have script capabilities,
+ * \note Not implemented in Linux.
+ * \sa \ref canCHANNEL_CAP_SCRIPT
+ */
+#define canEVENT_ENVVAR         32004
 # define canEVENT_BUSONOFF       32005       ///< Bus on/off status changed
 /** @} */
 

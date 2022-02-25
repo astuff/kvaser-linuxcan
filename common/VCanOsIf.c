@@ -3879,8 +3879,10 @@ static int kvaser_proc_open(struct inode* inode, struct file* file)
 {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 0)
   VCanHWInterface *hwIf = PDE(inode)->data;
-#else
+#elif LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0)
   VCanHWInterface *hwIf = PDE_DATA(inode);
+#else
+  VCanHWInterface *hwIf = pde_data(inode);
 #endif
   return single_open(file, hwIf->procRead, NULL);
 }

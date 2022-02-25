@@ -64,6 +64,10 @@
 // Linux Mhydra driver routines for printf and trp messages
 
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wtype-limits"
+#include <linux/bitops.h>
+#pragma GCC diagnostic pop
 #include <linux/version.h>
 #include <linux/usb.h>
 #include <linux/types.h>

@@ -52,8 +52,8 @@ var NAVTREEINDEX =
 "group__kvadb__signals.html#ga9eac31a7b70bed6db6d2a451f7bce592",
 "group__kvm__files.html#ga26c980e4cdd291958cc540b55d1bf481",
 "kva_memo_lib_x_m_l_8h.html#a668c1e6df525480097a3b0af4a516194a700f351475020460f67d976a872718eb",
-"obsolete_8h.html#a7748990724fd22b9be3cd02265358755",
-"structkv_bus_param_limits.html#aca75b9806920539ceea834b9ca411495"
+"linlib_8h.html#a9b19af88006130b3220a4ecb57cd4e0b",
+"structcan_notify_data.html#aa73ed1819d01004c05b8b1908ef91ef4"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

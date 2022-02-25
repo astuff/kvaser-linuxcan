@@ -30,8 +30,6 @@
 #ifndef __ALT_AVALON_SPI_H__
 #define __ALT_AVALON_SPI_H__
 
-#include <stddef.h>
-
 //#include "alt_types.h"
 
 #ifdef __cplusplus

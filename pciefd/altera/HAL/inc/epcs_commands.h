@@ -28,6 +28,10 @@
  *                                                                             *
  ******************************************************************************/
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wtype-limits"
+#include <linux/bitops.h>
+#pragma GCC diagnostic pop
 #include <asm/io.h>
 
 #define epcs_read    0x03

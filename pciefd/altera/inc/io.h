@@ -33,6 +33,10 @@
 #ifndef __IO_H__
 #define __IO_H__
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wtype-limits"
+#include <linux/bitops.h>
+#pragma GCC diagnostic pop
 /* IO Header file for Nios II Toolchain */
 #include <asm/io.h>
 

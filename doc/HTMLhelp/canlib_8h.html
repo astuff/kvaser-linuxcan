@@ -4317,7 +4317,7 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> mentioned below refers to this functions argument.</p>
-<p>The timer scale determines how precisely the channel's timestamps will be displayed without changing the accuracy of the clock. <em>buf</em> points to a DWORD which contains the desired time-stamp clock resolution in microseconds. The default value is 1000 microseconds, i.e. one millisecond.</p>
+<p>The timer scale determines how precisely the channel's timestamps will be displayed without changing the accuracy of the clock. <em>buf</em> points to a DWORD which contains the desired time-stamp clock resolution in microseconds. If you want to change the resolution to 10 microseconds, set the value to 10. The default value is 1000, i.e. one millisecond.</p>
 <dl class="section note"><dt>Note</dt><dd>The accuracy of the clock isn't affected. </dd></dl>
 
 </div>
@@ -6762,7 +6762,7 @@ On Linux, the default calling convention is used.</dd></dl>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="canlib_8h.html">canlib.h</a></li>
-    <li class="footer"> (canlib 5.37) Mon Sep 13 2021</li>
+    <li class="footer"> (canlib 5.38) Tue Feb 15 2022</li>
   </ul>
 </div>
 </body>

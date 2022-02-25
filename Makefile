@@ -195,7 +195,7 @@ check:
 clean:
 	@for dir in $(SUBDIRS) ; do cd $$dir; $(MAKE) clean; cd ..; done
 	rm -f modules.order Module.symvers $(KV_DKMS_TARBALL)
-	rm -rf .tmp_versions
+	rm -rf .tmp_versions $(KV_DKMS_TMP)
 	find . -name "checklog.txt"|xargs rm -f
 
 
@@ -273,17 +273,20 @@ endif
 	cp dkms/Makefile 10-kvaser.rules dkms/kv_dkms_script.sh moduleinfo.txt config.mak README COPYING COPYING.BSD COPYING.GPL $(KV_DKMS_TMP_SRC_LINUXCAN)/.
 	cp -r include common $(KV_DKMS_TMP_SRC_LINUXCAN)/.
 	sed -i 's/^KV_INSTALL_TARGET=none/KV_INSTALL_TARGET=$(KV_DKMS_INSTALL_TARGET)/g' $(KV_DKMS_TMP_SRC_LINUXCAN)/dkms.conf
-	fakeroot dkms add --verbose --sourcetree $(PWD)/$(KV_DKMS_TMP_SRC) --dkmstree $(PWD)/$(KV_DKMS_TMP_DKMSTREE) $(KV_DKMS_MODULE)/$(KV_DKMS_VERSION)
-	dkms mktarball --verbose --dkmstree $(PWD)/$(KV_DKMS_TMP_DKMSTREE) --source-only $(KV_DKMS_MODULE)/$(KV_DKMS_VERSION)
+	fakeroot dkms add --verbose --sourcetree "$(PWD)/$(KV_DKMS_TMP_SRC)" --dkmstree $(KV_DKMS_TMP_DKMSTREE) $(KV_DKMS_MODULE)/$(KV_DKMS_VERSION)
+	dkms mktarball --verbose --dkmstree $(KV_DKMS_TMP_DKMSTREE) --source-only $(KV_DKMS_MODULE)/$(KV_DKMS_VERSION)
 	cp $(KV_DKMS_TMP_DKMSTREE)/$(KV_DKMS_MODULE)/$(KV_DKMS_VERSION)/tarball/$(KV_DKMS_TARBALL) .
 	rm -rf $(KV_DKMS_TMP)
 
-dkms: $(USERLIBS) $(KV_DKMS_TARBALL)
+dkms: print_versions_start $(USERLIBS) $(KV_DKMS_TARBALL)
+	@$(call print_versions, Done)
+	@$(call check_for_kvaser_usb_devices)
+	@$(call check_for_secure_boot)
 
 dkms_install dkms_load: $(KV_DKMS_TARBALL)
 	$(MAKE) -C canlib install
 	$(MAKE) -C linlib install
-	dkms status $(KV_DKMS_MODULE) | cut -d',' -f 2 | xargs -I theversion dkms remove $(KV_DKMS_MODULE)/theversion --all
+	dkms status $(KV_DKMS_MODULE) | cut -d',' -f 2 | cut -d':' -f 1 | xargs -I theversion dkms remove $(KV_DKMS_MODULE)/theversion --all
 	dkms add $(KV_DKMS_TARBALL)
 	dkms install $(KV_DKMS_MODULE)/$(KV_DKMS_VERSION) -k $(KV_KERNEL_VERSION)
 	dkms status

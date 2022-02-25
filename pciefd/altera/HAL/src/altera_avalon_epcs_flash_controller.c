@@ -34,6 +34,10 @@
  * Author Aaron Ferrucci, adapted from code originally written by PRR.         *
  *                                                                             *
  ******************************************************************************/
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wtype-limits"
+#include <linux/bitops.h>
+#pragma GCC diagnostic pop
 #include <linux/errno.h>
 #include <linux/kernel.h>
 #include <linux/string.h>

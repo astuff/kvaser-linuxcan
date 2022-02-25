@@ -61,6 +61,10 @@
 ** -----------------------------------------------------------------------------
 */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wtype-limits"
+#include <linux/bitops.h>
+#pragma GCC diagnostic pop
 #include <linux/module.h>
 #include "asm/div64.h"
 #include "util.h"

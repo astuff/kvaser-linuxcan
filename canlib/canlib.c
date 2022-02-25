@@ -67,6 +67,7 @@
 #include "canlib_version.h"
 #include "canIfData.h"
 #include "canlib_data.h"
+#include "kv_dev_descr.h"
 
 #include "vcan_ioctl.h"    // Need this for IOCtl to check # channels
 #include "vcanevt.h"
@@ -151,12 +152,6 @@ static const char *errorStrings[] = {
   "The previous I/O pin value has not yet changed the output and is still pending", //canERR_IO_PENDING
 };
 
-struct dev_descr {
-   char * descr_string;
-   unsigned int ean[2];
-};
-
-
 #define CRITICAL_SECTION pthread_mutex_t
 typedef struct list_entry_s {
   struct list_entry_s *Flink;
@@ -205,103 +200,6 @@ static kvTimeDomainHead  timeDomains;
 static int Initialized = FALSE;
 
 
-static struct dev_descr dev_descr_list[] = {
-          {"Kvaser Unknown",                                    {0x00000000, 0x00000000}},
-          {"Kvaser Virtual CAN",                                {0x00000000, 0x00000000}},
-          {"Kvaser PCIcan-S, 1*HS",                             {0x30000827, 0x00073301}},
-          {"Kvaser PCIcan-D, 2*HS",                             {0x30000834, 0x00073301}},
-          {"Kvaser PCIcan-Q, 4 *HS drivers",                    {0x30000841, 0x00073301}},
-          {"Kvaser PCIcan II S",                                {0x30001565, 0x00073301}},
-          {"Kvaser PCIcan II D",                                {0x30001572, 0x00073301}},
-          {"Kvaser USBcan II HS (S)",                           {0x30001589, 0x00073301}},
-          {"Kvaser USBcan II HS/HS",                            {0x30001596, 0x00073301}},
-          {"Kvaser Memorator HS/LS",                            {0x30001701, 0x00073301}},
-          {"Kvaser USBcan II HS/LS",                            {0x30001749, 0x00073301}},
-          {"Kvaser Memorator HS/HS",                            {0x30001756, 0x00073301}},
-          {"Kvaser USBcan Rugged HS",                           {0x30001800, 0x00073301}},
-          {"Kvaser USBcan Rugged HS/HS",                        {0x30001817, 0x00073301}},
-          {"Kvaser PCIcanP-Swc",                                {0x30002210, 0x00073301}},
-          {"Kvaser USBcan II HS-SWC",                           {0x30002319, 0x00073301}},
-          {"Kvaser Memorator HS-SWC",                           {0x30002340, 0x00073301}},
-          {"Kvaser Leaf Light HS",                              {0x30002418, 0x00073301}},
-          {"Kvaser Leaf SemiPro HS",                            {0x30002425, 0x00073301}},
-          {"Kvaser Leaf Professional HS",                       {0x30002432, 0x00073301}},
-          {"Kvaser Leaf SemiPro LS",                            {0x30002609, 0x00073301}},
-          {"Kvaser Leaf Professional LSS",                      {0x30002616, 0x00073301}},
-          {"Kvaser Leaf SemiPro SWC",                           {0x30002630, 0x00073301}},
-          {"Kvaser Leaf Professional SWC",                      {0x30002647, 0x00073301}},
-          {"Kvaser Leaf Professional LIN",                      {0x30002692, 0x00073301}},
-          {"Kvaser PCIcanx 4xHS",                               {0x30003309, 0x00073301}},
-          {"Kvaser PCIcanx HS/HS",                              {0x30003316, 0x00073301}},
-          {"Kvaser PCIcanx HS",                                 {0x30003323, 0x00073301}},
-          {"Kvaser PCIcanx II 2*HS",                            {0x30003439, 0x00073301}},
-          {"Kvaser PCIcanx II 1*HS, combo",                     {0x30003446, 0x00073301}},
-          {"Kvaser Memorator Professional (HS/HS)",             {0x30003514, 0x00073301}},
-          {"Kvaser USBcan Professional (HS/HS)",                {0x30003576, 0x00073301}},
-          {"Kvaser Leaf Light HS with OBDII connector",         {0x30004023, 0x00073301}},
-          {"Kvaser Leaf SemiPro HS with OBDII connector",       {0x30004030, 0x00073301}},
-          {"Kvaser Leaf Professional HS with OBDII connector",  {0x30004047, 0x00073301}},
-          {"Kvaser PCIEcan HS/HS",                              {0x30004054, 0x00073301}},
-          {"Kvaser Leaf Light GI (Galvanic Isolation)",         {0x30004115, 0x00073301}},
-          {"Kvaser USBcan Professional HS/HS, with (standard) RJ45 connectors",   {0x30004139, 0x00073301}},
-          {"Kvaser Memorator Professional HS/LS",               {0x30004177, 0x00073301}},
-          {"Kvaser Leaf Light Rugged HS",                       {0x30004276, 0x00073301}},
-          {"Kvaser Leaf Light HS China",                        {0x30004351, 0x00073301}},
-          {"Kvaser BlackBird SemiPro HS",                       {0x30004412, 0x00073301}},
-          {"Kvaser BlackBird SemiPro 3xHS",                     {0x30004467, 0x00073301}},
-          {"Kvaser BlackBird SemiPro HS/HS",                    {0x30004535, 0x00073301}},
-          {"Kvaser Memorator R SemiPro",                        {0x30004900, 0x00073301}},
-          {"Kvaser Leaf SemiPro Rugged HS",                     {0x30005068, 0x00073301}},
-          {"Kvaser Leaf Professional Rugged HS",                {0x30005099, 0x00073301}},
-          {"Kvaser Memorator Light HS",                         {0x30005136, 0x00073301}},
-          {"Kvaser Memorator Professional CB",                  {0x30005815, 0x00073301}},
-          {"Kvaser Eagle",                                      {0x30005679, 0x00073301}},
-          {"Kvaser Leaf Light GI (Medical)",                    {0x30005686, 0x00073301}},
-          {"Kvaser USBcan Pro SHS/HS",                          {0x30005716, 0x00073301}},
-          {"Kvaser USBcan Pro SHS/SHS",                         {0x30005723, 0x00073301}},
-          {"Kvaser USBcan R",                                   {0x30005792, 0x00073301}},
-          {"Kvaser BlackBird SemiPro",                          {0x30006294, 0x00073301}},
-          {"Kvaser BlackBird v2",                               {0x30006713, 0x00073301}},
-          {"Kvaser USBcan Professional CB",                     {0x30006843, 0x00073301}},
-          {"Kvaser Leaf Light v2",                              {0x30006850, 0x00073301}},
-          {"Kvaser Mini PCI Express HS",                        {0x30006881, 0x00073301}},
-          {"Kvaser PCIEcan 4xHS",                               {0x30006829, 0x00073301}},
-          {"Kvaser Leaf Light HS v2 OEM",                       {0x30007352, 0x00073301}},
-          {"Kvaser Ethercan Light HS",                          {0x30007130, 0x00073301}},
-          {"Kvaser Mini PCI Express 2xHS",                      {0x30007437, 0x00073301}},
-          {"Kvaser USBcan Light 2xHS",                          {0x30007147, 0x00073301}},
-          {"Kvaser PCIEcan 4xHS",                               {0x30006836, 0x00073301}},
-          {"Kvaser Memorator Pro 5xHS",                         {0x30007789, 0x00073301}},
-          {"Kvaser USBcan Pro 5xHS",                            {0x30007796, 0x00073301}},
-          {"Kvaser USBcan Light 4xHS",                          {0x30008311, 0x00073301}},
-          {"Kvaser Leaf Pro HS v2",                             {0x30008434, 0x00073301}},
-          {"Kvaser USBcan Pro 2xHS v2",                         {0x30007529, 0x00073301}},
-          {"Kvaser Memorator 2xHS v2",                          {0x30008212, 0x00073301}},
-          {"Kvaser Memorator Pro 2xHS v2",                      {0x30008199, 0x00073301}},
-          {"Kvaser PCIEcan 2xHS v2",                            {0x30008618, 0x00073301}},
-          {"Kvaser PCIEcan HS v2",                              {0x30008663, 0x00073301}},
-          {"Kvaser USBcan Pro 2xHS v2 CB",                      {0x30008779, 0x00073301}},
-          {"Kvaser Leaf Light HS v2 M12",                       {0x30008816, 0x00073301}},
-          {"Kvaser USBcan R v2",                                {0x30009202, 0x00073301}},
-          {"Kvaser Leaf Light R v2",                            {0x30009219, 0x00073301}},
-          {"Kvaser Hybrid 2xCAN/LIN",                           {0x30009653, 0x00073301}},
-          {"ATI Leaf Light HS v2",                              {0x30009493, 0x00073301}},
-          {"ATI USBcan Pro 2xHS v2",                            {0x30009691, 0x00073301}},
-          {"ATI Memorator Pro 2xHS v2",                         {0x30009714, 0x00073301}},
-          {"Kvaser Mini PCI Express 2xHS v2",                   {0x30010291, 0x00073301}},
-          {"Kvaser Mini PCI Express HS v2",                     {0x30010383, 0x00073301}},
-          {"Kvaser Hybrid Pro 2xCAN/LIN",                       {0x30010420, 0x00073301}},
-          {"Kvaser BlackBird Pro HS v2",                        {0x30009837, 0x00073301}},
-          {"Kvaser Ethercan HS",                                {0x30009769, 0x00073301}},
-          {"Kvaser Memorator Light HS",                         {0x30010581, 0x00073301}},
-          {"Kvaser U100",                                       {0x30011731, 0x00073301}},
-          {"Kvaser U100P",                                      {0x30011748, 0x00073301}},
-          {"Kvaser U100S",                                      {0x30011816, 0x00073301}},
-          {"Kvaser USBcan Pro 4xHS",                            {0x30012615, 0x00073301}},
-          {"Kvaser Hybrid CAN/LIN",                             {0x30012844, 0x00073301}},
-          {"Kvaser Hybrid Pro CAN/LIN",                         {0x30012882, 0x00073301}},
-};
-
 static canStatus check_bitrate (const CanHandle hnd, unsigned int bitrate);
 
 //******************************************************
@@ -318,6 +216,7 @@ canStatus getDevParams (int channel, char devName[], int *devChannel,
     return canERR_NOTFOUND;
   }
 
+  memset(&channel_list, 0, sizeof(channel_list));
   stat = ccl_get_channel_list(&channel_list);
 
   if (stat != canOK) {
@@ -1511,6 +1410,7 @@ canStatus CANLIBAPI canGetNumberOfChannels (int *channelCount)
     return canERR_PARAM;
   }
 
+  memset(&channel_list, 0, sizeof(channel_list));
   stat = ccl_get_channel_list(&channel_list);
 
   if (stat != canOK) {
@@ -3113,7 +3013,7 @@ canStatus CANLIBAPI canUnloadLibrary (void)
 static canStatus check_bitrate (const CanHandle hnd, unsigned int bitrate)
 {
   canStatus    ret;
-  unsigned int max_bitrate;
+  unsigned int max_bitrate = 0;
 
   ret = canGetHandleData(hnd, canCHANNELDATA_MAX_BITRATE, &max_bitrate, sizeof(max_bitrate));
 

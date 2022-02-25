@@ -115,6 +115,10 @@
 
 
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wtype-limits"
+#include <linux/bitops.h>
+#pragma GCC diagnostic pop
 #include <linux/types.h>
 #include <linux/slab.h>
 #include <linux/math64.h>
