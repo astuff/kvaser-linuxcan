@@ -2,8 +2,10 @@ var searchData=
 [
   ['converting',['Converting',['../kvlclib_converting.html',1,'page_kvlclib']]],
   ['csv_20frame_20_28w_29',['CSV Frame (W)',['../kvlclib_format__f_o_r_m_a_t__c_s_v.html',1,'kvlclib_formats']]],
+  ['csv_20signal_20_28w_29',['CSV Signal (W)',['../kvlclib_format__f_o_r_m_a_t__c_s_v__s_i_g_n_a_l.html',1,'kvlclib_formats']]],
   ['can_20bus_20api_20_28canlib_29',['CAN bus API (CANlib)',['../page_canlib.html',1,'']]],
   ['canlib_20api_20calls_20grouped_20by_20function',['CANlib API Calls Grouped by Function',['../page_canlib_api_calls_grouped_by_function.html',1,'page_canlib']]],
+  ['create_20a_20j1939_20db',['Create a J1939 db',['../page_example_c_j1939db.html',1,'page_user_guide_kvadblib_samples']]],
   ['configure_20remote_20device',['Configure Remote Device',['../page_example_c_kvrconfig.html',1,'page_user_guide_kvrlib_samples']]],
   ['connect_20to_20remote_20device',['Connect to Remote Device',['../page_example_c_kvrconnect.html',1,'page_user_guide_kvrlib_samples']]],
   ['connection_20quality_20monitor',['Connection Quality Monitor',['../page_example_c_kvrnetworkconnectiontest.html',1,'page_user_guide_kvrlib_samples']]],

@@ -1,5 +1,17 @@
 var NAVTREEINDEX8 =
 {
+"structkv_bus_param_limits.html#aca75b9806920539ceea834b9ca411495":[14,0,7,3],
+"structkv_bus_params_tq.html":[13,0,2,0],
+"structkv_bus_params_tq.html#a3b769dc9a0e203dea3cc931bdb304377":[13,0,2,0,4],
+"structkv_bus_params_tq.html#a4559f9255ccc9f785a33412fe5496d1a":[13,0,2,0,5],
+"structkv_bus_params_tq.html#a4a8f6c91eefb9c6bf448592aac44153d":[13,0,2,0,3],
+"structkv_bus_params_tq.html#a87167f9802ef5563e4236d5710e1b65b":[13,0,2,0,1],
+"structkv_bus_params_tq.html#aa8c2aacf694615ddaff84e31b31ae0ff":[13,0,2,0,0],
+"structkv_bus_params_tq.html#af263c600d546b48e74f8f7ac7a891533":[13,0,2,0,2],
+"structkv_clock_info.html":[14,0,9],
+"structkv_clock_info.html#a1ceb47504c247019604b4d4e05504a9e":[14,0,9,0],
+"structkv_clock_info.html#a67810cb57a3edc799ac9b23ebbe59457":[14,0,9,3],
+"structkv_clock_info.html#a6d7a01ea2b2b71b529a024b1a4617e3f":[14,0,9,1],
 "structkv_clock_info.html#aad880fc4455c253781e8968f2239d56f":[14,0,9,4],
 "structkv_clock_info.html#afda10a8365f279d4d95a406787507bde":[14,0,9,2],
 "structkv_diag_sample.html":[14,0,10],
@@ -132,9 +144,9 @@ var NAVTREEINDEX8 =
 "structtag__token.html#ac765329451135abec74c45e1897abf26":[14,0,23,7],
 "structtag__token.html#af3fde244c3a673c0a8a0531b7a92c45a":[14,0,23,1],
 "structtag__token.html#afa54f74105f850a372148e16dde90651":[14,0,23,5],
-"tutorial_2c_2_monitor_can_channel_8c-example.html":[16,12],
-"tutorial_2c_2_send_message_8c-example.html":[16,13],
-"tutorial_2csharp_2_monitor_can_channel_8cs-example.html":[16,14],
-"tutorial_2csharp_2_send_message_8cs-example.html":[16,15],
-"writeloop_8c-example.html":[16,16]
+"tutorial_2c_2_monitor_can_channel_8c-example.html":[16,13],
+"tutorial_2c_2_send_message_8c-example.html":[16,14],
+"tutorial_2csharp_2_monitor_can_channel_8cs-example.html":[16,15],
+"tutorial_2csharp_2_send_message_8cs-example.html":[16,16],
+"writeloop_8c-example.html":[16,17]
 };

@@ -18,6 +18,7 @@ var kvmlib_8h =
     [ "kvmFILE_KME25", "kvmlib_8h.html#a78959352d1ef85550b7555521b70ef91", null ],
     [ "kvmFILE_KME40", "kvmlib_8h.html#ab2b06eb3c8b954f675923016bfa41393", null ],
     [ "kvmFILE_KME50", "kvmlib_8h.html#a2ecb833572388db67fface35ac728f74", null ],
+    [ "kvmFILE_KME60", "kvmlib_8h.html#af787ea40b87bbe68419b314c0ca57500", null ],
     [ "kvmFS_FAT16", "kvmlib_8h.html#a4e08b9d2039c3c74a93c067c38ebdc3a", null ],
     [ "kvmFS_FAT32", "kvmlib_8h.html#a3cb1501660624076c259b2a0a2145cab", null ],
     [ "kvmLDF_MAJOR_CAN", "kvmlib_8h.html#aee2a2b46e607e7668979fe55a55f263a", null ],

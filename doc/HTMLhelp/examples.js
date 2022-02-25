@@ -7,6 +7,7 @@ var examples =
     [ "canmonitor.c", "canmonitor_8c-example.html", null ],
     [ "example/c/busparams_tq.c", "example_2c_2busparams_tq_8c-example.html", null ],
     [ "example/c/candb_sample.c", "example_2c_2candb_sample_8c-example.html", null ],
+    [ "example/c/j1939_db.c", "example_2c_2j1939_db_8c-example.html", null ],
     [ "how-to/c/listChannels.c", "how-to_2c_2list_channels_8c-example.html", null ],
     [ "how-to/c/openChannels.c", "how-to_2c_2open_channels_8c-example.html", null ],
     [ "listChannels.c", "list_channels_8c-example.html", null ],

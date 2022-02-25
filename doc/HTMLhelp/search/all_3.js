@@ -46,6 +46,7 @@ var searchData=
   ['dword',['DWORD',['../linlib_8h.html#a798af1e30bc65f319c1a246cecf59e39',1,'linlib.h']]],
   ['databases',['Databases',['../group__kvadb__database.html',1,'']]],
   ['database',['Database',['../group__kvlc__database.html',1,'']]],
+  ['diadem_20dat_20_28w_29',['DIAdem DAT (W)',['../kvlclib_format__d_i_a_d_e_m.html',1,'kvlclib_formats']]],
   ['device_20connection',['Device Connection',['../group__kvm__connection.html',1,'']]],
   ['databases',['Databases',['../group__kvm__database.html',1,'']]],
   ['disk_20operations',['Disk Operations',['../group__kvm__disk__operations.html',1,'']]],

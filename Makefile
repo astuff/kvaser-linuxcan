@@ -266,7 +266,7 @@ $(KV_DKMS_TARBALL):
 	@for dir in $(DRIVERS) ; do cp -r $$dir $(KV_DKMS_TMP_SRC_LINUXCAN)/. ; done
 ifdef KV_NO_PCI
 	# make the non-pci dkms.conf
-	cp dkms/dkms-with-pci.conf $(KV_DKMS_TMP_SRC_LINUXCAN)/dkms.conf
+	cp dkms/dkms-no-pci.conf $(KV_DKMS_TMP_SRC_LINUXCAN)/dkms.conf
 else
 	cp dkms/dkms.conf $(KV_DKMS_TMP_SRC_LINUXCAN)/dkms.conf
 endif

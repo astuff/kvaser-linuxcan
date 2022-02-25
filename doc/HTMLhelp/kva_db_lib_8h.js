@@ -4,6 +4,7 @@ var kva_db_lib_8h =
     [ "KVADB_DATABASE_J1939", "kva_db_lib_8h.html#a9537a62c44999b70c79253ee1271e128", null ],
     [ "KVADB_MESSAGE_EXT", "kva_db_lib_8h.html#acb793e70d95b7daf6045c6dd9cc8792d", null ],
     [ "KVADB_MESSAGE_J1939", "kva_db_lib_8h.html#a0cb969b5cbf74422ee7064b6b8a355f7", null ],
+    [ "KVADB_MESSAGE_STD", "kva_db_lib_8h.html#a8b1e72bee3163130dd050237d2f45584", null ],
     [ "KVADB_MESSAGE_WAKEUP", "kva_db_lib_8h.html#a796f3e3f05590caf5c6e7988ee0cd11e", null ],
     [ "KVADB_MUX_INDEPENDENT", "kva_db_lib_8h.html#a1d99a6637fef6f787f72765ba216b24d", null ],
     [ "KVADB_MUX_SIGNAL", "kva_db_lib_8h.html#aad29b7ca1fc896cc0036c26315d2b2ab", null ],

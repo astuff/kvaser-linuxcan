@@ -62,7 +62,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.36  
+Release notes for linuxcan V5.37  
 ================================================================
 
 These release notes apply to both CANLIB SDK and the Linux drivers.
@@ -167,6 +167,31 @@ Known problems
      available if there is firmware support in the device.
      (This is the same as under Windows.)
 
+
+New Features and Fixed Problems in V5.37   (13-SEP-2021)
+===========================================================================
+* SDK (kvlclib)
+  - Added DIAdem DAT output format.
+  - Added MTS RPC III output format.
+  - Fixed a bug in CVS signal where values were wrong if signals had the
+    same name.
+  - Fixed a bug in CVS signal where values were wrong if signals used bits
+    not available with the received DLC.
+  - Removed creation of debug logfiles while reading KVLC_FILE_FORMAT_MDF_4X
+    logfiles.
+  - KME 2.4 reader now correctly reporting file suffix as '.kme'.
+  - Added experimental KME 6.0 input/output format.
+
+* SDK (kvadblib)
+  - Bugfix: Detect use of invalid object handles which previously could lead to
+    crashes or errors.
+
+* SDK (kvmlib)
+  - Added experimental KME 6.0 format to kvmKme API
+
+* Drivers
+  - Fixed a bug where kernel modules could not be installed using DKMS on 
+    systems without PCI interfaces.
 
 New Features and Fixed Problems in V5.36   (25-MAY-2021)
 ===========================================================================
