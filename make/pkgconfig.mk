@@ -1,5 +1,5 @@
 #
-#             Copyright 2017 by Kvaser AB, Molndal, Sweden
+#             Copyright 2022 by Kvaser AB, Molndal, Sweden
 #                         http://www.kvaser.com
 #
 #  This software is dual licensed under the following two licenses:
@@ -60,33 +60,45 @@
 #
 #  -----------------------------------------------------------------------------
 #
+# Add pkg-config file target to makefile
 
-# Makefile virtualcan
+.PHONY: install_pkgconfig uninstall_pkgconfig clean_pkgconfig
 
--include $(PWD)/../kveyes.mak
+PKG_CONFIG_NAME = $(patsubst lib%,%,$(basename $(LIBNAME)))
+PKG_CONFIG_FILE = $(PKG_CONFIG_NAME).pc
 
-# module name
-KV_MODULE_NAME = kvvirtualcan
+define PKG_CONFIG_CONTENTS
+prefix=$(prefix)
+exec_prefix=$(exec_prefix)
+libdir=$(libdir)
+includedir=$(includedir)
 
-# Number of virtual channels
-ifeq ($(KV_VIRT_CHANNELS),)
-  KV_VIRT_CHANNELS = 2
-endif
+Name: $(PKG_CONFIG_NAME)
+Description: Kvaser Gnu/Linux $(PKG_CONFIG_NAME)
+Version: $(MAJOR).$(MINOR).$(BUILD)
 
-ccflags-y += -DKV_VIRT_CHANNELS=$(KV_VIRT_CHANNELS)
+Requires: $(PKG_REQUIRES)
+Libs: -L$${libdir} -l$(PKG_CONFIG_NAME)
+Cflags: -I$${includedir}
+endef
 
-# Includes
-INCLUDES := $(src)/../include/
+$(OBJDIR)/$(PKG_CONFIG_FILE): $(abspath $(lastword $(MAKEFILE_LIST))) $(OBJDIR)
+	$(file >$@, $(PKG_CONFIG_CONTENTS))
 
-# source files
-SRCS := virtualcan.c
 
-ifneq ($(src),)
-	RUNDIR := $(src)
-else
-	RUNDIR := $(PWD)
-endif
+all: $(OBJDIR)/$(PKG_CONFIG_FILE)
 
-CHECK_SUPPRESS = suppressions.txt
+install_pkgconfig:
+	$(INSTALL_DATA) -D $(OBJDIR)/$(PKG_CONFIG_FILE) $(DESTDIR)$(libdir)/pkgconfig/$(PKG_CONFIG_FILE)
 
-include $(RUNDIR)/../config.mak
+uninstall_pkgconfig:
+	rm -f $(DESTDIR)$(libdir)/pkgconfig/$(PKG_CONFIG_FILE)
+
+clean_pkgconfig:
+	rm -f $(OBJDIR)/$(PKG_CONFIG_FILE)
+
+install: install_pkgconfig
+
+uninstall: uninstall_pkgconfig
+
+clean: clean_pkgconfig

@@ -102,7 +102,7 @@ static void sighand(int sig, siginfo_t *info, void *ucontext)
 
 int main(int argc, char *argv[])
 {
-  unsigned long time, last = 0, lastsys = 0;
+  unsigned int time, last = 0, lastsys = 0;
   canStatus stat;
   canHandle hnd;
   struct timeval tv;
@@ -141,12 +141,12 @@ int main(int argc, char *argv[])
   }
 
   while (!willExit) {
-    stat = canReadTimer(hnd, &time);
+    stat = kvReadTimer(hnd, &time);
     if (stat != canOK) {
       check("canReadTimer", stat);
       break;
     }
-    printf("Time=%lu ms (%lu)\n", time, time - last);
+    printf("Time=%u ms (%u)\n", time, time - last);
     gettimeofday(&tv, NULL);
     printf("system:%lu\n", tv.tv_sec * 1000 + tv.tv_usec / 1000 - lastsys);
     last = time;

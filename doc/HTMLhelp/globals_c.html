@@ -553,6 +553,9 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 <li>canFD_BITRATE_1M_80P
 : <a class="el" href="canlib_8h.html#a3a93c64ba76ebe3c5e525d4dfa4ade8d">canlib.h</a>
 </li>
+<li>canFD_BITRATE_2M_60P
+: <a class="el" href="canlib_8h.html#a945c8003af92915e03c730aabaff29f6">canlib.h</a>
+</li>
 <li>canFD_BITRATE_2M_80P
 : <a class="el" href="canlib_8h.html#a9f21214c84dbb6f5f37eb27520ecc162">canlib.h</a>
 </li>
@@ -573,6 +576,7 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 </li>
 <li>canFDMSG_BRS
 : <a class="el" href="canstat_8h.html#a20c4f6ae319558189eb85d10036e9eea">canstat.h</a>
+, <a class="el" href="kva_db_lib_8h.html#a20c4f6ae319558189eb85d10036e9eea">kvaDbLib.h</a>
 </li>
 <li>canFDMSG_EDL
 : <a class="el" href="canstat_8h.html#a162be4f6b66c81fa09dc76c268475216">canstat.h</a>
@@ -582,6 +586,7 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 </li>
 <li>canFDMSG_FDF
 : <a class="el" href="canstat_8h.html#adb943d749cf5d08a964ed00dc8df8435">canstat.h</a>
+, <a class="el" href="kva_db_lib_8h.html#adb943d749cf5d08a964ed00dc8df8435">kvaDbLib.h</a>
 </li>
 <li>canFDMSG_MASK
 : <a class="el" href="canstat_8h.html#a6f1046c663cdef60425ac4f821aa6dcc">canstat.h</a>
@@ -655,11 +660,11 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 <li>canGetVersionEx()
 : <a class="el" href="group__can__general.html#ga0803bc56e8695150563a48df2c14db5f">canlib.h</a>
 </li>
-<li>canHandle
-: <a class="el" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canlib.h</a>
-</li>
 <li>CanHandle
 : <a class="el" href="canlib_8h.html#a75f2e3a4c7b1e47c8c6b25b76975b510">canlib.h</a>
+</li>
+<li>canHandle
+: <a class="el" href="canlib_8h.html#ae3d1b041d62207d5336f93c089cd5b65">canlib.h</a>
 </li>
 <li>canHWTYPE_ACQUISITOR
 : <a class="el" href="canlib_8h.html#a51381247d42f9cd06d01c1e6b5cbc31d">canlib.h</a>
@@ -874,6 +879,9 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 <li>canIOCTL_SET_ERROR_FRAMES_REPORTING
 : <a class="el" href="canlib_8h.html#aa901680264aad0aec28d9f66e8487b2a">canlib.h</a>
 </li>
+<li>canIOCTL_SET_LOCAL_TXACK
+: <a class="el" href="canlib_8h.html#adc0a26043013ca3fa9d0b339544b12f4">canlib.h</a>
+</li>
 <li>canIOCTL_SET_LOCAL_TXECHO
 : <a class="el" href="canlib_8h.html#a86f7ce6c809f30983b69ead49d793689">canlib.h</a>
 </li>
@@ -921,12 +929,19 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 </li>
 <li>canMSG_EXT
 : <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canstat.h</a>
+, <a class="el" href="kva_db_lib_8h.html#ade936f23b4b303d64187b4c6589c9c10">kvaDbLib.h</a>
+</li>
+<li>canMSG_LOCAL_TXACK
+: <a class="el" href="canstat_8h.html#ae9746f1ef4c868bbc13737eb169c5b3a">canstat.h</a>
 </li>
 <li>canMSG_MASK
 : <a class="el" href="canstat_8h.html#a9ea137b68594f47f0cc3fb112b569b7c">canstat.h</a>
 </li>
 <li>canMSG_NERR
 : <a class="el" href="canstat_8h.html#a1f53f2fdeeb263cd2bf5d374e1dd59a2">canstat.h</a>
+</li>
+<li>canMSG_RESERVED_FOR_EXTENDING
+: <a class="el" href="canstat_8h.html#a05577847b8a71c09d4d4d5fc67b0a8b0">canstat.h</a>
 </li>
 <li>canMSG_RTR
 : <a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3">canstat.h</a>
@@ -936,6 +951,7 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 </li>
 <li>canMSG_STD
 : <a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canstat.h</a>
+, <a class="el" href="kva_db_lib_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">kvaDbLib.h</a>
 </li>
 <li>canMSG_TXACK
 : <a class="el" href="canstat_8h.html#a5ef7ad2e558debdbf85921440961efcb">canstat.h</a>
@@ -1394,7 +1410,7 @@ $(document).ready(function(){initNavTree('globals_c.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.38) Tue Feb 15 2022</li>
+    <li class="footer"> (canlib 5.39) Sun May 29 2022</li>
   </ul>
 </div>
 </body>

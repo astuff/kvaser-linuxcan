@@ -86,7 +86,7 @@ enum e_vevent_type {
        V_TRANSCEIVER           = 32,
        V_TIMER                 = 64,
        V_TRANSMIT_MSG          = 128,   // coexist with V_RECEIVE_MSG and V_CHIP_STATE
-	   V_ENVVAR_NOTIFY         = 5,     // new value 256 is too big if just 1 byte
+       V_ENVVAR_NOTIFY         = 5,     // new value 256 is too big if just 1 byte
        V_PRINTF_MSG            = 9      // new value 512 is too big if just 1 byte
      };
 
@@ -123,6 +123,8 @@ typedef unsigned char VeventTag;
 #define VCAN_MSG_FLAG_SSM_NACK     0x1000  /* Single shot failed (only rx)  */
 #define VCAN_MSG_FLAG_SSM_NACK_ABL 0x2000  /* Single shot failed due to arbitration loss (only rx) */
 
+#define VCAN_MSG_FLAG_LOCAL_TXACK  0x4000  /* Message Transmitted on other handle*/
+
 
 
 /* Used for objbuf write, we need these since the brs flag above is made to fit in flags2 BRS */
@@ -135,7 +137,7 @@ struct s_vcan_msg {  /* 14 Bytes */
   uint32_t           id;
   unsigned short int flags;
   unsigned char      dlc;
-  unsigned char      data[MAX_MSG_LEN];   // 128 bytes 
+  unsigned char      data[MAX_MSG_LEN];   // 128 bytes
 };
 
 
@@ -174,7 +176,7 @@ struct s_vcan_statistic_ext {
 struct s_vcan_error {
          unsigned char code;
        };
-	   
+
 
 #define VCAN_EVT_PRINTF_HEADER 0
 #define VCAN_EVT_PRINTF_DATA   1
@@ -198,7 +200,7 @@ struct s_printf_msg {
           } printf_data;
         };
       };
-      
+
 
 /* Structure for SET_OUTPUT_MODE */
 #define OUTPUT_MODE_SILENT 0
@@ -244,7 +246,7 @@ union s_vcan_tag_data {
         struct s_vcan_statistic_std        statisticStd;
         struct s_vcan_statistic_ext        statisticExt;
         struct s_vcan_error                error;
-		    struct s_printf_msg                printfMsg;
+        struct s_printf_msg                printfMsg;
       };
 
 
@@ -259,7 +261,7 @@ struct s_vcan_event {
                        tagData;         // 14 Bytes (_VMessage)
        };
                                         // --------
-                                        // 22 or 26 Bytes   
+                                        // 22 or 26 Bytes
 
 typedef struct s_vcan_event VCAN_EVENT, Vevent, *PVevent;
 

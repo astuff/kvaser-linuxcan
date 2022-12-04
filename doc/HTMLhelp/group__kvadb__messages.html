@@ -114,6 +114,8 @@ Functions</h2></td></tr>
 <tr class="separator:ga5041eeeb8c35df302ace87a2bab3b283"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga894f00aefc3b13615917a7db64d3c1e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#ga894f00aefc3b13615917a7db64d3c1e6">kvaDbGetMsgFlags</a> (<a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> mh, unsigned int *flags)</td></tr>
 <tr class="separator:ga894f00aefc3b13615917a7db64d3c1e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa8391b262b84d782e9bacbcc4d0a1ae2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#gaa8391b262b84d782e9bacbcc4d0a1ae2">kvaDbGetCanMsgFlags</a> (<a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> mh, unsigned int *flags)</td></tr>
+<tr class="separator:gaa8391b262b84d782e9bacbcc4d0a1ae2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaad8505adb65a9f91a646951136456404"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#gaad8505adb65a9f91a646951136456404">kvaDbGetMsgDlc</a> (<a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> mh, int *dlc)</td></tr>
 <tr class="separator:gaad8505adb65a9f91a646951136456404"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac400592a259f0db28e713aab2b8b4055"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#gac400592a259f0db28e713aab2b8b4055">kvaDbGetMsgSendNode</a> (<a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> mh, <a class="el" href="kva_db_lib_8h.html#adb7f65c8a757705c653045957266beb4">KvaDbNodeHnd</a> *nh)</td></tr>
@@ -273,6 +275,46 @@ Functions</h2></td></tr>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__kvadb__messages.html#ga20409dc07a8fa5f38cfd2e54f98e5748">kvaDbAddMsg()</a> </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="example_2c_2candb_sample_8c-example.html#a52">example/c/candb_sample.c</a>.</dd>
 </dl>
+</div>
+</div>
+<a id="gaa8391b262b84d782e9bacbcc4d0a1ae2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa8391b262b84d782e9bacbcc4d0a1ae2">&#9670;&nbsp;</a></span>kvaDbGetCanMsgFlags()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a> kvaDbGetCanMsgFlags </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a>&#160;</td>
+          <td class="paramname"><em>mh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int *&#160;</td>
+          <td class="paramname"><em>flags</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get relevant message attributes expressed as CAN message flags, see <a class="el" href="canstat_8h.html#canMSG_xxx">canMSG_xxx</a> and <a class="el" href="canstat_8h.html#canFDMSG_xxx">canFDMSG_xxx</a></p>
+<p>Note that canFDMSG_BRS will never be returned for non-CAN FD frames, even though the CANFD_BRS attribute was set in the .dbc file.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mh</td><td>A message handle </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">flags</td><td>The message flags, <a class="el" href="kva_db_lib_8h.html#KVADB_MESSAGE_xxx">KVADB_MESSAGE_xxx</a></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57ad8a19899af8c1e42208a67afb572b2fc">kvaDbOK</a> (zero) if success </dd>
+<dd>
+<a class="el" href="kva_db_lib_8h.html#kvaDbErr_xxx">kvaDbErr_xxx</a> (negative) if failure </dd></dl>
+
 </div>
 </div>
 <a id="ga860fbe484bbe5722c5141e8d73d51b81"></a>
@@ -678,7 +720,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Set the message flags, <a class="el" href="kva_db_lib_8h.html#KVADB_MESSAGE_xxx">KVADB_MESSAGE_xxx</a></p>
+<p>Get the message flags, <a class="el" href="kva_db_lib_8h.html#KVADB_MESSAGE_xxx">KVADB_MESSAGE_xxx</a></p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">mh</td><td>A message handle </td></tr>
@@ -1345,7 +1387,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer"> (canlib 5.38) Tue Feb 15 2022</li>
+    <li class="footer"> (canlib 5.39) Sun May 29 2022</li>
   </ul>
 </div>
 </body>

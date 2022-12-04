@@ -1,5 +1,5 @@
 #
-#             Copyright 2017 by Kvaser AB, Molndal, Sweden
+#             Copyright 2022 by Kvaser AB, Molndal, Sweden
 #                         http://www.kvaser.com
 #
 #  This software is dual licensed under the following two licenses:
@@ -61,32 +61,12 @@
 #  -----------------------------------------------------------------------------
 #
 
-# Makefile virtualcan
-
--include $(PWD)/../kveyes.mak
-
-# module name
-KV_MODULE_NAME = kvvirtualcan
-
-# Number of virtual channels
-ifeq ($(KV_VIRT_CHANNELS),)
-  KV_VIRT_CHANNELS = 2
-endif
-
-ccflags-y += -DKV_VIRT_CHANNELS=$(KV_VIRT_CHANNELS)
-
-# Includes
-INCLUDES := $(src)/../include/
-
-# source files
-SRCS := virtualcan.c
-
-ifneq ($(src),)
-	RUNDIR := $(src)
-else
-	RUNDIR := $(PWD)
-endif
-
-CHECK_SUPPRESS = suppressions.txt
-
-include $(RUNDIR)/../config.mak
+prefix ?= /usr
+exec_prefix ?= $(prefix)
+bindir ?= $(exec_prefix)/bin
+libdir ?= $(exec_prefix)/lib
+includedir ?= $(prefix)/include
+LDCONFIG ?= /sbin/ldconfig
+INSTALL ?= install
+INSTALL_LIB ?= $(INSTALL) -m 644
+INSTALL_DATA ?= $(INSTALL) -m 644

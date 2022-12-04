@@ -3,6 +3,7 @@ var group__kvadb__messages =
     [ "kvaDbAddMsg", "group__kvadb__messages.html#ga20409dc07a8fa5f38cfd2e54f98e5748", null ],
     [ "kvaDbBytesToMsgDlc", "group__kvadb__messages.html#gad5b5e16d7375d2a63c93b6b56aeae40a", null ],
     [ "kvaDbDeleteMsg", "group__kvadb__messages.html#ga35653db199de9237996e708ef9cfd7c1", null ],
+    [ "kvaDbGetCanMsgFlags", "group__kvadb__messages.html#gaa8391b262b84d782e9bacbcc4d0a1ae2", null ],
     [ "kvaDbGetFirstMsg", "group__kvadb__messages.html#ga860fbe484bbe5722c5141e8d73d51b81", null ],
     [ "kvaDbGetMsgById", "group__kvadb__messages.html#ga732d691ed8ead650e4a49d18c8f7ffa2", null ],
     [ "kvaDbGetMsgByIdEx", "group__kvadb__messages.html#ga9698147c268d22991c3ff0f907dff02e", null ],

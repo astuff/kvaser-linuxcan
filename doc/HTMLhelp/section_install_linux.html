@@ -102,23 +102,35 @@ Installing the Driver</h1>
 <div class="fragment"><div class="line">sudo apt-get install build-essential </div></div><!-- fragment --><p>On some systems you may need to install the Linux headers using something like:</p>
 <div class="fragment"><div class="line">sudo apt-get install linux-headers-`uname -r` </div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Having versions of the Linux headers installed other than that of the currently running kernel may cause conflicts and faulty drivers.</dd></dl>
 <p>To download and unpack the latest drivers you may use: </p><div class="fragment"><div class="line">wget --content-disposition <span class="stringliteral">&quot;https://www.kvaser.com/downloads-kvaser/?utm_source=software&amp;utm_ean=7330130980754&amp;utm_status=latest&quot;</span></div><div class="line">tar xvzf linuxcan.tar.gz</div><div class="line">cd linuxcan</div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Choose a path that doesn't contain any spaces for CANlib to build properly.</dd></dl>
+<p><b>Option 1. Manually build and install drivers</b></p>
 <p>To build (compile) all drivers use:</p>
 <div class="fragment"><div class="line">make </div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>It is advised to remove the old driver by calling <code>sudo make uninstall</code> before replacing the installed drivers.</dd></dl>
-<p>To install all drivers use:</p>
+<p>To install all drivers, canlib and linlib use:</p>
 <div class="fragment"><div class="line">sudo make install </div></div><!-- fragment --><p>To install and load, virtual and PCI drivers: </p><div class="fragment"><div class="line">sudo make load </div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Running <code>sudo make load</code> will also cause the virtual and PCI drivers to be loaded at boot time. This might be bad if experimenting with the device drivers.</dd>
 <dd>
 It is never required to manually install or load any modules, create or edit files. This is taken care of the Makefile, in the root of the linuxcan directory.</dd></dl>
+<p><b>Option 2. Build and install drivers using DKMS</b></p>
+<p>Alternatively, drivers can be installed using DKMS which automatically recompiles and reinstalles the CANlib drivers after a kernel upgrade. In order to use DKMS, the same version of Linux kernel package as your kernel version needs to be installed. On Ubuntu, the correct kernel header version can be installed by:</p>
+<div class="fragment"><div class="line">sudo apt-<span class="keyword">get</span> install linux-headers-<span class="keyword">generic</span> </div></div><!-- fragment --><p>To install DKMS on Ubuntu:</p>
+<div class="fragment"><div class="line">sudo apt-<span class="keyword">get</span> install dkms </div></div><!-- fragment --><p>To build a DKMS tarball, use:</p>
+<div class="fragment"><div class="line">make dkms</div></div><!-- fragment --><p>To add and install all drivers, canlib and linlib using DKMS:</p>
+<div class="fragment"><div class="line">sudo make dkms_install</div></div><!-- fragment --><dl class="section note"><dt>Note</dt><dd>Running dkms_install removes all previously installed CANlib DKMS modules for all kernel versions</dd></dl>
+<p>To list all managed DKMS modules, versions and kernels within the tree as well as whether they have been added, built or installed, use:</p>
+<div class="fragment"><div class="line">$ dkms status</div><div class="line">linuxcan, 5.38, 4.4.0-210-<span class="keyword">generic</span>, x86_64: installed</div></div><!-- fragment --><p>The example output is taken from a computer running Ubuntu 16.04.7 LTS.</p>
 <p>More information can be found in the included README file.</p>
 <h2><a class="anchor" id="section_install_virtual_device_linux"></a>
 Installing Virtual Devices</h2>
 <p>The driver named "virtualcan" controls the Virtual Devices. The number of channels each Virtual Device has, and the total number of Virtual Devices, is controlled by editing define statements in linuxcan\virtualcan\virtualcan.h.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define NR_CHANNELS          2</span></div><div class="line"></div><div class="line"><span class="preprocessor">#define NR_VIRTUAL_DEV       1</span></div></div><!-- fragment --><h2><a class="anchor" id="section_uninstall_driver_linux"></a>
 Removing the driver</h2>
-<p>To unload and uninstall all drivers: </p><div class="fragment"><div class="line">sudo make uninstall </div></div><!-- fragment --><p>Alternatively, if there are multiple versions of the drivers installed, all of them can be removed using: </p><div class="fragment"><div class="line">sudo make purge </div></div><!-- fragment --><h1><a class="anchor" id="section_install_sdk_linux"></a>
+<p><b>Option 1. Removing manually installed driver</b></p>
+<p>To unload and uninstall all drivers, canlib and linlib: </p><div class="fragment"><div class="line">sudo make uninstall </div></div><!-- fragment --><p>Alternatively, if there are multiple versions of the drivers installed, all of them can be removed using: </p><div class="fragment"><div class="line">sudo make purge </div></div><!-- fragment --><p><b>Option 2. Removing drivers installed using DKMS</b></p>
+<p>To remove the installed CANlib DKMS module for all kernel versions, along with canlib and linlub, use:</p>
+<div class="fragment"><div class="line">sudo make dkms_uninstall</div></div><!-- fragment --><h1><a class="anchor" id="section_install_sdk_linux"></a>
 Installing Kvaser CANlib SDK</h1>
 <p>System requirements:</p><ul>
 <li>The package libxml2-dev is needed in order to build kvamemolibxml.</li>
-<li>The packages libssl-dev and zlib1g-dev are needed to build kvlclib.</li>
+<li>The package zlib1g-dev is needed to build kvlclib.</li>
 </ul>
 <p>To download and unpack the latest version of Linux SDK library use: </p><div class="fragment"><div class="line">wget --content-disposition <span class="stringliteral">&quot;https://www.kvaser.com/downloads-kvaser/?utm_source=software&amp;utm_ean=7330130981966&amp;utm_status=latest&quot;</span></div><div class="line">tar xvzf kvlibsdk.tar.gz</div><div class="line">cd kvlibsdk</div></div><!-- fragment --><p>To build everything, run</p>
 <div class="fragment"><div class="line">make </div></div><!-- fragment --><p>To run self-tests, run</p>
@@ -133,7 +145,7 @@ Removing Kvaser CANlib SDK</h2>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="page_installing.html">Installation</a></li>
-    <li class="footer"> (canlib 5.38) Tue Feb 15 2022</li>
+    <li class="footer"> (canlib 5.39) Sun May 29 2022</li>
   </ul>
 </div>
 </body>
