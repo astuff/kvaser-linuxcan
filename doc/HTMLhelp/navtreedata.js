@@ -46,14 +46,14 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"canlib_8h.html#ab82a818e60cddf4c65c54d42a474a023",
-"functions.html",
+"canlib_8h.html#ab7c70409147e76675e586a7d201f8ae4",
+"files.html",
 "group__kvadb__attributes.html#ga1d7596e7ab7eb506c53121a13f8dc63f",
 "group__kvadb__signals.html#ga81ca4318029cefe8ecf5df6e5c237b5e",
 "group__kvm__disk__operations.html#gaea656874540da1c4551dbac178052647",
-"kva_memo_lib_x_m_l_8h.html#a43075637b5455ecdf9412b4a1da4b6baad5a5041d91788979c48f6e5e7916960d",
-"linlib_8h.html#a4817ac11ca69f5237588c0a3f422bcdb",
-"structcan_notify_data.html"
+"kva_memo_lib_x_m_l_8h.html#a43075637b5455ecdf9412b4a1da4b6baac76780602c9cde0e7c93351bbd9586ec",
+"linlib_8h.html#a479885d0466fcaff2cb80dedd09a7805",
+"structcan_bus_statistics__s.html#adbc105164238a47be6d13a16cfdf07d8"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -210,6 +210,7 @@ var searchData=
   ['canhwtype_5flapcan',['canHWTYPE_LAPCAN',['../canlib_8h.html#a61957eed346cfaa5792257f3f34f3d19',1,'canlib.h']]],
   ['canhwtype_5fleaf',['canHWTYPE_LEAF',['../canlib_8h.html#a35d5a306111e31e71ba7c2efc6012a9f',1,'canlib.h']]],
   ['canhwtype_5fleaf2',['canHWTYPE_LEAF2',['../canlib_8h.html#a128f359cf954d6f637d0ae5bc368f797',1,'canlib.h']]],
+  ['canhwtype_5fleaf3',['canHWTYPE_LEAF3',['../canlib_8h.html#aad24fe9abf4424a071ec79b535e49ec4',1,'canlib.h']]],
   ['canhwtype_5fmemorator_5fii',['canHWTYPE_MEMORATOR_II',['../canlib_8h.html#aceac09ce0aa12f5b5788540ee8dc432f',1,'canlib.h']]],
   ['canhwtype_5fmemorator_5flight',['canHWTYPE_MEMORATOR_LIGHT',['../canlib_8h.html#ad2c51c78cd35132861c95208a08943b2',1,'canlib.h']]],
   ['canhwtype_5fmemorator_5fpro',['canHWTYPE_MEMORATOR_PRO',['../canlib_8h.html#a0f817b0adc81d42c73445e0c26f37151',1,'canlib.h']]],

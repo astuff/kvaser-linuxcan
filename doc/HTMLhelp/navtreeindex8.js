@@ -1,5 +1,6 @@
 var NAVTREEINDEX8 =
 {
+"structcan_bus_statistics__s.html#adbc105164238a47be6d13a16cfdf07d8":[14,0,2,6],
 "structcan_notify_data.html":[14,0,3],
 "structcan_notify_data.html#a08ba82dcb2d1828a60a16863d4266189":[14,0,3,5],
 "structcan_notify_data.html#a0f3f821312e2c5e8b29394753ef40f94":[14,0,3,0],

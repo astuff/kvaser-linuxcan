@@ -139,6 +139,7 @@ var canlib_8h =
     [ "canHWTYPE_LAPCAN", "canlib_8h.html#a61957eed346cfaa5792257f3f34f3d19", null ],
     [ "canHWTYPE_LEAF", "canlib_8h.html#a35d5a306111e31e71ba7c2efc6012a9f", null ],
     [ "canHWTYPE_LEAF2", "canlib_8h.html#a128f359cf954d6f637d0ae5bc368f797", null ],
+    [ "canHWTYPE_LEAF3", "canlib_8h.html#aad24fe9abf4424a071ec79b535e49ec4", null ],
     [ "canHWTYPE_MEMORATOR_II", "canlib_8h.html#aceac09ce0aa12f5b5788540ee8dc432f", null ],
     [ "canHWTYPE_MEMORATOR_LIGHT", "canlib_8h.html#ad2c51c78cd35132861c95208a08943b2", null ],
     [ "canHWTYPE_MEMORATOR_PRO", "canlib_8h.html#a0f817b0adc81d42c73445e0c26f37151", null ],

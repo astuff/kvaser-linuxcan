@@ -2545,6 +2545,8 @@ static inline int kcan_ioctl_objbuf_allocate(VCanChanData *chd,
         *vStat = hwIf->objbufAlloc(chd, OBJBUF_TYPE_PERIODIC_TX,
                                    &io.buffer_number);
       }
+    } else {
+      *vStat = VCAN_STAT_NOT_IMPLEMENTED;
     }
   }
 

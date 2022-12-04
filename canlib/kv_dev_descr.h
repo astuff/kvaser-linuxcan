@@ -211,5 +211,11 @@ static struct dev_descr dev_descr_list[] = {
           {"ATI Leaf Light HS v2",                              {0x30009493, 0x00073301}},
           {"ATI USBcan Pro 2xHS v2",                            {0x30009691, 0x00073301}},
           {"ATI Memorator Pro 2xHS v2",                         {0x30009714, 0x00073301}},
+          {"Kvaser Leaf Light v3",                              {0x30014244, 0x00073301}},
+          {"Kvaser Leaf Light v3",                              {0x30014268, 0x00073301}},
+          {"Kvaser Leaf Light v3",                              {0x30014282, 0x00073301}},
+          {"Kvaser Leaf Light v3",                              {0x30014305, 0x00073301}},
+          {"Kvaser USBcan Pro 4xCAN Silent",                    {0x30014114, 0x00073301}},
+            
 };
 #endif /* __KV_DEV_DESCR_H_ */

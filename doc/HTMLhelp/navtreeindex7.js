@@ -1,5 +1,6 @@
 var NAVTREEINDEX7 =
 {
+"linlib_8h.html#a479885d0466fcaff2cb80dedd09a7805":[15,0,8,5],
 "linlib_8h.html#a4817ac11ca69f5237588c0a3f422bcdb":[15,0,8,20],
 "linlib_8h.html#a4ae1dab0fb4b072a66584546209e7d58":[15,0,8,22],
 "linlib_8h.html#a719cb4b7b29a67803d34ec60ea5e8a4d":[15,0,8,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX7 =
 "structcan_bus_statistics__s.html#a14481e6fd492f4db9a7db4062d5fc199":[14,0,2,3],
 "structcan_bus_statistics__s.html#a45656d1d249afb1ef001b9d56337b26b":[14,0,2,5],
 "structcan_bus_statistics__s.html#a54171b8fd05e42011ec548693594b4c5":[14,0,2,1],
-"structcan_bus_statistics__s.html#ad071e3666d2aedd0e3c971a3b4148385":[14,0,2,2],
-"structcan_bus_statistics__s.html#adbc105164238a47be6d13a16cfdf07d8":[14,0,2,6]
+"structcan_bus_statistics__s.html#ad071e3666d2aedd0e3c971a3b4148385":[14,0,2,2]
 };

@@ -2558,7 +2558,7 @@ typedef struct kvBusParamLimits {
 #define canHWTYPE_CANLINHYBRID       84  ///< Kvaser Hybrid CAN/LIN
 #define canHWTYPE_DINRAIL            86  ///< Kvaser DIN Rail SE400S and variants
 #define canHWTYPE_U100               88  ///< Kvaser U100 and variants
-
+#define canHWTYPE_LEAF3              90  ///< Kvaser Kvaser Leaf Light v3 and variants
 
 /** @} */
 
@@ -3209,7 +3209,9 @@ typedef struct kvBusParamLimits {
    * When Local transmit acknowledge on a handle is enabled, the handle will receive
    * messages with the canMSG_LOCAL_TXACK flag set every time a message is successfully
    * transmitted on the bus by another handle using the same channel. It will not be received
-   * if it is sent on the same channel.
+   * if it is sent on the same handle. 
+   *
+   * \a buf points to an unsigned int which contains
    *
    * \li 0: to turn Local Transmit Acknowledges off.
    * \li 1: to turn Local Transmit Acknowledges on.

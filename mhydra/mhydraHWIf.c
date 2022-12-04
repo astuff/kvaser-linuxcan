@@ -397,6 +397,9 @@ static int mhydra_send_and_wait_reply_memo (VCanCardData  *vCard,
 #define USB_USBCAN_PRO_4HS_PRODUCT_ID         276 // Kvaser USBcan Pro 4xHS (01261-5)
 #define USB_HYBRID_1HS_CANLIN_PRODUCT_ID      277 // Kvaser Hybrid CAN/LIN (01284-4)
 #define USB_HYBRID_PRO_1HS_CANLIN_PRODUCT_ID  278 // Kvaser Hybrid Pro CAN/LIN (01288-2)
+#define USB_LEAF_LIGHT_V3_PRODUCT_ID          279 // Kvaser Leaf Light v3 (01424-4, 01426-8, 01428-2, 01430-5)
+#define USB_USBCAN_PRO_4HS_SILENT_PRODUCT_ID  280 //  Kvaser USBcan Pro 4xCAN Silent (1411-4)
+
 
 // Table of devices that work with this driver
 static struct usb_device_id mhydra_table [] = {
@@ -421,6 +424,8 @@ static struct usb_device_id mhydra_table [] = {
   { USB_DEVICE(KVASER_VENDOR_ID, USB_USBCAN_PRO_4HS_PRODUCT_ID)},
   { USB_DEVICE(KVASER_VENDOR_ID, USB_HYBRID_1HS_CANLIN_PRODUCT_ID)},
   { USB_DEVICE(KVASER_VENDOR_ID, USB_HYBRID_PRO_1HS_CANLIN_PRODUCT_ID)},
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_LEAF_LIGHT_V3_PRODUCT_ID)},
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_USBCAN_PRO_4HS_SILENT_PRODUCT_ID)},
   { 0 }  // Terminating entry
 };
 
@@ -2805,7 +2810,9 @@ static int mhydra_plugin (struct usb_interface *interface,
        (udev->descriptor.idProduct != USB_U100S_PRODUCT_ID) &&
        (udev->descriptor.idProduct != USB_USBCAN_PRO_4HS_PRODUCT_ID) &&
        (udev->descriptor.idProduct != USB_HYBRID_1HS_CANLIN_PRODUCT_ID) &&
-       (udev->descriptor.idProduct != USB_HYBRID_PRO_1HS_CANLIN_PRODUCT_ID)
+       (udev->descriptor.idProduct != USB_HYBRID_PRO_1HS_CANLIN_PRODUCT_ID) &&
+       (udev->descriptor.idProduct != USB_LEAF_LIGHT_V3_PRODUCT_ID) &&
+       (udev->descriptor.idProduct != USB_USBCAN_PRO_4HS_SILENT_PRODUCT_ID)
       )
      )
   {
@@ -2900,7 +2907,15 @@ static int mhydra_plugin (struct usb_interface *interface,
       break;
     case USB_HYBRID_PRO_1HS_CANLIN_PRODUCT_ID:
       DEBUGPRINT(2, (TXT("\nKVASER ")));
-      DEBUGPRINT(2, (TXT(" Kvaser Hybrid Pro CAN/LIN plugged in\n")));
+      DEBUGPRINT(2, (TXT("Kvaser Hybrid Pro CAN/LIN plugged in\n")));
+      break;
+    case USB_LEAF_LIGHT_V3_PRODUCT_ID:
+      DEBUGPRINT(2, (TXT("\nKVASER ")));
+      DEBUGPRINT(2, (TXT("Kvaser Leaf Light v3 plugged in\n")));
+      break;
+    case USB_USBCAN_PRO_4HS_SILENT_PRODUCT_ID:
+      DEBUGPRINT(2, (TXT("\nKVASER ")));
+      DEBUGPRINT(2, (TXT("Kvaser USBcan Pro 4xCAN Silent plugged in\n")));
       break;
 
     default:

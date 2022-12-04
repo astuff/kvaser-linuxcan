@@ -481,6 +481,9 @@ Macros</h2></td></tr>
 <tr class="memitem:ab943def3563eb89a526ecd8f3b489768"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ab943def3563eb89a526ecd8f3b489768">canHWTYPE_U100</a>&#160;&#160;&#160;88</td></tr>
 <tr class="memdesc:ab943def3563eb89a526ecd8f3b489768"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kvaser U100 and variants.  <a href="#ab943def3563eb89a526ecd8f3b489768">More...</a><br /></td></tr>
 <tr class="separator:ab943def3563eb89a526ecd8f3b489768"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad24fe9abf4424a071ec79b535e49ec4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aad24fe9abf4424a071ec79b535e49ec4">canHWTYPE_LEAF3</a>&#160;&#160;&#160;90</td></tr>
+<tr class="memdesc:aad24fe9abf4424a071ec79b535e49ec4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kvaser Kvaser Leaf Light v3 and variants.  <a href="#aad24fe9abf4424a071ec79b535e49ec4">More...</a><br /></td></tr>
+<tr class="separator:aad24fe9abf4424a071ec79b535e49ec4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canCHANNEL_CAP_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canCHANNEL_CAP_xxx"></a> Channel capabilities. </p>
 </div></td></tr>
@@ -3314,6 +3317,22 @@ Not implemented in linux. </dd></dl>
 
 </div>
 </div>
+<a id="aad24fe9abf4424a071ec79b535e49ec4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad24fe9abf4424a071ec79b535e49ec4">&#9670;&nbsp;</a></span>canHWTYPE_LEAF3</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canHWTYPE_LEAF3&#160;&#160;&#160;90</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Kvaser Kvaser Leaf Light v3 and variants. </p>
+
+</div>
+</div>
 <a id="aceac09ce0aa12f5b5788540ee8dc432f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aceac09ce0aa12f5b5788540ee8dc432f">&#9670;&nbsp;</a></span>canHWTYPE_MEMORATOR_II</h2>
 
@@ -4261,7 +4280,8 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> mentioned below refers to an argument of that function.</p>
-<p>Enable reception of canMSG_LOCAL_TXACK When Local transmit acknowledge on a handle is enabled, the handle will receive messages with the canMSG_LOCAL_TXACK flag set every time a message is successfully transmitted on the bus by another handle using the same channel. It will not be received if it is sent on the same channel.</p>
+<p>Enable reception of canMSG_LOCAL_TXACK When Local transmit acknowledge on a handle is enabled, the handle will receive messages with the canMSG_LOCAL_TXACK flag set every time a message is successfully transmitted on the bus by another handle using the same channel. It will not be received if it is sent on the same handle.</p>
+<p><em>buf</em> points to an unsigned int which contains</p>
 <ul>
 <li>0: to turn Local Transmit Acknowledges off. </li>
 <li>1: to turn Local Transmit Acknowledges on.</li>
@@ -6802,7 +6822,7 @@ On Linux, the default calling convention is used.</dd></dl>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="canlib_8h.html">canlib.h</a></li>
-    <li class="footer"> (canlib 5.39) Sun May 29 2022</li>
+    <li class="footer"> (canlib 5.40) Thu Sep 8 2022</li>
   </ul>
 </div>
 </body>

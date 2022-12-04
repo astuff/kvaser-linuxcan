@@ -62,7 +62,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.39  
+Release notes for linuxcan V5.40  
 ================================================================
 
 These release notes apply to both CANLIB SDK and the Linux drivers.
@@ -166,6 +166,26 @@ Known problems
      hardware, the same is not true for auto tx. The latter is only
      available if there is firmware support in the device.
      (This is the same as under Windows.)
+
+
+New Features and Fixed Problems in V5.40   (08-SEP-2022)
+===========================================================================
+* Drivers
+  - Added support for new device, Kvaser Leaf Light v3
+  - Added support for new device, Kvaser USBcan Pro 4xCAN Silent
+
+* SDK (canlib)
+  - canObjBufAllocate() now properly returns canERR_NOT_IMPLEMENTED for
+    devices where the feature isn't supported.
+
+* SDK (kvlclib)
+  - MDF 4.1 signal based file format (KVLC_FILE_FORMAT_MDF_4X_SIGNAL)
+    was updated with regards to signal units. Specifically, md_unit of
+    CCBLOCK was changed from MDBLOCK to TXBLOCK. It is now also referenced
+    by cc_md_unit of CNBLOCK.
+
+* SDK (kvadblib)
+  - Fixed a crash when failing to parse a database file (with invalid attributes).
 
 
 New Features and Fixed Problems in V5.39   (29-MAY-2022)
