@@ -63,6 +63,8 @@
 
 # Kvaser Linux Canlib Examples Makefile
 
+include ../../make/gflags.mk
+
 CC ?= gcc
 CFLAGS = -Wall -Wextra -Werror -O2  -D_REENTRANT $(XTRA_CFLAGS) -I../../include
 LDFLAGS = -L..
@@ -100,19 +102,19 @@ all: sub
 
 install:
 	@echo --------------------------------------------------------------------
-	@echo "Installing examples into /usr/doc/canlib/examples"
+	@echo "Installing examples into $(DESTDIR)$(prefix)/doc/canlib/examples"
 	@echo --------------------------------------------------------------------
-	mkdir -p /usr/doc/canlib/examples
-	cp -r . /usr/doc/canlib/examples
+	mkdir -p $(DESTDIR)$(prefix)/doc/canlib/examples
+	cp -r . $(DESTDIR)$(prefix)/doc/canlib/examples
 
 uninstall:
-	rm -rf /usr/doc/canlib/examples
+	rm -rf $(DESTDIR)$(prefix)/doc/canlib/examples
 
 clean:
 	rm -f $(OBJS) *.o *~ $(CHECKLOG_FILE)
 
 check:
 	@echo --------------------------------------------------------------------
-	cppcheck -I ../../include/ -I ../../../tmp  -I /usr/include -I /usr/include/linux --enable=all --suppress=toomanyconfigs . > $(CHECKLOG_FILE) 2>&1
+	cppcheck -I ../../include/ -I /usr/include -I /usr/include/linux --enable=all --suppress=toomanyconfigs . > $(CHECKLOG_FILE) 2>&1
 	@cat $(CHECKLOG_FILE)
 	@echo --------------------------------------------------------------------

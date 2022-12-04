@@ -1,6 +1,10 @@
 var kva_db_lib_8h =
 [
     [ "KvaDbProtocolProperties", "struct_kva_db_protocol_properties.html", "struct_kva_db_protocol_properties" ],
+    [ "canFDMSG_BRS", "kva_db_lib_8h.html#a20c4f6ae319558189eb85d10036e9eea", null ],
+    [ "canFDMSG_FDF", "kva_db_lib_8h.html#adb943d749cf5d08a964ed00dc8df8435", null ],
+    [ "canMSG_EXT", "kva_db_lib_8h.html#ade936f23b4b303d64187b4c6589c9c10", null ],
+    [ "canMSG_STD", "kva_db_lib_8h.html#a56000a3f22f1408c26db4dc731aa4a9e", null ],
     [ "KVADB_DATABASE_J1939", "kva_db_lib_8h.html#a9537a62c44999b70c79253ee1271e128", null ],
     [ "KVADB_MESSAGE_EXT", "kva_db_lib_8h.html#acb793e70d95b7daf6045c6dd9cc8792d", null ],
     [ "KVADB_MESSAGE_J1939", "kva_db_lib_8h.html#a0cb969b5cbf74422ee7064b6b8a355f7", null ],
@@ -117,6 +121,7 @@ var kva_db_lib_8h =
     [ "kvaDbGetAttributeValueFloat", "group__kvadb__attributes.html#gaf24b0727ee677167cd371b4ac2abbf16", null ],
     [ "kvaDbGetAttributeValueInt", "group__kvadb__attributes.html#gacfa89a142224438951f501e730de1408", null ],
     [ "kvaDbGetAttributeValueString", "group__kvadb__attributes.html#ga382dbefe56378b9e23bead0d914097e3", null ],
+    [ "kvaDbGetCanMsgFlags", "group__kvadb__messages.html#gaa8391b262b84d782e9bacbcc4d0a1ae2", null ],
     [ "kvaDbGetDatabaseName", "group__kvadb__database.html#gaeacbe7c03340e8134181727b7f16958f", null ],
     [ "kvaDbGetEnumValue", "group__kvadb__signals.html#gab7e1ba2f2df7304d342733a0e275a3cb", null ],
     [ "kvaDbGetErrorText", "group__kvadb__database.html#gaef428f2f4f23c81ada89b8317683c276", null ],

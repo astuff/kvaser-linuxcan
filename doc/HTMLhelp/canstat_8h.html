@@ -90,6 +90,9 @@ $(document).ready(function(){initNavTree('canstat_8h.html','');});
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:a05577847b8a71c09d4d4d5fc67b0a8b0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a05577847b8a71c09d4d4d5fc67b0a8b0">canMSG_RESERVED_FOR_EXTENDING</a>&#160;&#160;&#160;0x80000000</td></tr>
+<tr class="memdesc:a05577847b8a71c09d4d4d5fc67b0a8b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserved future use, tell user that there are more flags.  <a href="#a05577847b8a71c09d4d4d5fc67b0a8b0">More...</a><br /></td></tr>
+<tr class="separator:a05577847b8a71c09d4d4d5fc67b0a8b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b7a3241ee88e905792b2630634a8373"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a3b7a3241ee88e905792b2630634a8373">canTRANSCEIVER_RESNET_NA</a>&#160;&#160;&#160;0</td></tr>
 <tr class="separator:a3b7a3241ee88e905792b2630634a8373"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a3115d766b5936b274c35000a0e72c3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a9a3115d766b5936b274c35000a0e72c3">canTRANSCEIVER_RESNET_MASTER</a>&#160;&#160;&#160;1</td></tr>
@@ -191,7 +194,7 @@ Macros</h2></td></tr>
 <tr><td colspan="2"><div class="groupHeader">Message information flags, CAN (canMSG_xxx)</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canMSG_xxx"></a> The following flags can be returned from <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> et al, or passed to <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a>.</p>
 <p>All flags and/or combinations of them are meaningful for received messages.</p>
-<p><a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3">canMSG_RTR</a>, <a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>, <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a>, <a class="el" href="canstat_8h.html#a616183e2ed8ca81976463914e47b35e1">canMSG_WAKEUP</a> and <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a> are meaningful also for transmitted messages. <a class="el" href="canstat_8h.html#a2a882491f16d0c536a34ac65f847d35e">canMSG_SINGLE_SHOT</a> is only for transmission.</p>
+<p><a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3">canMSG_RTR</a>, <a class="el" href="kva_db_lib_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>, <a class="el" href="kva_db_lib_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a>, <a class="el" href="canstat_8h.html#a616183e2ed8ca81976463914e47b35e1">canMSG_WAKEUP</a> and <a class="el" href="canstat_8h.html#ade1b8ed815a4bc6ada6ec666e48e9cf8">canMSG_ERROR_FRAME</a> are meaningful also for transmitted messages. <a class="el" href="canstat_8h.html#a2a882491f16d0c536a34ac65f847d35e">canMSG_SINGLE_SHOT</a> is only for transmission.</p>
 <p>Note that <a class="el" href="canstat_8h.html#a687df04559a9995e0bec503655454eb3">canMSG_RTR</a> cannot be set for CAN FD messages. </p>
 </div></td></tr>
 <tr class="memitem:a9ea137b68594f47f0cc3fb112b569b7c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a9ea137b68594f47f0cc3fb112b569b7c">canMSG_MASK</a>&#160;&#160;&#160;0x00ff</td></tr>
@@ -224,6 +227,9 @@ Macros</h2></td></tr>
 <tr class="memitem:ace754df19009a6eeff09d866d68a3a27"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ace754df19009a6eeff09d866d68a3a27">canMSG_DELAY_MSG</a>&#160;&#160;&#160;0x0100</td></tr>
 <tr class="memdesc:ace754df19009a6eeff09d866d68a3a27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message is NOT sent on the bus. The transmission of messages are delayed. The dlc specifies the delay in milliseconds (1..1000).  <a href="#ace754df19009a6eeff09d866d68a3a27">More...</a><br /></td></tr>
 <tr class="separator:ace754df19009a6eeff09d866d68a3a27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9746f1ef4c868bbc13737eb169c5b3a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#ae9746f1ef4c868bbc13737eb169c5b3a">canMSG_LOCAL_TXACK</a>&#160;&#160;&#160;0x10000000</td></tr>
+<tr class="memdesc:ae9746f1ef4c868bbc13737eb169c5b3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message was sent from another handle on the same can channel.  <a href="#ae9746f1ef4c868bbc13737eb169c5b3a">More...</a><br /></td></tr>
+<tr class="separator:ae9746f1ef4c868bbc13737eb169c5b3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a882491f16d0c536a34ac65f847d35e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a2a882491f16d0c536a34ac65f847d35e">canMSG_SINGLE_SHOT</a>&#160;&#160;&#160;0x1000000</td></tr>
 <tr class="memdesc:a2a882491f16d0c536a34ac65f847d35e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message is Single Shot, try to send once, no retransmission. This flag can only be used with transmitted messages.  <a href="#a2a882491f16d0c536a34ac65f847d35e">More...</a><br /></td></tr>
 <tr class="separator:a2a882491f16d0c536a34ac65f847d35e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -237,10 +243,10 @@ Macros</h2></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canFDMSG_xxx"></a> Flags used in the CAN FD protocol. Set <a class="el" href="canlib_8h.html#a10aad075bfb9891aa98cf3c131977dc3">canOPEN_CAN_FD</a> in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> to enable the CAN FD protocol. </p>
 </div></td></tr>
 <tr class="memitem:a6f1046c663cdef60425ac4f821aa6dcc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a6f1046c663cdef60425ac4f821aa6dcc">canFDMSG_MASK</a>&#160;&#160;&#160;0xff0000</td></tr>
-<tr class="memdesc:a6f1046c663cdef60425ac4f821aa6dcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obsolete, use <a class="el" href="canstat_8h.html#adb943d749cf5d08a964ed00dc8df8435">canFDMSG_FDF</a> instead.  <a href="#a6f1046c663cdef60425ac4f821aa6dcc">More...</a><br /></td></tr>
+<tr class="memdesc:a6f1046c663cdef60425ac4f821aa6dcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obsolete, use <a class="el" href="kva_db_lib_8h.html#adb943d749cf5d08a964ed00dc8df8435">canFDMSG_FDF</a> instead.  <a href="#a6f1046c663cdef60425ac4f821aa6dcc">More...</a><br /></td></tr>
 <tr class="separator:a6f1046c663cdef60425ac4f821aa6dcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a162be4f6b66c81fa09dc76c268475216"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#a162be4f6b66c81fa09dc76c268475216">canFDMSG_EDL</a>&#160;&#160;&#160;0x010000</td></tr>
-<tr class="memdesc:a162be4f6b66c81fa09dc76c268475216"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obsolete, use <a class="el" href="canstat_8h.html#adb943d749cf5d08a964ed00dc8df8435">canFDMSG_FDF</a> instead.  <a href="#a162be4f6b66c81fa09dc76c268475216">More...</a><br /></td></tr>
+<tr class="memdesc:a162be4f6b66c81fa09dc76c268475216"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obsolete, use <a class="el" href="kva_db_lib_8h.html#adb943d749cf5d08a964ed00dc8df8435">canFDMSG_FDF</a> instead.  <a href="#a162be4f6b66c81fa09dc76c268475216">More...</a><br /></td></tr>
 <tr class="separator:a162be4f6b66c81fa09dc76c268475216"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb943d749cf5d08a964ed00dc8df8435"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canstat_8h.html#adb943d749cf5d08a964ed00dc8df8435">canFDMSG_FDF</a>&#160;&#160;&#160;0x010000</td></tr>
 <tr class="memdesc:adb943d749cf5d08a964ed00dc8df8435"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message is an FD message (CAN FD)  <a href="#adb943d749cf5d08a964ed00dc8df8435">More...</a><br /></td></tr>
@@ -663,7 +669,7 @@ Not implemented in Linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>Obsolete, use <a class="el" href="canstat_8h.html#adb943d749cf5d08a964ed00dc8df8435">canFDMSG_FDF</a> instead. </p>
+<p>Obsolete, use <a class="el" href="kva_db_lib_8h.html#adb943d749cf5d08a964ed00dc8df8435">canFDMSG_FDF</a> instead. </p>
 
 </div>
 </div>
@@ -713,7 +719,7 @@ Not implemented in Linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>Obsolete, use <a class="el" href="canstat_8h.html#adb943d749cf5d08a964ed00dc8df8435">canFDMSG_FDF</a> instead. </p>
+<p>Obsolete, use <a class="el" href="kva_db_lib_8h.html#adb943d749cf5d08a964ed00dc8df8435">canFDMSG_FDF</a> instead. </p>
 
 </div>
 </div>
@@ -783,6 +789,22 @@ Not implemented in Linux. </dd></dl>
 </dl>
 </div>
 </div>
+<a id="ae9746f1ef4c868bbc13737eb169c5b3a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9746f1ef4c868bbc13737eb169c5b3a">&#9670;&nbsp;</a></span>canMSG_LOCAL_TXACK</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canMSG_LOCAL_TXACK&#160;&#160;&#160;0x10000000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Message was sent from another handle on the same can channel. </p>
+
+</div>
+</div>
 <a id="a9ea137b68594f47f0cc3fb112b569b7c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9ea137b68594f47f0cc3fb112b569b7c">&#9670;&nbsp;</a></span>canMSG_MASK</h2>
 
@@ -825,6 +847,22 @@ Not implemented in Linux. </dd></dl>
 <li>CANL and CANH mutually short-circuited</li>
 </ul>
 <p>See the TJA1054 data sheet (available from Philips) for more detailed information. </p>
+
+</div>
+</div>
+<a id="a05577847b8a71c09d4d4d5fc67b0a8b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05577847b8a71c09d4d4d5fc67b0a8b0">&#9670;&nbsp;</a></span>canMSG_RESERVED_FOR_EXTENDING</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canMSG_RESERVED_FOR_EXTENDING&#160;&#160;&#160;0x80000000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Reserved future use, tell user that there are more flags. </p>
 
 </div>
 </div>
@@ -874,7 +912,7 @@ Not implemented in Linux. </dd></dl>
 </div><div class="memdoc">
 
 <p>Message has a standard (11-bit) identifier. </p>
-<p>Message has a standard ID. If a message has an extended identifier but no <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> flag, the most significant bits of the identifier will be cut off. </p>
+<p>Message has a standard ID. If a message has an extended identifier but no <a class="el" href="kva_db_lib_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> flag, the most significant bits of the identifier will be cut off. </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="cancount_8c-example.html#a12">cancount.c</a>.</dd>
 </dl>
 </div>
@@ -2335,7 +2373,7 @@ Not implemented in Linux. </dd></dl>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="canstat_8h.html">canstat.h</a></li>
-    <li class="footer"> (canlib 5.38) Tue Feb 15 2022</li>
+    <li class="footer"> (canlib 5.40) Thu Sep 8 2022</li>
   </ul>
 </div>
 </body>

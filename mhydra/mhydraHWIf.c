@@ -397,6 +397,9 @@ static int mhydra_send_and_wait_reply_memo (VCanCardData  *vCard,
 #define USB_USBCAN_PRO_4HS_PRODUCT_ID         276 // Kvaser USBcan Pro 4xHS (01261-5)
 #define USB_HYBRID_1HS_CANLIN_PRODUCT_ID      277 // Kvaser Hybrid CAN/LIN (01284-4)
 #define USB_HYBRID_PRO_1HS_CANLIN_PRODUCT_ID  278 // Kvaser Hybrid Pro CAN/LIN (01288-2)
+#define USB_LEAF_LIGHT_V3_PRODUCT_ID          279 // Kvaser Leaf Light v3 (01424-4, 01426-8, 01428-2, 01430-5)
+#define USB_USBCAN_PRO_4HS_SILENT_PRODUCT_ID  280 //  Kvaser USBcan Pro 4xCAN Silent (1411-4)
+
 
 // Table of devices that work with this driver
 static struct usb_device_id mhydra_table [] = {
@@ -421,6 +424,8 @@ static struct usb_device_id mhydra_table [] = {
   { USB_DEVICE(KVASER_VENDOR_ID, USB_USBCAN_PRO_4HS_PRODUCT_ID)},
   { USB_DEVICE(KVASER_VENDOR_ID, USB_HYBRID_1HS_CANLIN_PRODUCT_ID)},
   { USB_DEVICE(KVASER_VENDOR_ID, USB_HYBRID_PRO_1HS_CANLIN_PRODUCT_ID)},
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_LEAF_LIGHT_V3_PRODUCT_ID)},
+  { USB_DEVICE(KVASER_VENDOR_ID, USB_USBCAN_PRO_4HS_SILENT_PRODUCT_ID)},
   { 0 }  // Terminating entry
 };
 
@@ -812,8 +817,12 @@ static int mhydra_rx_thread (void *context)
 
   DEBUGPRINT(3, (TXT("rx thread Ended - finalised\n")));
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0))
   module_put(THIS_MODULE);
   do_exit(result);
+#else
+  module_put_and_kthread_exit(result);
+#endif
 
   return result;
 } // _rx_thread
@@ -2801,7 +2810,9 @@ static int mhydra_plugin (struct usb_interface *interface,
        (udev->descriptor.idProduct != USB_U100S_PRODUCT_ID) &&
        (udev->descriptor.idProduct != USB_USBCAN_PRO_4HS_PRODUCT_ID) &&
        (udev->descriptor.idProduct != USB_HYBRID_1HS_CANLIN_PRODUCT_ID) &&
-       (udev->descriptor.idProduct != USB_HYBRID_PRO_1HS_CANLIN_PRODUCT_ID)
+       (udev->descriptor.idProduct != USB_HYBRID_PRO_1HS_CANLIN_PRODUCT_ID) &&
+       (udev->descriptor.idProduct != USB_LEAF_LIGHT_V3_PRODUCT_ID) &&
+       (udev->descriptor.idProduct != USB_USBCAN_PRO_4HS_SILENT_PRODUCT_ID)
       )
      )
   {
@@ -2896,7 +2907,15 @@ static int mhydra_plugin (struct usb_interface *interface,
       break;
     case USB_HYBRID_PRO_1HS_CANLIN_PRODUCT_ID:
       DEBUGPRINT(2, (TXT("\nKVASER ")));
-      DEBUGPRINT(2, (TXT(" Kvaser Hybrid Pro CAN/LIN plugged in\n")));
+      DEBUGPRINT(2, (TXT("Kvaser Hybrid Pro CAN/LIN plugged in\n")));
+      break;
+    case USB_LEAF_LIGHT_V3_PRODUCT_ID:
+      DEBUGPRINT(2, (TXT("\nKVASER ")));
+      DEBUGPRINT(2, (TXT("Kvaser Leaf Light v3 plugged in\n")));
+      break;
+    case USB_USBCAN_PRO_4HS_SILENT_PRODUCT_ID:
+      DEBUGPRINT(2, (TXT("\nKVASER ")));
+      DEBUGPRINT(2, (TXT("Kvaser USBcan Pro 4xCAN Silent plugged in\n")));
       break;
 
     default:
@@ -3621,21 +3640,21 @@ static int mhydra_set_busparams_tq (VCanChanData *vChan, VCanBusParamsTq *par)
   DEBUGPRINT(3, (TXT("mhydra_set_busparam_tq entry\n")));
 
   par->retval_from_device = 0;
-  
+
   memset(&cmd, 0, sizeof(cmd));
-  
+
   setDST(&cmd, dev->channel2he[vChan->channel]);
 
   cmd.cmdNo = CMD_SET_BUSPARAMS_TQ_REQ;
-  
+
   cmd.setBusparamsTqReq.prop   = (uint16_t)par->nominal.prop;
   cmd.setBusparamsTqReq.phase1 = (uint16_t)par->nominal.phase1;
   cmd.setBusparamsTqReq.phase2 = (uint16_t)par->nominal.phase2;
   cmd.setBusparamsTqReq.sjw    = (uint16_t)par->nominal.sjw;
   cmd.setBusparamsTqReq.brp    = (uint16_t)par->nominal.prescaler;
-  
+
   cmd.setBusparamsTqReq.open_as_canfd = vChan->openMode;
-  
+
   if (par->data_valid == 0) {
     cmd.setBusparamsTqReq.propFd   = 0;
     cmd.setBusparamsTqReq.phase1Fd = 0;
@@ -3651,7 +3670,7 @@ static int mhydra_set_busparams_tq (VCanChanData *vChan, VCanBusParamsTq *par)
   }
 
   retval = mhydra_send_and_wait_reply(vChan->vCard, (hydraHostCmd *)&cmd, &reply, CMD_SET_BUSPARAMS_TQ_RESP, 0, SKIP_ERROR_EVENT);
-  
+
   if (retval == VCAN_STAT_OK) {
     par->retval_from_device = (int)reply.setBusparamsTqResp.status;
   } else {
@@ -3772,7 +3791,7 @@ static int mhydra_get_busparams_tq (VCanChanData *vChan,  VCanBusParamsTq *par)
     par->nominal.sjw       = reply.getBusparamsTqResp.sjw;
     par->nominal.prescaler = reply.getBusparamsTqResp.brp;
     par->nominal.tq        = 1 + par->nominal.prop + par->nominal.phase1 + par->nominal.phase2;
-    
+
     if ((reply.getBusparamsTqResp.open_as_canfd == OPEN_AS_CANFD_ISO) || (reply.getBusparamsTqResp.open_as_canfd == OPEN_AS_CANFD_NONISO)) {
       par->data.prop      = reply.getBusparamsTqResp.propFd;
       par->data.phase1    = reply.getBusparamsTqResp.phase1Fd;
@@ -3780,7 +3799,7 @@ static int mhydra_get_busparams_tq (VCanChanData *vChan,  VCanBusParamsTq *par)
       par->data.sjw       = reply.getBusparamsTqResp.sjwFd;
       par->data.prescaler = reply.getBusparamsTqResp.brpFd;
       par->data.tq        = 1 + par->data.prop + par->data.phase1 + par->data.phase2;
-      
+
       par->data_valid = 1;
     } else {
       par->data_valid = 0;
@@ -4022,7 +4041,7 @@ static int mhydra_script_control(const VCanChanData *vChan,
           if (sizeof(cmd.scriptCtrlReq.payload) >= sizeof(script_control->data)) {
             memcpy(&cmd.scriptCtrlReq.payload, &script_control->data, sizeof(script_control->data));
           } else {
-            memcpy(&cmd.scriptCtrlReq.payload, &script_control->data, sizeof(cmd.scriptCtrlReq.payload)); 
+            memcpy(&cmd.scriptCtrlReq.payload, &script_control->data, sizeof(cmd.scriptCtrlReq.payload));
           }
           break;
       }

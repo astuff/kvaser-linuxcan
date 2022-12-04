@@ -1195,6 +1195,13 @@ canStatus CANLIBAPI canTranslateBaud (long *const freq,
     *sjw      = 4;
     break;
 
+  case canFD_BITRATE_2M_60P:
+    *freq     = 2000000L;
+    *tseg1    = 11;
+    *tseg2    = 8;
+    *sjw      = 4;
+    break;
+
   case canFD_BITRATE_1M_80P:
     *freq     = 1000000L;
     *tseg1    = 31;

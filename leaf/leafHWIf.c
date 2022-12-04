@@ -529,8 +529,12 @@ static int leaf_rx_thread (void *context)
 
   DEBUGPRINT(3, (TXT("rx thread Ended - finalised\n")));
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0))
   module_put(THIS_MODULE);
   do_exit(result);
+#else
+  module_put_and_kthread_exit(result);
+#endif
 
   return result;
 } // _rx_thread

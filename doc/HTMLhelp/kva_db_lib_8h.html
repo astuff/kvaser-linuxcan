@@ -116,6 +116,19 @@ Macros</h2></td></tr>
 <tr class="memitem:a796f3e3f05590caf5c6e7988ee0cd11e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#a796f3e3f05590caf5c6e7988ee0cd11e">KVADB_MESSAGE_WAKEUP</a>&#160;&#160;&#160;0x00000002</td></tr>
 <tr class="memdesc:a796f3e3f05590caf5c6e7988ee0cd11e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message is a wakeup frame. This flag is currently not used.  <a href="#a796f3e3f05590caf5c6e7988ee0cd11e">More...</a><br /></td></tr>
 <tr class="separator:a796f3e3f05590caf5c6e7988ee0cd11e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Kvaser CAN Message Flags</div></td></tr>
+<tr class="memitem:a56000a3f22f1408c26db4dc731aa4a9e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>&#160;&#160;&#160;0x0002</td></tr>
+<tr class="memdesc:a56000a3f22f1408c26db4dc731aa4a9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message has a standard (11-bit) identifier.  <a href="#a56000a3f22f1408c26db4dc731aa4a9e">More...</a><br /></td></tr>
+<tr class="separator:a56000a3f22f1408c26db4dc731aa4a9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade936f23b4b303d64187b4c6589c9c10"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a>&#160;&#160;&#160;0x0004</td></tr>
+<tr class="memdesc:ade936f23b4b303d64187b4c6589c9c10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message has an extended (29-bit) identifier.  <a href="#ade936f23b4b303d64187b4c6589c9c10">More...</a><br /></td></tr>
+<tr class="separator:ade936f23b4b303d64187b4c6589c9c10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb943d749cf5d08a964ed00dc8df8435"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#adb943d749cf5d08a964ed00dc8df8435">canFDMSG_FDF</a>&#160;&#160;&#160;0x010000</td></tr>
+<tr class="memdesc:adb943d749cf5d08a964ed00dc8df8435"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message is an FD message (CAN FD)  <a href="#adb943d749cf5d08a964ed00dc8df8435">More...</a><br /></td></tr>
+<tr class="separator:adb943d749cf5d08a964ed00dc8df8435"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20c4f6ae319558189eb85d10036e9eea"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="kva_db_lib_8h.html#a20c4f6ae319558189eb85d10036e9eea">canFDMSG_BRS</a>&#160;&#160;&#160;0x020000</td></tr>
+<tr class="memdesc:a20c4f6ae319558189eb85d10036e9eea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Message is sent/received with bit rate switch (CAN FD)  <a href="#a20c4f6ae319558189eb85d10036e9eea">More...</a><br /></td></tr>
+<tr class="separator:a20c4f6ae319558189eb85d10036e9eea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">CANDBDatabaseFlags API Database Flags</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="KVADB_DATABASE_xxx"></a> The following value is used by <a class="el" href="group__kvadb__database.html#ga04b35b1f5416157cb633cf7c44df396e">kvaDbGetFlags()</a>. </p>
 </div></td></tr>
@@ -343,6 +356,8 @@ Functions</h2></td></tr>
 <tr class="separator:ga5041eeeb8c35df302ace87a2bab3b283"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga894f00aefc3b13615917a7db64d3c1e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#ga894f00aefc3b13615917a7db64d3c1e6">kvaDbGetMsgFlags</a> (<a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> mh, unsigned int *flags)</td></tr>
 <tr class="separator:ga894f00aefc3b13615917a7db64d3c1e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa8391b262b84d782e9bacbcc4d0a1ae2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#gaa8391b262b84d782e9bacbcc4d0a1ae2">kvaDbGetCanMsgFlags</a> (<a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> mh, unsigned int *flags)</td></tr>
+<tr class="separator:gaa8391b262b84d782e9bacbcc4d0a1ae2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaad8505adb65a9f91a646951136456404"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#gaad8505adb65a9f91a646951136456404">kvaDbGetMsgDlc</a> (<a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> mh, int *dlc)</td></tr>
 <tr class="separator:gaad8505adb65a9f91a646951136456404"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac400592a259f0db28e713aab2b8b4055"><td class="memItemLeft" align="right" valign="top"><a class="el" href="kva_db_lib_8h.html#a2f504ec74e40048f49ed23d630528d57">KvaDbStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__kvadb__messages.html#gac400592a259f0db28e713aab2b8b4055">kvaDbGetMsgSendNode</a> (<a class="el" href="kva_db_lib_8h.html#a561c9270625ed9b7a4bc32edaab72227">KvaDbMessageHnd</a> mh, <a class="el" href="kva_db_lib_8h.html#adb7f65c8a757705c653045957266beb4">KvaDbNodeHnd</a> *nh)</td></tr>
@@ -593,6 +608,70 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Definitions for the Database API. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a20c4f6ae319558189eb85d10036e9eea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20c4f6ae319558189eb85d10036e9eea">&#9670;&nbsp;</a></span>canFDMSG_BRS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canFDMSG_BRS&#160;&#160;&#160;0x020000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Message is sent/received with bit rate switch (CAN FD) </p>
+
+</div>
+</div>
+<a id="adb943d749cf5d08a964ed00dc8df8435"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb943d749cf5d08a964ed00dc8df8435">&#9670;&nbsp;</a></span>canFDMSG_FDF</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canFDMSG_FDF&#160;&#160;&#160;0x010000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Message is an FD message (CAN FD) </p>
+
+</div>
+</div>
+<a id="ade936f23b4b303d64187b4c6589c9c10"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade936f23b4b303d64187b4c6589c9c10">&#9670;&nbsp;</a></span>canMSG_EXT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canMSG_EXT&#160;&#160;&#160;0x0004</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Message has an extended (29-bit) identifier. </p>
+
+</div>
+</div>
+<a id="a56000a3f22f1408c26db4dc731aa4a9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a56000a3f22f1408c26db4dc731aa4a9e">&#9670;&nbsp;</a></span>canMSG_STD</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canMSG_STD&#160;&#160;&#160;0x0002</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Message has a standard (11-bit) identifier. </p>
+
+</div>
+</div>
 <a id="a9537a62c44999b70c79253ee1271e128"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9537a62c44999b70c79253ee1271e128">&#9670;&nbsp;</a></span>KVADB_DATABASE_J1939</h2>
 
@@ -1027,7 +1106,7 @@ Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="kva_db_lib_8h.html">kvaDbLib.h</a></li>
-    <li class="footer"> (canlib 5.38) Tue Feb 15 2022</li>
+    <li class="footer"> (canlib 5.40) Thu Sep 8 2022</li>
   </ul>
 </div>
 </body>

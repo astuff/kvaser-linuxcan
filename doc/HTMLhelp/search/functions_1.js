@@ -45,6 +45,7 @@ var searchData=
   ['kvadbgetattributevaluefloat',['kvaDbGetAttributeValueFloat',['../group__kvadb__attributes.html#gaf24b0727ee677167cd371b4ac2abbf16',1,'kvaDbLib.h']]],
   ['kvadbgetattributevalueint',['kvaDbGetAttributeValueInt',['../group__kvadb__attributes.html#gacfa89a142224438951f501e730de1408',1,'kvaDbLib.h']]],
   ['kvadbgetattributevaluestring',['kvaDbGetAttributeValueString',['../group__kvadb__attributes.html#ga382dbefe56378b9e23bead0d914097e3',1,'kvaDbLib.h']]],
+  ['kvadbgetcanmsgflags',['kvaDbGetCanMsgFlags',['../group__kvadb__messages.html#gaa8391b262b84d782e9bacbcc4d0a1ae2',1,'kvaDbLib.h']]],
   ['kvadbgetdatabasename',['kvaDbGetDatabaseName',['../group__kvadb__database.html#gaeacbe7c03340e8134181727b7f16958f',1,'kvaDbLib.h']]],
   ['kvadbgetenumvalue',['kvaDbGetEnumValue',['../group__kvadb__signals.html#gab7e1ba2f2df7304d342733a0e275a3cb',1,'kvaDbLib.h']]],
   ['kvadbgeterrortext',['kvaDbGetErrorText',['../group__kvadb__database.html#gaef428f2f4f23c81ada89b8317683c276',1,'kvaDbLib.h']]],

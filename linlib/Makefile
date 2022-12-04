@@ -65,6 +65,8 @@
 
 include version.mk
 
+include ../make/gflags.mk
+
 LIBRARY := $(LIBNAME).$(MAJOR).$(MINOR).$(BUILD)
 SONAME  := $(LIBNAME).$(MAJOR)
 
@@ -74,6 +76,8 @@ CFLAGS  += -I. -I../include
 # Flags for  reentrant, position independent code
 LIBCFLAGS = $(CFLAGS) -D_REENTRANT -fPIC
 LDFLAGS = -lc -pthread -L../canlib -lcanlib
+
+OBJDIR = $(CURDIR)
 
 SRCS := linlib.c
 
@@ -113,24 +117,27 @@ $(LIBRARY): $(DEPS) $(OTHERDEPS) $(OBJS)
 	$(CC) -M $(CFLAGS) $< > $@
 	$(CC) -M $(CFLAGS) $< | sed s/\\.o/.d/> $@
 
-install: linlib
-	rm -f /usr/lib/$(LIBNAME)
-	rm -f /usr/lib/$(SONAME)
-	install  -m 644 $(LIBRARY) /usr/lib/
-	ln -sf $(LIBRARY) /usr/lib/$(LIBNAME)
-	ln -sf $(LIBRARY) /usr/lib/$(SONAME)
-	/sbin/ldconfig -X
-	install -m 644 ../include/linlib.h /usr/include
+install:
+	rm -f $(DESTDIR)$(libdir)/$(LIBNAME)
+	rm -f $(DESTDIR)$(libdir)/$(SONAME)
+	rm -f $(DESTDIR)$(libdir)/$(LIBRARY)
+	$(INSTALL_LIB) -D $(OBJDIR)/$(LIBRARY) $(DESTDIR)$(libdir)/$(LIBRARY)
+	ln -sf $(LIBRARY) $(DESTDIR)$(libdir)/$(LIBNAME)
+	ln -sf $(LIBRARY) $(DESTDIR)$(libdir)/$(SONAME)
+	$(LDCONFIG) -X
+	$(INSTALL_DATA) -D ../include/linlib.h $(DESTDIR)$(includedir)/linlib.h
 
 uninstall:
-	rm -f /usr/lib/$(LIBNAME)   \
-	      /usr/lib/$(SONAME)    \
-	      /usr/lib/$(LIBRARY)   \
-	      /usr/include/linlib.h
+	rm -f $(DESTDIR)$(libdir)/$(LIBNAME)   \
+	      $(DESTDIR)$(libdir)/$(SONAME)    \
+	      $(DESTDIR)$(libdir)/$(LIBRARY)   \
+	      $(DESTDIR)$(includedir)/linlib.h
 
 clean:
 	rm -f $(OBJS) $(LIBRARY) $(DEPS) $(LIBNAME) $(LIBRARY) $(SONAME) $(TARBALL) *~
 
 depend: $(DEPS)
+
+include ../make/pkgconfig.mk
 
 -include $DEPS

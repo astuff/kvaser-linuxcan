@@ -62,7 +62,7 @@
 */
 
 ================================================================
-Release notes for linuxcan V5.38  
+Release notes for linuxcan V5.40  
 ================================================================
 
 These release notes apply to both CANLIB SDK and the Linux drivers.
@@ -138,8 +138,8 @@ Version info
    * Tested under x86_64 SMP Ubuntu 18.04 x64 (4.15.0-39-generic).
    * Tested under x86_64 SMP Ubuntu 20.04 x64 (5.4.0-29-generic).
    * Tested under x86_64 SMP Ubuntu 20.04 x64 (5.6.0-050600-generic).
-   * Compiled with gcc version 5.4.0, 7.3.0 and 9.3.0.
-   * Used glibc version 2.23, 2.27 and 2.31.
+   * Compiled with gcc version 4.9.2, 5.4.0, 7.3.0, 9.3.0 and 11.2.0.
+   * Used glibc version 2.21, 2.23, 2.27, 2.31 and 2.34.
 
 
 ================================================================
@@ -167,6 +167,57 @@ Known problems
      available if there is firmware support in the device.
      (This is the same as under Windows.)
 
+
+New Features and Fixed Problems in V5.40   (08-SEP-2022)
+===========================================================================
+* Drivers
+  - Added support for new device, Kvaser Leaf Light v3
+  - Added support for new device, Kvaser USBcan Pro 4xCAN Silent
+
+* SDK (canlib)
+  - canObjBufAllocate() now properly returns canERR_NOT_IMPLEMENTED for
+    devices where the feature isn't supported.
+
+* SDK (kvlclib)
+  - MDF 4.1 signal based file format (KVLC_FILE_FORMAT_MDF_4X_SIGNAL)
+    was updated with regards to signal units. Specifically, md_unit of
+    CCBLOCK was changed from MDBLOCK to TXBLOCK. It is now also referenced
+    by cc_md_unit of CNBLOCK.
+
+* SDK (kvadblib)
+  - Fixed a crash when failing to parse a database file (with invalid attributes).
+
+
+New Features and Fixed Problems in V5.39   (29-MAY-2022)
+===========================================================================
+* Drivers
+  - Validate path to linuxcan source directory.
+  - Fixed dkms build targets when make -C flag is used.
+  - Added support for local TxAcks.
+  - Fixed build problems for kernel v5.17.0.
+  - Added possibility to set the number of virtual channels using an environment
+    variable KV_VIRT_CHANNELS during make build. Defaults to 2.
+
+* SDK
+  - Added support for DESTDIR in makefiles.
+  - Added support for pkg-config.
+  - Fixed issue with parallel build (make -j) for kvlibsdk.tar.gz.
+  - kvaMemoLibXML build now requires pkg-config.
+
+* SDK (canlib)
+  - Added possibility to enable local TxAcks on non sending handles. See canIoCtl().
+  - Added new bitrate constant canFD_BITRATE_2M_60P.
+
+* SDK (kvadblib)
+  - Added function kvaDbGetCanMsgFlags that returns relevant message attributes as
+    CAN message flags.
+  - Documentation fix for kvaDbGetMsgFlags.
+
+* SDK (kvlclib)
+  - Fixed build problems for Ubuntu 22.04.
+  - Removed dependency on openssl library libssl-dev.
+  - Updated MDF 4.1 format (KVLC_FILE_FORMAT_MDF_4X) so that CAN_DataFrame.IDE channel
+    is set for extended ID:s. Now both ID MSb and IDE are set for extended ID:s.
 
 New Features and Fixed Problems in V5.38   (15-FEB-2022)
 ===========================================================================

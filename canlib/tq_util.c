@@ -199,6 +199,9 @@ canStatus tqu_translate_bitrate_constant_fd (int freqA, int freqD, kvBusParamsTq
     case canFD_BITRATE_2M_80P:
       tqu_set_busparam_values(data, 20, 8, 4, 4, 7, 2);
       break;
+    case canFD_BITRATE_2M_60P:
+      tqu_set_busparam_values(data, 20, 8, 8, 4, 3, 2);
+      break;
     case canFD_BITRATE_1M_80P:
       tqu_set_busparam_values(data, 40, 8, 8, 8, 23, 2);
       break;
