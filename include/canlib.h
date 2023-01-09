@@ -210,15 +210,14 @@ typedef struct canNotifyData {
 #define canWANT_VIRTUAL                 0x0020
 
 /**
- * Don't allow sharing of this CANlib channel between applications.
+ * Don't allow sharing of this CANlib channel.
  *
- * Two or more applications can share the same CAN channel. You can, for
- * example, have one application send messages on the bus and another
- * application that just monitors the bus. If this is not desired (for
- * performance or other reasons) you can open an exclusive handle to a
- * channel. This means that no other application can open a handle to the same
- * channel. Do this by passing the \ref canOPEN_EXCLUSIVE flag in the flags
- * argument to \ref canOpenChannel().
+ * Two or more threads or applications can share the same CAN channel by
+ * opening multiple handles to the same CANlib channel. If this is not desired
+ * you can open a single exclusive handle to a channel which is done by passing
+ * the \ref canOPEN_EXCLUSIVE flag in the flags argument to \ref
+ * canOpenChannel().  If a handle to the CANlib channel is already open, the
+ * call to \ref canOpenChannel() will fail.
  *
  * This define is used in \ref canOpenChannel()
  */
@@ -441,6 +440,10 @@ typedef struct canNotifyData {
     CAN FD protocol. Indicates a bitrate of 2.0 Mbit/s and sampling point at
     80%. */
 #define canFD_BITRATE_2M_80P       (-1002)
+/** Used in \ref canSetBusParams() and \ref canSetBusParamsFd() when using the
+    CAN FD protocol. Indicates a bitrate of 2.0 Mbit/s and sampling point at
+    60%. */
+#define canFD_BITRATE_2M_60P       (-1007)
 /** Used in \ref canSetBusParams() and \ref canSetBusParamsFd() when using the
     CAN FD protocol. Indicates a bitrate of 4.0 Mbit/s and sampling point at
     80%. */
@@ -2715,13 +2718,13 @@ typedef struct kvBusParamLimits {
    *
    * Enabling transmit Acknowledges on a channel results in that channel receiving a
    * message with the TXACK flag enabled every time a message is successfully
-   * transmitted.
+   * transmitted on the bus.
    *
    * \a buf points to a DWORD which contains
    *
    * \li 0: to turn Transmit Acknowledges off.
    * \li 1: to turn Transmit Acknowledges on.
-   * \li 2: to turn Transmit Acknowledges off, even for the driver's internal
+   * \deprecated \li 2: to turn Transmit Acknowledges off, even for the driver's internal
    * usage. This might enhance performance but will cause some other APIs to
    * stop working (for example, the current size of the transmit queue can not
    * be read when this mode is active.)
@@ -3196,6 +3199,24 @@ typedef struct kvBusParamLimits {
    * \note This is only intended for internal use.
    */
 #  define canIOCTL_LIN_MODE                               45
+
+
+  /**
+   * This define is used in \ref canIoCtl(), \a buf mentioned below refers to an
+   * argument of that function.
+   *
+   * Enable reception of canMSG_LOCAL_TXACK
+   * When Local transmit acknowledge on a handle is enabled, the handle will receive
+   * messages with the canMSG_LOCAL_TXACK flag set every time a message is successfully
+   * transmitted on the bus by another handle using the same channel. It will not be received
+   * if it is sent on the same channel.
+   *
+   * \li 0: to turn Local Transmit Acknowledges off.
+   * \li 1: to turn Local Transmit Acknowledges on.
+   *
+   * The default value is 0, Local Transmit Acknowledge is off.
+   */
+#  define canIOCTL_SET_LOCAL_TXACK                     46
  /** @} */
 
 /** Used in \ref canIOCTL_SET_USER_IOPORT and \ref canIOCTL_GET_USER_IOPORT. */

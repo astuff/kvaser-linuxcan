@@ -309,7 +309,7 @@ typedef enum {
     canERR_IO_PENDING = -47,
 
     /**
-   * <b>There is no valid I/O pin configuration. 
+   * <b>There is no valid I/O pin configuration.
    * </b>
    */
     canERR_IO_NO_VALID_CONFIG = -48,
@@ -452,6 +452,8 @@ typedef enum {
 #define canMSG_TXRQ             0x0080   ///< Message is a TX REQUEST (msg was transfered to the chip)
 #define canMSG_DELAY_MSG        0x0100   ///< Message is NOT sent on the bus. The transmission of messages are delayed. The dlc specifies the delay in milliseconds (1..1000).
 
+#define canMSG_LOCAL_TXACK  0x10000000   ///< Message was sent from another handle on the same can channel. 
+
 // single shot flags:
 #define canMSG_SINGLE_SHOT      0x1000000      ///< Message is Single Shot, try to send once, no retransmission. This flag can only be used with transmitted messages.
 #define canMSG_TXNACK           0x2000000      ///< Message is a failed Single Shot, message was not sent. This flag is only used with received messages.
@@ -502,6 +504,8 @@ typedef enum {
 #define canMSGERR_BUSERR        0xF800      ///< Any RX error
 
 /** @} */
+
+#define canMSG_RESERVED_FOR_EXTENDING  0x80000000   ///< Reserved future use, tell user that there are more flags
 
 /**
  * \name canTRANSCEIVER_LINEMODE_xxx

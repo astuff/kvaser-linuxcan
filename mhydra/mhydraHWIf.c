@@ -812,8 +812,12 @@ static int mhydra_rx_thread (void *context)
 
   DEBUGPRINT(3, (TXT("rx thread Ended - finalised\n")));
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0))
   module_put(THIS_MODULE);
   do_exit(result);
+#else
+  module_put_and_kthread_exit(result);
+#endif
 
   return result;
 } // _rx_thread
@@ -3621,21 +3625,21 @@ static int mhydra_set_busparams_tq (VCanChanData *vChan, VCanBusParamsTq *par)
   DEBUGPRINT(3, (TXT("mhydra_set_busparam_tq entry\n")));
 
   par->retval_from_device = 0;
-  
+
   memset(&cmd, 0, sizeof(cmd));
-  
+
   setDST(&cmd, dev->channel2he[vChan->channel]);
 
   cmd.cmdNo = CMD_SET_BUSPARAMS_TQ_REQ;
-  
+
   cmd.setBusparamsTqReq.prop   = (uint16_t)par->nominal.prop;
   cmd.setBusparamsTqReq.phase1 = (uint16_t)par->nominal.phase1;
   cmd.setBusparamsTqReq.phase2 = (uint16_t)par->nominal.phase2;
   cmd.setBusparamsTqReq.sjw    = (uint16_t)par->nominal.sjw;
   cmd.setBusparamsTqReq.brp    = (uint16_t)par->nominal.prescaler;
-  
+
   cmd.setBusparamsTqReq.open_as_canfd = vChan->openMode;
-  
+
   if (par->data_valid == 0) {
     cmd.setBusparamsTqReq.propFd   = 0;
     cmd.setBusparamsTqReq.phase1Fd = 0;
@@ -3651,7 +3655,7 @@ static int mhydra_set_busparams_tq (VCanChanData *vChan, VCanBusParamsTq *par)
   }
 
   retval = mhydra_send_and_wait_reply(vChan->vCard, (hydraHostCmd *)&cmd, &reply, CMD_SET_BUSPARAMS_TQ_RESP, 0, SKIP_ERROR_EVENT);
-  
+
   if (retval == VCAN_STAT_OK) {
     par->retval_from_device = (int)reply.setBusparamsTqResp.status;
   } else {
@@ -3772,7 +3776,7 @@ static int mhydra_get_busparams_tq (VCanChanData *vChan,  VCanBusParamsTq *par)
     par->nominal.sjw       = reply.getBusparamsTqResp.sjw;
     par->nominal.prescaler = reply.getBusparamsTqResp.brp;
     par->nominal.tq        = 1 + par->nominal.prop + par->nominal.phase1 + par->nominal.phase2;
-    
+
     if ((reply.getBusparamsTqResp.open_as_canfd == OPEN_AS_CANFD_ISO) || (reply.getBusparamsTqResp.open_as_canfd == OPEN_AS_CANFD_NONISO)) {
       par->data.prop      = reply.getBusparamsTqResp.propFd;
       par->data.phase1    = reply.getBusparamsTqResp.phase1Fd;
@@ -3780,7 +3784,7 @@ static int mhydra_get_busparams_tq (VCanChanData *vChan,  VCanBusParamsTq *par)
       par->data.sjw       = reply.getBusparamsTqResp.sjwFd;
       par->data.prescaler = reply.getBusparamsTqResp.brpFd;
       par->data.tq        = 1 + par->data.prop + par->data.phase1 + par->data.phase2;
-      
+
       par->data_valid = 1;
     } else {
       par->data_valid = 0;
@@ -4022,7 +4026,7 @@ static int mhydra_script_control(const VCanChanData *vChan,
           if (sizeof(cmd.scriptCtrlReq.payload) >= sizeof(script_control->data)) {
             memcpy(&cmd.scriptCtrlReq.payload, &script_control->data, sizeof(script_control->data));
           } else {
-            memcpy(&cmd.scriptCtrlReq.payload, &script_control->data, sizeof(cmd.scriptCtrlReq.payload)); 
+            memcpy(&cmd.scriptCtrlReq.payload, &script_control->data, sizeof(cmd.scriptCtrlReq.payload));
           }
           break;
       }

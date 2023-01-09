@@ -93,6 +93,9 @@ reverse=$(if $(1),$(call reverse,$(wordlist 2,$(words $(1)),$(1)))) $(firstword 
 
 KV_KERNEL_VERSION ?= `uname -r`
 KDIR ?= /lib/modules/$(KV_KERNEL_VERSION)/build
+
+this-makefile := $(lastword $(MAKEFILE_LIST))
+abs_srctree := $(realpath $(dir $(this-makefile)))
 define print_versions
 	echo '$1 building linuxcan v'`sed -n 's/^version=//g; s/_/./g; s/\([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).\(beta\)\?/\1 \2/p' moduleinfo.txt`
 	echo '  User    : '$(USER)
@@ -131,13 +134,16 @@ print_versions_start:
 	@$(call check_for_kvaser_usb_devices)
 	@$(call check_for_secure_boot)
 
+check_srctree_path:
+	@$(call check_space_or_colon_in_abs_srctree)
+
 canlib:
-	$(MAKE) -C canlib examples
+	$(MAKE) -C canlib
 
 linlib: canlib
 	$(MAKE) -C linlib
 
-common:
+common: check_srctree_path
 	@cd ./common; $(MAKE) kv_module
 
 pcican: common
@@ -197,6 +203,15 @@ clean:
 	rm -f modules.order Module.symvers $(KV_DKMS_TARBALL)
 	rm -rf .tmp_versions $(KV_DKMS_TMP)
 	find . -name "checklog.txt"|xargs rm -f
+
+
+define check_space_or_colon_in_abs_srctree
+	if test $(words $(subst :, ,$(abs_srctree))) -ne 1 ; then \
+		echo ''; \
+		echo 'Error: Source directory cannot contain spaces or colons: "$(abs_srctree)"'; \
+		exit 1; \
+	fi
+endef
 
 
 define check_for_kvaser_usb_devices
@@ -273,7 +288,7 @@ endif
 	cp dkms/Makefile 10-kvaser.rules dkms/kv_dkms_script.sh moduleinfo.txt config.mak README COPYING COPYING.BSD COPYING.GPL $(KV_DKMS_TMP_SRC_LINUXCAN)/.
 	cp -r include common $(KV_DKMS_TMP_SRC_LINUXCAN)/.
 	sed -i 's/^KV_INSTALL_TARGET=none/KV_INSTALL_TARGET=$(KV_DKMS_INSTALL_TARGET)/g' $(KV_DKMS_TMP_SRC_LINUXCAN)/dkms.conf
-	fakeroot dkms add --verbose --sourcetree "$(PWD)/$(KV_DKMS_TMP_SRC)" --dkmstree $(KV_DKMS_TMP_DKMSTREE) $(KV_DKMS_MODULE)/$(KV_DKMS_VERSION)
+	fakeroot dkms add --verbose --sourcetree "$(CURDIR)/$(KV_DKMS_TMP_SRC)" --dkmstree "$(CURDIR)/$(KV_DKMS_TMP_DKMSTREE)" $(KV_DKMS_MODULE)/$(KV_DKMS_VERSION)
 	dkms mktarball --verbose --dkmstree $(KV_DKMS_TMP_DKMSTREE) --source-only $(KV_DKMS_MODULE)/$(KV_DKMS_VERSION)
 	cp $(KV_DKMS_TMP_DKMSTREE)/$(KV_DKMS_MODULE)/$(KV_DKMS_VERSION)/tarball/$(KV_DKMS_TARBALL) .
 	rm -rf $(KV_DKMS_TMP)

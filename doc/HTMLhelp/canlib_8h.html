@@ -212,6 +212,8 @@ Macros</h2></td></tr>
 <tr class="separator:a3a93c64ba76ebe3c5e525d4dfa4ade8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f21214c84dbb6f5f37eb27520ecc162"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a9f21214c84dbb6f5f37eb27520ecc162">canFD_BITRATE_2M_80P</a>&#160;&#160;&#160;(-1002)</td></tr>
 <tr class="separator:a9f21214c84dbb6f5f37eb27520ecc162"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a945c8003af92915e03c730aabaff29f6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a945c8003af92915e03c730aabaff29f6">canFD_BITRATE_2M_60P</a>&#160;&#160;&#160;(-1007)</td></tr>
+<tr class="separator:a945c8003af92915e03c730aabaff29f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa643e5939f0d4d5fff21747e55c76153"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#aa643e5939f0d4d5fff21747e55c76153">canFD_BITRATE_4M_80P</a>&#160;&#160;&#160;(-1003)</td></tr>
 <tr class="separator:aa643e5939f0d4d5fff21747e55c76153"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1d8bd40554b1433f00e4f1bca3f7a8e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#ac1d8bd40554b1433f00e4f1bca3f7a8e">canFD_BITRATE_8M_60P</a>&#160;&#160;&#160;(-1004)</td></tr>
@@ -658,6 +660,8 @@ Macros</h2></td></tr>
 <tr class="separator:ab5abee158dc1d1872a75dd9483a699b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8462fab97248430a1a349c1ccbaa3911"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#a8462fab97248430a1a349c1ccbaa3911">canIOCTL_LIN_MODE</a>&#160;&#160;&#160;45</td></tr>
 <tr class="separator:a8462fab97248430a1a349c1ccbaa3911"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc0a26043013ca3fa9d0b339544b12f4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="canlib_8h.html#adc0a26043013ca3fa9d0b339544b12f4">canIOCTL_SET_LOCAL_TXACK</a>&#160;&#160;&#160;46</td></tr>
+<tr class="separator:adc0a26043013ca3fa9d0b339544b12f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">canVERSION_CANLIB32_xxx</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><a class="anchor" id="canVERSION_CANLIB32_xxx"></a> Item codes for <a class="el" href="group__can__general.html#ga0803bc56e8695150563a48df2c14db5f">canGetVersionEx()</a>. </p>
 </div></td></tr>
@@ -2890,6 +2894,21 @@ Not implemented in linux. </dd></dl>
 </dl>
 </div>
 </div>
+<a id="a945c8003af92915e03c730aabaff29f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a945c8003af92915e03c730aabaff29f6">&#9670;&nbsp;</a></span>canFD_BITRATE_2M_60P</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canFD_BITRATE_2M_60P&#160;&#160;&#160;(-1007)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Used in <a class="el" href="group___c_a_n.html#ga7eb8c2e92cfae57e7ec5031818524301">canSetBusParams()</a> and <a class="el" href="group___c_a_n.html#gafcd85fbac103dcb123f4cd609be6fa14">canSetBusParamsFd()</a> when using the CAN FD protocol. Indicates a bitrate of 2.0 Mbit/s and sampling point at 60%. </p>
+
+</div>
+</div>
 <a id="a9f21214c84dbb6f5f37eb27520ecc162"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9f21214c84dbb6f5f37eb27520ecc162">&#9670;&nbsp;</a></span>canFD_BITRATE_2M_80P</h2>
 
@@ -4021,7 +4040,7 @@ Not implemented in linux. </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000003">Deprecated:</a></b></dt><dd>Use <a class="el" href="canlib_8h.html#a668aff1bb8e1ff96d50c8bded8706d48">canIOCTL_GET_THROTTLE_SCALED</a> instead</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000004">Deprecated:</a></b></dt><dd>Use <a class="el" href="canlib_8h.html#a668aff1bb8e1ff96d50c8bded8706d48">canIOCTL_GET_THROTTLE_SCALED</a> instead</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Not implemented in linux. </dd></dl>
 
 </div>
@@ -4104,7 +4123,7 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> and <em>buflen</em> refers to this functions arguments.</p>
-<p>Tells CANlib to "prefer" extended identifiers; that is, if you send a message with <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a> and don't specify <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> nor <a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>, <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> will be assumed and the most significant bits of the identifier will be cut off. The contents of <em>buf</em> and <em>buflen</em> is ignored. <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> et al will set <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> and/or <a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a> as usual and are not affected by this call.</p>
+<p>Tells CANlib to "prefer" extended identifiers; that is, if you send a message with <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a> and don't specify <a class="el" href="kva_db_lib_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> nor <a class="el" href="kva_db_lib_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>, <a class="el" href="kva_db_lib_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> will be assumed and the most significant bits of the identifier will be cut off. The contents of <em>buf</em> and <em>buflen</em> is ignored. <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> et al will set <a class="el" href="kva_db_lib_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> and/or <a class="el" href="kva_db_lib_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a> as usual and are not affected by this call.</p>
 <dl class="section note"><dt>Note</dt><dd>Not implemented in linux. </dd></dl>
 
 </div>
@@ -4121,7 +4140,7 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> and <em>buflen</em> refers to this functions arguments.</p>
-<p>Tells CANlib to "prefer" standard identifiers; that is, if you send a message with <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a> and don't specify <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> nor <a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>, <a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a> will be assumed. The contents of <em>buf</em> and <em>buflen</em> are ignored. <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> et al will set <a class="el" href="canstat_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> and/or <a class="el" href="canstat_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a> as usual and are not affected by this call.</p>
+<p>Tells CANlib to "prefer" standard identifiers; that is, if you send a message with <a class="el" href="group___c_a_n.html#ga62c185329d6741c90102511e2f37983e">canWrite()</a> and don't specify <a class="el" href="kva_db_lib_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> nor <a class="el" href="kva_db_lib_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a>, <a class="el" href="kva_db_lib_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a> will be assumed. The contents of <em>buf</em> and <em>buflen</em> are ignored. <a class="el" href="group___c_a_n.html#ga157d49a9343dea68ac953145e02266d8">canRead()</a> et al will set <a class="el" href="kva_db_lib_8h.html#ade936f23b4b303d64187b4c6589c9c10">canMSG_EXT</a> and/or <a class="el" href="kva_db_lib_8h.html#a56000a3f22f1408c26db4dc731aa4a9e">canMSG_STD</a> as usual and are not affected by this call.</p>
 <dl class="section note"><dt>Note</dt><dd>Not implemented in linux. </dd></dl>
 
 </div>
@@ -4230,6 +4249,27 @@ Not implemented in linux. </dd></dl>
 
 </div>
 </div>
+<a id="adc0a26043013ca3fa9d0b339544b12f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc0a26043013ca3fa9d0b339544b12f4">&#9670;&nbsp;</a></span>canIOCTL_SET_LOCAL_TXACK</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define canIOCTL_SET_LOCAL_TXACK&#160;&#160;&#160;46</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> mentioned below refers to an argument of that function.</p>
+<p>Enable reception of canMSG_LOCAL_TXACK When Local transmit acknowledge on a handle is enabled, the handle will receive messages with the canMSG_LOCAL_TXACK flag set every time a message is successfully transmitted on the bus by another handle using the same channel. It will not be received if it is sent on the same channel.</p>
+<ul>
+<li>0: to turn Local Transmit Acknowledges off. </li>
+<li>1: to turn Local Transmit Acknowledges on.</li>
+</ul>
+<p>The default value is 0, Local Transmit Acknowledge is off. </p>
+
+</div>
+</div>
 <a id="a86f7ce6c809f30983b69ead49d793689"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a86f7ce6c809f30983b69ead49d793689">&#9670;&nbsp;</a></span>canIOCTL_SET_LOCAL_TXECHO</h2>
 
@@ -4334,11 +4374,12 @@ Not implemented in linux. </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>This define is used in <a class="el" href="group__can__general.html#gaeaa24db97af22478ca51d48636c7bb12">canIoCtl()</a>, <em>buf</em> mentioned below refers to this functions argument.</p>
-<p>Enabling transmit Acknowledges on a channel results in that channel receiving a message with the TXACK flag enabled every time a message is successfully transmitted.</p>
+<p>Enabling transmit Acknowledges on a channel results in that channel receiving a message with the TXACK flag enabled every time a message is successfully transmitted on the bus.</p>
 <p><em>buf</em> points to a DWORD which contains</p>
 <ul>
 <li>0: to turn Transmit Acknowledges off. </li>
-<li>1: to turn Transmit Acknowledges on. </li>
+<li>1: to turn Transmit Acknowledges on. <dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd></dd></dl>
+</li>
 <li>2: to turn Transmit Acknowledges off, even for the driver's internal usage. This might enhance performance but will cause some other APIs to stop working (for example, the current size of the transmit queue can not be read when this mode is active.)</li>
 </ul>
 <p>The default value is 0, Transmit Acknowledge is off. </p>
@@ -4394,7 +4435,7 @@ Not implemented in linux. </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000002">Deprecated:</a></b></dt><dd>Use <a class="el" href="canlib_8h.html#a209b1bfbe11114d7b1b72d447672bcb4">canIOCTL_SET_THROTTLE_SCALED</a> instead.</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000003">Deprecated:</a></b></dt><dd>Use <a class="el" href="canlib_8h.html#a209b1bfbe11114d7b1b72d447672bcb4">canIOCTL_SET_THROTTLE_SCALED</a> instead.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Not implemented in linux. </dd></dl>
 
 </div>
@@ -4583,8 +4624,8 @@ Not implemented in linux. </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Don't allow sharing of this CANlib channel between applications.</p>
-<p>Two or more applications can share the same CAN channel. You can, for example, have one application send messages on the bus and another application that just monitors the bus. If this is not desired (for performance or other reasons) you can open an exclusive handle to a channel. This means that no other application can open a handle to the same channel. Do this by passing the <a class="el" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a> flag in the flags argument to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>.</p>
+<p>Don't allow sharing of this CANlib channel.</p>
+<p>Two or more threads or applications can share the same CAN channel by opening multiple handles to the same CANlib channel. If this is not desired you can open a single exclusive handle to a channel which is done by passing the <a class="el" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a> flag in the flags argument to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>. If a handle to the CANlib channel is already open, the call to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> will fail.</p>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> </p>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="busparams_8c-example.html#a4">busparams.c</a>, <a class="el" href="cancount_8c-example.html#a4">cancount.c</a>, <a class="el" href="canfdwrite_8c-example.html#a5">canfdwrite.c</a>, <a class="el" href="canmonitor_8c-example.html#a16">canmonitor.c</a>, <a class="el" href="how-to_2c_2open_channels_8c-example.html#a6">how-to/c/openChannels.c</a>, <a class="el" href="simplewrite_8c-example.html#a16">simplewrite.c</a>, and <a class="el" href="writeloop_8c-example.html#a4">writeloop.c</a>.</dd>
 </dl>
@@ -4866,8 +4907,8 @@ reporting" by calling <a class="el" href="group__can__general.html#gaeaa24db97af
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Don't allow sharing of this CANlib channel between applications.</p>
-<p>Two or more applications can share the same CAN channel. You can, for example, have one application send messages on the bus and another application that just monitors the bus. If this is not desired (for performance or other reasons) you can open an exclusive handle to a channel. This means that no other application can open a handle to the same channel. Do this by passing the <a class="el" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a> flag in the flags argument to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>.</p>
+<p>Don't allow sharing of this CANlib channel.</p>
+<p>Two or more threads or applications can share the same CAN channel by opening multiple handles to the same CANlib channel. If this is not desired you can open a single exclusive handle to a channel which is done by passing the <a class="el" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a> flag in the flags argument to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>. If a handle to the CANlib channel is already open, the call to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> will fail.</p>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> </p>
 
 </div>
@@ -4883,8 +4924,8 @@ reporting" by calling <a class="el" href="group__can__general.html#gaeaa24db97af
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Don't allow sharing of this CANlib channel between applications.</p>
-<p>Two or more applications can share the same CAN channel. You can, for example, have one application send messages on the bus and another application that just monitors the bus. If this is not desired (for performance or other reasons) you can open an exclusive handle to a channel. This means that no other application can open a handle to the same channel. Do this by passing the <a class="el" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a> flag in the flags argument to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>.</p>
+<p>Don't allow sharing of this CANlib channel.</p>
+<p>Two or more threads or applications can share the same CAN channel by opening multiple handles to the same CANlib channel. If this is not desired you can open a single exclusive handle to a channel which is done by passing the <a class="el" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a> flag in the flags argument to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>. If a handle to the CANlib channel is already open, the call to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> will fail.</p>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> </p>
 
 </div>
@@ -4900,8 +4941,8 @@ reporting" by calling <a class="el" href="group__can__general.html#gaeaa24db97af
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Don't allow sharing of this CANlib channel between applications.</p>
-<p>Two or more applications can share the same CAN channel. You can, for example, have one application send messages on the bus and another application that just monitors the bus. If this is not desired (for performance or other reasons) you can open an exclusive handle to a channel. This means that no other application can open a handle to the same channel. Do this by passing the <a class="el" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a> flag in the flags argument to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>.</p>
+<p>Don't allow sharing of this CANlib channel.</p>
+<p>Two or more threads or applications can share the same CAN channel by opening multiple handles to the same CANlib channel. If this is not desired you can open a single exclusive handle to a channel which is done by passing the <a class="el" href="canlib_8h.html#afacd9e186d273d0dc24956ea0d433822">canOPEN_EXCLUSIVE</a> flag in the flags argument to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a>. If a handle to the CANlib channel is already open, the call to <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> will fail.</p>
 <p>This define is used in <a class="el" href="group___c_a_n.html#gac377d182232fb4ec2fed881c2b9ab300">canOpenChannel()</a> </p>
 
 </div>
@@ -6445,8 +6486,7 @@ On Linux, the default calling convention is used.</dd></dl>
       </table>
 </div><div class="memdoc">
 <dl class="section warning"><dt>Warning</dt><dd>Obsolete! <a class="el" href="group__can__general.html#ga0671078a6184ab2b73287946a49763f2">kvReadTimer()</a> should be used instead. </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="read_timer_test_8c-example.html#a4">readTimerTest.c</a>.</dd>
-</dl>
+
 </div>
 </div>
 <a id="a95f4a1383f8be77e74ff48d8be71aecf"></a>
@@ -6762,7 +6802,7 @@ On Linux, the default calling convention is used.</dd></dl>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_8af83c0dc83a45a35ca6968cdc29a7af.html">tmp</a></li><li class="navelem"><a class="el" href="dir_b077c42d920d220d4fe5af62a68f598c.html">src</a></li><li class="navelem"><a class="el" href="canlib_8h.html">canlib.h</a></li>
-    <li class="footer"> (canlib 5.38) Tue Feb 15 2022</li>
+    <li class="footer"> (canlib 5.39) Sun May 29 2022</li>
   </ul>
 </div>
 </body>

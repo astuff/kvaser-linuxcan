@@ -66,6 +66,8 @@
 -include ../kveyes.mak
 include version.mk
 
+include ../make/gflags.mk
+
 LIBRARY := $(LIBNAME).$(MAJOR).$(MINOR).$(BUILD)
 SONAME  := $(LIBNAME).$(MAJOR)
 
@@ -73,6 +75,8 @@ CFLAGS  += -Wall -Werror -Wextra -DCANLIB_NAME_STRING=\"$(LIBRARY)\" -O2 -fomit-
 	$(XTRA_CFLAGS) -pthread
 CFLAGS  += $(ccflags-y)
 CFLAGS  += -I. -I../include
+
+OBJDIR = $(CURDIR)
 
 # GCC 4.6 and below does not allow initializing of struct with '{ 0 }'
 GCC_VERSION_LTEQ_4_6 := $(shell expr $$(gcc -dumpfullversion -dumpversion \
@@ -141,24 +145,29 @@ examples: canlib
 
 install:
 	$(MAKE) -C examples install
-	rm -f /usr/lib/$(LIBNAME)
-	rm -f /usr/lib/$(SONAME)
-	install  -m 644 $(LIBRARY) /usr/lib/
-	ln -sf $(LIBRARY) /usr/lib/$(LIBNAME)
-	ln -sf $(LIBRARY) /usr/lib/$(SONAME)
-	/sbin/ldconfig
-	install -m 644 ../include/canlib.h /usr/include
-	install -m 644 ../include/canstat.h /usr/include
-	install -m 644 ../include/obsolete.h /usr/include
-	mkdir -p /usr/doc/canlib
-	cp -r ../doc/HTMLhelp /usr/doc/canlib
+	rm -f $(DESTDIR)$(libdir)/$(LIBNAME)
+	rm -f $(DESTDIR)$(libdir)/$(SONAME)
+	rm -f $(DESTDIR)$(libdir)/$(LIBRARY)
+	$(INSTALL_LIB) -D $(OBJDIR)/$(LIBRARY) $(DESTDIR)$(libdir)/$(LIBRARY)
+	ln -sf $(LIBRARY) $(DESTDIR)$(libdir)/$(LIBNAME)
+	ln -sf $(LIBRARY) $(DESTDIR)$(libdir)/$(SONAME)
+	$(LDCONFIG)
+	$(INSTALL_DATA) -D ../include/canlib.h $(DESTDIR)$(includedir)/canlib.h
+	$(INSTALL_DATA) -D ../include/canstat.h $(DESTDIR)$(includedir)/canstat.h
+	$(INSTALL_DATA) -D ../include/obsolete.h $(DESTDIR)$(includedir)/obsolete.h
+	mkdir -p $(DESTDIR)$(prefix)/doc/canlib
+	cp -r ../doc/HTMLhelp $(DESTDIR)$(prefix)/doc/canlib
 
 uninstall:
 	$(MAKE) -C examples uninstall
-	rm -f /usr/lib/$(LIBNAME) /usr/lib/$(SONAME) /usr/lib/$(LIBRARY)
-	/sbin/ldconfig
-	rm -f /usr/include/canlib.h /usr/include/canstat.h /usr/include/obsolete.h /usr/include/bus_params_tq.h
-	rm -rf /usr/doc/canlib
+	rm -f $(DESTDIR)$(libdir)/$(LIBNAME)   \
+	      $(DESTDIR)$(libdir)/$(SONAME)    \
+	      $(DESTDIR)$(libdir)/$(LIBRARY)   \
+	      $(DESTDIR)$(includedir)/canlib.h \
+	      $(DESTDIR)$(includedir)/canstat.h \
+	      $(DESTDIR)$(includedir)/obsolete.h
+	$(LDCONFIG)
+	rm -rf $(DESTDIR)$(prefix)/doc/canlib
 
 clean:
 	rm -f $(OBJS) $(LIBRARY) $(DEPS) $(LIBNAME) $(LIBRARY) $(SONAME) $(TARBALL) $(CHECKLOG_FILE) *~
@@ -166,9 +175,10 @@ clean:
 
 check:
 	@echo --------------------------------------------------------------------
-	cppcheck -I ../include/ -I ../../tmp  -I /usr/include -I /usr/include/linux --enable=all --suppress=toomanyconfigs . > $(CHECKLOG_FILE) 2>&1
+	cppcheck -I ../include/ -I /usr/include -I /usr/include/linux --enable=all --suppress=toomanyconfigs . > $(CHECKLOG_FILE) 2>&1
 	@cat $(CHECKLOG_FILE)
 	@echo --------------------------------------------------------------------
 
 depend: $(DEPS)
 
+include ../make/pkgconfig.mk

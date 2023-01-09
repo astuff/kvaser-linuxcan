@@ -74,8 +74,10 @@
 
 #define DEVICE_NAME_STRING   "kvvirtualcan"
 
-#define NR_CHANNELS          2
-#define MAX_CHANNELS         NR_CHANNELS
+#ifndef KV_VIRT_CHANNELS
+#define KV_VIRT_CHANNELS     2
+#endif
+#define MAX_CHANNELS         KV_VIRT_CHANNELS
 
 #define NR_VIRTUAL_DEV       1
 #define VIRTUAL_MAX_DEV      NR_VIRTUAL_DEV

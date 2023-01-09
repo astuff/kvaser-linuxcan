@@ -203,7 +203,7 @@ static unsigned long getTime(VCanCardData *vCard)
 static int virtualProcRead (struct seq_file* m, void* v)
 {
     seq_printf(m, "\ntotal channels %d\n",
-                   NR_CHANNELS * NR_VIRTUAL_DEV);
+                   KV_VIRT_CHANNELS * NR_VIRTUAL_DEV);
 
     return 0;
 }
@@ -227,7 +227,7 @@ static int virtualProbe (VCanCardData *vCd)
     int i;
     static int serial_low = 0;
 
-    vCd->nrChannels = NR_CHANNELS;
+    vCd->nrChannels = KV_VIRT_CHANNELS;
     DEBUGPRINT(1, "Kvaser virtual with %d channels found\n", vCd->nrChannels);
 
     // As a workaround to show which virtual channels that are connected to
@@ -258,7 +258,7 @@ static int virtualProbe (VCanCardData *vCd)
                           VCAN_CHANNEL_CAP_CANFD,
                           0xFFFFFFFF,
                           0xFFFFFFFF,
-                          NR_CHANNELS);
+                          KV_VIRT_CHANNELS);
 
     vCd->hw_type      = HWTYPE_VIRTUAL;
 
